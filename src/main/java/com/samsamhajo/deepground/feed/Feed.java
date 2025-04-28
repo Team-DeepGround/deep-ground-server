@@ -20,7 +20,7 @@ public class Feed extends BaseEntity {
     public String content;
 
 //   TODO: Member Entity 등록 시 추가
-//    @ManyToOne
+//    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "member_id")
 //    public Member member;
 

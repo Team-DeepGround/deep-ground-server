@@ -24,7 +24,7 @@ public class FeedReplyMedia extends BaseEntity {
     @Column
     public String extension;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
     public FeedReply feed;
 }

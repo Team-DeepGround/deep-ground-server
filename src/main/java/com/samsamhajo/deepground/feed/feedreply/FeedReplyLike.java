@@ -19,12 +19,12 @@ public class FeedReplyLike extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
     public FeedReply feedReply;
 
 //   TODO: Member Entity 등록 시 추가
-//    @ManyToOne
+//    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "member_id")
 //    public Member member;
 

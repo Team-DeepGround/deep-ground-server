@@ -20,12 +20,12 @@ public class FeedComment extends BaseEntity {
     @Column(length = 4096)
     public String content;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="feed_id")
     public Feed feed;
 
 //   TODO: Member Entity 등록 시 추가
-//    @ManyToOne
+//    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "member_id")
 //    public Member member;
 
