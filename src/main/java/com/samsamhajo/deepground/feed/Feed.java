@@ -1,4 +1,4 @@
-package com.samsamhajo.deepground.global.feed;
+package com.samsamhajo.deepground.feed;
 
 
 import com.samsamhajo.deepground.global.BaseEntity;
