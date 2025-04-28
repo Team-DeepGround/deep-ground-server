@@ -1,6 +1,7 @@
-package com.samsamhajo.deepground.feed;
+package com.samsamhajo.deepground.feed.feedcomment;
 
 
+import com.samsamhajo.deepground.feed.Feed;
 import com.samsamhajo.deepground.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
