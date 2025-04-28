@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.feed.feedreply;
 
 
 import com.samsamhajo.deepground.feed.feedreply.FeedReply;
+import com.samsamhajo.deepground.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class FeedReplyLike {
+public class FeedReplyLike extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
