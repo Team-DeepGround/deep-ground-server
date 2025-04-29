@@ -14,7 +14,7 @@ public class TechStack extends BaseEntity {
     @Column(name = "tech_stack_id", nullable = false)
     private Long id;
 
-    @Column(name = "tech_stack_name")
+    @Column(name = "tech_stack_name", nullable = false)
     private String name;
 
     @Column(name = "tech_stack_category")

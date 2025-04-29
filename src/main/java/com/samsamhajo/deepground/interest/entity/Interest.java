@@ -14,7 +14,7 @@ public class Interest extends BaseEntity {
     @Column(name = "interest_id", nullable = false)
     private Long id;
 
-    @Column(name = "interest_name")
+    @Column(name = "interest_name", nullable = false)
     private String name;
 
     @Column(name = "interest_category")
