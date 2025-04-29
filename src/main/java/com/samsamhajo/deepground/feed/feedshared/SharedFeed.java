@@ -15,6 +15,7 @@ public class SharedFeed extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "shared_feed_id")
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)

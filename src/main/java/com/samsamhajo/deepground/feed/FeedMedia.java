@@ -16,15 +16,16 @@ public class FeedMedia extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    @Column(name = "feed_media_id")
+    private Long id;
 
     @Column(length = 1024)
-    public String media_url;
+    private String media_url;
 
     @Column
-    public String extension;
+    private String extension;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
-    public Feed feed;
+    private Feed feed;
 }

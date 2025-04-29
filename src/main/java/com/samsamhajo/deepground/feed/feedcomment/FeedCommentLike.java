@@ -17,11 +17,12 @@ public class FeedCommentLike extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    @Column(name = "feed_comment_like_id")
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
-    public FeedComment feedComment;
+    private FeedComment feedComment;
 
 //   TODO: Member Entity 등록 시 추가
 //    @ManyToOne(fetch = FetchType.LAZY)

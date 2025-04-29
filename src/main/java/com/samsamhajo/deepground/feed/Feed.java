@@ -4,20 +4,23 @@ package com.samsamhajo.deepground.feed;
 import com.samsamhajo.deepground.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 public class Feed extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    @Column(name = "feed_id")
+    private Long id;
 
     @Column(length = 4096)
-    public String content;
+    private String content;
 
 //   TODO: Member Entity 등록 시 추가
 //    @ManyToOne(fetch = FetchType.LAZY)

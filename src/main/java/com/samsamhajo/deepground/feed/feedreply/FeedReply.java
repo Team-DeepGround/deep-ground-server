@@ -15,14 +15,15 @@ public class FeedReply extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+    @Column(name = "feed_reply_id")
+    private Long id;
 
     @Column(length = 4096)
-    public String content;
+    private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="feed_id")
-    public FeedComment feed;
+    private FeedComment feed;
 
 //   TODO: Member Entity 등록 시 추가
 //    @ManyToOne(fetch = FetchType.LAZY)
