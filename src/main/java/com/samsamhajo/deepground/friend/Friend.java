@@ -10,7 +10,7 @@ import lombok.Getter;
 public class Friend extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = IDENTITY)
     @Column(name ="friend_id")
     private Long id;
 
