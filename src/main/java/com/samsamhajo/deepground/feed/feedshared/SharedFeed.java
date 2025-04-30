@@ -2,15 +2,12 @@ package com.samsamhajo.deepground.feed.feedshared;
 
 import com.samsamhajo.deepground.feed.Feed;
 import com.samsamhajo.deepground.global.BaseEntity;
-
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
-@Table
+@Table(name = "shared_feeds")
 @Getter
-@NoArgsConstructor
 public class SharedFeed extends BaseEntity {
 
     @Id
@@ -30,4 +27,18 @@ public class SharedFeed extends BaseEntity {
     //    @ManyToOne(fetch = FetchType.LAZY)
     //    @JoinColumn(name = "member_id")
     //    private Member member;
+
+
+    protected SharedFeed() {
+    }
+
+    private SharedFeed(Feed feed, Feed originFeed) {
+        this.feed = feed;
+        this.originFeed = originFeed;
+        // TODO: this.member = member;
+    }
+
+    public static SharedFeed of(Feed feed, Feed originFeed){
+        return new SharedFeed(feed,originFeed);
+    }
 }
