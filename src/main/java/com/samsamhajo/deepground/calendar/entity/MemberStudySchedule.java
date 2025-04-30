@@ -2,12 +2,14 @@ package com.samsamhajo.deepground.calendar.entity;
 
 import com.samsamhajo.deepground.global.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "member_study_schedules")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberStudySchedule extends BaseEntity {
 
     @Id
@@ -26,11 +28,11 @@ public class MemberStudySchedule extends BaseEntity {
     @Column(name = "memo")
     private String memo;
 
-    @Column(name = "is_available", nullable = false)
+    @Column(name = "is_available")
     private Boolean isAvailable;
 
-    @Column(name = "is_important")
-    private Boolean isImportant;
+    @Column(name = "is_important", nullable = false)
+    private Boolean isImportant = false;
 
 
 }
