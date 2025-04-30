@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.chat.entity;
 
+import com.samsamhajo.deepground.global.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Entity
-public class ChatRoomMember {
+public class ChatRoomMember extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
