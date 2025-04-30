@@ -1,4 +1,4 @@
-package com.samsamhajo.deepground.modules.friend;
+package com.samsamhajo.deepground.friend;
 
 public enum FriendStatus {
 
