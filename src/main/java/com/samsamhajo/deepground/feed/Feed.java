@@ -3,14 +3,10 @@ package com.samsamhajo.deepground.feed;
 
 import com.samsamhajo.deepground.global.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
-@Table
-@AllArgsConstructor
-@NoArgsConstructor
+@Table(name = "feeds")
 @Getter
 public class Feed extends BaseEntity {
 
@@ -19,7 +15,7 @@ public class Feed extends BaseEntity {
     @Column(name = "feed_id")
     private Long id;
 
-    @Column(length = 4096)
+    @Column(length = 4096, nullable = false)
     private String content;
 
 //   TODO: Member Entity 등록 시 추가
@@ -27,4 +23,14 @@ public class Feed extends BaseEntity {
 //    @JoinColumn(name = "member_id")
 //    public Member member;
 
+    protected Feed() {}
+
+    private Feed(String content) {
+        this.content = content;
+        // TODO: this.member = member;
+    }
+
+    public static Feed of(String content) {
+        return new Feed(content);
+    }
 }

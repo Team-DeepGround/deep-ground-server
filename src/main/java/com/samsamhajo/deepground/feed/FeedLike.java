@@ -3,14 +3,10 @@ package com.samsamhajo.deepground.feed;
 
 import com.samsamhajo.deepground.global.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
-@Table
-@AllArgsConstructor
-@NoArgsConstructor
+@Table(name = "feed_likes")
 @Getter
 public class FeedLike extends BaseEntity {
 
@@ -28,4 +24,14 @@ public class FeedLike extends BaseEntity {
 //    @JoinColumn(name = "member_id")
 //    public Member member;
 
+    protected FeedLike() {}
+
+    private FeedLike(Feed feed) {
+        this.feed = feed;
+        // TODO: this.member = member;
+    }
+
+    public static FeedLike of(Feed feed){
+        return new FeedLike(feed);
+    }
 }
