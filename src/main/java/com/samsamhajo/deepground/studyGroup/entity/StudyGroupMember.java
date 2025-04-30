@@ -22,6 +22,6 @@ public class StudyGroupMember extends BaseEntity {
     @Column(name = "study_group_id", nullable = false)
     private Long studyGroupId;
 
-    @Column(name = "is_allowed")
+    @Column(name = "is_allowed", nullable = false)
     private Boolean isAllowed = false;
 }
