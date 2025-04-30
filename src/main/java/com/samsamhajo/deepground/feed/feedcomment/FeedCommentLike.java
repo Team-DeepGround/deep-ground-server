@@ -1,17 +1,12 @@
 package com.samsamhajo.deepground.feed.feedcomment;
 
 
-import com.samsamhajo.deepground.feed.feedcomment.FeedComment;
 import com.samsamhajo.deepground.global.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
-@Table
-@AllArgsConstructor
-@NoArgsConstructor
+@Table(name = "feed_comment_likes")
 @Getter
 public class FeedCommentLike extends BaseEntity {
 
@@ -29,4 +24,15 @@ public class FeedCommentLike extends BaseEntity {
 //    @JoinColumn(name = "member_id")
 //    public Member member;
 
+
+    protected FeedCommentLike() {}
+
+    private FeedCommentLike(FeedComment feedComment) {
+        this.feedComment = feedComment;
+        // TODO: this.member = member;
+    }
+
+    public static FeedCommentLike of(FeedComment feedComment){
+        return new FeedCommentLike(feedComment);
+    }
 }
