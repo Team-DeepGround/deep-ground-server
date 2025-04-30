@@ -2,14 +2,16 @@ package com.samsamhajo.deepground.calendar.entity;
 
 import com.samsamhajo.deepground.global.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "study_schedules")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StudySchedule extends BaseEntity {
 
     @Id
