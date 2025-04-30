@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "study_groups")
 public class StudyGroup extends BaseEntity {
 
     @Id
@@ -29,7 +30,7 @@ public class StudyGroup extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "group_status", nullable = false)
-    private GroupStatus groupStatus;
+    private GroupStatus groupStatus = GroupStatus.RECRUITING;
 
     @Column(name = "study_start_date", nullable = false)
     private LocalDate studyStartDate;
