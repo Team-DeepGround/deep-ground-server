@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table (name = "question_Media")
+@Table (name = "question_media")
 public class QuestionMedia extends BaseEntity {
 
     @Id
