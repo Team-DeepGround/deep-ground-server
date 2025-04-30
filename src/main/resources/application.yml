@@ -47,6 +47,13 @@ spring:
         use_sql_comments: true
     open-in-view: false
     show-sql: true
+  data:
+    mongodb:
+      host: ${MONGO_HOST}
+      port: ${MONGO_PORT}
+      database: ${MONGO_DATABASE}
+      username: ${MONGO_USERNAME}
+      password: ${MONGO_PASSWORD}
 
 # CORS 설정
 cors:
