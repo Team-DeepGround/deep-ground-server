@@ -17,9 +17,9 @@ public class QuestionMedia extends BaseEntity {
     @Column(name = "question_media_id", nullable = false)
     private Long id;
 
-    @Column(name="question_content_url")
+    @Column(name="question_content_url", nullable = false)
     private String questionContentUrl;
 
-    @Column(name = "extension")
+    @Column(name = "extension", nullable = false)
     private String extension;
 }
