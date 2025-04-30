@@ -23,7 +23,7 @@ public class FeedCommentMedia extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
-    public FeedComment feedComment;
+    private FeedComment feedComment;
 
 
     protected FeedCommentMedia() {
