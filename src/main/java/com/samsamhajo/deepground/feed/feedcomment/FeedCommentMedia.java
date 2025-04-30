@@ -21,7 +21,7 @@ public class FeedCommentMedia extends BaseEntity {
     private Long id;
 
     @Column(length = 1024)
-    private String media_url;
+    private String mediaUrl;
 
     @Column
     private String extension;
