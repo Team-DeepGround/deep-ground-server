@@ -6,18 +6,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table
+@Table(name = "answer_media")
 @NoArgsConstructor
 @Getter
 public class AnswerMedia extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "answer_media_id", nullable = false)
     private Long id;
 
-    @Column(nullable = false)
-    private String AnswerCommentUrl;
+    @Column(name = "answer_comment_url",nullable = false)
+    private String answerCommentUrl;
 
-    @Column(nullable = false)
+    @Column(name = "extension",nullable = false)
     private String extension;
 }

@@ -8,13 +8,13 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table
-@AllArgsConstructor
+@Table(name = "answer_likes")
 @NoArgsConstructor
 public class AnswerLike extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "answer_like_id", nullable = false)
     private Long id;
 
     //TODO : Member, Question

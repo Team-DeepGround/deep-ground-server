@@ -6,22 +6,22 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Table
+@Table(name = "answers")
 public class Answer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "answer_id",nullable = false)
     private Long id;
 
-    @Column(name = "answer_content", nullable = false)
+    @Column(name = "answer_content", nullable = false, columnDefinition = "TEXT")
     private String answer_content;
 
-    @Column(nullable = false)
-    private int answer_like_count = 0;
+    @Column(name = "answer_like_count",nullable = false)
+    private int answerLikeCount = 0;
 
-    @Column(nullable = false)
-    private int comment_count = 0;
+    @Column(name = "comment_count",nullable = false)
+    private int commentCount = 0;
 }
