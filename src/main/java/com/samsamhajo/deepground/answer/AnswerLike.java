@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class AnswerLike extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "answer_like_id", nullable = false)
     private Long id;
 
