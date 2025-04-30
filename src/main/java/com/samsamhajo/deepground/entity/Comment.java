@@ -7,12 +7,13 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table
+@Table(name = "comments")
 @NoArgsConstructor
 public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue (strategy = GenerationType.AUTO)
+    @Column(name = "comment_id", nullable = false)
     private Long id;
 
     @Column(name = "comment_content", nullable = false)
