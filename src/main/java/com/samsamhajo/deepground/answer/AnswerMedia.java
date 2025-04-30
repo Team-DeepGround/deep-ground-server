@@ -1,4 +1,4 @@
-package com.samsamhajo.deepground.entity.answer;
+package com.samsamhajo.deepground.answer;
 
 import com.samsamhajo.deepground.global.BaseEntity;
 import jakarta.persistence.*;

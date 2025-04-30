@@ -1,7 +1,6 @@
-package com.samsamhajo.deepground.entity.answer;
+package com.samsamhajo.deepground.answer;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
