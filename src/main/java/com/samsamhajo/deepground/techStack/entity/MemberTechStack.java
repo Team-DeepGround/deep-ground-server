@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-@Table(name = "member_tech_stack")
+@Table(name = "member_tech_stacks")
 public class MemberTechStack {
 
     @Id

@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-@Table(name = "member")
+@Table(name = "members")
 public class Member extends BaseEntity {
 
     @Id
@@ -30,12 +30,12 @@ public class Member extends BaseEntity {
     private String introduction;
 
     @Column(name = "is_verified", nullable = false)
-    private boolean isVerified;
+    private boolean isVerified = false;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "provider", nullable = false)
     private Provider provider;
 
-    @Column(name = "provider_id", nullable = false)
+    @Column(name = "provider_id")
     private String providerId;
 }
