@@ -1,6 +1,8 @@
 package com.samsamhajo.deepground.feed.feedreply;
 
 
+import com.samsamhajo.deepground.feed.feedcomment.FeedComment;
+import com.samsamhajo.deepground.feed.feedcomment.FeedCommentLike;
 import com.samsamhajo.deepground.feed.feedreply.FeedReply;
 import com.samsamhajo.deepground.global.BaseEntity;
 import jakarta.persistence.*;
@@ -9,9 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table
-@AllArgsConstructor
-@NoArgsConstructor
+@Table(name = "feed_reply_likes")
 @Getter
 public class FeedReplyLike extends BaseEntity {
 
@@ -29,4 +29,14 @@ public class FeedReplyLike extends BaseEntity {
 //    @JoinColumn(name = "member_id")
 //    public Member member;
 
+    protected FeedReplyLike() {}
+
+    private FeedReplyLike(FeedReply feedReply) {
+        this.feedReply = feedReply;
+        // TODO: this.member = member;
+    }
+
+    public static FeedReplyLike of(FeedReply feedReply){
+        return new FeedReplyLike(feedReply);
+    }
 }
