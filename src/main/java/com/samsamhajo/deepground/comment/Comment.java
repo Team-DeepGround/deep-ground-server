@@ -1,4 +1,4 @@
-package com.samsamhajo.deepground.entity;
+package com.samsamhajo.deepground.comment;
 
 import com.samsamhajo.deepground.global.BaseEntity;
 import jakarta.persistence.*;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class Comment extends BaseEntity {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.AUTO)
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id", nullable = false)
     private Long id;
 
