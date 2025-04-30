@@ -1,0 +1,25 @@
+package com.samsamhajo.deepground.interest.entity;
+
+import com.samsamhajo.deepground.global.BaseEntity;
+import com.samsamhajo.deepground.member.entity.Member;
+import jakarta.persistence.*;
+import lombok.Getter;
+
+@Entity
+@Getter
+@Table(name = "member_interests")
+public class MemberInterest extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_interest_id", nullable = false)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "interest_id", nullable = false)
+    private Interest interest;
+}
