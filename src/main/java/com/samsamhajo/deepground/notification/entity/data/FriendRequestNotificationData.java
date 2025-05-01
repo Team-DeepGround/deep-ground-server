@@ -4,8 +4,8 @@ import lombok.Getter;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 @Getter
-public abstract class NotificationData {
+public class FriendRequestNotificationData extends NotificationData {
 
-    @Field("id")
-    private Long id;
+    @Field("nickname")
+    private String nickname;
 }
