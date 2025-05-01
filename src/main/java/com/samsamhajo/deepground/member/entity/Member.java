@@ -1,10 +1,15 @@
 package com.samsamhajo.deepground.member.entity;
 
+import com.samsamhajo.deepground.friend.entity.Friend;
 import com.samsamhajo.deepground.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.w3c.dom.stylesheets.LinkStyle;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -41,4 +46,5 @@ public class Member extends BaseEntity {
 
     @Column(name = "provider_id")
     private String providerId;
+
 }
