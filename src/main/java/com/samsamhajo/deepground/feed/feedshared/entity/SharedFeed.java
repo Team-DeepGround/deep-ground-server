@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.feed.feedshared.entity;
 
 import com.samsamhajo.deepground.feed.feed.entity.Feed;
 import com.samsamhajo.deepground.global.BaseEntity;
+import com.samsamhajo.deepground.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -26,18 +27,17 @@ public class SharedFeed extends BaseEntity {
     @JoinColumn(name = "origin_feed_id")
     private Feed originFeed; // 원본 피드
 
-    // TODO: Member Entity 구현 시 작성
-    //    @ManyToOne(fetch = FetchType.LAZY)
-    //    @JoinColumn(name = "member_id")
-    //    private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
-    private SharedFeed(Feed feed, Feed originFeed) {
+    private SharedFeed(Feed feed, Feed originFeed, Member member) {
         this.feed = feed;
         this.originFeed = originFeed;
-        // TODO: this.member = member;
+        this.member = member;
     }
 
-    public static SharedFeed of(Feed feed, Feed originFeed){
-        return new SharedFeed(feed,originFeed);
+    public static SharedFeed of(Feed feed, Feed originFeed, Member member) {
+        return new SharedFeed(feed, originFeed, member);
     }
 }

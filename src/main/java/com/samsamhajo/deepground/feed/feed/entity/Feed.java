@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.feed.feed.entity;
 
 
 import com.samsamhajo.deepground.global.BaseEntity;
+import com.samsamhajo.deepground.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,17 +22,16 @@ public class Feed extends BaseEntity {
     @Column(length = 4096, nullable = false)
     private String content;
 
-//   TODO: Member Entity 등록 시 추가
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "member_id")
-//    public Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    public Member member;
 
-    private Feed(String content) {
+    private Feed(String content, Member member) {
         this.content = content;
-        // TODO: this.member = member;
+        this.member = member;
     }
 
-    public static Feed of(String content) {
-        return new Feed(content);
+    public static Feed of(String content, Member member) {
+        return new Feed(content, member);
     }
 }

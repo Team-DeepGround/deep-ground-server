@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.feed.feedreply.entity;
 
 
 import com.samsamhajo.deepground.global.BaseEntity;
+import com.samsamhajo.deepground.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,18 +23,17 @@ public class FeedReplyLike extends BaseEntity {
     @JoinColumn(name = "feed_id")
     private FeedReply feedReply;
 
-//   TODO: Member Entity 등록 시 추가
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "member_id")
-//    public Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    public Member member;
 
 
-    private FeedReplyLike(FeedReply feedReply) {
+    private FeedReplyLike(FeedReply feedReply, Member member) {
         this.feedReply = feedReply;
-        // TODO: this.member = member;
+        this.member = member;
     }
 
-    public static FeedReplyLike of(FeedReply feedReply){
-        return new FeedReplyLike(feedReply);
+    public static FeedReplyLike of(FeedReply feedReply, Member member) {
+        return new FeedReplyLike(feedReply, member);
     }
 }
