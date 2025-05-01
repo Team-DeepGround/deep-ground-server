@@ -24,7 +24,7 @@ public class Feed extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    public Member member;
+    private Member member;
 
     private Feed(String content, Member member) {
         this.content = content;

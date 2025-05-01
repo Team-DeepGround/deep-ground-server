@@ -29,7 +29,7 @@ public class FeedComment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    public Member member;
+    private Member member;
 
     private FeedComment(String content, Feed feed, Member member) {
         this.content = content;
