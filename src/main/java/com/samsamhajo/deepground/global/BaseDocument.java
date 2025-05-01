@@ -16,11 +16,4 @@ public abstract class BaseDocument {
     @LastModifiedDate
     @Field("modified_at")
     private LocalDateTime modifiedAt;
-
-    @Field("is_deleted")
-    private boolean deleted = false;
-
-    public void softDelete() {
-        this.deleted = true;
-    }
 }
