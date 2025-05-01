@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.calendar.entity;
 
 import com.samsamhajo.deepground.global.BaseEntity;
+import com.samsamhajo.deepground.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,13 +18,13 @@ public class MemberStudySchedule extends BaseEntity {
     @Column(name = "member_study_schedule_id")
     private Long id;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "study_schedule_id")
-//    private StudySchedule studySchedule;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "study_schedule_id")
+    private StudySchedule studySchedule;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "member_id")
-//    private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Column(name = "memo")
     private String memo;
