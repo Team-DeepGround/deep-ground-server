@@ -2,11 +2,14 @@ package com.samsamhajo.deepground.interest.entity;
 
 import com.samsamhajo.deepground.global.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "interests")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Interest extends BaseEntity {
 
     @Id

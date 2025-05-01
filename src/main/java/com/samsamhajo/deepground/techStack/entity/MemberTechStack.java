@@ -2,11 +2,14 @@ package com.samsamhajo.deepground.techStack.entity;
 
 import com.samsamhajo.deepground.member.entity.Member;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "member_tech_stacks")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberTechStack {
 
     @Id

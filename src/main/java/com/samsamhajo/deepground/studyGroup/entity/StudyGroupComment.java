@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "study_group_comments")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StudyGroupComment extends BaseEntity {
 
     @Id

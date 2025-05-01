@@ -10,8 +10,8 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "study_groups")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StudyGroup extends BaseEntity {
 
     @Id
