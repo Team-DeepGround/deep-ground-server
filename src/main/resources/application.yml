@@ -54,6 +54,7 @@ spring:
       database: ${MONGO_DATABASE}
       username: ${MONGO_USERNAME}
       password: ${MONGO_PASSWORD}
+      auto-index-creation: true
 
 # CORS 설정
 cors:
