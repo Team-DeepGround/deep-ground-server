@@ -1,7 +1,11 @@
 package com.samsamhajo.deepground.studyGroup.entity;
 
+import com.samsamhajo.deepground.chat.entity.ChatRoom;
 import com.samsamhajo.deepground.global.BaseEntity;
+import com.samsamhajo.deepground.member.entity.Member;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,13 +23,10 @@ public class StudyGroup extends BaseEntity {
     @Column(name = "study_group_id")
     private Long id;
 
-    @Column(name = "chat_room_id", nullable = false)
-    private Long chatRoomId;
-
-    @Column(name = "title", nullable = false)
+    @Column(nullable = false)
     private String title;
 
-    @Column(name = "explanation", nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String explanation;
 
     @Enumerated(EnumType.STRING)
@@ -47,12 +48,54 @@ public class StudyGroup extends BaseEntity {
     @Column(name = "group_member_count", nullable = false)
     private Integer groupMemberCount;
 
-    @Column(name = "founder_id", nullable = false)
-    private Long founderId;
-
     @Column(name = "is_offline", nullable = false)
     private Boolean isOffline;
 
     @Column(name = "study_location")
     private String studyLocation;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private Member member;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private ChatRoom chatRoom;
+
+    @OneToMany(mappedBy = "studyGroup")
+    private final List<StudyGroupMember> members = new ArrayList<>();
+
+    @OneToMany(mappedBy = "studyGroup")
+    private final List<StudyGroupComment> comments = new ArrayList<>();
+
+    private StudyGroup(
+        ChatRoom chatRoom, String title, String explanation,
+        LocalDate studyStartDate, LocalDate studyEndDate,
+        LocalDate recruitStartDate, LocalDate recruitEndDate,
+        Integer groupMemberCount, Member member, Boolean isOffline, String studyLocation
+    ) {
+        this.chatRoom = chatRoom;
+        this.title = title;
+        this.explanation = explanation;
+        this.studyStartDate = studyStartDate;
+        this.studyEndDate = studyEndDate;
+        this.recruitStartDate = recruitStartDate;
+        this.recruitEndDate = recruitEndDate;
+        this.groupMemberCount = groupMemberCount;
+        this.member = member;
+        this.isOffline = isOffline;
+        this.studyLocation = studyLocation;
+    }
+
+  public static StudyGroup of(
+        ChatRoom chatRoom, String title, String explanation,
+        LocalDate studyStartDate, LocalDate studyEndDate,
+        LocalDate recruitStartDate, LocalDate recruitEndDate,
+        Integer groupMemberCount, Member member, Boolean isOffline, String studyLocation
+    ) {
+        return new StudyGroup(
+            chatRoom, title, explanation,
+            studyStartDate, studyEndDate,
+            recruitStartDate, recruitEndDate,
+            groupMemberCount, member, isOffline, studyLocation
+        );
+    }
 }
