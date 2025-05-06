@@ -21,6 +21,7 @@ public class StudyGroupMember extends BaseEntity {
     private Long id;
 
     @OneToMany(mappedBy = "studyGroupMember")
+    @JoinColumn(name = "member_id", nullable = false)
     private final List<Member> studyMember = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
