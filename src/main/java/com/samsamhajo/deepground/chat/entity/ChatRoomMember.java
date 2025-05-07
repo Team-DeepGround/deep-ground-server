@@ -37,4 +37,14 @@ public class ChatRoomMember extends BaseEntity {
 
     @Column(name = "last_read_message_time")
     private LocalDateTime lastReadMessageTime;
+
+    private ChatRoomMember(Member member, ChatRoom chatRoom) {
+        this.member = member;
+        this.chatRoom = chatRoom;
+        this.lastReadMessageTime = null;
+    }
+
+    public static ChatRoomMember of(Member member, ChatRoom chatRoom) {
+        return new ChatRoomMember(member, chatRoom);
+    }
 }
