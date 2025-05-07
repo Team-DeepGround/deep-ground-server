@@ -22,18 +22,18 @@ public class Notification extends BaseDocument {
 
     @DBRef
     @Field("notification_message_id")
-    private NotificationMessage notificationMessage;
+    private NotificationMessage message;
 
     @Field("is_read")
     private boolean read = false;
 
-    private Notification(Long receiverId, NotificationMessage notificationMessage) {
+    private Notification(Long receiverId, NotificationMessage message) {
         this.receiverId = receiverId;
-        this.notificationMessage = notificationMessage;
+        this.message = message;
     }
 
-    public static Notification of(Long receiverId, NotificationMessage notificationMessage) {
-        return new Notification(receiverId, notificationMessage);
+    public static Notification of(Long receiverId, NotificationMessage message) {
+        return new Notification(receiverId, message);
     }
 
     public void read() {
