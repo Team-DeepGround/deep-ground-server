@@ -52,6 +52,24 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "members")
     private List<MemberTechStack> memberTechStacks = new ArrayList<>();
+
+    //기본 생성자
+    public Member(String email, String password, String nickname) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+        this.provider = Provider.LOCAL;
+        this.isVerified = false;
+    }
+
+    //소셜 로그인 용 생성자
+    public Member(String email, Provider provider, String providerId, String nickname) {
+        this.email = email;
+        this.nickname = nickname;
+        this.provider = provider;
+        this.providerId = providerId;
+        this.isVerified = true;
+    }
 }
 
 
