@@ -27,4 +27,12 @@ public class ChatRoom extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "chat_room_type", nullable = false)
     private ChatRoomType chatRoomType;
+
+    private ChatRoom(ChatRoomType chatRoomType) {
+        this.chatRoomType = chatRoomType;
+    }
+
+    public static ChatRoom of(ChatRoomType chatRoomType) {
+        return new ChatRoom(chatRoomType);
+    }
 }
