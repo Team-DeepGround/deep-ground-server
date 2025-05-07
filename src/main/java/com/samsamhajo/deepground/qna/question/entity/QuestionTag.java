@@ -1,36 +1,33 @@
 package com.samsamhajo.deepground.qna.question.entity;
 
 import com.samsamhajo.deepground.global.BaseEntity;
+import com.samsamhajo.deepground.techStack.entity.TechStack;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
 @Entity
 @Getter
-@Table (name = "question_media")
+@Table(name = "question_tags")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class QuestionMedia extends BaseEntity {
+public class QuestionTag extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "question_media_id", nullable = false)
+    @Column(name = "question_tag_id", nullable = false)
     private Long id;
-
-    @Column(name="question_content_url", nullable = false)
-    private String questionContentUrl;
-
-    @Column(name = "extension", nullable = false)
-    private String extension;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")
     private Question question;
 
-    public QuestionMedia(String QuestionConentUrl, String extension, Question question) {
-        this.questionContentUrl = QuestionConentUrl;
-        this.extension = extension;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "teck_stack_id")
+    private TechStack techStack;
+
+    public QuestionTag(Question question, TechStack techStack) {
         this.question = question;
+        this.techStack = techStack;
     }
 }

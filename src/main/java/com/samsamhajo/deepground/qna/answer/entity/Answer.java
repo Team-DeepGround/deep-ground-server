@@ -1,9 +1,15 @@
 package com.samsamhajo.deepground.qna.answer.entity;
 
+import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.qna.comment.entity.Comment;
+import com.samsamhajo.deepground.qna.question.entity.Question;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -24,4 +30,20 @@ public class Answer {
 
     @Column(name = "comment_count",nullable = false)
     private int commentCount = 0;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "question_id")
+    private Question question;
+
+    public Answer(String answerContent, Member member, Question question) {
+        this.answerContent = answerContent;
+        this.member = member;
+        this.question = question;
+    }
+
+
 }

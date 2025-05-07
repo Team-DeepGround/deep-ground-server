@@ -1,6 +1,8 @@
 package com.samsamhajo.deepground.qna.comment.entity;
 
 import com.samsamhajo.deepground.global.BaseEntity;
+import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.qna.answer.entity.Answer;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -19,4 +21,18 @@ public class Comment extends BaseEntity {
 
     @Column(name = "comment_content", nullable = false)
     private String commentContent;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "memebr_id")
+    private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "answer_id")
+    private Answer answer;
+
+    public Comment(String commentContent, Member member, Answer answer) {
+        this.commentContent = commentContent;
+        this.member = member;
+        this.answer = answer;
+    }
 }

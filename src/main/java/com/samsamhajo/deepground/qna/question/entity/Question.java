@@ -1,10 +1,15 @@
 package com.samsamhajo.deepground.qna.question.entity;
 
 import com.samsamhajo.deepground.global.BaseEntity;
+import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.qna.answer.entity.Answer;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "questions")
@@ -32,6 +37,22 @@ public class Question extends BaseEntity {
     @Column(name = "view_count",nullable = false)
     private int viewCount = 0;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
+    public Question(String title, String content, Member member) {
+        this.title = title;
+        this.content = content;
+        this.member = member;
+    }
+
+    public void questionActive() {
+        this.questionStatus = true;
+    }
+
+    public void questionDeactive() {
+        this.questionStatus = false;
+    }
 
 }
