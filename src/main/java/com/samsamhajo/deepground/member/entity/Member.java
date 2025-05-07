@@ -1,10 +1,15 @@
 package com.samsamhajo.deepground.member.entity;
 
 import com.samsamhajo.deepground.global.BaseEntity;
+import com.samsamhajo.deepground.interest.entity.MemberInterest;
+import com.samsamhajo.deepground.techStack.entity.MemberTechStack;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -41,4 +46,16 @@ public class Member extends BaseEntity {
 
     @Column(name = "provider_id")
     private String providerId;
+
+    @OneToMany(mappedBy = "members")
+    private List<MemberInterest> memberInterests = new ArrayList<>();
+
+    @OneToMany(mappedBy = "members")
+    private List<MemberTechStack> memberTechStacks = new ArrayList<>();
 }
+
+
+
+
+
+
