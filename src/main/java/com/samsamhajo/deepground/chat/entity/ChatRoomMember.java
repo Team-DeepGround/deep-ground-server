@@ -47,4 +47,8 @@ public class ChatRoomMember extends BaseEntity {
     public static ChatRoomMember of(Member member, ChatRoom chatRoom) {
         return new ChatRoomMember(member, chatRoom);
     }
+
+    public void updateLastReadMessageTime(LocalDateTime lastReadMessageTime) {
+        this.lastReadMessageTime = lastReadMessageTime;
+    }
 }
