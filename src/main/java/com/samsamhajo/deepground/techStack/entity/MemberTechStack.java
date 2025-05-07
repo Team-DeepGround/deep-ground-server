@@ -24,4 +24,9 @@ public class MemberTechStack {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tech_stack_id", nullable = false)
     private TechStack techStack;
+
+    public MemberTechStack(Member member, TechStack techStack) {
+        this.member = member;
+        this.techStack = techStack;
+    }
 }
