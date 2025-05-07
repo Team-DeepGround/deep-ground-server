@@ -47,10 +47,10 @@ public class Member extends BaseEntity {
     @Column(name = "provider_id")
     private String providerId;
 
-    @OneToMany(mappedBy = "members")
+    @OneToMany(mappedBy = "member")
     private List<MemberInterest> memberInterests = new ArrayList<>();
 
-    @OneToMany(mappedBy = "members")
+    @OneToMany(mappedBy = "member")
     private List<MemberTechStack> memberTechStacks = new ArrayList<>();
 
     //기본 생성자
