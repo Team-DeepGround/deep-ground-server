@@ -11,4 +11,14 @@ public class ChatMessageNotificationData extends NotificationData {
 
     @Field("sender")
     private String sender;
+
+    private ChatMessageNotificationData(Long id, Long senderId, String sender) {
+        super(id);
+        this.senderId = senderId;
+        this.sender = sender;
+    }
+
+    public static ChatMessageNotificationData of(Long id, Long senderId, String sender) {
+        return new ChatMessageNotificationData(id, senderId, sender);
+    }
 }
