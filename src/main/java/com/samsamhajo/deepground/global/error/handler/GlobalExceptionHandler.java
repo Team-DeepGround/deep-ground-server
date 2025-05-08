@@ -5,11 +5,8 @@ import com.samsamhajo.deepground.global.error.core.ErrorCode;
 import com.samsamhajo.deepground.global.error.core.ErrorResponse;
 import com.samsamhajo.deepground.global.utils.GlobalLogger;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
-import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
