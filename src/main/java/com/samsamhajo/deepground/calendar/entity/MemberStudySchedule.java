@@ -35,5 +35,17 @@ public class MemberStudySchedule extends BaseEntity {
     @Column(name = "is_important", nullable = false)
     private Boolean isImportant = false;
 
+    private MemberStudySchedule(StudySchedule studySchedule, Member member, String memo, Boolean isAvailable, Boolean isImportant) {
+        this.studySchedule = studySchedule;
+        this.member = member;
+        this.memo = memo;
+        this.isAvailable = isAvailable;
+        this.isImportant = isImportant;
+    }
+
+    public static MemberStudySchedule of(StudySchedule studySchedule, Member member, String memo, Boolean isAvailable, Boolean isImportant) {
+        return new MemberStudySchedule(studySchedule, member, memo, isAvailable, isImportant);
+    }
+
 
 }
