@@ -39,6 +39,9 @@ public class Answer {
     @JoinColumn(name = "question_id")
     private Question question;
 
+    @OneToMany(mappedBy = "answer")
+    private List<Comment> comments = new ArrayList<>();
+
     private Answer(String answerContent, Member member, Question question) {
         this.answerContent = answerContent;
         this.member = member;

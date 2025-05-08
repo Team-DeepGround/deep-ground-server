@@ -41,6 +41,12 @@ public class Question extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @OneToMany(mappedBy = "question")
+    private List<Answer> answers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "question")
+    private List<QuestionTag> questionTags = new ArrayList<>();
+
     private Question(String title, String content, Member member) {
         this.title = title;
         this.content = content;
