@@ -30,9 +30,13 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "answer_id")
     private Answer answer;
 
-    public Comment(String commentContent, Member member, Answer answer) {
+    private Comment(String commentContent, Member member, Answer answer) {
         this.commentContent = commentContent;
         this.member = member;
         this.answer = answer;
+    }
+
+    public static Comment of(String commentContent, Member member, Answer answer) {
+        return new Comment(commentContent, member, answer);
     }
 }

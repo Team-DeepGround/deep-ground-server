@@ -41,10 +41,14 @@ public class Question extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    public Question(String title, String content, Member member) {
+    private Question(String title, String content, Member member) {
         this.title = title;
         this.content = content;
         this.member = member;
+    }
+
+    public static Question of(String title, String content, Member member) {
+        return new Question(title, content, member);
     }
 
     public void questionActive() {

@@ -26,13 +26,12 @@ public class AnswerLike extends BaseEntity {
     @JoinColumn(name = "answer_id")
     private Answer answer;
 
-    public AnswerLike(Member member, Answer answer) {
+    private AnswerLike(Member member, Answer answer) {
         this.member = member;
         this.answer = answer;
     }
 
-
-
-    //TODO : Member, Question
-
+    public static AnswerLike of(Member member, Answer answer) {
+        return new AnswerLike(member, answer);
+    }
 }

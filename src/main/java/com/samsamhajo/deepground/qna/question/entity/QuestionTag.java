@@ -26,8 +26,12 @@ public class QuestionTag extends BaseEntity {
     @JoinColumn(name = "teck_stack_id")
     private TechStack techStack;
 
-    public QuestionTag(Question question, TechStack techStack) {
+    private QuestionTag(Question question, TechStack techStack) {
         this.question = question;
         this.techStack = techStack;
     }
+    public static QuestionTag of(Question question, TechStack techStack) {
+        return new QuestionTag(question, techStack);
+    }
+
 }

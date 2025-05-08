@@ -39,11 +39,13 @@ public class Answer {
     @JoinColumn(name = "question_id")
     private Question question;
 
-    public Answer(String answerContent, Member member, Question question) {
+    private Answer(String answerContent, Member member, Question question) {
         this.answerContent = answerContent;
         this.member = member;
         this.question = question;
     }
 
-
+    public static Answer of(String answerContent, Member member, Question question) {
+        return new Answer(answerContent, member, question);
+    }
 }

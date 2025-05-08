@@ -28,9 +28,13 @@ public class QuestionMedia extends BaseEntity {
     @JoinColumn(name = "question_id")
     private Question question;
 
-    public QuestionMedia(String QuestionConentUrl, String extension, Question question) {
-        this.questionContentUrl = QuestionConentUrl;
+    private QuestionMedia(String QuestionContentUrl, String extension, Question question) {
+        this.questionContentUrl = QuestionContentUrl;
         this.extension = extension;
         this.question = question;
     }
+    public static QuestionMedia of(String QuestionContentUrl, String extension, Question question) {
+        return new QuestionMedia(QuestionContentUrl, extension, question);
+    }
+
 }
