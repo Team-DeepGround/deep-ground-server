@@ -17,4 +17,15 @@ public class ChatMessageMedia {
 
     @Field("extension")
     private String extension;
+
+    private ChatMessageMedia(String mediaUrl, String fileName, Long fileSize, String extension) {
+        this.mediaUrl = mediaUrl;
+        this.fileName = fileName;
+        this.fileSize = fileSize;
+        this.extension = extension;
+    }
+
+    public static ChatMessageMedia of(String mediaUrl, String fileName, Long fileSize, String extension) {
+        return new ChatMessageMedia(mediaUrl, fileName, fileSize, extension);
+    }
 }
