@@ -32,11 +32,15 @@ public class Friend extends BaseEntity {
     @Column(name="friend_status", nullable = false)
     private FriendStatus status; //REQUEST,CANCEL,ACCEPT,REFUSAL
 
-    /* 친구 요청 생성자 */
-    public Friend(Member requestMember, Member receiveMember) {
+    private Friend(Member requestMember, Member receiveMember, FriendStatus status) {
         this.requestMember = requestMember;
         this.receiveMember = receiveMember;
-        this.status = FriendStatus.REQUEST;
+        this.status = status;
+    }
+
+
+    public static Friend request (Member requestMember, Member receiveMember) {
+      return new Friend (requestMember, receiveMember, FriendStatus.REQUEST);
     }
 
     public void cancel() {
