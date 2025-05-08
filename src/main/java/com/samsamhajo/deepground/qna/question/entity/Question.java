@@ -28,8 +28,8 @@ public class Question extends BaseEntity {
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "question_status",nullable = false)
-    private boolean questionStatus = false;
+    @Column(name = "is_question_status",nullable = false)
+    private boolean isQuestionStatus = false;
 
     @Column(name ="answer_count",nullable = false)//DB에 null값이 들어가면 +1 연산할 때 문제가 발생하거나 예외 발생할 수 있어 nullable = false;
     private int answerCount = 0;
@@ -48,11 +48,11 @@ public class Question extends BaseEntity {
     }
 
     public void questionActive() {
-        this.questionStatus = true;
+        this.isQuestionStatus = true;
     }
 
     public void questionDeactive() {
-        this.questionStatus = false;
+        this.isQuestionStatus = false;
     }
 
 }
