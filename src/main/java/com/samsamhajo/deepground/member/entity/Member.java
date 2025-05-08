@@ -53,7 +53,7 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
     private List<MemberTechStack> memberTechStacks = new ArrayList<>();
 
-    public Member(String email, String password, String nickname, Provider provider, String providerId) {
+    private Member(String email, String password, String nickname, Provider provider, String providerId) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;

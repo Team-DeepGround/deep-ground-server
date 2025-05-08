@@ -25,8 +25,12 @@ public class MemberTechStack {
     @JoinColumn(name = "tech_stack_id", nullable = false)
     private TechStack techStack;
 
-    public MemberTechStack(Member member, TechStack techStack) {
+    private MemberTechStack(Member member, TechStack techStack) {
         this.member = member;
         this.techStack = techStack;
+    }
+
+    public static MemberTechStack of(Member member, TechStack techStack) {
+        return new MemberTechStack(member, techStack);
     }
 }

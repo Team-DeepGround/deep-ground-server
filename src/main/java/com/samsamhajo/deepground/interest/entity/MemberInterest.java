@@ -26,8 +26,12 @@ public class MemberInterest extends BaseEntity {
     @JoinColumn(name = "interest_id", nullable = false)
     private Interest interest;
 
-    public MemberInterest(Member member, Interest interest) {
+    private MemberInterest(Member member, Interest interest) {
         this.member = member;
         this.interest = interest;
+    }
+
+    public static MemberInterest of(Member member, Interest interest) {
+        return new MemberInterest(member,interest);
     }
 }

@@ -23,8 +23,12 @@ public class TechStack extends BaseEntity {
     @Column(name = "tech_stack_category")
     private String category;
 
-    public TechStack(String name, String category) {
+    private TechStack(String name, String category) {
         this.name = name;
         this.category = category;
+    }
+
+    public static TechStack of(String name, String category) {
+        return new TechStack(name, category);
     }
 }
