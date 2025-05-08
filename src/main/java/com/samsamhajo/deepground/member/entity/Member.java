@@ -63,12 +63,12 @@ public class Member extends BaseEntity {
     }
 
     //일반 회원가입 정적 메소드
-    public Member createLocalMember(String email, String password, String nickname) {
+    public static Member createLocalMember(String email, String password, String nickname) {
         return new Member(email, password, nickname, Provider.LOCAL, null);
     }
 
     //소셜 로그인 용 정적 메소드
-    public Member createSocialMember(String email, String nickname, Provider provider, String providerId) {
+    public static Member createSocialMember(String email, String nickname, Provider provider, String providerId) {
         return new Member(email, null, nickname, provider, providerId);
     }
 
