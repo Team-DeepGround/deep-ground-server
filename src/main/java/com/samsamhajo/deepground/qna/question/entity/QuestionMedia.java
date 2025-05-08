@@ -23,4 +23,18 @@ public class QuestionMedia extends BaseEntity {
 
     @Column(name = "extension", nullable = false)
     private String extension;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "question_id")
+    private Question question;
+
+    private QuestionMedia(String QuestionContentUrl, String extension, Question question) {
+        this.questionContentUrl = QuestionContentUrl;
+        this.extension = extension;
+        this.question = question;
+    }
+    public static QuestionMedia of(String QuestionContentUrl, String extension, Question question) {
+        return new QuestionMedia(QuestionContentUrl, extension, question);
+    }
+
 }
