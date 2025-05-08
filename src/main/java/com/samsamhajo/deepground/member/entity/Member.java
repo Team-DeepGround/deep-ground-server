@@ -1,12 +1,12 @@
 package com.samsamhajo.deepground.member.entity;
 
-import com.samsamhajo.deepground.friend.entity.Friend;
 import com.samsamhajo.deepground.global.BaseEntity;
+import com.samsamhajo.deepground.interest.entity.MemberInterest;
+import com.samsamhajo.deepground.techStack.entity.MemberTechStack;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,4 +47,38 @@ public class Member extends BaseEntity {
     @Column(name = "provider_id")
     private String providerId;
 
+    @OneToMany(mappedBy = "member")
+    private List<MemberInterest> memberInterests = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<MemberTechStack> memberTechStacks = new ArrayList<>();
+
+    private Member(String email, String password, String nickname, Provider provider, String providerId) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+        this.provider = provider;
+        this.providerId = providerId;
+        this.isVerified = (provider != Provider.LOCAL);
+    }
+
+    //일반 회원가입 정적 메소드
+    public static Member createLocalMember(String email, String password, String nickname) {
+        return new Member(email, password, nickname, Provider.LOCAL, null);
+    }
+
+    //소셜 로그인 용 정적 메소드
+    public static Member createSocialMember(String email, String nickname, Provider provider, String providerId) {
+        return new Member(email, null, nickname, provider, providerId);
+    }
+
+    public void verify() {
+        this.isVerified = true;
+    }
 }
+
+
+
+
+
+

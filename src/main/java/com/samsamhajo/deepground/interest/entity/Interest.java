@@ -22,4 +22,13 @@ public class Interest extends BaseEntity {
 
     @Column(name = "interest_category")
     private String category;
+
+    private Interest(String name, String category) {
+        this.name = name;
+        this.category = category;
+    }
+
+    public static Interest of(String name, String category) {
+        return new Interest(name, category);
+    }
 }
