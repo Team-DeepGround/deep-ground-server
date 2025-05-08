@@ -48,20 +48,15 @@ public class StudySchedule extends BaseEntity {
         this.location = location;
     }
 
-
-    // location 있는 경우
+    // location이 있는 경우
     public static StudySchedule of(StudyGroup studyGroup, String title, LocalDateTime startTime, LocalDateTime endTime, String description, String location) {
         return new StudySchedule(studyGroup, title, startTime, endTime, description, location);
     }
 
-
-    // location 없는 경우
+    // location이 없는 경우
     public static StudySchedule of(StudyGroup studyGroup, String title, LocalDateTime startTime, LocalDateTime endTime, String description) {
         return new StudySchedule(studyGroup, title, startTime, endTime, description, null);
     }
-
-
-
 
 
 }

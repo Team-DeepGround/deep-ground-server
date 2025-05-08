@@ -26,25 +26,32 @@ public class MemberStudySchedule extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Column(name = "memo")
-    private String memo;
-
     @Column(name = "is_available")
     private Boolean isAvailable;
 
     @Column(name = "is_important", nullable = false)
     private Boolean isImportant = false;
 
-    private MemberStudySchedule(StudySchedule studySchedule, Member member, String memo, Boolean isAvailable, Boolean isImportant) {
+    @Column(name = "memo")
+    private String memo;
+
+    private MemberStudySchedule(StudySchedule studySchedule, Member member, Boolean isAvailable, Boolean isImportant, String memo) {
         this.studySchedule = studySchedule;
         this.member = member;
-        this.memo = memo;
         this.isAvailable = isAvailable;
         this.isImportant = isImportant;
+        this.memo = memo;
+
     }
 
-    public static MemberStudySchedule of(StudySchedule studySchedule, Member member, String memo, Boolean isAvailable, Boolean isImportant) {
-        return new MemberStudySchedule(studySchedule, member, memo, isAvailable, isImportant);
+    // memo가 있는 경우
+    public static MemberStudySchedule of(StudySchedule studySchedule, Member member, Boolean isAvailable, Boolean isImportant, String memo) {
+        return new MemberStudySchedule(studySchedule, member, isAvailable, isImportant, memo);
+    }
+
+    // memo가 없는 경우
+    public static MemberStudySchedule of(StudySchedule studySchedule, Member member, Boolean isAvailable, Boolean isImportant) {
+        return new MemberStudySchedule(studySchedule, member, isAvailable, isImportant, "");
     }
 
 
