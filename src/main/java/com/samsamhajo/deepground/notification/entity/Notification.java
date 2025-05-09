@@ -1,8 +1,8 @@
 package com.samsamhajo.deepground.notification.entity;
 
 import com.samsamhajo.deepground.global.BaseDocument;
-import jakarta.persistence.Id;
 import lombok.Getter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -22,10 +22,19 @@ public class Notification extends BaseDocument {
 
     @DBRef
     @Field("notification_message_id")
-    private NotificationMessage notificationMessage;
+    private NotificationMessage message;
 
     @Field("is_read")
     private boolean read = false;
+
+    private Notification(Long receiverId, NotificationMessage message) {
+        this.receiverId = receiverId;
+        this.message = message;
+    }
+
+    public static Notification of(Long receiverId, NotificationMessage message) {
+        return new Notification(receiverId, message);
+    }
 
     public void read() {
         this.read = true;

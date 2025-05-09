@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.qna.answer.entity;
 
 import com.samsamhajo.deepground.global.BaseEntity;
+import com.samsamhajo.deepground.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,6 +18,20 @@ public class AnswerLike extends BaseEntity {
     @Column(name = "answer_like_id", nullable = false)
     private Long id;
 
-    //TODO : Member, Question
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "answer_id")
+    private Answer answer;
+
+    private AnswerLike(Member member, Answer answer) {
+        this.member = member;
+        this.answer = answer;
+    }
+
+    public static AnswerLike of(Member member, Answer answer) {
+        return new AnswerLike(member, answer);
+    }
 }

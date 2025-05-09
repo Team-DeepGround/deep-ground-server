@@ -8,4 +8,8 @@ public abstract class NotificationData {
 
     @Field("id")
     private Long id;
+
+    protected NotificationData(Long id) {
+        this.id = id;
+    }
 }

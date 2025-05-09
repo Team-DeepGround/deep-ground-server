@@ -25,4 +25,13 @@ public class MemberInterest extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "interest_id", nullable = false)
     private Interest interest;
+
+    private MemberInterest(Member member, Interest interest) {
+        this.member = member;
+        this.interest = interest;
+    }
+
+    public static MemberInterest of(Member member, Interest interest) {
+        return new MemberInterest(member,interest);
+    }
 }

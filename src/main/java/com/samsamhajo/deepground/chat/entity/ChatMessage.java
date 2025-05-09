@@ -1,9 +1,9 @@
 package com.samsamhajo.deepground.chat.entity;
 
 import com.samsamhajo.deepground.global.BaseDocument;
-import jakarta.persistence.Id;
 import java.util.List;
 import lombok.Getter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -28,4 +28,19 @@ public class ChatMessage extends BaseDocument {
 
     @Field("media")
     private List<ChatMessageMedia> media;
+
+    private ChatMessage(Long chatRoomId, Long senderId, String message, List<ChatMessageMedia> media) {
+        this.chatRoomId = chatRoomId;
+        this.senderId = senderId;
+        this.message = message;
+        this.media = media;
+    }
+
+    public static ChatMessage of(Long chatRoomId, Long senderId, String message) {
+        return new ChatMessage(chatRoomId, senderId, message, null);
+    }
+
+    public static ChatMessage of(Long chatRoomId, Long senderId, String message, List<ChatMessageMedia> media) {
+        return new ChatMessage(chatRoomId, senderId, message, media);
+    }
 }

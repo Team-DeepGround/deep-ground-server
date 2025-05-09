@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.friend.entity;
 
 import com.samsamhajo.deepground.global.BaseEntity;
+import com.samsamhajo.deepground.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,26 +19,29 @@ public class Friend extends BaseEntity {
     @Column(name ="friend_id")
     private Long id;
 
-    // TODO: Member Entity 구현 시 작성
-//    @ManyToOne (fetch = FetchType.LAZY)
-//    @JoinColumn(name = "request_member_id" , nullable = false)
-//    private Member requestMember;
+    @ManyToOne (fetch = FetchType.LAZY)
+    @JoinColumn(name = "request_member_id" , nullable = false)
+    private Member requestMember;
 
-//    @ManyToOne (fetch = FetchType.LAZY)
-//    @JoinColumn(name = "receive_member_id" , nullable = false)
-//    private Member receiveMember;
+    @ManyToOne (fetch = FetchType.LAZY)
+    @JoinColumn(name = "receive_member_id" , nullable = false)
+    private Member receiveMember;
 
 
     @Enumerated(EnumType.STRING)
     @Column(name="friend_status", nullable = false)
     private FriendStatus status; //REQUEST,CANCEL,ACCEPT,REFUSAL
 
-    /* 친구 요청 생성자 */
-//    public Friend(Member requestMember, Member receiveMember) {
-//        this.requestMember = requestMember;
-//        this.receiveMember = receiveMember;
-//        this.status = FriendStatus.REQUEST;
-//    }
+    private Friend(Member requestMember, Member receiveMember, FriendStatus status) {
+        this.requestMember = requestMember;
+        this.receiveMember = receiveMember;
+        this.status = status;
+    }
+
+
+    public static Friend request (Member requestMember, Member receiveMember) {
+      return new Friend (requestMember, receiveMember, FriendStatus.REQUEST);
+    }
 
     public void cancel() {
         this.status = FriendStatus.CANCEL;

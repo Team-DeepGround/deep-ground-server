@@ -21,4 +21,18 @@ public class AnswerMedia extends BaseEntity {
 
     @Column(name = "extension",nullable = false)
     private String extension;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "answer_id")
+    private Answer answer;
+
+    private AnswerMedia(String answerCommentUrl, String extension, Answer answer) {
+        this.answerCommentUrl = answerCommentUrl;
+        this.extension = extension;
+        this.answer = answer;
+    }
+
+    public static AnswerMedia of(String answerCommentUrl, String extension, Answer answer) {
+        return new AnswerMedia(answerCommentUrl, extension, answer);
+    }
 }

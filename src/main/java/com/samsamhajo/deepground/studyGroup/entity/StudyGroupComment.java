@@ -1,7 +1,10 @@
 package com.samsamhajo.deepground.studyGroup.entity;
 
 import com.samsamhajo.deepground.global.BaseEntity;
+import com.samsamhajo.deepground.member.entity.Member;
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,12 +20,27 @@ public class StudyGroupComment extends BaseEntity {
     @Column(name = "comment_id")
     private Long id;
 
-    @Column(name = "study_group_id", nullable = false)
-    private Long studyGroupId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "study_group_id", nullable = false)
+    private StudyGroup studyGroup;
 
-    @Column(name = "member_id", nullable = false)
-    private Long memberId;
+    @ManyToOne
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
-    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
+
+    @OneToMany(mappedBy = "comment")
+    private List<StudyGroupReply> replies = new ArrayList<>();
+
+    private StudyGroupComment(StudyGroup studyGroup, Member member, String content) {
+        this.studyGroup = studyGroup;
+        this.member = member;
+        this.content = content;
+    }
+
+    public static StudyGroupComment of(StudyGroup studyGroup, Member member, String content) {
+        return new StudyGroupComment(studyGroup, member, content);
+    }
 }

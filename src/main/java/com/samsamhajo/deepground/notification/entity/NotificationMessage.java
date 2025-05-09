@@ -1,8 +1,8 @@
 package com.samsamhajo.deepground.notification.entity;
 
 import com.samsamhajo.deepground.notification.entity.data.NotificationData;
-import jakarta.persistence.Id;
 import lombok.Getter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -19,4 +19,13 @@ public class NotificationMessage {
 
     @Field("notification_data")
     private NotificationData data;
+
+    private NotificationMessage(NotificationType type, NotificationData data) {
+        this.type = type;
+        this.data = data;
+    }
+
+    public static NotificationMessage of(NotificationType type, NotificationData data) {
+        return new NotificationMessage(type, data);
+    }
 }
