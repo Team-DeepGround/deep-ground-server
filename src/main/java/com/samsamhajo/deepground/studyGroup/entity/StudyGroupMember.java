@@ -20,9 +20,9 @@ public class StudyGroupMember extends BaseEntity {
     @Column(name = "group_member_id")
     private Long id;
 
-    @OneToMany(mappedBy = "studyGroupMember")
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private final List<Member> studyMember = new ArrayList<>();
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "study_group_id", nullable = false)

@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.member.entity;
 
 import com.samsamhajo.deepground.global.BaseEntity;
 import com.samsamhajo.deepground.interest.entity.MemberInterest;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.techStack.entity.MemberTechStack;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -52,6 +53,9 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member")
     private List<MemberTechStack> memberTechStacks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<StudyGroupMember> studyGroupMembers = new ArrayList<>();
 
     private Member(String email, String password, String nickname, Provider provider, String providerId) {
         this.email = email;
