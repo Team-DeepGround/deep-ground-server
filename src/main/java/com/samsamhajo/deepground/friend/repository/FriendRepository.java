@@ -14,4 +14,5 @@ public interface FriendRepository extends JpaRepository<Friend,Long> {
 
     boolean existsByRequestMemberAndReceiveMember(Member requester, Member receiver);
 
+    boolean existsByRequestMemberAndReceiveMemberAndStatus(Member requester, Member receiver, FriendStatus status);
 }

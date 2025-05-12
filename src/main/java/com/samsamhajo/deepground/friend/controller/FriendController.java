@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.friend.controller;
 
+import com.samsamhajo.deepground.friend.Dto.FriendRequestDto;
 import com.samsamhajo.deepground.friend.Dto.ResponseDto;
 import com.samsamhajo.deepground.friend.service.FriendService;
 import com.samsamhajo.deepground.member.entity.Member;
@@ -28,11 +29,6 @@ public class FriendController {
     }
 
 
-    @Data
-    static class FriendRequestDto {
-        private Long requesterId;
-        private String receiverEmail;
-    }
 
     @Data
     @AllArgsConstructor
