@@ -38,9 +38,6 @@ public class FriendService {
             throw new FriendException(FriendErrorCode.ALREADY_FRIEND);
         }
 
-
-
-
         Friend friend = Friend.request(requester, receiver);
         friendRepository.save(friend);
 
