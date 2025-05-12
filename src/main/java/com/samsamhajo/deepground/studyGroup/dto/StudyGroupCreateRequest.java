@@ -1,11 +1,18 @@
 package com.samsamhajo.deepground.studyGroup.dto;
 
 import jakarta.validation.constraints.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Builder(toBuilder = true)
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StudyGroupCreateRequest {
 
   @NotBlank(message = "제목은 필수입니다.")

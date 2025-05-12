@@ -1,11 +1,14 @@
 package com.samsamhajo.deepground.studyGroup.service;
 
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
+import com.samsamhajo.deepground.chat.entity.ChatRoomType;
+import com.samsamhajo.deepground.chat.repository.ChatRoomRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCreateRequest;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCreateResponse;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
+import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
@@ -24,8 +27,7 @@ public class StudyGroupService {
   public StudyGroupCreateResponse createStudyGroup(StudyGroupCreateRequest request, Member creator) {
     validateRequest(request);
 
-    // 채팅방 생성 (추후 분리 가능)
-    ChatRoom chatRoom = chatRoomRepository.save(ChatRoom.create());
+    ChatRoom chatRoom = chatRoomRepository.save(ChatRoom.of(ChatRoomType.STUDY_GROUP));
 
     StudyGroup studyGroup = StudyGroup.of(
         chatRoom,
