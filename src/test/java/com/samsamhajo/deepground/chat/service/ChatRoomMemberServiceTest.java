@@ -1,16 +1,22 @@
 package com.samsamhajo.deepground.chat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
 import com.samsamhajo.deepground.chat.entity.ChatRoomMember;
+import com.samsamhajo.deepground.chat.exception.ChatRoomErrorCode;
+import com.samsamhajo.deepground.chat.exception.ChatRoomException;
 import com.samsamhajo.deepground.chat.repository.ChatRoomMemberRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import java.time.LocalDateTime;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -30,11 +36,18 @@ class ChatRoomMemberServiceTest {
     @Mock
     private ChatRedisService chatRedisService;
 
+    private Member member;
+    private ChatRoom chatRoom;
+
+    @BeforeEach
+    void setUp() {
+        member = mock(Member.class);
+        chatRoom = mock(ChatRoom.class);
+    }
+
     @Test
     @DisplayName("채팅방에 참여한다")
     void joinChatRoom() {
-        Member member = mock(Member.class);
-        ChatRoom chatRoom = mock(ChatRoom.class);
         LocalDateTime latestMessageTime = LocalDateTime.now();
 
         when(chatRoom.getId()).thenReturn(1L);
@@ -48,5 +61,34 @@ class ChatRoomMemberServiceTest {
         ChatRoomMember savedChatRoomMember = captor.getValue();
         assertThat(savedChatRoomMember).isNotNull();
         assertThat(savedChatRoomMember.getLastReadMessageTime()).isEqualTo(latestMessageTime);
+    }
+
+    @Nested
+    @DisplayName("채팅방 나가기")
+    class LeaveChatRoom {
+
+        @Test
+        @DisplayName("채팅방을 나가면 softDelete가 실행된다")
+        void leaveChatRoom_softDelete() {
+            ChatRoomMember chatRoomMember = ChatRoomMember.of(member, chatRoom);
+
+            when(chatRoomMemberRepository.findByMemberAndChatRoomAndDeletedIsFalse(member, chatRoom))
+                    .thenReturn(Optional.of(chatRoomMember));
+
+            chatRoomMemberService.leaveChatRoom(member, chatRoom);
+
+            assertThat(chatRoomMember.isDeleted()).isTrue();
+        }
+
+        @Test
+        @DisplayName("스터디 멤버를 찾을 수 없다면 예외가 발생한다")
+        void leaveChatRoom_notFound() {
+            when(chatRoomMemberRepository.findByMemberAndChatRoomAndDeletedIsFalse(member, chatRoom))
+                    .thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> chatRoomMemberService.leaveChatRoom(member, chatRoom))
+                    .isInstanceOf(ChatRoomException.class)
+                    .hasMessage(ChatRoomErrorCode.MEMBER_NOT_FOUND.getMessage());
+        }
     }
 }
