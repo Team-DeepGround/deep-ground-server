@@ -5,7 +5,9 @@ import com.samsamhajo.deepground.global.BaseEntity;
 import com.samsamhajo.deepground.member.entity.Member;
 import jakarta.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -54,14 +56,16 @@ public class StudyGroup extends BaseEntity {
     @Column(name = "study_location")
     private String studyLocation;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
 
     @OneToOne(fetch = FetchType.LAZY)
     private ChatRoom chatRoom;
 
     @OneToMany(mappedBy = "studyGroup")
-    private final List<StudyGroupMember> members = new ArrayList<>();
+    private final Set<StudyGroupMember> members = new HashSet<>();
 
     @OneToMany(mappedBy = "studyGroup")
     private final List<StudyGroupComment> comments = new ArrayList<>();
