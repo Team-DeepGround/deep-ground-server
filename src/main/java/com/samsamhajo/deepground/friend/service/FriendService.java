@@ -34,7 +34,7 @@ public class FriendService {
         if(requester.getEmail().equals(receiver.getEmail())) {
             throw new FriendException(FriendErrorCode.SELF_REQUEST);
         }
-        if(memberRepository.existsByRequestMemberAndReceiveMember(requester,receiver)) {
+        if(friendRepository.existsByRequestMemberAndReceiveMember(requester,receiver)) {
             throw new FriendException(FriendErrorCode.ALREADY_FRIEND);
         }
 
