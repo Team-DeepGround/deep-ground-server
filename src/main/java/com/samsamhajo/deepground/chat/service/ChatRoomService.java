@@ -1,17 +1,14 @@
 package com.samsamhajo.deepground.chat.service;
 
-import com.samsamhajo.deepground.chat.entity.ChatMessage;
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
 import com.samsamhajo.deepground.chat.entity.ChatRoomMember;
 import com.samsamhajo.deepground.chat.entity.ChatRoomType;
-import com.samsamhajo.deepground.chat.repository.ChatMessageRepository;
 import com.samsamhajo.deepground.chat.repository.ChatRoomMemberRepository;
 import com.samsamhajo.deepground.chat.repository.ChatRoomRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +19,7 @@ public class ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
-    private final ChatMessageRepository chatMessageRepository;
+    private final ChatRedisService chatRedisService;
 
     @Transactional
     public ChatRoom createFriendChatRoom(Member member1, Member member2) {
@@ -55,16 +52,11 @@ public class ChatRoomService {
     public void joinChatRoom(Member member, ChatRoom chatRoom) {
         ChatRoomMember chatRoomMember = ChatRoomMember.of(member, chatRoom);
 
-        // 채팅방의 가장 최근 메시지를 조회
-        // TODO: chatrooms:{room_id}:latest_message_id를 조회해서 가져오도록 수정
-        Optional<ChatMessage> chatMessage =
-                chatMessageRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoom.getId());
-
-        // 메시지가 있다면 마지막으로 읽은 메시지 시간을 업데이트
-        chatMessage.ifPresent(message -> {
-            LocalDateTime lastReadMessageTime = message.getCreatedAt();
-            chatRoomMember.updateLastReadMessageTime(lastReadMessageTime);
-        });
+        // 채팅방에 메시지가 있다면 마지막으로 읽은 메시지 시간을 업데이트
+        LocalDateTime latestMessageTime = chatRedisService.getLatestMessageTime(chatRoom.getId());
+        if (latestMessageTime != null) {
+            chatRoomMember.updateLastReadMessageTime(latestMessageTime);
+        }
 
         chatRoomMemberRepository.save(chatRoomMember);
     }
