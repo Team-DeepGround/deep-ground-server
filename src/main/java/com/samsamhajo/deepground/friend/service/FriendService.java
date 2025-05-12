@@ -3,6 +3,7 @@ package com.samsamhajo.deepground.friend.service;
 import com.samsamhajo.deepground.friend.Exception.FriendException;
 import com.samsamhajo.deepground.friend.entity.Friend;
 import com.samsamhajo.deepground.friend.Exception.FriendErrorCode;
+import com.samsamhajo.deepground.friend.entity.FriendStatus;
 import com.samsamhajo.deepground.friend.repository.FriendRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
@@ -34,9 +35,13 @@ public class FriendService {
         if(requester.getEmail().equals(receiver.getEmail())) {
             throw new FriendException(FriendErrorCode.SELF_REQUEST);
         }
-        if(friendRepository.existsByRequestMemberAndReceiveMember(requester,receiver)) {
+        if(friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver, FriendStatus.ACCEPT)) {
             throw new FriendException(FriendErrorCode.ALREADY_FRIEND);
         }
+        if(friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester,receiver, FriendStatus.REQUEST)) {
+            throw new FriendException(FriendErrorCode.ALREADY_REQUESTED);
+        }
+
 
         Friend friend = Friend.request(requester, receiver);
         friendRepository.save(friend);
