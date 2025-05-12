@@ -54,7 +54,8 @@ public class StudyGroup extends BaseEntity {
     @Column(name = "study_location")
     private String studyLocation;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -97,5 +98,9 @@ public class StudyGroup extends BaseEntity {
             recruitStartDate, recruitEndDate,
             groupMemberCount, member, isOffline, studyLocation
         );
+    }
+
+    public void changeGroupStatus(GroupStatus newStatus) {
+        this.groupStatus = newStatus;
     }
 }
