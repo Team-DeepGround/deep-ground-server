@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 
 @AllArgsConstructor
 public enum ChatRoomErrorCode implements ErrorCode {
+    ROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "채팅방을 찾을 수 없습니다."),
     MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "채팅방 멤버를 찾을 수 없습니다.");
 
     public static final String PREFIX = "[CHATROOM ERROR] ";
