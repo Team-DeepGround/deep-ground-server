@@ -72,18 +72,18 @@ class ChatRoomMemberServiceTest {
         @Test
         @DisplayName("채팅방을 나가면 softDelete가 실행된다")
         void leaveChatRoom_softDelete() {
-            ChatRoomMember chatRoomMember = ChatRoomMember.of(member, chatRoom);
+            ChatRoomMember chatRoomMember = mock(ChatRoomMember.class);
 
             when(chatRoomMemberRepository.findByMemberIdAndChatRoomId(memberId, chatRoomId))
                     .thenReturn(Optional.of(chatRoomMember));
 
             chatRoomMemberService.leaveChatRoom(memberId, chatRoomId);
 
-            assertThat(chatRoomMember.isDeleted()).isTrue();
+            verify(chatRoomMember).softDelete();
         }
 
         @Test
-        @DisplayName("스터디 멤버를 찾을 수 없다면 예외가 발생한다")
+        @DisplayName("채팅방 멤버를 찾을 수 없다면 예외가 발생한다")
         void leaveChatRoom_notFound() {
             when(chatRoomMemberRepository.findByMemberIdAndChatRoomId(memberId, chatRoomId))
                     .thenReturn(Optional.empty());
