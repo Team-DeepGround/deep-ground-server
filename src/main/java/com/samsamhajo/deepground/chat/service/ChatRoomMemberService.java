@@ -32,9 +32,9 @@ public class ChatRoomMemberService {
     }
 
     @Transactional
-    public void leaveChatRoom(Member member, ChatRoom chatRoom) {
+    public void leaveChatRoom(Long memberId, Long chatRoomId) {
         ChatRoomMember chatRoomMember =
-                chatRoomMemberRepository.findByMemberAndChatRoomAndDeletedIsFalse(member, chatRoom)
+                chatRoomMemberRepository.findByMemberIdAndChatRoomId(memberId, chatRoomId)
                         .orElseThrow(() -> new ChatRoomException(ChatRoomErrorCode.MEMBER_NOT_FOUND));
 
         chatRoomMember.softDelete();

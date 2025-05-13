@@ -38,6 +38,8 @@ class ChatRoomMemberServiceTest {
 
     private Member member;
     private ChatRoom chatRoom;
+    private final Long memberId = 1L;
+    private final Long chatRoomId = 1L;
 
     @BeforeEach
     void setUp() {
@@ -50,8 +52,8 @@ class ChatRoomMemberServiceTest {
     void joinChatRoom() {
         LocalDateTime latestMessageTime = LocalDateTime.now();
 
-        when(chatRoom.getId()).thenReturn(1L);
-        when(chatRedisService.getLatestMessageTime(chatRoom.getId())).thenReturn(latestMessageTime);
+        when(chatRoom.getId()).thenReturn(chatRoomId);
+        when(chatRedisService.getLatestMessageTime(chatRoomId)).thenReturn(latestMessageTime);
 
         chatRoomMemberService.joinChatRoom(member, chatRoom);
 
@@ -72,10 +74,10 @@ class ChatRoomMemberServiceTest {
         void leaveChatRoom_softDelete() {
             ChatRoomMember chatRoomMember = ChatRoomMember.of(member, chatRoom);
 
-            when(chatRoomMemberRepository.findByMemberAndChatRoomAndDeletedIsFalse(member, chatRoom))
+            when(chatRoomMemberRepository.findByMemberIdAndChatRoomId(memberId, chatRoomId))
                     .thenReturn(Optional.of(chatRoomMember));
 
-            chatRoomMemberService.leaveChatRoom(member, chatRoom);
+            chatRoomMemberService.leaveChatRoom(memberId, chatRoomId);
 
             assertThat(chatRoomMember.isDeleted()).isTrue();
         }
@@ -83,10 +85,10 @@ class ChatRoomMemberServiceTest {
         @Test
         @DisplayName("스터디 멤버를 찾을 수 없다면 예외가 발생한다")
         void leaveChatRoom_notFound() {
-            when(chatRoomMemberRepository.findByMemberAndChatRoomAndDeletedIsFalse(member, chatRoom))
+            when(chatRoomMemberRepository.findByMemberIdAndChatRoomId(memberId, chatRoomId))
                     .thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> chatRoomMemberService.leaveChatRoom(member, chatRoom))
+            assertThatThrownBy(() -> chatRoomMemberService.leaveChatRoom(memberId, chatRoomId))
                     .isInstanceOf(ChatRoomException.class)
                     .hasMessage(ChatRoomErrorCode.MEMBER_NOT_FOUND.getMessage());
         }
