@@ -1,0 +1,7 @@
+package com.samsamhajo.deepground.member.repository;
+
+import com.samsamhajo.deepground.member.entity.Member;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface MemberRepository extends JpaRepository<Member, Long> {
+}
