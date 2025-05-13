@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.friend.service;
 
 import com.samsamhajo.deepground.friend.Dto.FriendDto;
+
 import com.samsamhajo.deepground.friend.Exception.FriendException;
 import com.samsamhajo.deepground.friend.entity.Friend;
 import com.samsamhajo.deepground.friend.Exception.FriendErrorCode;
@@ -14,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.samsamhajo.deepground.friend.entity.FriendStatus.CANCEL;
 
 @Service
 @Transactional(readOnly = true)
@@ -60,6 +63,14 @@ public class FriendService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public Long cancelFriendRequest(Long friendId, Long requesterId) {
+        Friend friendRequest = friendRepository.findById(friendId)
+                .orElseThrow(() -> new FriendException(FriendErrorCode.REQUEST_NOT_FOUND));
 
+        friendRequest.cancel(requesterId);
 
+        return friendRequest.getId();
+
+    }
 }
