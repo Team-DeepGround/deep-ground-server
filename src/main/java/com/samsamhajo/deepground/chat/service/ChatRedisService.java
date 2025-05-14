@@ -3,8 +3,9 @@ package com.samsamhajo.deepground.chat.service;
 import com.samsamhajo.deepground.chat.entity.ChatMessage;
 import com.samsamhajo.deepground.chat.redis.ChatRedisKeys;
 import com.samsamhajo.deepground.chat.repository.ChatMessageRepository;
+import com.samsamhajo.deepground.external.redis.RedisKey;
 import com.samsamhajo.deepground.global.BaseDocument;
-import com.samsamhajo.deepground.utils.redis.RedisUtil;
+import com.samsamhajo.deepground.external.redis.RedisManager;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -15,21 +16,19 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ChatRedisService {
 
-    private final RedisUtil redisUtil;
+    private final RedisManager redisManager;
     private final ChatMessageRepository chatMessageRepository;
 
     public LocalDateTime getLatestMessageTime(Long chatRoomId) {
-        String key = ChatRedisKeys.getLatestMessageKey(chatRoomId);
-        Supplier<LocalDateTime> supplier = () -> loadLatestMessageTime(chatRoomId);
+        RedisKey key = ChatRedisKeys.getLatestMessageKey(chatRoomId);
 
-        return redisUtil.getAndCache(key, supplier, RedisUtil.LONG_TTL);
-    }
-
-    private LocalDateTime loadLatestMessageTime(Long chatRoomId) {
         // 채팅방의 가장 최근 메시지를 조회
-        Optional<ChatMessage> chatMessage =
-                chatMessageRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoomId);
+        Supplier<LocalDateTime> supplier = () -> {
+            Optional<ChatMessage> chatMessage =
+                    chatMessageRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoomId);
+            return chatMessage.map(BaseDocument::getCreatedAt).orElse(null);
+        };
 
-        return chatMessage.map(BaseDocument::getCreatedAt).orElse(null);
+        return redisManager.getAndCache(key, supplier, RedisManager.LONG_TTL);
     }
 }

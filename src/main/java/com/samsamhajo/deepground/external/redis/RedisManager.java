@@ -1,4 +1,4 @@
-package com.samsamhajo.deepground.utils.redis;
+package com.samsamhajo.deepground.external.redis;
 
 import java.time.Duration;
 import java.util.function.Supplier;
@@ -8,24 +8,24 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class RedisUtil {
+public class RedisManager {
 
     public static final Duration LONG_TTL = Duration.ofDays(7);
 
     private final RedisTemplate<String, Object> redisTemplate;
 
     @SuppressWarnings("unchecked")
-    public <T> T get(String key) {
-        return (T) redisTemplate.opsForValue().get(key);
+    public <T> T get(RedisKey key) {
+        return (T) redisTemplate.opsForValue().get(key.toString());
     }
 
-    public <T> T getAndCache(String key, Supplier<T> fallback) {
+    public <T> T getAndCache(RedisKey key, Supplier<T> fallback) {
         return getAndCache(key, fallback, null);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T getAndCache(String key, Supplier<T> fallback, Duration timeout) {
-        T cached = (T) redisTemplate.opsForValue().get(key);
+    public <T> T getAndCache(RedisKey key, Supplier<T> fallback, Duration timeout) {
+        T cached = (T) redisTemplate.opsForValue().get(key.toString());
         if (cached != null) {
             return cached;
         }
@@ -37,19 +37,19 @@ public class RedisUtil {
         return value;
     }
 
-    public void set(String key, Object value) {
+    public void set(RedisKey key, Object value) {
         set(key, value, null);
     }
 
-    public void set(String key, Object value, Duration ttl) {
+    public void set(RedisKey key, Object value, Duration ttl) {
         if (ttl == null) {
-            redisTemplate.opsForValue().set(key, value);
+            redisTemplate.opsForValue().set(key.toString(), value);
         } else {
-            redisTemplate.opsForValue().set(key, value, ttl);
+            redisTemplate.opsForValue().set(key.toString(), value, ttl);
         }
     }
 
-    public boolean delete(String key) {
-        return redisTemplate.delete(key);
+    public boolean delete(RedisKey key) {
+        return redisTemplate.delete(key.toString());
     }
 }
