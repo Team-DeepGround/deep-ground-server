@@ -24,6 +24,8 @@ public class FeedMediaService {
 
     @Transactional
     public void createFeedMedia(Feed feed, List<MultipartFile> images){
+        if(images == null || images.isEmpty()) return;
+
         feedMediaRepository.saveAll(
                 images.stream()
                         .map(image -> FeedMedia.of(
