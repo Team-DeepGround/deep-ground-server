@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.qna.question.controller;
 
 import com.samsamhajo.deepground.qna.question.Dto.QuestionRequestDto;
 import com.samsamhajo.deepground.qna.question.service.QuestionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,7 +18,7 @@ public class QuestionController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Long> creatQuestion(
-            @ModelAttribute QuestionRequestDto questionRequestDto,
+            @Valid @ModelAttribute QuestionRequestDto questionRequestDto,
             @RequestParam Long memberId) {
 
         Long questionId = questionService.createQuestion(questionRequestDto, memberId);

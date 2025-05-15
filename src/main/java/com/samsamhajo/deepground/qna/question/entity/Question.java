@@ -23,7 +23,7 @@ public class Question extends BaseEntity {
     @Column(name = "question_id", nullable = false)
     private Long id;
 
-    @Column(name = "title", nullable = false, length = 200)
+    @Column(name = "title", nullable = false, length = 100)
     private String title;
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")

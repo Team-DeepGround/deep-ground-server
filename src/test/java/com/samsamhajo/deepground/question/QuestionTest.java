@@ -58,7 +58,7 @@ public class QuestionTest {
 
         // when & then
         String responseBody = mockMvc.perform(
-                        multipart("/api/v1/question")
+                        multipart("/question")
                                 .file(mediaFile)
                                 .param("title", title)
                                 .param("content", content)
