@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.studyGroup.repository;
 
+
 import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import org.springframework.data.domain.Page;
@@ -25,4 +26,5 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
       GroupStatus groupStatus,
       Pageable pageable
   );
+
 }
