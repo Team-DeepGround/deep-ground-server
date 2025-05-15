@@ -102,4 +102,8 @@ public class StudyGroup extends BaseEntity {
             groupMemberCount, member, isOffline, studyLocation
         );
     }
+
+    public void changeGroupStatus(GroupStatus newStatus) {
+        this.groupStatus = newStatus;
+    }
 }

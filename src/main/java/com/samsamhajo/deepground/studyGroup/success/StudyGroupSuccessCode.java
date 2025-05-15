@@ -24,4 +24,5 @@ public enum StudyGroupSuccessCode implements SuccessCode {
   public String getMessage() {
     return message;
   }
+
 }
