@@ -74,7 +74,7 @@ public class FriendRequestTest {
         FriendException exception = assertThrows(FriendException.class, () ->
                 friendService.sendFriendRequest(requester.getId(), "garde@gmail.com"));
 
-        assertEquals(FriendErrorCode.MEMBER_NOT_FOUND, exception.getErrorCode());
+        assertEquals(FriendErrorCode.INVALID_MEMBER_EMAIL, exception.getErrorCode());
     }
 
     @Test
@@ -157,7 +157,7 @@ public class FriendRequestTest {
             friendService.cancelFriendRequest(invalidFriendId, requester.getId());
         });
         //then
-        assertEquals(FriendErrorCode.REQUEST_NOT_FOUND, exception.getErrorCode());
+        assertEquals(FriendErrorCode.INVALID_FRIEND_REQUEST, exception.getErrorCode());
     }
 
 
