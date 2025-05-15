@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.friend.service;
 
+import com.samsamhajo.deepground.friend.Dto.FriendDto;
 import com.samsamhajo.deepground.friend.Exception.FriendException;
 import com.samsamhajo.deepground.friend.entity.Friend;
 import com.samsamhajo.deepground.friend.Exception.FriendErrorCode;
@@ -10,6 +11,9 @@ import com.samsamhajo.deepground.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -47,6 +51,13 @@ public class FriendService {
         friendRepository.save(friend);
 
         return friend.getId();
+    }
+    @Transactional
+    public List<FriendDto> findSentFriendRequest(Long requesterId) {
+        List<Friend> friends = friendRepository.findSentRequests(requesterId);
+        return friends.stream()
+                .map(FriendDto::fromSent)
+                .collect(Collectors.toList());
     }
 
 

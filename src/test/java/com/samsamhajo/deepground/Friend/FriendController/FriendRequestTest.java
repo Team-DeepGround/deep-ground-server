@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.Friend.FriendController;
 
+import com.samsamhajo.deepground.friend.Dto.FriendDto;
 import com.samsamhajo.deepground.friend.Exception.FriendErrorCode;
 import com.samsamhajo.deepground.friend.Exception.FriendException;
 import com.samsamhajo.deepground.friend.entity.Friend;
@@ -16,8 +17,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -35,15 +37,23 @@ public class FriendRequestTest {
 
     private Member requester;
     private Member receiver;
+    private Member receiver2;
+    private Member receiver3;
 
     @BeforeEach
     void setup() {
         requester = Member.createLocalMember("paka@gamil.com", "pw", "파카");
         receiver = Member.createLocalMember("garden@gmail.com", "pw", "가든");
+        receiver2 =  Member.createLocalMember("gar@gmail.com", "pw", "가");
+        receiver3 = Member.createLocalMember("den@gmail.com", "pw", "든");
+
 
 
         memberRepository.save(requester);
         memberRepository.save(receiver);
+        memberRepository.save(receiver2);
+        memberRepository.save(receiver3);
+
     }
 
     @Test
@@ -106,6 +116,27 @@ public class FriendRequestTest {
 
         assertEquals(FriendErrorCode.ALREADY_FRIEND, exception.getErrorCode());
     }
+
+
+    @Test
+    public void 친구_목록() throws Exception {
+        //given
+        friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
+        friendService.sendFriendRequest(requester.getId(), receiver2.getEmail());
+        friendService.sendFriendRequest(requester.getId(), receiver3.getEmail());
+        //when
+        List<FriendDto> sentList = friendService.findSentFriendRequest(requester.getId());
+
+        // then
+        assertEquals(3, sentList.size());
+
+
+        assertTrue(sentList.stream().anyMatch(f -> f.getOtherMemberName().equals(receiver.getNickname())));
+        assertTrue(sentList.stream().anyMatch(f -> f.getOtherMemberName().equals(receiver2.getNickname())));
+        assertTrue(sentList.stream().anyMatch(f -> f.getOtherMemberName().equals(receiver3.getNickname())));
+
+    }
+
 
 
 }
