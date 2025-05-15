@@ -8,13 +8,10 @@ import com.samsamhajo.deepground.global.success.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -32,4 +29,19 @@ public class AuthController {
                 .body(SuccessResponse.of(AuthSuccessCode.REGISTER_SUCCESS, response));
     }
 
+    @GetMapping("/check-email")
+    public ResponseEntity<SuccessResponse<Void>> checkEmailDuplicate(@RequestParam String email) {
+        authService.checkEmailDuplicate(email);
+        return ResponseEntity
+                .status(AuthSuccessCode.EMAIL_AVAILABLE.getStatus())
+                .body(SuccessResponse.of(AuthSuccessCode.EMAIL_AVAILABLE));
+    }
+
+    @GetMapping("/check-nickname")
+    public ResponseEntity<SuccessResponse<Void>> checkNicknameDuplicate(@RequestParam String nickname) {
+        authService.checkNicknameDuplicate(nickname);
+        return ResponseEntity
+                .status(AuthSuccessCode.NICKNAME_AVAILABLE.getStatus())
+                .body(SuccessResponse.of(AuthSuccessCode.NICKNAME_AVAILABLE));
+    }
 }
