@@ -2,12 +2,12 @@ package com.samsamhajo.deepground.qna.question.Dto;
 
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class QuestionRequestDto {
 

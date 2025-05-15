@@ -8,8 +8,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum QuestionErrorCode implements ErrorCode {
 
-    QUESTION_TITLE_NOT_FOUND(HttpStatus.BAD_REQUEST, "제목을 찾을 수 없습니다."),
-    QUESTION_CONTENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "내용을 찾을 수 없습니다.");
+    QUESTION_TITLE_REQUIRED(HttpStatus.BAD_REQUEST, "제목을 찾을 수 없습니다."),
+    QUESTION_CONTENT_REQUIRED(HttpStatus.BAD_REQUEST, "내용을 찾을 수 없습니다.");
 
 
     private final HttpStatus status;

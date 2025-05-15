@@ -23,10 +23,10 @@ public class Question extends BaseEntity {
     @Column(name = "question_id", nullable = false)
     private Long id;
 
-    @Column(name = "title", nullable = false, length = 100)
+    @Column(nullable = false, length = 100)
     private String title;
 
-    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
     @Enumerated(EnumType.STRING)
