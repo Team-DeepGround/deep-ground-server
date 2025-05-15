@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.friend.controller;
 
+
 import com.samsamhajo.deepground.friend.Dto.FriendDto;
 import com.samsamhajo.deepground.friend.Dto.FriendRequestDto;
 import com.samsamhajo.deepground.friend.Dto.ResponseDto;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping(("/friends"))
@@ -38,11 +40,13 @@ public class FriendController {
         return ResponseEntity.ok(friendService.findSentFriendRequest(requesterId));
     }
 
+
     @PatchMapping("/sent/{friendId}/cancel")
     public ResponseEntity<ResponseDto> cancelFriendRequest(@PathVariable Long friendId,
                                                            @RequestParam Long requesterId){
         friendService.cancelFriendRequest(friendId,requesterId);
         return ResponseEntity.ok().body(new ResponseDto(HttpStatus.OK, "친구 요청 취소가 되었습니다!",friendId));
 
+    }
 
 }
