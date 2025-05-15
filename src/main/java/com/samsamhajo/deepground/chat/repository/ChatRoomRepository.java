@@ -1,7 +1,9 @@
 package com.samsamhajo.deepground.chat.repository;
 
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
+@Repository
+public interface ChatRoomRepository extends CrudRepository<ChatRoom, Long> {
 }
