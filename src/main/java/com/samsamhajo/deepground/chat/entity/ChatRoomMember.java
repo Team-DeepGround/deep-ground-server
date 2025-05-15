@@ -15,11 +15,13 @@ import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "chat_room_members")
+@SQLRestriction("is_deleted = false")
 public class ChatRoomMember extends BaseEntity {
 
     @Id

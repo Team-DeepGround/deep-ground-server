@@ -31,12 +31,14 @@ public class StudyGroupMember extends BaseEntity {
     @Column(name = "is_allowed", nullable = false)
     private Boolean isAllowed = false;
 
-    private StudyGroupMember(StudyGroup studyGroup) {
+    private StudyGroupMember(Member member, StudyGroup studyGroup, Boolean isAllowed) {
+        this.member = member;
         this.studyGroup = studyGroup;
+        this.isAllowed = isAllowed;
     }
 
-    public static StudyGroupMember of(StudyGroup studyGroup) {
-        return new StudyGroupMember(studyGroup);
+    public static StudyGroupMember of(Member member, StudyGroup studyGroup, Boolean isAllowed) {
+        return new StudyGroupMember(member, studyGroup, isAllowed);
     }
 
     public void allowMember() {
