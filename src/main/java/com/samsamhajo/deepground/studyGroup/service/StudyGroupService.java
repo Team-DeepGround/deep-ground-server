@@ -1,5 +1,7 @@
 package com.samsamhajo.deepground.studyGroup.service;
 
+import com.samsamhajo.deepground.studyGroup.dto.StudyGroupDetailResponse;
+import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupSearchRequest;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,15 @@ public class StudyGroupService {
   private final StudyGroupRepository studyGroupRepository;
   private final StudyGroupMemberRepository studyGroupMemberRepository;
   private final ChatRoomRepository chatRoomRepository;
+  
+  
+  public StudyGroupDetailResponse getStudyGroupDetail(Long studyGroupId) {
+    StudyGroup group = studyGroupRepository.findWithMemberAndCommentsById(studyGroupId)
+        .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
+
+    return StudyGroupDetailResponse.from(group);
+  }
+
 
   public Page<StudyGroupResponse> searchStudyGroups(StudyGroupSearchRequest request) {
     String keyword = request.getKeyword();
