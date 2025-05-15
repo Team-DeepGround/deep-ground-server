@@ -2,7 +2,6 @@ package com.samsamhajo.deepground.qna.question.controller;
 
 import com.samsamhajo.deepground.qna.question.Dto.QuestionRequestDto;
 import com.samsamhajo.deepground.qna.question.service.QuestionService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
