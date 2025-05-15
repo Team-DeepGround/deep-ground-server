@@ -48,6 +48,7 @@ public class FriendRequestTest {
         receiver3 = Member.createLocalMember("den@gmail.com", "pw", "든");
 
 
+
         memberRepository.save(requester);
         memberRepository.save(receiver);
         memberRepository.save(receiver2);
@@ -116,6 +117,7 @@ public class FriendRequestTest {
         assertEquals(FriendErrorCode.ALREADY_FRIEND, exception.getErrorCode());
     }
 
+
     @Test
     public void 친구_목록() throws Exception {
         //given
@@ -134,6 +136,7 @@ public class FriendRequestTest {
         assertTrue(sentList.stream().anyMatch(f -> f.getOtherMemberName().equals(receiver3.getNickname())));
 
     }
+
 
 
 }

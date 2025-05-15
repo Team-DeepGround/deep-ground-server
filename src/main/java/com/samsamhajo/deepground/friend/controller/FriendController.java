@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.friend.controller;
 
+
 import com.samsamhajo.deepground.friend.Dto.FriendDto;
 import com.samsamhajo.deepground.friend.Dto.FriendRequestDto;
 import com.samsamhajo.deepground.friend.Dto.ResponseDto;
@@ -13,7 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+
+
 
 
 @RestController("/api/v1/friends")
@@ -21,6 +23,7 @@ import java.util.List;
 public class FriendController {
 
     private final FriendService friendService;
+
 
     @PostMapping("/request")
     public ResponseEntity<ResponseDto> requestFriend(@RequestBody @Valid FriendRequestDto dto) {
@@ -34,13 +37,12 @@ public class FriendController {
         private Long id;
     }
 
+
     @GetMapping("/sent")
     public ResponseEntity<List<FriendDto>> getSentFriendRequests(@RequestParam Long requesterId) {
         return ResponseEntity.ok(friendService.findSentFriendRequest(requesterId));
     }
 
 }
-
-
 
 

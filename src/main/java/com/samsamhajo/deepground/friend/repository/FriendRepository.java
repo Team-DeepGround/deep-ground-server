@@ -21,4 +21,5 @@ public interface FriendRepository extends JpaRepository<Friend,Long> {
 
     @Query("SELECT f FROM Friend f WHERE f.requestMember.id = :requesterId AND f.status = 'REQUEST'")
     List<Friend> findSentRequests(@Param("requesterId") Long requesterId);
+
 }
