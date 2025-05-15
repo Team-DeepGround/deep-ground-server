@@ -16,7 +16,8 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/swagger-resources/**",
             "/webjars/**",
-            "/v3/api-docs.yaml"
+            "/v3/api-docs.yaml",
+            "/auth/**"
     };
 
     @Bean
@@ -27,9 +28,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(PERMIT_URL_ARRAY).permitAll()
-                .anyRequest().authenticated()
-        );
+                        .requestMatchers(PERMIT_URL_ARRAY).permitAll()
+                        .anyRequest().authenticated())
+                        .csrf(csrf -> csrf.disable());
         return http.build();
     }
 }
