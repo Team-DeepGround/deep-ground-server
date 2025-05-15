@@ -1,7 +1,6 @@
 package com.samsamhajo.deepground.friend.service;
 
 import com.samsamhajo.deepground.friend.Dto.FriendDto;
-
 import com.samsamhajo.deepground.friend.Exception.FriendException;
 import com.samsamhajo.deepground.friend.entity.Friend;
 import com.samsamhajo.deepground.friend.Exception.FriendErrorCode;
@@ -16,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.samsamhajo.deepground.friend.entity.FriendStatus.CANCEL;
 
 @Service
 @Transactional(readOnly = true)
@@ -48,6 +46,7 @@ public class FriendService {
         if(friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester,receiver, FriendStatus.REQUEST)) {
             throw new FriendException(FriendErrorCode.ALREADY_REQUESTED);
         }
+
 
         Friend friend = Friend.request(requester, receiver);
         friendRepository.save(friend);
