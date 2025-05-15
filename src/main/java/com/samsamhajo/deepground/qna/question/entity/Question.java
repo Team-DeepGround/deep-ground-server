@@ -4,6 +4,7 @@ import com.samsamhajo.deepground.global.BaseEntity;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.qna.answer.entity.Answer;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,14 +23,15 @@ public class Question extends BaseEntity {
     @Column(name = "question_id", nullable = false)
     private Long id;
 
-    @Column(name = "title", nullable = false, length = 200)
+    @Column(nullable = false, length = 100)
     private String title;
 
-    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "is_question_status",nullable = false)
-    private boolean isQuestionStatus = false;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "question_status",nullable = false)
+    private QuestionStatus questionStatus = QuestionStatus.OPEN;
 
     @Column(name ="answer_count",nullable = false)//DB에 null값이 들어가면 +1 연산할 때 문제가 발생하거나 예외 발생할 수 있어 nullable = false;
     private int answerCount = 0;
@@ -55,14 +57,6 @@ public class Question extends BaseEntity {
 
     public static Question of(String title, String content, Member member) {
         return new Question(title, content, member);
-    }
-
-    public void questionActive() {
-        this.isQuestionStatus = true;
-    }
-
-    public void questionDeactive() {
-        this.isQuestionStatus = false;
     }
 
 }
