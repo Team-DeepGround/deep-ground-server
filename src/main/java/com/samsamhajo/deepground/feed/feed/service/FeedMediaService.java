@@ -33,9 +33,9 @@ public class FeedMediaService {
 
     public FeedMediaResponse fetchFeedMedia(Long feedMediaId) {
         FeedMedia feedMedia = feedMediaRepository.getById(feedMediaId);
-        InputStreamResource image = MediaUtils.getMedia(feedMedia.getMediaUrl());
+        InputStreamResource media = MediaUtils.getMedia(feedMedia.getMediaUrl());
 
-        return FeedMediaResponse.of(image, feedMedia.getExtension());
+        return FeedMediaResponse.of(media, feedMedia.getExtension());
     }
 
     public List<FeedMedia> findAllByFeed(Feed feed) {
