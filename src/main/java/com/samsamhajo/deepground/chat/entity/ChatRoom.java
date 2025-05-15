@@ -12,11 +12,13 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "chat_rooms")
+@SQLRestriction("is_deleted = false")
 public class ChatRoom extends BaseEntity {
 
     @Id
@@ -26,10 +28,10 @@ public class ChatRoom extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "chat_room_type", nullable = false)
-    private ChatRoomType chatRoomType;
+    private ChatRoomType type;
 
-    private ChatRoom(ChatRoomType chatRoomType) {
-        this.chatRoomType = chatRoomType;
+    private ChatRoom(ChatRoomType type) {
+        this.type = type;
     }
 
     public static ChatRoom of(ChatRoomType chatRoomType) {
