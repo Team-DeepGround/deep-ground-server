@@ -27,11 +27,11 @@ public class FriendService {
     public Long sendFriendRequest (Long requesterId, String receiverEmail) {
 
         Member requester = memberRepository.findById(requesterId)
-                .orElseThrow(() -> new FriendException(FriendErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_MEMBER_EMAIL));
 
 
         Member receiver = memberRepository.findByEmail(receiverEmail)
-                .orElseThrow(() -> new FriendException(FriendErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_MEMBER_EMAIL));
 
         if(receiverEmail == null || receiverEmail.trim().isEmpty()){
             throw new FriendException(FriendErrorCode.BLANK_EMAIL);
@@ -60,6 +60,14 @@ public class FriendService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public Long cancelFriendRequest(Long friendId, Long requesterId) {
+        Friend friendRequest = friendRepository.findById(friendId)
+                .orElseThrow(() -> new FriendException(FriendErrorCode. INVALID_FRIEND_REQUEST));
 
+        friendRequest.cancel(requesterId);
 
+        return friendRequest.getId();
+
+    }
 }
