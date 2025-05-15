@@ -10,6 +10,6 @@ import java.time.LocalDateTime;
 @Repository
 public interface StudyScheduleRepository extends JpaRepository<StudySchedule, Long> {
 
-    boolean existsByStudyGroupAndStartTime(StudyGroup studyGroup, LocalDateTime startTime);
+    boolean existsByStudyGroupAndEndTimeGreaterThanAndStartTimeLessThan(StudyGroup studyGroup, LocalDateTime startTime, LocalDateTime endTime);
 
 }

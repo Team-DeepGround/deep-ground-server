@@ -54,8 +54,10 @@ public class StudyScheduleService {
             throw new IllegalArgumentException("종료 시간이 시작 시간보다 늦을 수 없습니다.");
         }
 
-        boolean isDuplicated = studyScheduleRepository.existsByStudyGroupAndStartTime(
-                studyGroup, requestDto.getStartTime()
+        boolean isDuplicated = studyScheduleRepository.existsByStudyGroupAndEndTimeGreaterThanAndStartTimeLessThan(
+                studyGroup,
+                requestDto.getStartTime(),
+                requestDto.getEndTime()
         );
 
         if (isDuplicated) {

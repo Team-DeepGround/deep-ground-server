@@ -54,7 +54,7 @@ class StudyScheduleServiceTest {
     void createStudySchedule_Success() {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
-        when(studyScheduleRepository.existsByStudyGroupAndStartTime(studyGroup, requestDto.getStartTime())).thenReturn(false);
+        when(studyScheduleRepository.existsByStudyGroupAndEndTimeGreaterThanAndStartTimeLessThan(studyGroup, requestDto.getStartTime(), requestDto.getEndTime())).thenReturn(false);
 
         when(studyScheduleRepository.save(any(StudySchedule.class)))
                 .thenAnswer(invocation -> {
@@ -79,7 +79,11 @@ class StudyScheduleServiceTest {
         assertThat(responseDto.getLocation()).isEqualTo(requestDto.getLocation());
 
         verify(studyGroupRepository, times(1)).findById(anyLong());
-        verify(studyScheduleRepository, times(1)).existsByStudyGroupAndStartTime(studyGroup, requestDto.getStartTime());
+        verify(studyScheduleRepository, times(1)).existsByStudyGroupAndEndTimeGreaterThanAndStartTimeLessThan(
+                studyGroup,
+                requestDto.getStartTime(),
+                requestDto.getEndTime()
+        );
         verify(studyScheduleRepository, times(1)).save(any(StudySchedule.class));
     }
 
@@ -121,7 +125,11 @@ class StudyScheduleServiceTest {
     void createStudySchedule_Fail_DuplicateSchedule() {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
-        when(studyScheduleRepository.existsByStudyGroupAndStartTime(studyGroup, requestDto.getStartTime())).thenReturn(true);
+        when(studyScheduleRepository.existsByStudyGroupAndEndTimeGreaterThanAndStartTimeLessThan(
+                studyGroup,
+                requestDto.getStartTime(),
+                requestDto.getEndTime()
+        )).thenReturn(true);
 
         // when & then
         assertThatThrownBy(() -> studyScheduleService.createStudySchedule(1L, requestDto))
