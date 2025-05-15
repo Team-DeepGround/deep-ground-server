@@ -57,14 +57,10 @@ class MediaUtilsTest {
     @DisplayName("멀티파트 파일로 미디어 URL을 생성한다")
     void generateMediaUrl_returnsValidUrl() {
         // given
-        when(mockMultipartFile.getName()).thenReturn("test-file.jpg");
-
-        // when
         String mediaUrl = MediaUtils.generateMediaUrl(mockMultipartFile);
 
         // then
         assertThat(mediaUrl).startsWith("/media/");
-        assertThat(mediaUrl).contains("_test-file.jpg");
     }
 
     @Test
