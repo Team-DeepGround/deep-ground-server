@@ -3,6 +3,8 @@ package com.samsamhajo.deepground.chat.service;
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
 import com.samsamhajo.deepground.chat.entity.ChatRoomMember;
 import com.samsamhajo.deepground.chat.entity.ChatRoomType;
+import com.samsamhajo.deepground.chat.exception.ChatRoomErrorCode;
+import com.samsamhajo.deepground.chat.exception.ChatRoomException;
 import com.samsamhajo.deepground.chat.repository.ChatRoomMemberRepository;
 import com.samsamhajo.deepground.chat.repository.ChatRoomRepository;
 import com.samsamhajo.deepground.member.entity.Member;
@@ -44,5 +46,14 @@ public class ChatRoomService {
                 .map(member -> ChatRoomMember.of(member, chatRoom))
                 .toList();
         chatRoomMemberRepository.saveAll(chatRoomMembers);
+    }
+
+    @Transactional
+    public void deleteChatRoom(Long chatRoomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new ChatRoomException(ChatRoomErrorCode.ROOM_NOT_FOUND));
+
+        chatRoomMemberRepository.softDeleteByChatRoomId(chatRoomId);
+        chatRoom.softDelete();
     }
 }
