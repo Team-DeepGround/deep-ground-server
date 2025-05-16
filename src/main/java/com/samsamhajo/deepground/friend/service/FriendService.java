@@ -29,9 +29,17 @@ public class FriendService {
         Member requester = memberRepository.findById(requesterId)
                 .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_MEMBER_EMAIL));
 
-
         Member receiver = memberRepository.findByEmail(receiverEmail)
                 .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_MEMBER_EMAIL));
+
+        validateSendRequest(requester, receiver, receiverEmail);
+
+        Friend friend = Friend.request(requester, receiver);
+        friendRepository.save(friend);
+
+        return friend.getId();
+    }
+    private void validateSendRequest(Member requester, Member receiver,String receiverEmail) {
 
         if(receiverEmail == null || receiverEmail.trim().isEmpty()){
             throw new FriendException(FriendErrorCode.BLANK_EMAIL);
@@ -45,19 +53,13 @@ public class FriendService {
         if(friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester,receiver, FriendStatus.REQUEST)) {
             throw new FriendException(FriendErrorCode.ALREADY_REQUESTED);
         }
-
-
-        Friend friend = Friend.request(requester, receiver);
-        friendRepository.save(friend);
-
-        return friend.getId();
     }
     @Transactional
     public List<FriendDto> findSentFriendRequest(Long requesterId) {
         List<Friend> friends = friendRepository.findSentRequests(requesterId);
         return friends.stream()
                 .map(FriendDto::fromSent)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional

@@ -1,4 +1,4 @@
-package com.samsamhajo.deepground.Friend;
+package com.samsamhajo.deepground.Friend.FriendService;
 
 import com.samsamhajo.deepground.friend.Dto.FriendDto;
 import com.samsamhajo.deepground.friend.Exception.FriendErrorCode;

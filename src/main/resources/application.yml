@@ -56,8 +56,8 @@ spring:
       host: ${MONGO_HOST}
       port: ${MONGO_PORT}
       database: ${MONGO_DATABASE}
-#      username: ${MONGO_USERNAME}
-#      password: ${MONGO_PASSWORD}
+      username: ${MONGO_USERNAME}
+      password: ${MONGO_PASSWORD}
       auto-index-creation: true
 
 # CORS 설정
@@ -70,4 +70,4 @@ cors:
 # Swagger 설정
 swagger:
   server:
-    url: http://localhost:8080
+    url: ${SWAGGER_SERVER_URL:http://localhost:8080/api/v1}
