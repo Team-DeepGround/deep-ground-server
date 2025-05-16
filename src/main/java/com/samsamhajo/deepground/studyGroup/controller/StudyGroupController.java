@@ -34,6 +34,7 @@ public class StudyGroupController {
         .status(StudyGroupSuccessCode.READ_SUCCESS.getStatus())
         .body(SuccessResponse.of(StudyGroupSuccessCode.READ_SUCCESS, response));
   }
+
   @GetMapping("/search")
   public ResponseEntity<SuccessResponse<?>> searchStudyGroups(
       @ModelAttribute StudyGroupSearchRequest request
@@ -41,6 +42,10 @@ public class StudyGroupController {
     GlobalLogger.info("스터디 목록 검색 요청", request.getKeyword(), request.getGroupStatus());
 
     var response = studyGroupService.searchStudyGroups(request);
+    return ResponseEntity
+        .status(StudyGroupSuccessCode.SEARCH_SUCCESS.getStatus())
+        .body(SuccessResponse.of(StudyGroupSuccessCode.READ_SUCCESS, response));
+  }
 
   @PostMapping
   public ResponseEntity<SuccessResponse<StudyGroupCreateResponse>> createStudyGroup(

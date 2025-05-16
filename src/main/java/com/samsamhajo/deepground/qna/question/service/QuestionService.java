@@ -27,11 +27,11 @@ public class QuestionService{
 //                .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다."));
 
         if(!StringUtils.hasText(questionRequestDto.getTitle())) {
-            throw new QuestionException(QuestionErrorCode.QUESTION_TITLE_NOT_FOUND);
+            throw new QuestionException(QuestionErrorCode.QUESTION_TITLE_REQUIRED);
         }
 
         if(!StringUtils.hasText(questionRequestDto.getContent())) {
-            throw new QuestionException(QuestionErrorCode.QUESTION_CONTENT_NOT_FOUND);
+            throw new QuestionException(QuestionErrorCode.QUESTION_CONTENT_REQUIRED);
         }
 
         //TODO : 미디어, 태그 처리 추후에 로직 작성
