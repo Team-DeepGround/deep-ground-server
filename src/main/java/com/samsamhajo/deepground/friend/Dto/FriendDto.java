@@ -6,12 +6,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class FriendDto {
 
     private Long friendId;
     private String otherMemberName;
     private FriendStatus status;
+
+    private FriendDto(Long friendId, String otherMemberName, FriendStatus status) {
+        this.friendId = friendId;
+        this.otherMemberName = otherMemberName;
+        this.status = status;
+    }
 
     public static FriendDto fromSent(Friend friend) {
         return new FriendDto(
