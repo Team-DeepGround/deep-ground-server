@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.friend.service;
 
+import com.samsamhajo.deepground.friend.Dto.FriendDto;
 import com.samsamhajo.deepground.friend.Exception.FriendException;
 import com.samsamhajo.deepground.friend.entity.Friend;
 import com.samsamhajo.deepground.friend.Exception.FriendErrorCode;
@@ -10,6 +11,9 @@ import com.samsamhajo.deepground.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -23,11 +27,11 @@ public class FriendService {
     public Long sendFriendRequest (Long requesterId, String receiverEmail) {
 
         Member requester = memberRepository.findById(requesterId)
-                .orElseThrow(() -> new FriendException(FriendErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_MEMBER_EMAIL));
 
 
         Member receiver = memberRepository.findByEmail(receiverEmail)
-                .orElseThrow(() -> new FriendException(FriendErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_MEMBER_EMAIL));
 
         if(receiverEmail == null || receiverEmail.trim().isEmpty()){
             throw new FriendException(FriendErrorCode.BLANK_EMAIL);
@@ -48,7 +52,22 @@ public class FriendService {
 
         return friend.getId();
     }
+    @Transactional
+    public List<FriendDto> findSentFriendRequest(Long requesterId) {
+        List<Friend> friends = friendRepository.findSentRequests(requesterId);
+        return friends.stream()
+                .map(FriendDto::fromSent)
+                .collect(Collectors.toList());
+    }
 
+    @Transactional
+    public Long cancelFriendRequest(Long friendId, Long requesterId) {
+        Friend friendRequest = friendRepository.findById(friendId)
+                .orElseThrow(() -> new FriendException(FriendErrorCode. INVALID_FRIEND_REQUEST));
 
+        friendRequest.cancel(requesterId);
 
+        return friendRequest.getId();
+
+    }
 }

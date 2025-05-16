@@ -43,7 +43,7 @@ public class Friend extends BaseEntity {
       return new Friend (requestMember, receiveMember, FriendStatus.REQUEST);
     }
 
-    public void cancel() {
+    public void cancel(Long requesterId) {
         this.status = FriendStatus.CANCEL;
     }
 
