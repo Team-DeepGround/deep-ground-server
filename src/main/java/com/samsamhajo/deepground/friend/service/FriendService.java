@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -70,5 +69,12 @@ public class FriendService {
 
         return friendRequest.getId();
 
+    }
+
+    public List<FriendDto> findFriendReceive (Long receiverId) {
+        List<Friend> friends = friendRepository.findReceiveRequests(receiverId);
+        return friends.stream()
+                .map(FriendDto::fromReceived)
+                .toList();
     }
 }
