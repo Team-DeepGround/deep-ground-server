@@ -54,7 +54,6 @@ public class FriendService {
             throw new FriendException(FriendErrorCode.ALREADY_REQUESTED);
         }
     }
-    @Transactional
     public List<FriendDto> findSentFriendRequest(Long requesterId) {
         List<Friend> friends = friendRepository.findSentRequests(requesterId);
         return friends.stream()
