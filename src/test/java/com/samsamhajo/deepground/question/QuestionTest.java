@@ -1,5 +1,7 @@
 package com.samsamhajo.deepground.qna.question;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
@@ -69,7 +71,9 @@ public class QuestionTest {
                 .getResponse()
                 .getContentAsString();
 
-        Long questionId = Long.parseLong(responseBody);
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        Long questionId = jsonNode.get("result").asLong();
 
         // assert DB에 잘 들어갔는지 확인
         assertThat(questionRepository.findById(questionId)).isPresent();
