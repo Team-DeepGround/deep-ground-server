@@ -49,7 +49,7 @@ public class FriendController {
 
     @PatchMapping("/receive/{friendId}/refusal")
     public ResponseEntity<SuccessResponse> refusalFriendRequest(@PathVariable Long friendId,
-                                                                @RequestParam Member receiverId){
+                                                                @RequestParam Long receiverId){
         friendService.refusalFriendRequest(friendId,receiverId);
         return ResponseEntity
                 .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_REFUSAL,friendId));
