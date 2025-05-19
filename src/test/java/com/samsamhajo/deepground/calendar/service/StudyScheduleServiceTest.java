@@ -3,10 +3,11 @@ package com.samsamhajo.deepground.calendar.service;
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleRequestDto;
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleResponseDto;
 import com.samsamhajo.deepground.calendar.entity.StudySchedule;
+import com.samsamhajo.deepground.calendar.exception.ScheduleErrorCode;
+import com.samsamhajo.deepground.calendar.exception.ScheduleException;
 import com.samsamhajo.deepground.calendar.repository.StudyScheduleRepository;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -102,8 +103,8 @@ class StudyScheduleServiceTest {
 
         // when & then
         assertThatThrownBy(() -> studyScheduleService.createStudySchedule(1L, requestDto))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("종료 시간이 시작 시간보다 늦을 수 없습니다.");
+                .isInstanceOf(ScheduleException.class)
+                .hasMessageContaining(ScheduleErrorCode.INVALID_DATE_RANGE.getMessage());
 
         verify(studyScheduleRepository, never()).save(any(StudySchedule.class));
     }
@@ -115,8 +116,8 @@ class StudyScheduleServiceTest {
 
         // when & then
         assertThatThrownBy(() -> studyScheduleService.createStudySchedule(1L, requestDto))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessageContaining("스터디 그룹이 존재하지 않습니다.");
+                .isInstanceOf(ScheduleException.class)
+                .hasMessageContaining(ScheduleErrorCode.NOT_FOUND_SCHEDULE.getMessage());
 
         verify(studyScheduleRepository, never()).save(any(StudySchedule.class));
     }
@@ -133,8 +134,8 @@ class StudyScheduleServiceTest {
 
         // when & then
         assertThatThrownBy(() -> studyScheduleService.createStudySchedule(1L, requestDto))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("해당 시간에 이미 스터디 스케줄이 존재합니다.");
+                .isInstanceOf(ScheduleException.class)
+                .hasMessageContaining(ScheduleErrorCode.DUPLICATE_SCHEDULE.getMessage());
 
         verify(studyScheduleRepository, never()).save(any(StudySchedule.class));
     }
