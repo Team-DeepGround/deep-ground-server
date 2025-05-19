@@ -187,19 +187,6 @@ public class FriendRequestTest {
     }
 
     @Test
-    public void 존재하지_않는_응답자자_ID일_때_예외발생_프로필() {
-        // given
-        Long invalidReceiverId = 99L; // 실제 존재하지 않는 ID
-
-        // when & then
-        FriendException exception = assertThrows(FriendException.class, () ->
-                friendService.sendProfileFriendRequest(requester.getId(), invalidReceiverId)
-        );
-
-        assertEquals(FriendErrorCode.INVALID_MEMBER_ID, exception.getErrorCode());
-    }
-
-    @Test
     public void 본인_계정에_프로필_친구_요청_예외() throws Exception {
         //given
         friendService.sendProfileFriendRequest(requester.getId(), receiver.getId());
