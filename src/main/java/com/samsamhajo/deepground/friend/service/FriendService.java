@@ -7,6 +7,8 @@ import com.samsamhajo.deepground.friend.Exception.FriendErrorCode;
 import com.samsamhajo.deepground.friend.entity.FriendStatus;
 import com.samsamhajo.deepground.friend.repository.FriendRepository;
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.member.exception.MemberErrorCode;
+import com.samsamhajo.deepground.member.exception.MemberException;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -73,7 +75,10 @@ public class FriendService {
     }
 
     @Transactional
-    public Long acceptFriendRequest(Long friendId, Member receiver) {
+    public Long acceptFriendRequest(Long friendId, Long receiverId) {
+        Member receiver = memberRepository.findById(receiverId)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+
         Friend friendRequest = validateAccept(friendId, receiver);
 
         friendRequest.accept();

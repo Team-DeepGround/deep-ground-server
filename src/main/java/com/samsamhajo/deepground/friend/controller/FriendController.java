@@ -49,10 +49,10 @@ public class FriendController {
 
     @PatchMapping("/receive/{friendId}/accept")
     public ResponseEntity<SuccessResponse> acceptFriendRequest(@PathVariable Long friendId,
-                                                               @RequestParam Member receiverId){
-        friendService.acceptFriendRequest(friendId, receiverId);
+                                                               @RequestParam Long receiverId){
+        Long result = friendService.acceptFriendRequest(friendId, receiverId);
         return ResponseEntity
-                .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_ACCEPT,friendId));
+                .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_ACCEPT,result));
     }
 
 

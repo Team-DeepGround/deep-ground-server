@@ -55,6 +55,7 @@ public class FriendReceiveTest {
         memberRepository.save(requester3);
         memberRepository.save(requester2);
         memberRepository.save(receiver);
+        memberRepository.save(receiver2);
 
     }
 
@@ -64,7 +65,7 @@ public class FriendReceiveTest {
         Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
 
         //when
-        Long accept = friendService.acceptFriendRequest(friendId, receiver);
+        Long accept = friendService.acceptFriendRequest(friendId, receiver.getId());
 
         //then
         assertEquals(friendId ,accept);
@@ -77,7 +78,7 @@ public class FriendReceiveTest {
 
         //when
         FriendException exception = assertThrows(FriendException.class, () ->
-                friendService.acceptFriendRequest(friendId, receiver2));
+                friendService.acceptFriendRequest(friendId, receiver2.getId()));
         //then
         assertEquals(FriendErrorCode.UNAUTHORIZED_ACCESS, exception.getErrorCode());
         }
@@ -91,7 +92,7 @@ public class FriendReceiveTest {
 
         //when,then
         FriendException exception = assertThrows(FriendException.class, () ->
-                friendService.acceptFriendRequest(friend.getId(), receiver));
+                friendService.acceptFriendRequest(friend.getId(), receiver.getId()));
 
         assertEquals(FriendErrorCode.ALREADY_FRIEND, exception.getErrorCode());
     }
