@@ -1,8 +1,6 @@
 package com.samsamhajo.deepground.qna.question.service;
 
-import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
-import com.samsamhajo.deepground.qna.question.Dto.QuestionDeleteDto;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionRequestDto;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.exception.QuestionErrorCode;
@@ -49,7 +47,7 @@ public class QuestionService{
     }
 
     @Transactional
-    public Long deleteQuesiton(Long questionId , Long memberId) {
+    public Long deleteQuesiton(Long questionId, Long memberId) {
 
         //TODO : question을 작성한 멤버가 맞는지, 삭제권한 있는지 추후 로직 작성
 
