@@ -39,6 +39,9 @@ dependencies {
 	// swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
+	// jackson
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
