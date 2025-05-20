@@ -1,15 +1,16 @@
 package com.samsamhajo.deepground.calendar.repository;
 
 import com.samsamhajo.deepground.calendar.entity.StudySchedule;
-import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface StudyScheduleRepository extends JpaRepository<StudySchedule, Long> {
 
-    boolean existsByStudyGroupAndEndTimeGreaterThanAndStartTimeLessThan(StudyGroup studyGroup, LocalDateTime startTime, LocalDateTime endTime);
+    boolean existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(Long studyGroupId, LocalDateTime startTime, LocalDateTime endTime);
 
+    List<StudySchedule> findAllByStudyGroupId(Long studyGroupId);
 }

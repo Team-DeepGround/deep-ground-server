@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleRequestDto;
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleResponseDto;
+import com.samsamhajo.deepground.calendar.exception.ScheduleSuccessCode;
 import com.samsamhajo.deepground.calendar.service.StudyScheduleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,10 +17,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -77,6 +80,40 @@ public class StudyScheduleControllerTest {
                 .andExpect(jsonPath("$.result.endTime").value("2025-05-20T16:00:00"))
                 .andExpect(jsonPath("$.result.description").value("Spring Boot 학습"))
                 .andExpect(jsonPath("$.result.location").value("온라인"));
+
+    }
+
+    @Test
+    @WithMockUser(username = "testUser")
+    void getStudySchedulesByGroup_Success() throws Exception {
+        // given
+        StudyScheduleResponseDto schedule1 = StudyScheduleResponseDto.builder()
+                .id(1L)
+                .title("Spring Study 1")
+                .startTime(LocalDateTime.now())
+                .endTime(LocalDateTime.now().plusHours(2))
+                .description("설명")
+                .location("Online")
+                .build();
+
+        StudyScheduleResponseDto schedule2 = StudyScheduleResponseDto.builder()
+                .id(2L)
+                .title("Spring Study 2")
+                .startTime(LocalDateTime.now())
+                .endTime(LocalDateTime.now().plusHours(2))
+                .description("설명")
+                .location("Offline")
+                .build();
+
+        when(studyScheduleService.findSchedulesByStudyGroupId(1L)).thenReturn(List.of(schedule1, schedule2));
+
+        // when & then
+        mockMvc.perform(get("/study-group/{studyGroupId}/schedules", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(ScheduleSuccessCode.SCHEDULE_FOUND.getStatus().value()))
+                .andExpect(jsonPath("$.result[0].title").value("Spring Study 1"))
+                .andExpect(jsonPath("$.result[1].title").value("Spring Study 2"));
 
     }
 }
