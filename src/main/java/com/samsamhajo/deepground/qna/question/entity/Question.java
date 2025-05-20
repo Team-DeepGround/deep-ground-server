@@ -59,4 +59,9 @@ public class Question extends BaseEntity {
         return new Question(title, content, member);
     }
 
+    public void questionUpdate(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
 }

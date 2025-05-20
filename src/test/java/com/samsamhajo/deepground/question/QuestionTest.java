@@ -86,7 +86,7 @@ public class QuestionTest {
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
-        Long questionId = jsonNode.get("result").asLong();
+        Long questionId = jsonNode.get("result").get("id").asLong();
 
         // assert DB에 잘 들어갔는지 확인
         assertThat(questionRepository.findById(questionId)).isPresent();
@@ -109,10 +109,10 @@ public class QuestionTest {
 
         QuestionRequestDto questionRequestDto = new QuestionRequestDto(title, content, techStack, mediaFiles);
 
-        Long questionId = questionService.createQuestion(questionRequestDto, memberId);
+        Question question = questionService.createQuestion(questionRequestDto, memberId);
 
-        assertThat(questionRepository.findById(questionId)).isPresent();
-        assertThat(questionRepository.findById(questionId).get().getTitle()).isEqualTo(title);
+        assertThat(questionRepository.findById(question.getId())).isPresent();
+        assertThat(questionRepository.findById(question.getId()).get().getTitle()).isEqualTo(title);
     }
 
     @Test

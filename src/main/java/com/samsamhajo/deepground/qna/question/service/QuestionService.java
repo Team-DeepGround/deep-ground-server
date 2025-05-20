@@ -1,8 +1,9 @@
 package com.samsamhajo.deepground.qna.question.service;
 
-import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionRequestDto;
+import com.samsamhajo.deepground.qna.question.Dto.QuestionResponseDto;
+import com.samsamhajo.deepground.qna.question.Dto.QuestionUpdateDto;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.exception.QuestionErrorCode;
 import com.samsamhajo.deepground.qna.question.exception.QuestionException;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.WebRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -18,11 +20,12 @@ import org.springframework.util.StringUtils;
 public class QuestionService{
 
     private final QuestionRepository questionRepository;
-    //private final MemberRepository memberRepository;
+    private final WebRequest webRequest;
+    private final MemberRepository memberRepository;
 
     //질문 생성
     @Transactional
-    public Long createQuestion(QuestionRequestDto questionRequestDto, Long memberId) {
+    public Question createQuestion(QuestionRequestDto questionRequestDto, Long memberId) {
 //       Member member = memberRepository.findById(memberId)
 //                .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다."));
 
@@ -43,7 +46,34 @@ public class QuestionService{
                 null
         );
 
-        return questionRepository.save(question).getId();
+        return questionRepository.save(question);
     }
+
+    @Transactional
+    public QuestionResponseDto updateQuestion(QuestionUpdateDto questionUpdateDto, Long memberId) {
+
+//        Member member = memberRepository.findById(memberId)
+//                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
+
+        if(!StringUtils.hasText(questionUpdateDto.getTitle())) {
+            throw new QuestionException(QuestionErrorCode.QUESTION_TITLE_REQUIRED);
+        }
+
+        if(!StringUtils.hasText(questionUpdateDto.getContent())) {
+            throw new QuestionException(QuestionErrorCode.QUESTION_CONTENT_REQUIRED);
+        }
+
+        Question question = questionRepository.findById(questionUpdateDto.getId())
+                .orElseThrow(()-> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
+
+
+        //TODO : Media, TechStack 로직은 추후에 한꺼번에 구현 예정
+
+        question.questionUpdate(questionUpdateDto.getTitle(), questionUpdateDto.getContent());
+
+        return new QuestionResponseDto(question);
+
+    }
+
 
 }
