@@ -31,4 +31,17 @@ public class QuestionController {
 
     }
 
+    @DeleteMapping("/{questionId}/delete")
+    public ResponseEntity<SuccessResponse> deleteQuestion(
+            @PathVariable Long questionId
+    ,       @RequestParam Long memberId) {
+
+        questionService.deleteQuesiton(questionId, memberId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.of(QuestionSuccessCode.QUESTION_DELETED, questionId));
+
+    }
+
 }

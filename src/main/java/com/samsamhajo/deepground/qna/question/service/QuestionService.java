@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.qna.question.service;
 
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
+import com.samsamhajo.deepground.qna.question.Dto.QuestionDeleteDto;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionRequestDto;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.exception.QuestionErrorCode;
@@ -18,6 +19,7 @@ import org.springframework.util.StringUtils;
 public class QuestionService{
 
     private final QuestionRepository questionRepository;
+    private final MemberRepository memberRepository;
     //private final MemberRepository memberRepository;
 
     //질문 생성
@@ -44,6 +46,20 @@ public class QuestionService{
         );
 
         return questionRepository.save(question).getId();
+    }
+
+    @Transactional
+    public Long deleteQuesiton(Long questionId , Long memberId) {
+
+        //TODO : question을 작성한 멤버가 맞는지, 삭제권한 있는지 추후 로직 작성
+
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
+
+        questionRepository.deleteById(questionId);
+
+        return question.getId();
+
     }
 
 }
