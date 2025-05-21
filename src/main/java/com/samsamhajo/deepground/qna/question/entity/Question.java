@@ -59,4 +59,8 @@ public class Question extends BaseEntity {
         return new Question(title, content, member);
     }
 
+    public void incrementAnswerCount() {
+        this.answerCount++;
+    }
+
 }
