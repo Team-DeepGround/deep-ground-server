@@ -59,7 +59,17 @@ spring:
       username: ${MONGO_USERNAME}
       password: ${MONGO_PASSWORD}
       auto-index-creation: true
-
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 # CORS 설정
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGIN}
