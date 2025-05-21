@@ -55,7 +55,11 @@ class StudyScheduleServiceTest {
     void createStudySchedule_Success() {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
-        when(studyScheduleRepository.existsByStudyGroupAndEndTimeGreaterThanAndStartTimeLessThan(studyGroup, requestDto.getStartTime(), requestDto.getEndTime())).thenReturn(false);
+        when(studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
+                anyLong(),
+                eq(requestDto.getStartTime()),
+                eq(requestDto.getEndTime())
+        )).thenReturn(false);
 
         when(studyScheduleRepository.save(any(StudySchedule.class)))
                 .thenAnswer(invocation -> {
@@ -80,10 +84,10 @@ class StudyScheduleServiceTest {
         assertThat(responseDto.getLocation()).isEqualTo(requestDto.getLocation());
 
         verify(studyGroupRepository, times(1)).findById(anyLong());
-        verify(studyScheduleRepository, times(1)).existsByStudyGroupAndEndTimeGreaterThanAndStartTimeLessThan(
-                studyGroup,
-                requestDto.getStartTime(),
-                requestDto.getEndTime()
+        verify(studyScheduleRepository, times(1)).existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
+                anyLong(),
+                eq(requestDto.getStartTime()),
+                eq(requestDto.getEndTime())
         );
         verify(studyScheduleRepository, times(1)).save(any(StudySchedule.class));
     }
@@ -117,7 +121,7 @@ class StudyScheduleServiceTest {
         // when & then
         assertThatThrownBy(() -> studyScheduleService.createStudySchedule(1L, requestDto))
                 .isInstanceOf(ScheduleException.class)
-                .hasMessageContaining(ScheduleErrorCode.NOT_FOUND_SCHEDULE.getMessage());
+                .hasMessageContaining(ScheduleErrorCode.STUDY_GROUP_NOT_FOUND.getMessage());
 
         verify(studyScheduleRepository, never()).save(any(StudySchedule.class));
     }
@@ -126,10 +130,10 @@ class StudyScheduleServiceTest {
     void createStudySchedule_Fail_DuplicateSchedule() {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
-        when(studyScheduleRepository.existsByStudyGroupAndEndTimeGreaterThanAndStartTimeLessThan(
-                studyGroup,
-                requestDto.getStartTime(),
-                requestDto.getEndTime()
+        when(studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
+                anyLong(),
+                eq(requestDto.getStartTime()),
+                eq(requestDto.getEndTime())
         )).thenReturn(true);
 
         // when & then
@@ -138,5 +142,120 @@ class StudyScheduleServiceTest {
                 .hasMessageContaining(ScheduleErrorCode.DUPLICATE_SCHEDULE.getMessage());
 
         verify(studyScheduleRepository, never()).save(any(StudySchedule.class));
+    }
+
+    @Test
+    void updateStudySchedule_Success() throws NoSuchFieldException, IllegalAccessException {
+        // given
+        when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
+
+        StudySchedule existingSchedule = StudySchedule.of(
+                studyGroup,
+                "기존 제목",
+                requestDto.getStartTime(),
+                requestDto.getEndTime(),
+                requestDto.getDescription(),
+                requestDto.getLocation()
+        );
+
+        Field idField = StudySchedule.class.getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(existingSchedule, 1L);
+
+        when(studyScheduleRepository.findById(anyLong())).thenReturn(Optional.of(existingSchedule));
+
+        StudyScheduleRequestDto updateRequestDto = StudyScheduleRequestDto.builder()
+                .title("수정된 일정 제목")
+                .startTime(LocalDateTime.now())
+                .endTime(LocalDateTime.now().plusHours(2))
+                .description("수정된 일정 설명")
+                .location("Online")
+                .build();
+        // when
+        StudyScheduleResponseDto responseDto = studyScheduleService.updateStudySchedule(studyGroup.getId(), existingSchedule.getId(), updateRequestDto);
+
+        // then
+        assertThat(responseDto).isNotNull();
+        assertThat(responseDto.getId()).isEqualTo(existingSchedule.getId());
+        assertThat(responseDto.getTitle()).isEqualTo(updateRequestDto.getTitle());
+    }
+
+    @Test
+    void updateStudySchedule_Fail_StudyGroupNotFound() {
+        // given
+        when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, 1L, requestDto))
+                .isInstanceOf(ScheduleException.class)
+                .hasMessageContaining(ScheduleErrorCode.STUDY_GROUP_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void updateStudySchedule_Fail_ScheduleNotFound() {
+        // given
+        when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
+        when(studyScheduleRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, 1L, requestDto))
+                .isInstanceOf(ScheduleException.class)
+                .hasMessageContaining(ScheduleErrorCode.SCHEDULE_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void updateStudySchedule_Fail_EndTimeBeforeStartTime() throws IllegalAccessException, NoSuchFieldException {
+        // given
+        LocalDateTime startTime = LocalDateTime.of(2025, 5, 21, 13, 0);
+        LocalDateTime endTime = LocalDateTime.of(2025, 5, 21, 11, 0);
+
+        StudyScheduleRequestDto request = requestDto.toBuilder()
+                .startTime(startTime)
+                .endTime(endTime)
+                .build();
+
+        StudySchedule schedule = StudySchedule.of(
+                studyGroup,
+                "제목",
+                requestDto.getStartTime(),
+                requestDto.getEndTime(),
+                requestDto.getDescription(),
+                requestDto.getLocation()
+        );
+
+        Field idField = StudySchedule.class.getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(schedule, 1L);
+
+        when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
+        when(studyScheduleRepository.findById(anyLong())).thenReturn(Optional.of(schedule));
+        when(studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
+                anyLong(), any(), any()
+        )).thenReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, 1L, request))
+                .isInstanceOf(ScheduleException.class)
+                .hasMessageContaining(ScheduleErrorCode.INVALID_DATE_RANGE.getMessage());
+    }
+
+    @Test
+    void updateStudySchedule_Fail_DuplicateSchedule() {
+        // given
+        when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
+        StudySchedule schedule = mock(StudySchedule.class);
+        when(schedule.getId()).thenReturn(2L);
+
+        when(studyScheduleRepository.findById(anyLong())).thenReturn(Optional.of(schedule));
+        when(studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
+                anyLong(),
+                eq(requestDto.getStartTime()),
+                eq(requestDto.getEndTime())
+        )).thenReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, 1L, requestDto))
+                .isInstanceOf(ScheduleException.class)
+                .hasMessageContaining(ScheduleErrorCode.DUPLICATE_SCHEDULE.getMessage());
     }
 }

@@ -27,6 +27,15 @@ public class StudyScheduleController {
                 .body(SuccessResponse.of(ScheduleSuccessCode.SCHEDULE_CREATED, responseDto));
     }
 
-
+    @PatchMapping("/schedules/{scheduleId}")
+    public ResponseEntity<SuccessResponse<StudyScheduleResponseDto>> updateSchedule(
+            @PathVariable Long studyGroupId,
+            @PathVariable Long scheduleId,
+            @Valid @RequestBody StudyScheduleRequestDto requestDto
+    ) {
+        StudyScheduleResponseDto responseDto = studyScheduleService.updateStudySchedule(studyGroupId, scheduleId, requestDto);
+        return ResponseEntity.status(ScheduleSuccessCode.SCHEDULE_UPDATED.getStatus())
+                .body(SuccessResponse.of(ScheduleSuccessCode.SCHEDULE_UPDATED, responseDto));
+    }
 
 }
