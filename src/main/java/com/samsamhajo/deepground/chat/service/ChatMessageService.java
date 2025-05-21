@@ -10,6 +10,8 @@ import com.samsamhajo.deepground.global.message.MessagePublisher;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +22,7 @@ public class ChatMessageService {
     private final ChatRedisService chatRedisService;
 
     public void sendMessage(Long chatRoomId, Long memberId, ChatMessageRequest request) {
-        if (request.getMessage().isBlank() && request.getMediaIds().isEmpty()) {
+        if (!StringUtils.hasText(request.getMessage()) && CollectionUtils.isEmpty(request.getMediaIds())) {
             throw new ChatMessageException(ChatMessageErrorCode.INVALID_MESSAGE);
         }
 
