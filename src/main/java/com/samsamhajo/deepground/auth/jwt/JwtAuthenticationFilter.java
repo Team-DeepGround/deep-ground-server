@@ -1,5 +1,8 @@
 package com.samsamhajo.deepground.auth.jwt;
 
+import com.samsamhajo.deepground.auth.security.CustomUserDetailsService;
+import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.member.repository.MemberRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -16,6 +20,9 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
+    private final CustomUserDetailsService userDetailsService;
+    private final MemberRepository memberRepository;
+
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
 
@@ -29,8 +36,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(jwt) && jwtProvider.validateToken(jwt)) {
             Long memberId = jwtProvider.getMemberId(jwt);
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(memberId, null, null);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            Member member = memberRepository.findById(memberId).orElse(null);
+            if (member != null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(member.getEmail());
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities()
+                );
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
 
         filterChain.doFilter(request, response);
