@@ -1,5 +1,7 @@
 package com.samsamhajo.deepground.auth.service;
 
+import com.samsamhajo.deepground.auth.dto.LoginRequest;
+import com.samsamhajo.deepground.auth.dto.LoginResponse;
 import com.samsamhajo.deepground.auth.dto.RegisterRequest;
 import com.samsamhajo.deepground.auth.exception.AuthErrorCode;
 import com.samsamhajo.deepground.auth.exception.AuthException;
@@ -25,13 +27,16 @@ public class AuthServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private Member member;
 
     @BeforeEach
     void setup() {
         member = Member.createLocalMember(
                 "test@example.com",
-                "password123",
+                passwordEncoder.encode("password123"),
                 "test01"
         );
         memberRepository.save(member);
@@ -61,7 +66,7 @@ public class AuthServiceTest {
     void 이메일_중복_검사_성공() {
         // when & then
        assertDoesNotThrow(() ->
-               authService.checkEmailDuplicate("test2@example.com"));
+               authService.checkEmailDuplicate("test123@example.com"));
     }
 
     @Test
@@ -119,5 +124,54 @@ public class AuthServiceTest {
                 () -> authService.register(request));
 
         assertEquals(AuthErrorCode.DUPLICATE_NICKNAME, exception.getErrorCode());
+    }
+
+    @Test
+    void 로그인_성공() {
+        // given
+        LoginRequest request = new LoginRequest(
+                member.getEmail(),
+                "password123"
+        );
+
+        // when
+        LoginResponse response = authService.login(request);
+
+        //then
+        assertNotNull(response.getAccessToken());
+        assertNotNull(response.getRefreshToken());
+        assertEquals(member.getId(), response.getMemberId());
+        assertEquals(member.getEmail(), response.getEmail());
+        assertEquals(member.getNickname(), response.getNickname());
+    }
+
+    @Test
+    void 존재하지_않는_이메일로_로그인_실패() {
+        // given
+        LoginRequest request = new LoginRequest(
+                "notfound@example.com",
+                "password123"
+        );
+
+        // when & then
+        AuthException exception = assertThrows(AuthException.class,
+                () -> authService.login(request));
+
+        assertEquals(AuthErrorCode.INVALID_EMAIL, exception.getErrorCode());
+    }
+
+    @Test
+    void 잘못된_비밀번호로_로그인_실패() {
+        // given
+        LoginRequest request = new LoginRequest(
+                member.getEmail(),
+                "wrongpassword"
+        );
+
+        // when & then
+        AuthException exception = assertThrows(AuthException.class,
+                () -> authService.login(request));
+
+        assertEquals(AuthErrorCode.INVALID_PASSWORD, exception.getErrorCode());
     }
 }

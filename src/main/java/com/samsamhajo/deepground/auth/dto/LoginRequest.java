@@ -10,15 +10,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class RegisterRequest {
+public class LoginRequest {
 
     @NotBlank(message = "email을 입력하세요.")
-    @Email(message = "유효한 email을 입력하세요.")
+    @Email(message = "유효한 이메일을 입력하세요.")
     private String email;
 
     @NotBlank(message = "비밀번호를 입력하세요.")
     private String password;
-
-    @NotBlank(message = "닉네임을 입력하세요.")
-    private String nickname;
 }
