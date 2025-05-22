@@ -2,9 +2,8 @@ package com.samsamhajo.deepground.question;
 
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
-import com.samsamhajo.deepground.qna.answer.dto.AnswerRequestDto;
-import com.samsamhajo.deepground.qna.answer.dto.AnswerResponseDto;
-import com.samsamhajo.deepground.qna.answer.entity.Answer;
+import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateRequestDto;
+import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
 import com.samsamhajo.deepground.qna.answer.repository.AnswerRepository;
 import com.samsamhajo.deepground.qna.answer.service.AnswerService;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionRequestDto;
@@ -76,16 +75,16 @@ public class AnswerTest {
 
         //질문 생성
         QuestionRequestDto questionRequestDto = new QuestionRequestDto(title, content, techStack, mediaFiles);
-        Question question = questionService.createQuestion(questionRequestDto, memberId);
+        Question question = questionService.createQuestion(questionRequestDto,memberId);
 
         //후에 답변 작성
-        AnswerRequestDto answerRequestDto = new AnswerRequestDto(answerContent, mediaFiles);
-        AnswerResponseDto answerResponseDto = answerService.createAnswer(answerRequestDto, memberId, question.getId());
+        AnswerCreateRequestDto answerCreateRequestDto = new AnswerCreateRequestDto(answerContent, mediaFiles, questionId);
+        AnswerCreateResponseDto answerCreateResponseDto = answerService.createAnswer(answerCreateRequestDto, question.getId(), memberId);
 
         //생성된 questionId, Answer에 넘어간 questionId가 같은지 확인
-        assertThat(answerResponseDto.getQuestionId()).isEqualTo(question.getId());
+        assertThat(answerCreateResponseDto.getQuestionId()).isEqualTo(question.getId());
         //우리가 작성한 내용이 잘 들어갔는지
-        assertThat(answerResponseDto.getAnswerContent()).isEqualTo(answerContent);
+        assertThat(answerCreateResponseDto.getAnswerContent()).isEqualTo(answerContent);
 
     }
 

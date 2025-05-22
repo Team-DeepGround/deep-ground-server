@@ -2,8 +2,8 @@ package com.samsamhajo.deepground.qna.answer.service;
 
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
-import com.samsamhajo.deepground.qna.answer.dto.AnswerRequestDto;
-import com.samsamhajo.deepground.qna.answer.dto.AnswerResponseDto;
+import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateRequestDto;
+import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
 import com.samsamhajo.deepground.qna.answer.entity.Answer;
 import com.samsamhajo.deepground.qna.answer.repository.AnswerRepository;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerErrorCode;
@@ -26,20 +26,20 @@ public class AnswerService {
     private final QuestionRepository questionRepository;
 
     @Transactional
-    public AnswerResponseDto createAnswer(AnswerRequestDto answerRequestDto , Long memberId, Long questionId) {
+    public AnswerCreateResponseDto createAnswer(AnswerCreateRequestDto answerCreateRequestDto, Long memberId) {
 
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        Question question = questionRepository.findById(questionId)
+        Question question = questionRepository.findById(answerCreateRequestDto.getQuestionId())
                 .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
 
-        if(!StringUtils.hasText(answerRequestDto.getAnswerContent())) {
+        if(!StringUtils.hasText(answerCreateRequestDto.getAnswerContent())) {
             throw new AnswerException(AnswerErrorCode.ANSWER_CONTENT_REQUIRED);
         }
 
         Answer answer = Answer.of(
-                answerRequestDto.getAnswerContent(),
+                answerCreateRequestDto.getAnswerContent(),
                 member,
                 question
         );
@@ -48,6 +48,6 @@ public class AnswerService {
 
         question.incrementAnswerCount();
 
-        return new AnswerResponseDto(saved.getId(), saved.getAnswerContent(), saved.getQuestion().getId(), saved.getMember().getId());
+        return new AnswerCreateResponseDto(saved.getAnswerContent(), saved.getQuestion().getId(), saved.getMember().getId());
     }
 }
