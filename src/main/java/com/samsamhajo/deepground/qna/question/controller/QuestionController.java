@@ -38,6 +38,20 @@ public class QuestionController {
 
     }
 
+    @DeleteMapping("/{questionId}/delete")
+    public ResponseEntity<SuccessResponse> deleteQuestion(
+            @PathVariable Long questionId
+    ,       @RequestParam Long memberId) {
+
+        questionService.deleteQuestion(questionId, memberId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.of(QuestionSuccessCode.QUESTION_DELETED, questionId));
+
+    }
+
+
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse> updateQuestion(
             @Valid @ModelAttribute QuestionUpdateDto questionUpdateDto,

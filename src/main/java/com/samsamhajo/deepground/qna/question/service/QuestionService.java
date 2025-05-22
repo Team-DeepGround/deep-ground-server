@@ -48,6 +48,19 @@ public class QuestionService{
     }
 
     @Transactional
+    public Long deleteQuestion(Long questionId, Long memberId) {
+
+        //TODO : question을 작성한 멤버가 맞는지, 삭제권한 있는지 추후 로직 작성
+
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
+
+        questionRepository.deleteById(questionId);
+
+        return question.getId();
+
+    }
+
     public QuestionResponseDto updateQuestion(QuestionUpdateDto questionUpdateDto, Long memberId) {
 
 //        Member member = memberRepository.findById(memberId)
@@ -77,6 +90,4 @@ public class QuestionService{
         );
 
     }
-
-
 }
