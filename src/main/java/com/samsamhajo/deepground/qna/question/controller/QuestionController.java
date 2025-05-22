@@ -38,7 +38,7 @@ public class QuestionController {
 
     }
 
-    @PostMapping(path = "/{questionId}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse> updateQuestion(
             @Valid @ModelAttribute QuestionUpdateDto questionUpdateDto,
             @RequestParam Long memberId) {
