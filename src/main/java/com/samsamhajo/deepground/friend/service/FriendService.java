@@ -55,7 +55,6 @@ public class FriendService {
             throw new FriendException(FriendErrorCode.ALREADY_REQUESTED);
         }
     }
-    @Transactional
     public List<FriendDto> findSentFriendRequest(Long requesterId) {
         List<Friend> friends = friendRepository.findSentRequests(requesterId);
         return friends.stream()
@@ -99,5 +98,11 @@ public class FriendService {
 
 
         return friendRequest;
+
+    public List<FriendDto> findFriendReceive (Long receiverId) {
+        List<Friend> friends = friendRepository.findReceiveRequests(receiverId);
+        return friends.stream()
+                .map(FriendDto::fromReceived)
+                .toList();
     }
 }

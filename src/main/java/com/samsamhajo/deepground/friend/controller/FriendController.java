@@ -8,8 +8,6 @@ import com.samsamhajo.deepground.friend.service.FriendService;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.member.entity.Member;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,6 +53,10 @@ public class FriendController {
                 .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_ACCEPT,result));
     }
 
+    @GetMapping("/receive")
+    public ResponseEntity<List<FriendDto>> getReceiveFriendRequests(@RequestParam Long receiverId) {
+        return ResponseEntity.ok(friendService.findFriendReceive(receiverId));
+    }
 
 
 }
