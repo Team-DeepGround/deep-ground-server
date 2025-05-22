@@ -1,5 +1,7 @@
 package com.samsamhajo.deepground.calendar.entity;
 
+import com.samsamhajo.deepground.calendar.exception.ScheduleErrorCode;
+import com.samsamhajo.deepground.calendar.exception.ScheduleException;
 import com.samsamhajo.deepground.global.BaseEntity;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import jakarta.persistence.*;
@@ -58,5 +60,15 @@ public class StudySchedule extends BaseEntity {
         return new StudySchedule(studyGroup, title, startTime, endTime, description, null);
     }
 
+    public void update(String title, LocalDateTime startTime, LocalDateTime endTime, String description, String location) {
+        if (startTime.isAfter(endTime)) {
+            throw new ScheduleException(ScheduleErrorCode.INVALID_DATE_RANGE);
+        }
 
+        this.title = title;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.description = description;
+        this.location = location;
+    }
 }

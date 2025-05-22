@@ -68,17 +68,52 @@ public class StudyScheduleService {
                 ).toList();
     }
 
+    @Transactional
+    public StudyScheduleResponseDto updateStudySchedule(Long studyGroupId, Long scheduleId, StudyScheduleRequestDto requestDto) {
+
+        validateStudyGroup(studyGroupId);
+
+        StudySchedule studySchedule = studyScheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.SCHEDULE_NOT_FOUND));
+
+        boolean isDuplicated = studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
+                studyGroupId,
+                requestDto.getStartTime(),
+                requestDto.getEndTime()
+        );
+
+        // 자기 자신은 제외
+        if (isDuplicated && !studySchedule.getId().equals(scheduleId)) {
+            throw new ScheduleException(ScheduleErrorCode.DUPLICATE_SCHEDULE);
+        }
+
+        studySchedule.update(
+                requestDto.getTitle(),
+                requestDto.getStartTime(),
+                requestDto.getEndTime(),
+                requestDto.getDescription(),
+                requestDto.getLocation()
+        );
+
+        return StudyScheduleResponseDto.builder()
+                .id(studySchedule.getId())
+                .title(studySchedule.getTitle())
+                .startTime(studySchedule.getStartTime())
+                .endTime(studySchedule.getEndTime())
+                .description(studySchedule.getDescription())
+                .location(studySchedule.getLocation())
+                .build();
+    }
+
     private StudyGroup validateStudyGroup(Long studyGroupId) {
         return studyGroupRepository.findById(studyGroupId)
                 .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.STUDY_GROUP_NOT_FOUND));
     }
 
     private void validateSchedule(Long studyGroupId, StudyScheduleRequestDto requestDto) {
-
         if (requestDto.getEndTime().isBefore(requestDto.getStartTime())) {
             throw new ScheduleException(ScheduleErrorCode.INVALID_DATE_RANGE);
         }
-
         boolean isDuplicated = studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
                 studyGroupId,
                 requestDto.getStartTime(),
@@ -87,6 +122,7 @@ public class StudyScheduleService {
 
         if (isDuplicated) {
             throw new ScheduleException(ScheduleErrorCode.DUPLICATE_SCHEDULE);
+
         }
     }
 }
