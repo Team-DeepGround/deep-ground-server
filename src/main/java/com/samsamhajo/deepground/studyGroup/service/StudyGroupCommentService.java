@@ -32,7 +32,7 @@ public class StudyGroupCommentService {
     StudyGroupComment comment = StudyGroupComment.of(studyGroup, member, requestDto.getContent());
     StudyGroupComment saved = commentRepository.save(comment);
 
-    return new StudyGroupCommentResponse(
+    return StudyGroupCommentResponse.from(
         saved.getId(),
         member.getNickname(),
         saved.getContent(),
