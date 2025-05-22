@@ -24,7 +24,6 @@ public class NotificationService {
 
     public void sendNotification(List<Long> receiverIds, NotificationData data) {
         NotificationData savedData = notificationDataRepository.save(data);
-        System.out.println(savedData.getId());
 
         List<Notification> notifications = receiverIds.stream()
                 .map(receiverId -> Notification.of(receiverId, savedData))
