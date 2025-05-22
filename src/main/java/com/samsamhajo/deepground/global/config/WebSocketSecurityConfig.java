@@ -1,6 +1,6 @@
 package com.samsamhajo.deepground.global.config;
 
-import com.samsamhajo.deepground.chat.service.ChatRedisService;
+import com.samsamhajo.deepground.chat.service.ChatRoomMemberService;
 import com.samsamhajo.deepground.utils.destination.DestinationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +20,7 @@ import org.springframework.security.messaging.access.intercept.MessageMatcherDel
 @RequiredArgsConstructor
 public class WebSocketSecurityConfig {
 
-    private final ChatRedisService chatRedisService;
+    private final ChatRoomMemberService chatRoomMemberService;
 
     @Bean
     public ChannelInterceptor csrfChannelInterceptor() {
@@ -55,7 +55,8 @@ public class WebSocketSecurityConfig {
             }
 
             Long memberId = Long.valueOf(accessor.getUser().getName());
-            return new AuthorizationDecision(chatRedisService.isChatRoomMember(memberId, chatRoomId));
+            boolean granted = chatRoomMemberService.isChatRoomMember(chatRoomId, memberId);
+            return new AuthorizationDecision(granted);
         };
     }
 }
