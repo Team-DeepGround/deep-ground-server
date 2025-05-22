@@ -139,4 +139,32 @@ class StudyScheduleServiceTest {
 
         verify(studyScheduleRepository, never()).save(any(StudySchedule.class));
     }
+
+    @Test
+    void deleteStudySchedule_Success() {
+        // given
+        Long scheduleId = 1L;
+        StudySchedule schedule = mock(StudySchedule.class);
+        when(studyScheduleRepository.findById(scheduleId)).thenReturn(Optional.of(schedule));
+
+        // when
+        studyScheduleService.deleteStudySchedule(scheduleId);
+
+        // then
+        verify(studyScheduleRepository).delete(schedule);
+    }
+
+    @Test
+    void deleteStudySchedule_Fail_StudyScheduleNotFound() {
+        // given
+        Long scheduleId = 1L;
+        when(studyScheduleRepository.findById(scheduleId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> studyScheduleService.deleteStudySchedule(scheduleId))
+                .isInstanceOf(ScheduleException.class)
+                .hasMessageContaining(ScheduleErrorCode.NOT_FOUND_SCHEDULE.getMessage());
+
+        verify(studyScheduleRepository, never()).delete(any());
+    }
 }

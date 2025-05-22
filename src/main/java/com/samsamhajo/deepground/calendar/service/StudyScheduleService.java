@@ -46,6 +46,14 @@ public class StudyScheduleService {
 
     }
 
+    @Transactional
+    public void deleteStudySchedule(Long scheduleId) {
+        StudySchedule schedule = studyScheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
+
+        studyScheduleRepository.delete(schedule);
+    }
+
     private StudyGroup validateSchedule(Long studyGroupId, StudyScheduleRequestDto requestDto) {
 
         StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)

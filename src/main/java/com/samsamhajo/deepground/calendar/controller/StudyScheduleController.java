@@ -27,6 +27,12 @@ public class StudyScheduleController {
                 .body(SuccessResponse.of(ScheduleSuccessCode.SCHEDULE_CREATED, responseDto));
     }
 
+    @DeleteMapping("/schedules/{scheduleId}")
+    public ResponseEntity<Void> deleteSchedule(@PathVariable Long scheduleId) {
+        studyScheduleService.deleteStudySchedule(scheduleId);
+        return ResponseEntity.noContent().build();
+    }
+
 
 
 }
