@@ -1,7 +1,7 @@
 package com.samsamhajo.deepground.Friend.FriendService;
 
 import com.samsamhajo.deepground.friend.Dto.FriendDto;
-
+import com.samsamhajo.deepground.friend.Dto.FriendRequestDto;
 import com.samsamhajo.deepground.friend.Exception.FriendErrorCode;
 import com.samsamhajo.deepground.friend.Exception.FriendException;
 import com.samsamhajo.deepground.friend.entity.Friend;
@@ -60,7 +60,19 @@ public class FriendReceiveTest {
         memberRepository.save(receiver);
         memberRepository.save(receiver2);
 
+    }
 
+    @Test
+    public void 친구_요청_거절() throws Exception {
+        //given
+        Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
+
+        //when
+        Long refusal = friendService.refusalFriendRequest(friendId, receiver.getId());
+
+        //then
+        Friend request = friendRepository.findById(friendId).orElseThrow();
+        assertEquals(FriendStatus.REFUSAL, request.getStatus());
     }
 
     @Test
@@ -82,13 +94,15 @@ public class FriendReceiveTest {
 
         //when
         FriendException exception = assertThrows(FriendException.class, () ->
-                friendService.acceptFriendRequest(friendId, receiver2.getId()));
+
+                friendService.refusalFriendRequest(friendId, receiver2.getId()));
         //then
         assertEquals(FriendErrorCode.UNAUTHORIZED_ACCESS, exception.getErrorCode());
         }
 
     @Test
     public void 이미_친구_상태에서_수락시_예외() throws Exception {
+
         //given
         Friend friend = Friend.request(requester, receiver);
         friend.accept();
@@ -96,13 +110,15 @@ public class FriendReceiveTest {
 
         //when,then
         FriendException exception = assertThrows(FriendException.class, () ->
-                friendService.acceptFriendRequest(friend.getId(), receiver.getId()));
+
+                friendService.refusalFriendRequest(friend.getId(), receiver.getId()));
 
         assertEquals(FriendErrorCode.ALREADY_FRIEND, exception.getErrorCode());
     }
 
 
 }
+
     public void 받은_친구_요청_목록() throws Exception {
         //given
         friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
@@ -119,7 +135,6 @@ public class FriendReceiveTest {
         assertTrue(receiveList.stream().anyMatch(f -> f.getOtherMemberName().equals(requester3.getNickname())));
 
     }
-
 
 }
 
