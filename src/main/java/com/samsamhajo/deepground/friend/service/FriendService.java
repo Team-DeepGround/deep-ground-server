@@ -7,6 +7,8 @@ import com.samsamhajo.deepground.friend.Exception.FriendErrorCode;
 import com.samsamhajo.deepground.friend.entity.FriendStatus;
 import com.samsamhajo.deepground.friend.repository.FriendRepository;
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.member.exception.MemberErrorCode;
+import com.samsamhajo.deepground.member.exception.MemberException;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -70,6 +72,33 @@ public class FriendService {
         return friendRequest.getId();
 
     }
+
+
+    @Transactional
+    public Long acceptFriendRequest(Long friendId, Long receiverId) {
+        Member receiver = memberRepository.findById(receiverId)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Friend friendRequest = validateAccept(friendId, receiver);
+
+        friendRequest.accept();
+
+        return friendRequest.getId();
+    }
+    private Friend validateAccept(Long friendId, Member receiver){
+        Friend friendRequest = friendRepository.findById(friendId)
+                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_FRIEND_REQUEST));
+
+        if (!friendRequest.getReceiveMember().equals(receiver)) {
+            throw new FriendException(FriendErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
+        if(friendRepository.existsByIdAndReceiveMemberAndStatus(friendId, receiver,FriendStatus.ACCEPT)) {
+            throw new FriendException(FriendErrorCode.ALREADY_FRIEND);
+        }
+
+
+        return friendRequest;
 
 
     public Long sendProfileFriendRequest(Long requesterId, Long receiverId) {

@@ -1,6 +1,11 @@
 package com.samsamhajo.deepground.Friend.FriendService;
 
 import com.samsamhajo.deepground.friend.Dto.FriendDto;
+
+import com.samsamhajo.deepground.friend.Exception.FriendErrorCode;
+import com.samsamhajo.deepground.friend.Exception.FriendException;
+import com.samsamhajo.deepground.friend.entity.Friend;
+import com.samsamhajo.deepground.friend.entity.FriendStatus;
 import com.samsamhajo.deepground.friend.repository.FriendRepository;
 import com.samsamhajo.deepground.friend.service.FriendService;
 import com.samsamhajo.deepground.member.entity.Member;
@@ -34,6 +39,8 @@ public class FriendReceiveTest {
     private Member requester2;
     private Member requester3;
     private Member receiver;
+    private Member receiver2;
+
 
 
     @BeforeEach
@@ -42,6 +49,8 @@ public class FriendReceiveTest {
         requester2 = Member.createLocalMember("gar@gmail.com", "pw", "가");
         requester3 = Member.createLocalMember("den@gmail.com", "pw", "든");
         receiver = Member.createLocalMember("garden@gmail.com", "pw", "가든");
+        receiver2 = Member.createLocalMember("pa@gmail.com","pw","파카");
+
 
 
 
@@ -49,10 +58,51 @@ public class FriendReceiveTest {
         memberRepository.save(requester3);
         memberRepository.save(requester2);
         memberRepository.save(receiver);
+        memberRepository.save(receiver2);
+
 
     }
 
     @Test
+    public void 친구_요청_수락() throws Exception {
+        //given
+        Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
+
+        //when
+        Long accept = friendService.acceptFriendRequest(friendId, receiver.getId());
+
+        //then
+        assertEquals(friendId ,accept);
+    }
+
+    @Test
+    public void 다른_사용자_수락_예외() throws Exception {
+        //given
+        Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
+
+        //when
+        FriendException exception = assertThrows(FriendException.class, () ->
+                friendService.acceptFriendRequest(friendId, receiver2.getId()));
+        //then
+        assertEquals(FriendErrorCode.UNAUTHORIZED_ACCESS, exception.getErrorCode());
+        }
+
+    @Test
+    public void 이미_친구_상태에서_수락시_예외() throws Exception {
+        //given
+        Friend friend = Friend.request(requester, receiver);
+        friend.accept();
+        friendRepository.save(friend);
+
+        //when,then
+        FriendException exception = assertThrows(FriendException.class, () ->
+                friendService.acceptFriendRequest(friend.getId(), receiver.getId()));
+
+        assertEquals(FriendErrorCode.ALREADY_FRIEND, exception.getErrorCode());
+    }
+
+
+}
     public void 받은_친구_요청_목록() throws Exception {
         //given
         friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
@@ -72,3 +122,4 @@ public class FriendReceiveTest {
 
 
 }
+

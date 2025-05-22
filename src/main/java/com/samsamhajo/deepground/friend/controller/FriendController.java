@@ -46,6 +46,14 @@ public class FriendController {
 
     }
 
+    @PatchMapping("/receive/{friendId}/accept")
+    public ResponseEntity<SuccessResponse> acceptFriendRequest(@PathVariable Long friendId,
+                                                               @RequestParam Long receiverId){
+        Long result = friendService.acceptFriendRequest(friendId, receiverId);
+        return ResponseEntity
+                .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_ACCEPT,result));
+    }
+
 
     @PostMapping("/from-profile/{receiverId}")
     public ResponseEntity<SuccessResponse> requestProfileFriend(@PathVariable Long receiverId,
@@ -59,5 +67,6 @@ public class FriendController {
     public ResponseEntity<List<FriendDto>> getReceiveFriendRequests(@RequestParam Long receiverId) {
         return ResponseEntity.ok(friendService.findFriendReceive(receiverId));
     }
+
 
 }
