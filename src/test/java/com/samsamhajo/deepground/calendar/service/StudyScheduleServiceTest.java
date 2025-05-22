@@ -309,4 +309,42 @@ class StudyScheduleServiceTest {
                 .isInstanceOf(ScheduleException.class)
                 .hasMessageContaining(ScheduleErrorCode.DUPLICATE_SCHEDULE.getMessage());
     }
+
+    @Test
+    @DisplayName("스터디 일정 삭제 성공")
+    void deleteStudySchedule_Success() {
+        // given
+        Long studyGroupId = 1L;
+        Long scheduleId = 1L;
+
+        StudyGroup studyGroup = mock(StudyGroup.class);
+        when(studyGroup.getId()).thenReturn(studyGroupId);
+
+        StudySchedule schedule = mock(StudySchedule.class);
+        when(schedule.getStudyGroup()).thenReturn(studyGroup);
+        when(studyScheduleRepository.findById(scheduleId)).thenReturn(Optional.of(schedule));
+
+        // when
+        studyScheduleService.deleteStudySchedule(studyGroupId, scheduleId);
+
+        // then
+        verify(studyScheduleRepository).delete(schedule);
+    }
+
+    @Test
+    @DisplayName("스터디 일정 삭제 실패 - 존재하지 않는 스터디 일정")
+    void deleteStudySchedule_Fail_StudyScheduleNotFound() {
+        // given
+        Long studyGroupId = 1L;
+        Long scheduleId = 1L;
+
+        when(studyScheduleRepository.findById(scheduleId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> studyScheduleService.deleteStudySchedule(studyGroupId, scheduleId))
+                .isInstanceOf(ScheduleException.class)
+                .hasMessageContaining(ScheduleErrorCode.SCHEDULE_NOT_FOUND.getMessage());
+
+        verify(studyScheduleRepository, never()).delete(any());
+    }
 }

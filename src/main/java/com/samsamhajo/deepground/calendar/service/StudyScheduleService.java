@@ -105,6 +105,18 @@ public class StudyScheduleService {
                 .build();
     }
 
+    @Transactional
+    public void deleteStudySchedule(Long studyGroupId, Long scheduleId) {
+        StudySchedule schedule = studyScheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.STUDY_GROUP_NOT_FOUND));
+
+        if (!schedule.getStudyGroup().getId().equals(studyGroupId)) {
+            throw new ScheduleException(ScheduleErrorCode.MISMATCHED_GROUP);
+        }
+
+        studyScheduleRepository.delete(schedule);
+    }
+
     private StudyGroup validateStudyGroup(Long studyGroupId) {
         return studyGroupRepository.findById(studyGroupId)
                 .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.STUDY_GROUP_NOT_FOUND));
