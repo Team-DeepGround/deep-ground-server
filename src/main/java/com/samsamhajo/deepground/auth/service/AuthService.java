@@ -1,8 +1,11 @@
 package com.samsamhajo.deepground.auth.service;
 
+import com.samsamhajo.deepground.auth.dto.LoginRequest;
+import com.samsamhajo.deepground.auth.dto.LoginResponse;
 import com.samsamhajo.deepground.auth.dto.RegisterRequest;
 import com.samsamhajo.deepground.auth.exception.AuthErrorCode;
 import com.samsamhajo.deepground.auth.exception.AuthException;
+import com.samsamhajo.deepground.auth.jwt.JwtProvider;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
 
     @Transactional
     public Long register(RegisterRequest request) {
@@ -31,6 +35,28 @@ public class AuthService {
 
         Member savedMember = memberRepository.save(member);
         return savedMember.getId();
+    }
+
+    @Transactional
+    public LoginResponse login(LoginRequest request) {
+
+        Member member = memberRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AuthException(AuthErrorCode.INVALID_EMAIL));
+
+        if (!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
+            throw new AuthException(AuthErrorCode.INVALID_PASSWORD);
+        }
+
+        String accessToken = jwtProvider.createAccessToken(member.getId());
+        String refreshToken = jwtProvider.createRefreshToken(member.getId());
+
+        return new LoginResponse(
+                accessToken,
+                refreshToken,
+                member.getId(),
+                member.getEmail(),
+                member.getNickname()
+        );
     }
 
     public void checkEmailDuplicate(String email) {

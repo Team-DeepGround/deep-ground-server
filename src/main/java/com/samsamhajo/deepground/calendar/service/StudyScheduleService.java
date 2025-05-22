@@ -3,13 +3,16 @@ package com.samsamhajo.deepground.calendar.service;
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleRequestDto;
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleResponseDto;
 import com.samsamhajo.deepground.calendar.entity.StudySchedule;
+import com.samsamhajo.deepground.calendar.exception.ScheduleErrorCode;
+import com.samsamhajo.deepground.calendar.exception.ScheduleException;
 import com.samsamhajo.deepground.calendar.repository.StudyScheduleRepository;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +24,8 @@ public class StudyScheduleService {
     @Transactional
     public StudyScheduleResponseDto createStudySchedule(Long studyGroupId, StudyScheduleRequestDto requestDto) {
 
-        StudyGroup studyGroup = validateSchedule(studyGroupId, requestDto);
+        StudyGroup studyGroup = validateStudyGroup(studyGroupId);
+        validateSchedule(studyGroupId, requestDto);
 
         StudySchedule studySchedule = StudySchedule.of(
                 studyGroup,
@@ -45,25 +49,92 @@ public class StudyScheduleService {
 
     }
 
-    private StudyGroup validateSchedule(Long studyGroupId, StudyScheduleRequestDto requestDto) {
+    @Transactional(readOnly = true)
+    public List<StudyScheduleResponseDto> findSchedulesByStudyGroupId(Long studyGroupId) {
 
-        StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
-                .orElseThrow(() -> new EntityNotFoundException("스터디 그룹이 존재하지 않습니다."));
+        validateStudyGroup(studyGroupId);
 
-        if (requestDto.getEndTime().isBefore(requestDto.getStartTime())) {
-            throw new IllegalArgumentException("종료 시간이 시작 시간보다 늦을 수 없습니다.");
+        List<StudySchedule> schedules = studyScheduleRepository.findAllByStudyGroupId(studyGroupId);
+
+        return schedules.stream()
+                .map(schedule -> StudyScheduleResponseDto.builder()
+                        .id(schedule.getId())
+                        .title(schedule.getTitle())
+                        .startTime(schedule.getStartTime())
+                        .endTime(schedule.getEndTime())
+                        .description(schedule.getDescription())
+                        .location(schedule.getLocation())
+                        .build()
+                ).toList();
+    }
+
+    @Transactional
+    public StudyScheduleResponseDto updateStudySchedule(Long studyGroupId, Long scheduleId, StudyScheduleRequestDto requestDto) {
+
+        validateStudyGroup(studyGroupId);
+
+        StudySchedule studySchedule = studyScheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.SCHEDULE_NOT_FOUND));
+
+        boolean isDuplicated = studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
+                studyGroupId,
+                requestDto.getStartTime(),
+                requestDto.getEndTime()
+        );
+
+        // 자기 자신은 제외
+        if (isDuplicated && !studySchedule.getId().equals(scheduleId)) {
+            throw new ScheduleException(ScheduleErrorCode.DUPLICATE_SCHEDULE);
         }
 
-        boolean isDuplicated = studyScheduleRepository.existsByStudyGroupAndEndTimeGreaterThanAndStartTimeLessThan(
-                studyGroup,
+        studySchedule.update(
+                requestDto.getTitle(),
+                requestDto.getStartTime(),
+                requestDto.getEndTime(),
+                requestDto.getDescription(),
+                requestDto.getLocation()
+        );
+
+        return StudyScheduleResponseDto.builder()
+                .id(studySchedule.getId())
+                .title(studySchedule.getTitle())
+                .startTime(studySchedule.getStartTime())
+                .endTime(studySchedule.getEndTime())
+                .description(studySchedule.getDescription())
+                .location(studySchedule.getLocation())
+                .build();
+    }
+
+    @Transactional
+    public void deleteStudySchedule(Long studyGroupId, Long scheduleId) {
+        StudySchedule schedule = studyScheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.STUDY_GROUP_NOT_FOUND));
+
+        if (!schedule.getStudyGroup().getId().equals(studyGroupId)) {
+            throw new ScheduleException(ScheduleErrorCode.MISMATCHED_GROUP);
+        }
+
+        studyScheduleRepository.delete(schedule);
+    }
+
+    private StudyGroup validateStudyGroup(Long studyGroupId) {
+        return studyGroupRepository.findById(studyGroupId)
+                .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.STUDY_GROUP_NOT_FOUND));
+    }
+
+    private void validateSchedule(Long studyGroupId, StudyScheduleRequestDto requestDto) {
+        if (requestDto.getEndTime().isBefore(requestDto.getStartTime())) {
+            throw new ScheduleException(ScheduleErrorCode.INVALID_DATE_RANGE);
+        }
+        boolean isDuplicated = studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
+                studyGroupId,
                 requestDto.getStartTime(),
                 requestDto.getEndTime()
         );
 
         if (isDuplicated) {
-            throw new IllegalStateException("해당 시간에 이미 스터디 스케줄이 존재합니다.");
-        }
+            throw new ScheduleException(ScheduleErrorCode.DUPLICATE_SCHEDULE);
 
-        return studyGroup;
+        }
     }
 }

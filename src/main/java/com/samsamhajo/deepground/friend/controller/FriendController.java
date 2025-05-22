@@ -6,11 +6,11 @@ import com.samsamhajo.deepground.friend.Dto.FriendRequestDto;
 import com.samsamhajo.deepground.friend.Exception.FriendSuccessCode;
 import com.samsamhajo.deepground.friend.service.FriendService;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
+import com.samsamhajo.deepground.member.entity.Member;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,6 +44,38 @@ public class FriendController {
         return ResponseEntity
                 .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_CANCEL,friendId));
 
+    }
+
+
+    @PatchMapping("/receive/{friendId}/refusal")
+    public ResponseEntity<SuccessResponse> refusalFriendRequest(@PathVariable Long friendId,
+                                                                @RequestParam Long receiverId){
+        friendService.refusalFriendRequest(friendId,receiverId);
+        return ResponseEntity
+                .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_REFUSAL,friendId));
+
+    }
+
+    @PatchMapping("/receive/{friendId}/accept")
+    public ResponseEntity<SuccessResponse> acceptFriendRequest(@PathVariable Long friendId,
+                                                               @RequestParam Long receiverId){
+        Long result = friendService.acceptFriendRequest(friendId, receiverId);
+        return ResponseEntity
+                .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_ACCEPT,result));
+    }
+
+
+    @PostMapping("/from-profile/{receiverId}")
+    public ResponseEntity<SuccessResponse> requestProfileFriend(@PathVariable Long receiverId,
+                                                                @AuthenticationPrincipal Member requester) {
+        Long friendId = friendService.sendProfileFriendRequest(requester.getId(), receiverId);
+        return ResponseEntity
+                .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_REQUEST,friendId));
+    }
+  
+    @GetMapping("/receive")
+    public ResponseEntity<List<FriendDto>> getReceiveFriendRequests(@RequestParam Long receiverId) {
+        return ResponseEntity.ok(friendService.findFriendReceive(receiverId));
     }
 
 }
