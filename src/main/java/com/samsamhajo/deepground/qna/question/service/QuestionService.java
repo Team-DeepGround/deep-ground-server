@@ -18,7 +18,6 @@ public class QuestionService{
 
     private final QuestionRepository questionRepository;
     private final MemberRepository memberRepository;
-    //private final MemberRepository memberRepository;
 
     //질문 생성
     @Transactional
@@ -47,7 +46,7 @@ public class QuestionService{
     }
 
     @Transactional
-    public Long deleteQuesiton(Long questionId, Long memberId) {
+    public Long deleteQuestion(Long questionId, Long memberId) {
 
         //TODO : question을 작성한 멤버가 맞는지, 삭제권한 있는지 추후 로직 작성
 

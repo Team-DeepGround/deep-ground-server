@@ -63,7 +63,7 @@ public class QuestionDeleteTest {
         QuestionRequestDto questionRequestDto = new QuestionRequestDto(title, content, techStack, mediaFiles);
         Long questionId = questionService.createQuestion(questionRequestDto, memberId);
         System.out.println(questionId);
-        Long deleteId = questionService.deleteQuesiton(questionId, memberId);
+        Long deleteId = questionService.deleteQuestion(questionId, memberId);
         System.out.println(deleteId);
 
         //questionId가 없어야 함
@@ -100,7 +100,7 @@ public class QuestionDeleteTest {
         System.out.println(questionRepository.findById(questionId).get().getTitle());
 
         //삭제
-        Long deleteId = questionService.deleteQuesiton(questionId, memberId);
+        Long deleteId = questionService.deleteQuestion(questionId, memberId);
         System.out.println(deleteId);
 
         //questionId, deleteId가 같아야함

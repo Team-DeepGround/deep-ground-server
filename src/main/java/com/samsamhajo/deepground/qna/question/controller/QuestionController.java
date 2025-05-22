@@ -36,7 +36,7 @@ public class QuestionController {
             @PathVariable Long questionId
     ,       @RequestParam Long memberId) {
 
-        questionService.deleteQuesiton(questionId, memberId);
+        questionService.deleteQuestion(questionId, memberId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
