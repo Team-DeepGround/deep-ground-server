@@ -63,13 +63,45 @@ public class FriendService {
     @Transactional
     public Long cancelFriendRequest(Long friendId, Long requesterId) {
         Friend friendRequest = friendRepository.findById(friendId)
-                .orElseThrow(() -> new FriendException(FriendErrorCode. INVALID_FRIEND_REQUEST));
+                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_FRIEND_REQUEST));
 
         friendRequest.cancel(requesterId);
 
         return friendRequest.getId();
 
     }
+
+
+    public Long sendProfileFriendRequest(Long requesterId, Long receiverId) {
+
+        Member requester = memberRepository.findById(requesterId)
+                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_MEMBER_ID));
+
+        Member receiver = memberRepository.findById(receiverId)
+                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_MEMBER_ID));
+
+        validateSendProfileRequest(requester, receiver);
+
+        Friend friend = Friend.request(requester, receiver);
+        friendRepository.save(friend);
+
+        return friend.getId();
+    }
+
+    private void validateSendProfileRequest(Member requester, Member receiver) {
+
+        if (requester.getId().equals(receiver.getId())) {
+            throw new FriendException(FriendErrorCode.SELF_REQUEST);
+        }
+        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver, FriendStatus.ACCEPT)) {
+            throw new FriendException(FriendErrorCode.ALREADY_FRIEND);
+        }
+        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver, FriendStatus.REQUEST)) {
+            throw new FriendException(FriendErrorCode.ALREADY_REQUESTED);
+        }
+        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(receiver, requester, FriendStatus.REQUEST)) {
+            throw new FriendException(FriendErrorCode.REQUEST_ALREADY_RECEIVED);
+        }
 
     public List<FriendDto> findFriendReceive (Long receiverId) {
         List<Friend> friends = friendRepository.findReceiveRequests(receiverId);
