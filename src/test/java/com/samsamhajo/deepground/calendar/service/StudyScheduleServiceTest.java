@@ -9,6 +9,7 @@ import com.samsamhajo.deepground.calendar.repository.StudyScheduleRepository;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -53,6 +54,7 @@ class StudyScheduleServiceTest {
     }
 
     @Test
+    @DisplayName("스터디 일정 생성 성공")
     void createStudySchedule_Success() {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
@@ -90,6 +92,7 @@ class StudyScheduleServiceTest {
     }
 
     @Test
+    @DisplayName("스터디 일정 생성 실패 - 종료 시간이 시작 시간보다 빠른 경우")
     void createStudySchedule_Fail_EndTimeBeforeStartTime() {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
@@ -111,6 +114,7 @@ class StudyScheduleServiceTest {
     }
 
     @Test
+    @DisplayName("스터디 일정 생성 실패 - 존재하지 않는 스터디 그룹으로 생성 요청")
     void createStudySchedule_Fail_StudyGroupNotFound() {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -124,6 +128,7 @@ class StudyScheduleServiceTest {
     }
 
     @Test
+    @DisplayName("스터디 일정 생성 실패 - 중복된 시간대의 일정이 존재할 경우")
     void createStudySchedule_Fail_DuplicateSchedule() {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
@@ -143,6 +148,7 @@ class StudyScheduleServiceTest {
 
 
     @Test
+    @DisplayName("스터디 그룹 ID로 일정 조회 성공")
     void findSchedulesByStudyGroupId_Success() {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
@@ -164,6 +170,7 @@ class StudyScheduleServiceTest {
     }
 
     @Test
+    @DisplayName("스터디 그룹 ID로 일정 조회 실패 - 존재하지 않는 스터디 그룹 ID로 조회")
     void findSchedulesByStudyGroupId_StudyGroupNotFound() {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.empty());
