@@ -9,6 +9,7 @@ import com.samsamhajo.deepground.calendar.repository.StudyScheduleRepository;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -141,6 +142,7 @@ class StudyScheduleServiceTest {
     }
 
     @Test
+    @DisplayName("스터디 일정 삭제 성공")
     void deleteStudySchedule_Success() {
         // given
         Long studyGroupId = 1L;
@@ -161,6 +163,7 @@ class StudyScheduleServiceTest {
     }
 
     @Test
+    @DisplayName("스터디 일정 삭제 실패 - 존재하지 않는 스터디 일정")
     void deleteStudySchedule_Fail_StudyScheduleNotFound() {
         // given
         Long studyGroupId = 1L;
