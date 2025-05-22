@@ -2,6 +2,8 @@ package com.samsamhajo.deepground.qna.question.service;
 
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionRequestDto;
+import com.samsamhajo.deepground.qna.question.Dto.QuestionResponseDto;
+import com.samsamhajo.deepground.qna.question.Dto.QuestionUpdateDto;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.exception.QuestionErrorCode;
 import com.samsamhajo.deepground.qna.question.exception.QuestionException;
@@ -21,7 +23,7 @@ public class QuestionService{
 
     //질문 생성
     @Transactional
-    public Long createQuestion(QuestionRequestDto questionRequestDto, Long memberId) {
+    public Question createQuestion(QuestionRequestDto questionRequestDto, Long memberId) {
 //       Member member = memberRepository.findById(memberId)
 //                .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다."));
 
@@ -42,7 +44,7 @@ public class QuestionService{
                 null
         );
 
-        return questionRepository.save(question).getId();
+        return questionRepository.save(question);
     }
 
     @Transactional
@@ -59,4 +61,33 @@ public class QuestionService{
 
     }
 
+    public QuestionResponseDto updateQuestion(QuestionUpdateDto questionUpdateDto, Long memberId) {
+
+//        Member member = memberRepository.findById(memberId)
+//                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
+
+        if(!StringUtils.hasText(questionUpdateDto.getTitle())) {
+            throw new QuestionException(QuestionErrorCode.QUESTION_TITLE_REQUIRED);
+        }
+
+        if(!StringUtils.hasText(questionUpdateDto.getContent())) {
+            throw new QuestionException(QuestionErrorCode.QUESTION_CONTENT_REQUIRED);
+        }
+
+        Question question = questionRepository.findById(questionUpdateDto.getQuestionId())
+                .orElseThrow(()-> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
+
+
+        //TODO : Media, TechStack 로직은 추후에 한꺼번에 구현 예정
+
+        question.questionUpdate(questionUpdateDto.getTitle(), questionUpdateDto.getContent());
+
+        return new QuestionResponseDto(
+                question.getId(),
+                question.getTitle(),
+                question.getContent(),
+                null
+        );
+
+    }
 }
