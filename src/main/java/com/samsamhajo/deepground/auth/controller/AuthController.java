@@ -1,5 +1,7 @@
 package com.samsamhajo.deepground.auth.controller;
 
+import com.samsamhajo.deepground.auth.dto.LoginRequest;
+import com.samsamhajo.deepground.auth.dto.LoginResponse;
 import com.samsamhajo.deepground.auth.dto.RegisterRequest;
 import com.samsamhajo.deepground.auth.dto.RegisterResponse;
 import com.samsamhajo.deepground.auth.service.AuthService;
@@ -43,5 +45,15 @@ public class AuthController {
         return ResponseEntity
                 .status(AuthSuccessCode.NICKNAME_AVAILABLE.getStatus())
                 .body(SuccessResponse.of(AuthSuccessCode.NICKNAME_AVAILABLE));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<SuccessResponse<LoginResponse>> login(
+            @Valid @RequestBody LoginRequest request
+    ) {
+        LoginResponse response = authService.login(request);
+        return ResponseEntity
+                .status(AuthSuccessCode.LOGIN_SUCCESS.getStatus())
+                .body(SuccessResponse.of(AuthSuccessCode.LOGIN_SUCCESS, response));
     }
 }

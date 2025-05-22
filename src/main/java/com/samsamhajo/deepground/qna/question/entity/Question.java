@@ -43,7 +43,7 @@ public class Question extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "question")
+    @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     private List<Answer> answers = new ArrayList<>();
 
     @OneToMany(mappedBy = "question")
@@ -57,6 +57,15 @@ public class Question extends BaseEntity {
 
     public static Question of(String title, String content, Member member) {
         return new Question(title, content, member);
+    }
+
+    public void incrementAnswerCount() {
+        this.answerCount++;
+
+    public void questionUpdate(String title, String content) {
+        this.title = title;
+        this.content = content;
+
     }
 
 }

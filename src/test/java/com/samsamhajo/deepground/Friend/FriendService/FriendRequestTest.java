@@ -160,5 +160,83 @@ public class FriendRequestTest {
         assertEquals(FriendErrorCode.INVALID_FRIEND_REQUEST, exception.getErrorCode());
     }
 
+    @Test
+    public void 프로필_친구_요청() throws Exception {
+        //given
+        Long friendId = friendService.sendProfileFriendRequest(requester.getId(), receiver.getId());
+        //when
+        Friend saved = friendRepository.findById(friendId).get();
+
+        //then
+        assertEquals(requester.getId(), saved.getRequestMember().getId());
+        assertEquals(receiver.getId(), saved.getReceiveMember().getId());
+        assertEquals(FriendStatus.REQUEST, saved.getStatus());
+    }
+
+    @Test
+    public void 존재하지_않는_요청자_ID일_때_예외발생_프로필() {
+        // given
+        Long invalidRequesterId = 99L; // 실제 존재하지 않는 ID
+
+        // when & then
+        FriendException exception = assertThrows(FriendException.class, () ->
+                friendService.sendProfileFriendRequest(invalidRequesterId, receiver.getId())
+        );
+
+        assertEquals(FriendErrorCode.INVALID_MEMBER_ID, exception.getErrorCode());
+    }
+
+    @Test
+    public void 본인_계정에_프로필_친구_요청_예외() throws Exception {
+        //given
+        friendService.sendProfileFriendRequest(requester.getId(), receiver.getId());
+
+        //when,then
+        FriendException exception = assertThrows(FriendException.class, () ->
+                friendService.sendProfileFriendRequest(requester.getId(), requester.getId()));
+
+        assertEquals(FriendErrorCode.SELF_REQUEST, exception.getErrorCode());
+    }
+
+    @Test
+    public void 이미_친구_상태에서_포로필_친구_요청시_예외() throws Exception {
+        //given
+        Friend friend = Friend.request(requester, receiver);
+        friend.accept();
+        friendRepository.save(friend);
+
+        //when,then
+        FriendException exception = assertThrows(FriendException.class, () ->
+                friendService.sendProfileFriendRequest(requester.getId(), receiver.getId()));
+
+        assertEquals(FriendErrorCode.ALREADY_FRIEND, exception.getErrorCode());
+    }
+
+    @Test
+    public void 중복_친구_요청_프로필_예외() throws Exception {
+        //given
+        friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
+
+        //when,then
+        FriendException exception = assertThrows(FriendException.class, () ->
+                friendService.sendProfileFriendRequest(requester.getId(), receiver.getId()));
+
+        assertEquals(FriendErrorCode.ALREADY_REQUESTED, exception.getErrorCode());
+    }
+
+    @Test
+    public void 상대방_이미_보낸_친구_요청_프로필() throws Exception {
+        //given
+        friendService.sendFriendRequest(receiver.getId(), requester.getEmail());
+
+        //when,then
+        FriendException exception = assertThrows(FriendException.class, () ->
+                friendService.sendProfileFriendRequest(requester.getId(), receiver.getId()));
+
+        assertEquals(FriendErrorCode.REQUEST_ALREADY_RECEIVED, exception.getErrorCode());
+        }
+
+
+
 
 }

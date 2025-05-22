@@ -7,13 +7,14 @@ import com.samsamhajo.deepground.friend.Exception.FriendErrorCode;
 import com.samsamhajo.deepground.friend.entity.FriendStatus;
 import com.samsamhajo.deepground.friend.repository.FriendRepository;
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.member.exception.MemberErrorCode;
+import com.samsamhajo.deepground.member.exception.MemberException;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -54,7 +55,6 @@ public class FriendService {
             throw new FriendException(FriendErrorCode.ALREADY_REQUESTED);
         }
     }
-    @Transactional
     public List<FriendDto> findSentFriendRequest(Long requesterId) {
         List<Friend> friends = friendRepository.findSentRequests(requesterId);
         return friends.stream()
@@ -65,11 +65,98 @@ public class FriendService {
     @Transactional
     public Long cancelFriendRequest(Long friendId, Long requesterId) {
         Friend friendRequest = friendRepository.findById(friendId)
-                .orElseThrow(() -> new FriendException(FriendErrorCode. INVALID_FRIEND_REQUEST));
+                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_FRIEND_REQUEST));
 
         friendRequest.cancel(requesterId);
 
         return friendRequest.getId();
 
+    }
+
+
+    @Transactional
+    public Long refusalFriendRequest(Long friendId, Long receiverId) {
+        Member receiver = memberRepository.findById(receiverId)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Friend friendRequest = validateRefusal(friendId, receiver);
+
+        friendRequest.refusal();
+
+        return friendRequest.getId();
+    }
+
+    private Friend validateRefusal(Long friendId, Member receiver) {
+
+    @Transactional
+    public Long acceptFriendRequest(Long friendId, Long receiverId) {
+        Member receiver = memberRepository.findById(receiverId)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Friend friendRequest = validateAccept(friendId, receiver);
+
+        friendRequest.accept();
+
+        return friendRequest.getId();
+    }
+    private Friend validateAccept(Long friendId, Member receiver){
+
+        Friend friendRequest = friendRepository.findById(friendId)
+                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_FRIEND_REQUEST));
+
+        if (!friendRequest.getReceiveMember().equals(receiver)) {
+            throw new FriendException(FriendErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
+        if (friendRepository.existsByIdAndReceiveMemberAndStatus(friendId, receiver, FriendStatus.ACCEPT)) {
+            throw new FriendException(FriendErrorCode.ALREADY_FRIEND);
+        }
+
+        return friendRequest;
+
+        if(friendRepository.existsByIdAndReceiveMemberAndStatus(friendId, receiver,FriendStatus.ACCEPT)) {
+            throw new FriendException(FriendErrorCode.ALREADY_FRIEND);
+        }
+
+
+        return friendRequest;
+
+
+    public Long sendProfileFriendRequest(Long requesterId, Long receiverId) {
+
+        Member requester = memberRepository.findById(requesterId)
+                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_MEMBER_ID));
+
+        Member receiver = memberRepository.findById(receiverId)
+                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_MEMBER_ID));
+
+        validateSendProfileRequest(requester, receiver);
+
+        Friend friend = Friend.request(requester, receiver);
+        friendRepository.save(friend);
+
+        return friend.getId();
+    }
+
+    private void validateSendProfileRequest(Member requester, Member receiver) {
+
+        if (requester.getId().equals(receiver.getId())) {
+            throw new FriendException(FriendErrorCode.SELF_REQUEST);
+        }
+        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver, FriendStatus.ACCEPT)) {
+            throw new FriendException(FriendErrorCode.ALREADY_FRIEND);
+        }
+        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver, FriendStatus.REQUEST)) {
+            throw new FriendException(FriendErrorCode.ALREADY_REQUESTED);
+        }
+        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(receiver, requester, FriendStatus.REQUEST)) {
+            throw new FriendException(FriendErrorCode.REQUEST_ALREADY_RECEIVED);
+        }
+
+    public List<FriendDto> findFriendReceive (Long receiverId) {
+        List<Friend> friends = friendRepository.findReceiveRequests(receiverId);
+        return friends.stream()
+                .map(FriendDto::fromReceived)
+                .toList();
     }
 }

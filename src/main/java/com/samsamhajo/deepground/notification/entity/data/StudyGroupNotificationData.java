@@ -1,20 +1,39 @@
 package com.samsamhajo.deepground.notification.entity.data;
 
+import com.samsamhajo.deepground.notification.entity.NotificationData;
+import com.samsamhajo.deepground.notification.entity.NotificationType;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import lombok.Getter;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 @Getter
 public class StudyGroupNotificationData extends NotificationData {
 
+    @Field("study_group_id")
+    private Long studyGroupId;
+
     @Field("title")
     private String title;
 
-    private StudyGroupNotificationData(Long id, String title) {
-        super(id);
+    private StudyGroupNotificationData(NotificationType type, Long studyGroupId, String title) {
+        super(type);
+        this.studyGroupId = studyGroupId;
         this.title = title;
     }
 
-    public static StudyGroupNotificationData of(Long id, String title) {
-        return new StudyGroupNotificationData(id, title);
+    public static StudyGroupNotificationData invite(StudyGroup studyGroup) {
+        return new StudyGroupNotificationData(
+                NotificationType.STUDY_GROUP_INVITE,
+                studyGroup.getId(),
+                studyGroup.getTitle()
+        );
+    }
+
+    public static StudyGroupNotificationData join(StudyGroup studyGroup) {
+        return new StudyGroupNotificationData(
+                NotificationType.STUDY_GROUP_JOIN,
+                studyGroup.getId(),
+                studyGroup.getTitle()
+        );
     }
 }

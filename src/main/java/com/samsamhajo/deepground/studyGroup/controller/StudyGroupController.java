@@ -3,6 +3,7 @@ package com.samsamhajo.deepground.studyGroup.controller;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.global.utils.GlobalLogger;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupSearchRequest;
+import com.samsamhajo.deepground.studyGroup.service.StudyGroupJoinService;
 import com.samsamhajo.deepground.studyGroup.service.StudyGroupService;
 import com.samsamhajo.deepground.studyGroup.success.StudyGroupSuccessCode;
 import com.samsamhajo.deepground.member.entity.Member;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class StudyGroupController {
 
   private final StudyGroupService studyGroupService;
+  private final StudyGroupJoinService studyGroupJoinService;
 
   @GetMapping("/{studyGroupId}")
   public ResponseEntity<SuccessResponse<?>> getStudyGroupDetail(
@@ -59,5 +61,26 @@ public class StudyGroupController {
     return ResponseEntity
         .status(StudyGroupSuccessCode.CREATE_SUCCESS.getStatus())
         .body(SuccessResponse.of(StudyGroupSuccessCode.CREATE_SUCCESS, response));
+  }
+
+
+
+  /**
+   * 스터디 그룹 참가 요청 API
+   * @param studyGroupId 요청 대상 스터디 그룹 ID
+   * @param member 요청자 (JWT 인증 필터를 통해 주입됨)
+   */
+  @PostMapping("/{studyGroupId}/join")
+  public ResponseEntity<SuccessResponse<?>> requestJoin(
+      @PathVariable Long studyGroupId,
+      @RequestAttribute("member") Member member
+  ) {
+    GlobalLogger.info("스터디 참가 요청", member.getEmail(), "스터디 ID:", studyGroupId);
+
+    studyGroupJoinService.requestToJoin(member, studyGroupId);
+
+    return ResponseEntity
+        .status(StudyGroupSuccessCode.REQUEST_JOIN_SUCCESS.getStatus())
+        .body(SuccessResponse.of(StudyGroupSuccessCode.REQUEST_JOIN_SUCCESS));
   }
 }
