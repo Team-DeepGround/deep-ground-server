@@ -9,7 +9,8 @@ public enum ScheduleErrorCode implements ErrorCode {
     DUPLICATE_SCHEDULE(HttpStatus.CONFLICT, "이미 같은 시간대에 등록된 일정이 있습니다."),
     INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "종료 시간이 시작 시간보다 늦을 수 없습니다."),
     MISSING_REQUIRED_FIELDS(HttpStatus.BAD_REQUEST, "필수 입력 값이 누락되었습니다."),
-    NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, "요청한 일정을 찾을 수 없습니다.");
+    NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, "요청한 일정을 찾을 수 없습니다."),
+    MISMATCHED_GROUP(HttpStatus.FORBIDDEN, "해당 스케줄은 요청한 스터디 그룹에 속하지 않습니다.");
 
     private final HttpStatus status;
     private final String message;

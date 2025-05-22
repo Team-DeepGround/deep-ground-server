@@ -28,8 +28,11 @@ public class StudyScheduleController {
     }
 
     @DeleteMapping("/schedules/{scheduleId}")
-    public ResponseEntity<Void> deleteSchedule(@PathVariable Long scheduleId) {
-        studyScheduleService.deleteStudySchedule(scheduleId);
+    public ResponseEntity<Void> deleteSchedule(
+            @PathVariable Long studyGroupId,
+            @PathVariable Long scheduleId
+    ) {
+        studyScheduleService.deleteStudySchedule(studyGroupId, scheduleId);
         return ResponseEntity.noContent().build();
     }
 

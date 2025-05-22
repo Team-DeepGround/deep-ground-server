@@ -143,12 +143,18 @@ class StudyScheduleServiceTest {
     @Test
     void deleteStudySchedule_Success() {
         // given
+        Long studyGroupId = 1L;
         Long scheduleId = 1L;
+
+        StudyGroup studyGroup = mock(StudyGroup.class);
+        when(studyGroup.getId()).thenReturn(studyGroupId);
+
         StudySchedule schedule = mock(StudySchedule.class);
+        when(schedule.getStudyGroup()).thenReturn(studyGroup);
         when(studyScheduleRepository.findById(scheduleId)).thenReturn(Optional.of(schedule));
 
         // when
-        studyScheduleService.deleteStudySchedule(scheduleId);
+        studyScheduleService.deleteStudySchedule(studyGroupId, scheduleId);
 
         // then
         verify(studyScheduleRepository).delete(schedule);
@@ -157,11 +163,13 @@ class StudyScheduleServiceTest {
     @Test
     void deleteStudySchedule_Fail_StudyScheduleNotFound() {
         // given
+        Long studyGroupId = 1L;
         Long scheduleId = 1L;
+
         when(studyScheduleRepository.findById(scheduleId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> studyScheduleService.deleteStudySchedule(scheduleId))
+        assertThatThrownBy(() -> studyScheduleService.deleteStudySchedule(studyGroupId, scheduleId))
                 .isInstanceOf(ScheduleException.class)
                 .hasMessageContaining(ScheduleErrorCode.NOT_FOUND_SCHEDULE.getMessage());
 
