@@ -59,6 +59,7 @@ public class FriendReceiveTest {
         memberRepository.save(requester2);
         memberRepository.save(receiver);
         memberRepository.save(receiver2);
+
     }
 
     @Test
@@ -75,19 +76,33 @@ public class FriendReceiveTest {
     }
 
     @Test
-    public void 다른_사용자_거절_예외() throws Exception {
+    public void 친구_요청_수락() throws Exception {
+        //given
+        Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
+
+        //when
+        Long accept = friendService.acceptFriendRequest(friendId, receiver.getId());
+
+        //then
+        assertEquals(friendId ,accept);
+    }
+
+    @Test
+    public void 다른_사용자_수락_예외() throws Exception {
         //given
         Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
 
         //when
         FriendException exception = assertThrows(FriendException.class, () ->
+
                 friendService.refusalFriendRequest(friendId, receiver2.getId()));
         //then
         assertEquals(FriendErrorCode.UNAUTHORIZED_ACCESS, exception.getErrorCode());
         }
 
     @Test
-    public void 이미_친구_상태에서_거절시_예외() throws Exception {
+    public void 이미_친구_상태에서_수락시_예외() throws Exception {
+
         //given
         Friend friend = Friend.request(requester, receiver);
         friend.accept();
@@ -95,10 +110,12 @@ public class FriendReceiveTest {
 
         //when,then
         FriendException exception = assertThrows(FriendException.class, () ->
+
                 friendService.refusalFriendRequest(friend.getId(), receiver.getId()));
 
         assertEquals(FriendErrorCode.ALREADY_FRIEND, exception.getErrorCode());
     }
+
 
 }
 
