@@ -12,6 +12,8 @@ import org.springframework.stereotype.Repository;
 public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, Long> {
     Optional<ChatRoomMember> findByMemberIdAndChatRoomId(Long memberId, Long chatRoomId);
 
+    boolean existsByChatRoomIdAndMemberId(Long chatRoomId, Long memberId);
+
     @Modifying
     @Query("UPDATE ChatRoomMember SET deleted = true WHERE chatRoom.id = :chatRoomId")
     void softDeleteByChatRoomId(@Param("chatRoomId") Long chatRoomId);

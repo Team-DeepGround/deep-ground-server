@@ -6,10 +6,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.samsamhajo.deepground.chat.entity.ChatMessage;
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
 import com.samsamhajo.deepground.chat.entity.ChatRoomMember;
 import com.samsamhajo.deepground.chat.exception.ChatRoomErrorCode;
 import com.samsamhajo.deepground.chat.exception.ChatRoomException;
+import com.samsamhajo.deepground.chat.repository.ChatMessageRepository;
 import com.samsamhajo.deepground.chat.repository.ChatRoomMemberRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import java.time.LocalDateTime;
@@ -34,7 +36,7 @@ class ChatRoomMemberServiceTest {
     private ChatRoomMemberRepository chatRoomMemberRepository;
 
     @Mock
-    private ChatRedisService chatRedisService;
+    private ChatMessageRepository chatMessageRepository;
 
     private Member member;
     private ChatRoom chatRoom;
@@ -50,19 +52,25 @@ class ChatRoomMemberServiceTest {
     @Test
     @DisplayName("채팅방에 참여한다")
     void joinChatRoom() {
-        LocalDateTime latestMessageTime = LocalDateTime.now();
+        // given
+        LocalDateTime createdAt = LocalDateTime.now();
+        ChatMessage chatMessage = mock(ChatMessage.class);
 
         when(chatRoom.getId()).thenReturn(chatRoomId);
-        when(chatRedisService.getLatestMessageTime(chatRoomId)).thenReturn(latestMessageTime);
+        when(chatMessage.getCreatedAt()).thenReturn(createdAt);
+        when(chatMessageRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(chatRoomId)).thenReturn(
+                Optional.of(chatMessage));
 
+        // when
         chatRoomMemberService.joinChatRoom(member, chatRoom);
 
+        // then
         ArgumentCaptor<ChatRoomMember> captor = ArgumentCaptor.forClass(ChatRoomMember.class);
         verify(chatRoomMemberRepository).save(captor.capture());
 
         ChatRoomMember savedChatRoomMember = captor.getValue();
         assertThat(savedChatRoomMember).isNotNull();
-        assertThat(savedChatRoomMember.getLastReadMessageTime()).isEqualTo(latestMessageTime);
+        assertThat(savedChatRoomMember.getLastReadMessageTime()).isEqualTo(createdAt);
     }
 
     @Nested
@@ -72,22 +80,27 @@ class ChatRoomMemberServiceTest {
         @Test
         @DisplayName("채팅방을 나가면 softDelete가 실행된다")
         void leaveChatRoom_softDelete() {
+            // given
             ChatRoomMember chatRoomMember = mock(ChatRoomMember.class);
 
             when(chatRoomMemberRepository.findByMemberIdAndChatRoomId(memberId, chatRoomId))
                     .thenReturn(Optional.of(chatRoomMember));
 
+            // when
             chatRoomMemberService.leaveChatRoom(memberId, chatRoomId);
 
+            // then
             verify(chatRoomMember).softDelete();
         }
 
         @Test
         @DisplayName("채팅방 멤버를 찾을 수 없다면 예외가 발생한다")
         void leaveChatRoom_notFound() {
+            // given
             when(chatRoomMemberRepository.findByMemberIdAndChatRoomId(memberId, chatRoomId))
                     .thenReturn(Optional.empty());
 
+            // when & then
             assertThatThrownBy(() -> chatRoomMemberService.leaveChatRoom(memberId, chatRoomId))
                     .isInstanceOf(ChatRoomException.class)
                     .hasMessage(ChatRoomErrorCode.MEMBER_NOT_FOUND.getMessage());

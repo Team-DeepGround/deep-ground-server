@@ -16,4 +16,8 @@ public class ErrorResponse {
     public static ErrorResponse of(ErrorCode errorCode, String message) {
         return new ErrorResponse(errorCode.getStatus().value(), message);
     }
+
+    public static ErrorResponse of(WebSocketErrorCode errorCode) {
+        return new ErrorResponse(errorCode.getStatus(), errorCode.getMessage());
+    }
 }
