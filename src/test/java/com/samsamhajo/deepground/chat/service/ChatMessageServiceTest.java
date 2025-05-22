@@ -34,9 +34,6 @@ public class ChatMessageServiceTest {
     @Mock
     private ChatMessageRepository chatMessageRepository;
 
-    @Mock
-    private ChatRedisService chatRedisService;
-
     private final Long chatRoomId = 1L;
     private final Long memberId = 1L;
 
@@ -63,8 +60,6 @@ public class ChatMessageServiceTest {
         assertThat(savedChatMessage.getChatRoomId()).isEqualTo(chatRoomId);
         assertThat(savedChatMessage.getSenderId()).isEqualTo(memberId);
         assertThat(savedChatMessage.getMessage()).isEqualTo(message);
-
-        verify(chatRedisService).updateLatestMessageTime(eq(chatRoomId), any());
 
         String expectedDestination = "/chatrooms/" + chatRoomId + "/message";
         verify(messagePublisher).convertAndSend(eq(expectedDestination), any(ChatMessageResponse.class));
