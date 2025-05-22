@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.request.WebRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +19,6 @@ import org.springframework.web.context.request.WebRequest;
 public class QuestionService{
 
     private final QuestionRepository questionRepository;
-    private final WebRequest webRequest;
     private final MemberRepository memberRepository;
 
     //질문 생성
@@ -63,7 +61,7 @@ public class QuestionService{
             throw new QuestionException(QuestionErrorCode.QUESTION_CONTENT_REQUIRED);
         }
 
-        Question question = questionRepository.findById(questionUpdateDto.getId())
+        Question question = questionRepository.findById(questionUpdateDto.getQuestionId())
                 .orElseThrow(()-> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
 
 
@@ -71,7 +69,12 @@ public class QuestionService{
 
         question.questionUpdate(questionUpdateDto.getTitle(), questionUpdateDto.getContent());
 
-        return new QuestionResponseDto(question);
+        return new QuestionResponseDto(
+                question.getId(),
+                question.getTitle(),
+                question.getContent(),
+                null
+        );
 
     }
 

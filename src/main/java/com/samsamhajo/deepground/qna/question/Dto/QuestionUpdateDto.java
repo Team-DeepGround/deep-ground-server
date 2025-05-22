@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class QuestionUpdateDto {
 
-    private Long id;
+    private Long questionId;
 
     @Size(max = 100, message = "제목은 100자 이내로 입력해야 합니다.")
     private String title;

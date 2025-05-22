@@ -76,7 +76,7 @@ public class QuestionUpdateTest {
         //MemberId가 서로 동일한지, 동일한 회원이 자신이 작성한 질문을 수정하는지
         assertThat(question.getMember()).isEqualTo(questionResponseDto.getMemberId());
         //같은 Question이 수정되고 있는지
-        assertThat(question.getId()).isEqualTo(questionUpdateDto.getId());
+        assertThat(question.getId()).isEqualTo(questionUpdateDto.getQuestionId());
         //제목이 수정되었는지
         assertThat(question.getTitle()).isEqualTo(questionUpdateDto.getTitle());
         //내용이 수정되었는지
@@ -107,8 +107,8 @@ public class QuestionUpdateTest {
         QuestionResponseDto questionResponseDto = questionService.updateQuestion(questionUpdateDto, memberId);
 
         assertThat(question.getMember()).isEqualTo(questionResponseDto.getMemberId());
-        assertThat(questionRepository.findById(questionUpdateDto.getId()).get().getTitle()).isEqualTo(questionUpdateDto.getTitle());
-        assertThat(questionRepository.findById(questionUpdateDto.getId()).get().getContent()).isEqualTo(questionUpdateDto.getContent());
+        assertThat(questionRepository.findById(questionUpdateDto.getQuestionId()).get().getTitle()).isEqualTo(questionUpdateDto.getTitle());
+        assertThat(questionRepository.findById(questionUpdateDto.getQuestionId()).get().getContent()).isEqualTo(questionUpdateDto.getContent());
 
     }
 

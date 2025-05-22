@@ -41,11 +41,7 @@ public class QuestionController {
     @PostMapping(path = "/{questionId}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse> updateQuestion(
             @Valid @ModelAttribute QuestionUpdateDto questionUpdateDto,
-            @PathVariable Long questionId,
             @RequestParam Long memberId) {
-
-
-        questionUpdateDto.setId(questionId);
 
         QuestionResponseDto questionResponseDto = questionService.updateQuestion(questionUpdateDto, memberId);
 
