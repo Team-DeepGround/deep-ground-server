@@ -21,19 +21,19 @@ public class Notification extends BaseDocument {
     private Long receiverId;
 
     @DBRef
-    @Field("notification_message_id")
-    private NotificationMessage message;
+    @Field("notification_data_id")
+    private NotificationData data;
 
     @Field("is_read")
     private boolean read = false;
 
-    private Notification(Long receiverId, NotificationMessage message) {
+    private Notification(Long receiverId, NotificationData data) {
         this.receiverId = receiverId;
-        this.message = message;
+        this.data = data;
     }
 
-    public static Notification of(Long receiverId, NotificationMessage message) {
-        return new Notification(receiverId, message);
+    public static Notification of(Long receiverId, NotificationData data) {
+        return new Notification(receiverId, data);
     }
 
     public void read() {
