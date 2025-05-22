@@ -42,6 +42,7 @@ public class FriendReceiveTest {
     private Member receiver2;
 
 
+
     @BeforeEach
     void setup() {
         requester = Member.createLocalMember("paka@gamil.com", "pw", "파카");
@@ -52,12 +53,12 @@ public class FriendReceiveTest {
 
 
 
+
         memberRepository.save(requester);
         memberRepository.save(requester3);
         memberRepository.save(requester2);
         memberRepository.save(receiver);
         memberRepository.save(receiver2);
-
     }
 
     @Test
@@ -99,5 +100,24 @@ public class FriendReceiveTest {
         assertEquals(FriendErrorCode.ALREADY_FRIEND, exception.getErrorCode());
     }
 
+}
+
+    public void 받은_친구_요청_목록() throws Exception {
+        //given
+        friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
+        friendService.sendFriendRequest(requester2.getId(), receiver.getEmail());
+        friendService.sendFriendRequest(requester3.getId(), receiver.getEmail());
+        //when
+        List<FriendDto> receiveList = friendService.findFriendReceive(receiver.getId());
+        //then
+        assertEquals(3, receiveList.size());
+
+
+        assertTrue(receiveList.stream().anyMatch(f -> f.getOtherMemberName().equals(requester.getNickname())));
+        assertTrue(receiveList.stream().anyMatch(f -> f.getOtherMemberName().equals(requester2.getNickname())));
+        assertTrue(receiveList.stream().anyMatch(f -> f.getOtherMemberName().equals(requester3.getNickname())));
+
+    }
 
 }
+

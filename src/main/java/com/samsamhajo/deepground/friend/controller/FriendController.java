@@ -53,5 +53,8 @@ public class FriendController {
 
     }
 
-
+    @GetMapping("/receive")
+    public ResponseEntity<List<FriendDto>> getReceiveFriendRequests(@RequestParam Long receiverId) {
+        return ResponseEntity.ok(friendService.findFriendReceive(receiverId));
+    }
 }
