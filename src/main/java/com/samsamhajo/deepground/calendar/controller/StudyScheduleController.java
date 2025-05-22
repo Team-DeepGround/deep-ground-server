@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/study-group/{studyGroupId}")
 @RequiredArgsConstructor
@@ -27,6 +29,14 @@ public class StudyScheduleController {
                 .body(SuccessResponse.of(ScheduleSuccessCode.SCHEDULE_CREATED, responseDto));
     }
 
+    @GetMapping("/schedules")
+    public ResponseEntity<SuccessResponse<List<StudyScheduleResponseDto>>> getStudySchedulesByGroup(
+            @PathVariable Long studyGroupId
+    ) {
+        List<StudyScheduleResponseDto> schedules = studyScheduleService.findSchedulesByStudyGroupId(studyGroupId);
 
+        return ResponseEntity.status(ScheduleSuccessCode.SCHEDULE_FOUND.getStatus())
+                .body(SuccessResponse.of(ScheduleSuccessCode.SCHEDULE_FOUND, schedules));
+    }
 
 }

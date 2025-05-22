@@ -2,20 +2,19 @@ package com.samsamhajo.deepground.calendar.exception;
 
 import com.samsamhajo.deepground.global.error.core.ErrorCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
+@RequiredArgsConstructor
 public enum ScheduleErrorCode implements ErrorCode {
     DUPLICATE_SCHEDULE(HttpStatus.CONFLICT, "이미 같은 시간대에 등록된 일정이 있습니다."),
     INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "종료 시간이 시작 시간보다 늦을 수 없습니다."),
     MISSING_REQUIRED_FIELDS(HttpStatus.BAD_REQUEST, "필수 입력 값이 누락되었습니다."),
-    NOT_FOUND_SCHEDULE(HttpStatus.NOT_FOUND, "요청한 일정을 찾을 수 없습니다.");
+    STUDY_GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "스터디 그룹을 찾을 수 없습니다."),
+    SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 일정을 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;
 
-    ScheduleErrorCode(HttpStatus status, String message) {
-        this.status = status;
-        this.message = message;
-    }
 }

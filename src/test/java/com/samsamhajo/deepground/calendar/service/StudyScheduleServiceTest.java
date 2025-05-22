@@ -9,6 +9,7 @@ import com.samsamhajo.deepground.calendar.repository.StudyScheduleRepository;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,10 +54,11 @@ class StudyScheduleServiceTest {
     }
 
     @Test
+    @DisplayName("스터디 일정 생성 성공")
     void createStudySchedule_Success() {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
-        when(studyScheduleRepository.existsByStudyGroupAndEndTimeGreaterThanAndStartTimeLessThan(studyGroup, requestDto.getStartTime(), requestDto.getEndTime())).thenReturn(false);
+        when(studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(anyLong(), eq(requestDto.getStartTime()), eq(requestDto.getEndTime()))).thenReturn(false);
 
         when(studyScheduleRepository.save(any(StudySchedule.class)))
                 .thenAnswer(invocation -> {
@@ -80,15 +83,16 @@ class StudyScheduleServiceTest {
         assertThat(responseDto.getLocation()).isEqualTo(requestDto.getLocation());
 
         verify(studyGroupRepository, times(1)).findById(anyLong());
-        verify(studyScheduleRepository, times(1)).existsByStudyGroupAndEndTimeGreaterThanAndStartTimeLessThan(
-                studyGroup,
-                requestDto.getStartTime(),
-                requestDto.getEndTime()
+        verify(studyScheduleRepository, times(1)).existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
+                anyLong(),
+                eq(requestDto.getStartTime()),
+                eq(requestDto.getEndTime())
         );
         verify(studyScheduleRepository, times(1)).save(any(StudySchedule.class));
     }
 
     @Test
+    @DisplayName("스터디 일정 생성 실패 - 종료 시간이 시작 시간보다 빠른 경우")
     void createStudySchedule_Fail_EndTimeBeforeStartTime() {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
@@ -110,6 +114,7 @@ class StudyScheduleServiceTest {
     }
 
     @Test
+    @DisplayName("스터디 일정 생성 실패 - 존재하지 않는 스터디 그룹으로 생성 요청")
     void createStudySchedule_Fail_StudyGroupNotFound() {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -117,19 +122,20 @@ class StudyScheduleServiceTest {
         // when & then
         assertThatThrownBy(() -> studyScheduleService.createStudySchedule(1L, requestDto))
                 .isInstanceOf(ScheduleException.class)
-                .hasMessageContaining(ScheduleErrorCode.NOT_FOUND_SCHEDULE.getMessage());
+                .hasMessageContaining(ScheduleErrorCode.STUDY_GROUP_NOT_FOUND.getMessage());
 
         verify(studyScheduleRepository, never()).save(any(StudySchedule.class));
     }
 
     @Test
+    @DisplayName("스터디 일정 생성 실패 - 중복된 시간대의 일정이 존재할 경우")
     void createStudySchedule_Fail_DuplicateSchedule() {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
-        when(studyScheduleRepository.existsByStudyGroupAndEndTimeGreaterThanAndStartTimeLessThan(
-                studyGroup,
-                requestDto.getStartTime(),
-                requestDto.getEndTime()
+        when(studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
+                anyLong(),
+                eq(requestDto.getStartTime()),
+                eq(requestDto.getEndTime())
         )).thenReturn(true);
 
         // when & then
@@ -139,4 +145,44 @@ class StudyScheduleServiceTest {
 
         verify(studyScheduleRepository, never()).save(any(StudySchedule.class));
     }
+
+
+    @Test
+    @DisplayName("스터디 그룹 ID로 일정 조회 성공")
+    void findSchedulesByStudyGroupId_Success() {
+        // given
+        when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
+        StudySchedule studySchedule1 = StudySchedule.of(studyGroup, "스터디 1", LocalDateTime.now(), LocalDateTime.now().plusHours(1), "설명 1", "온라인");
+        StudySchedule studySchedule2 = StudySchedule.of(studyGroup, "스터디 2", LocalDateTime.now().plusHours(2), LocalDateTime.now().plusHours(3), "설명 2", "오프라인");
+
+        when(studyScheduleRepository.findAllByStudyGroupId(anyLong())).thenReturn(List.of(studySchedule1, studySchedule2));
+
+        // when
+        List<StudyScheduleResponseDto> responseDtos = studyScheduleService.findSchedulesByStudyGroupId(1L);
+
+        // then
+        assertThat(responseDtos).hasSize(2);
+        assertThat(responseDtos.get(0).getTitle()).isEqualTo("스터디 1");
+        assertThat(responseDtos.get(1).getTitle()).isEqualTo("스터디 2");
+
+        verify(studyScheduleRepository, times(1)).findAllByStudyGroupId(anyLong());
+
+    }
+
+    @Test
+    @DisplayName("스터디 그룹 ID로 일정 조회 실패 - 존재하지 않는 스터디 그룹 ID로 조회")
+    void findSchedulesByStudyGroupId_StudyGroupNotFound() {
+        // given
+        when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> studyScheduleService.findSchedulesByStudyGroupId(1L))
+                .isInstanceOf(ScheduleException.class)
+                .hasMessageContaining(ScheduleErrorCode.STUDY_GROUP_NOT_FOUND.getMessage());
+
+        verify(studyScheduleRepository, never()).findAllByStudyGroupId(anyLong());
+
+    }
+
+
 }

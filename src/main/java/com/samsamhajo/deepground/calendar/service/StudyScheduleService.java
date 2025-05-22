@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class StudyScheduleService {
@@ -22,7 +24,8 @@ public class StudyScheduleService {
     @Transactional
     public StudyScheduleResponseDto createStudySchedule(Long studyGroupId, StudyScheduleRequestDto requestDto) {
 
-        StudyGroup studyGroup = validateSchedule(studyGroupId, requestDto);
+        StudyGroup studyGroup = validateStudyGroup(studyGroupId);
+        validateSchedule(studyGroupId, requestDto);
 
         StudySchedule studySchedule = StudySchedule.of(
                 studyGroup,
@@ -46,17 +49,38 @@ public class StudyScheduleService {
 
     }
 
-    private StudyGroup validateSchedule(Long studyGroupId, StudyScheduleRequestDto requestDto) {
+    @Transactional(readOnly = true)
+    public List<StudyScheduleResponseDto> findSchedulesByStudyGroupId(Long studyGroupId) {
 
-        StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
-                .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
+        validateStudyGroup(studyGroupId);
+
+        List<StudySchedule> schedules = studyScheduleRepository.findAllByStudyGroupId(studyGroupId);
+
+        return schedules.stream()
+                .map(schedule -> StudyScheduleResponseDto.builder()
+                        .id(schedule.getId())
+                        .title(schedule.getTitle())
+                        .startTime(schedule.getStartTime())
+                        .endTime(schedule.getEndTime())
+                        .description(schedule.getDescription())
+                        .location(schedule.getLocation())
+                        .build()
+                ).toList();
+    }
+
+    private StudyGroup validateStudyGroup(Long studyGroupId) {
+        return studyGroupRepository.findById(studyGroupId)
+                .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.STUDY_GROUP_NOT_FOUND));
+    }
+
+    private void validateSchedule(Long studyGroupId, StudyScheduleRequestDto requestDto) {
 
         if (requestDto.getEndTime().isBefore(requestDto.getStartTime())) {
             throw new ScheduleException(ScheduleErrorCode.INVALID_DATE_RANGE);
         }
 
-        boolean isDuplicated = studyScheduleRepository.existsByStudyGroupAndEndTimeGreaterThanAndStartTimeLessThan(
-                studyGroup,
+        boolean isDuplicated = studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
+                studyGroupId,
                 requestDto.getStartTime(),
                 requestDto.getEndTime()
         );
@@ -64,7 +88,5 @@ public class StudyScheduleService {
         if (isDuplicated) {
             throw new ScheduleException(ScheduleErrorCode.DUPLICATE_SCHEDULE);
         }
-
-        return studyGroup;
     }
 }
