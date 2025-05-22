@@ -12,13 +12,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RegisterRequest {
 
-    @NotBlank
-    @Email
+    @NotBlank(message = "email을 입력하세요.")
+    @Email(message = "유효한 email을 입력하세요.")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "비밀번호를 입력하세요.")
     private String password;
 
-    @NotBlank
+    @NotBlank(message = "닉네임을 입력하세요.")
     private String nickname;
 }

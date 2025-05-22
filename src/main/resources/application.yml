@@ -62,9 +62,10 @@ spring:
 
 # JWT 설정
 jwt:
-  secret: 5vbzVtyjIMw0BcQVZ5whHLOU3pwgbVvM48A6mUCcSe9N3lNMaNDFMxF3pvE/evCf/TJF2FIRgg+RoBYUU+hdbw==
-  access-token-validity-in-seconds: 3600      # 1시간
-  refresh-token-validity-in-seconds: 1209600  # 14일
+  secret: ${JWT_SECRET}
+  access-token-validity-in-seconds: ${JWT_ACCESS_TOKEN_VALIDITY_IN_SECONDS}
+  refresh-token-validity-in-seconds: ${JWT_REFRESH_TOKEN_VALIDITY_IN_SECONDS}
+
 
 
 # CORS 설정
