@@ -46,12 +46,18 @@ public class FriendController {
 
     }
 
+
     @PostMapping("/from-profile/{receiverId}")
     public ResponseEntity<SuccessResponse> requestProfileFriend(@PathVariable Long receiverId,
                                                                 @AuthenticationPrincipal Member requester) {
         Long friendId = friendService.sendProfileFriendRequest(requester.getId(), receiverId);
         return ResponseEntity
                 .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_REQUEST,friendId));
+    }
+  
+    @GetMapping("/receive")
+    public ResponseEntity<List<FriendDto>> getReceiveFriendRequests(@RequestParam Long receiverId) {
+        return ResponseEntity.ok(friendService.findFriendReceive(receiverId));
     }
 
 }

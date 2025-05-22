@@ -1,6 +1,8 @@
 package com.samsamhajo.deepground.qna.question.controller;
 
+import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionRequestDto;
+import com.samsamhajo.deepground.qna.question.exception.QuestionSuccessCode;
 import com.samsamhajo.deepground.qna.question.service.QuestionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +19,7 @@ public class QuestionController {
     private final QuestionService questionService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Long> creatQuestion(
+    public ResponseEntity<SuccessResponse> createQuestion(
             @Valid @ModelAttribute QuestionRequestDto questionRequestDto,
             @RequestParam Long memberId) {
 
@@ -25,6 +27,8 @@ public class QuestionController {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(questionId);
+                .body(SuccessResponse.of(QuestionSuccessCode.QUESTION_CREATED, questionId));
+
     }
+
 }

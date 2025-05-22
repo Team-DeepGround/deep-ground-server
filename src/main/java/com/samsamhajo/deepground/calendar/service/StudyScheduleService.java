@@ -3,10 +3,11 @@ package com.samsamhajo.deepground.calendar.service;
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleRequestDto;
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleResponseDto;
 import com.samsamhajo.deepground.calendar.entity.StudySchedule;
+import com.samsamhajo.deepground.calendar.exception.ScheduleErrorCode;
+import com.samsamhajo.deepground.calendar.exception.ScheduleException;
 import com.samsamhajo.deepground.calendar.repository.StudyScheduleRepository;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,10 +49,10 @@ public class StudyScheduleService {
     private StudyGroup validateSchedule(Long studyGroupId, StudyScheduleRequestDto requestDto) {
 
         StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
-                .orElseThrow(() -> new EntityNotFoundException("스터디 그룹이 존재하지 않습니다."));
+                .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.NOT_FOUND_SCHEDULE));
 
         if (requestDto.getEndTime().isBefore(requestDto.getStartTime())) {
-            throw new IllegalArgumentException("종료 시간이 시작 시간보다 늦을 수 없습니다.");
+            throw new ScheduleException(ScheduleErrorCode.INVALID_DATE_RANGE);
         }
 
         boolean isDuplicated = studyScheduleRepository.existsByStudyGroupAndEndTimeGreaterThanAndStartTimeLessThan(
@@ -61,7 +62,7 @@ public class StudyScheduleService {
         );
 
         if (isDuplicated) {
-            throw new IllegalStateException("해당 시간에 이미 스터디 스케줄이 존재합니다.");
+            throw new ScheduleException(ScheduleErrorCode.DUPLICATE_SCHEDULE);
         }
 
         return studyGroup;

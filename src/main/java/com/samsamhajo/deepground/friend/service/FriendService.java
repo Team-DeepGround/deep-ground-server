@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -54,7 +53,6 @@ public class FriendService {
             throw new FriendException(FriendErrorCode.ALREADY_REQUESTED);
         }
     }
-    @Transactional
     public List<FriendDto> findSentFriendRequest(Long requesterId) {
         List<Friend> friends = friendRepository.findSentRequests(requesterId);
         return friends.stream()
@@ -72,6 +70,7 @@ public class FriendService {
         return friendRequest.getId();
 
     }
+
 
     public Long sendProfileFriendRequest(Long requesterId, Long receiverId) {
 
@@ -103,5 +102,11 @@ public class FriendService {
         if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(receiver, requester, FriendStatus.REQUEST)) {
             throw new FriendException(FriendErrorCode.REQUEST_ALREADY_RECEIVED);
         }
+
+    public List<FriendDto> findFriendReceive (Long receiverId) {
+        List<Friend> friends = friendRepository.findReceiveRequests(receiverId);
+        return friends.stream()
+                .map(FriendDto::fromReceived)
+                .toList();
     }
 }
