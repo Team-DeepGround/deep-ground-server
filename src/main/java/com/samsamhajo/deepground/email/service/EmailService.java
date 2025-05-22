@@ -6,6 +6,9 @@ import com.samsamhajo.deepground.email.dto.EmailVerifyRequest;
 import com.samsamhajo.deepground.email.exception.EmailErrorCode;
 import com.samsamhajo.deepground.email.exception.EmailException;
 import com.samsamhajo.deepground.email.repository.EmailVerificationRepository;
+import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.member.repository.MemberRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -22,6 +25,7 @@ public class EmailService {
 
     private static final int VERIFICATION_CODE_LENGTH = 6;
     private static final long VERIFICATION_CODE_TTL = 300L;
+    private final MemberRepository memberRepository;
 
     public EmailResponse sendVerificationEmail(EmailRequest request) {
         String email = request.getEmail();
@@ -37,7 +41,9 @@ public class EmailService {
         return new EmailResponse(email, true);
     }
 
+    @Transactional
     public boolean verifyEmail(EmailVerifyRequest request) {
+        String email =request.getEmail();
         String storedCode = emailVerificationRepository.getCode(request.getEmail());
 
         if (storedCode == null) {
@@ -47,6 +53,14 @@ public class EmailService {
         if (!storedCode.equals(request.getCode())) {
             throw new EmailException(EmailErrorCode.INVALID_VERIFICATION_CODE);
         }
+
+        // 인증 성공 시
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new EmailException(EmailErrorCode.EMAIL_NOT_FOUND));
+
+        member.verify();
+        memberRepository.save(member);
+
         // 인증 성공 시 Redis에서 인증 코드 삭제
         emailVerificationRepository.delete(request.getEmail());
 
