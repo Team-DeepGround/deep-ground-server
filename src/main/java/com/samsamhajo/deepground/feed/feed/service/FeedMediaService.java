@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class FeedMediaService {
 
     @Transactional
     public void createFeedMedia(Feed feed, List<MultipartFile> images){
-        if(images == null || images.isEmpty()) return;
+        if(CollectionUtils.isEmpty(images)) return;
 
         feedMediaRepository.saveAll(
                 images.stream()
