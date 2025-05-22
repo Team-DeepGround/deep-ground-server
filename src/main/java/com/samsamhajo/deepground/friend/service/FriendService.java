@@ -81,7 +81,7 @@ public class FriendService {
 
         Friend friendRequest = validateRefusal(friendId, receiver);
 
-        friendRequest.accept();
+        friendRequest.refusal();
 
         return friendRequest.getId();
     }

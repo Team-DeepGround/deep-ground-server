@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.Friend.FriendService;
 
 import com.samsamhajo.deepground.friend.Dto.FriendDto;
+import com.samsamhajo.deepground.friend.Dto.FriendRequestDto;
 import com.samsamhajo.deepground.friend.Exception.FriendErrorCode;
 import com.samsamhajo.deepground.friend.Exception.FriendException;
 import com.samsamhajo.deepground.friend.entity.Friend;
@@ -68,11 +69,12 @@ public class FriendReceiveTest {
         Long refusal = friendService.refusalFriendRequest(friendId, receiver.getId());
 
         //then
-        assertEquals(friendId ,refusal);
+        Friend request = friendRepository.findById(friendId).orElseThrow();
+        assertEquals(FriendStatus.REFUSAL, request.getStatus());
     }
 
     @Test
-    public void 다른_사용자_수락_예외() throws Exception {
+    public void 다른_사용자_거절_예외() throws Exception {
         //given
         Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
 
