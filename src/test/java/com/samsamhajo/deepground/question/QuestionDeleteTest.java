@@ -92,23 +92,24 @@ public class QuestionDeleteTest {
 
 
         QuestionRequestDto questionRequestDto = new QuestionRequestDto(title, content, techStack, mediaFiles);
-        Question questionId = questionService.createQuestion(questionRequestDto, memberId);
+        Question question = questionService.createQuestion(questionRequestDto, memberId);
+        Long questionId = question.getId();
         System.out.println(questionId);
 
         //질문 생성 후 실제로 DB에 반영됐는지 확인
-        assertThat(questionRepository.findById(questionId.getId()).get().getTitle()).isNotNull();
-        System.out.println(questionRepository.findById(questionId.getId()).get().getTitle());
+        assertThat(questionRepository.findById(questionId).get().getTitle()).isNotNull();
+        System.out.println(questionRepository.findById(questionId).get().getTitle());
 
         //삭제
-        Long deleteId = questionService.deleteQuestion(questionId.getId(), memberId);
+        Long deleteId = questionService.deleteQuestion(questionId, memberId);
         System.out.println(deleteId);
 
         //questionId, deleteId가 같아야함
         assertThat(deleteId.equals(questionId)).isTrue();
 
         //삭제 후 DB에서 지워졌는지 확인
-        assertThat(questionRepository.findById(questionId.getId()).isEmpty()).isTrue();
-        System.out.println(questionRepository.findById(questionId.getId()).isEmpty());
+        assertThat(questionRepository.findById(questionId).isEmpty()).isTrue();
+        System.out.println(questionRepository.findById(questionId).isEmpty());
 
 
 
