@@ -80,7 +80,7 @@ public class QuestionService{
 
         //TODO : Media, TechStack 로직은 추후에 한꺼번에 구현 예정
 
-        question.questionUpdate(questionUpdateDto.getTitle(), questionUpdateDto.getContent());
+        question.updateQuesiton(questionUpdateDto.getTitle(), questionUpdateDto.getContent());
 
         return new QuestionResponseDto(
                 question.getId(),
