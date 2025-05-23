@@ -25,7 +25,7 @@ public class FriendService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Long sendFriendRequest (Long requesterId, String receiverEmail) {
+    public Long sendFriendRequest(Long requesterId, String receiverEmail) {
 
         Member requester = memberRepository.findById(requesterId)
                 .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_MEMBER_EMAIL));
@@ -40,21 +40,23 @@ public class FriendService {
 
         return friend.getId();
     }
-    private void validateSendRequest(Member requester, Member receiver,String receiverEmail) {
 
-        if(receiverEmail == null || receiverEmail.trim().isEmpty()){
+    private void validateSendRequest(Member requester, Member receiver, String receiverEmail) {
+
+        if (receiverEmail == null || receiverEmail.trim().isEmpty()) {
             throw new FriendException(FriendErrorCode.BLANK_EMAIL);
         }
-        if(requester.getEmail().equals(receiver.getEmail())) {
+        if (requester.getEmail().equals(receiver.getEmail())) {
             throw new FriendException(FriendErrorCode.SELF_REQUEST);
         }
-        if(friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver, FriendStatus.ACCEPT)) {
+        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver, FriendStatus.ACCEPT)) {
             throw new FriendException(FriendErrorCode.ALREADY_FRIEND);
         }
-        if(friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester,receiver, FriendStatus.REQUEST)) {
+        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver, FriendStatus.REQUEST)) {
             throw new FriendException(FriendErrorCode.ALREADY_REQUESTED);
         }
     }
+
     public List<FriendDto> findSentFriendRequest(Long requesterId) {
         List<Friend> friends = friendRepository.findSentRequests(requesterId);
         return friends.stream()
@@ -73,11 +75,43 @@ public class FriendService {
 
     }
 
+    public List<FriendDto> findFriendReceive(Long receiverId) {
+        List<Friend> friends = friendRepository.findReceiveRequests(receiverId);
+        return friends.stream()
+                .map(FriendDto::fromReceived)
+                .toList();
+    }
+
+    @Transactional
+    public Long acceptFriendRequest(Long friendId, Long receiverId) {
+        Member receiver = memberRepository.findById(receiverId)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.INVALID_MEMBER_ID));
+
+        Friend friendRequest = validateAccept(friendId, receiver);
+
+        friendRequest.accept();
+
+        return friendRequest.getId();
+    }
+
+    private Friend validateAccept(Long friendId, Member receiver) {
+        Friend friendRequest = friendRepository.findById(friendId)
+                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_FRIEND_REQUEST));
+
+        if (!friendRequest.getReceiveMember().equals(receiver)) {
+            throw new FriendException(FriendErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
+        if (friendRepository.existsByIdAndReceiveMemberAndStatus(friendId, receiver, FriendStatus.ACCEPT)) {
+            throw new FriendException(FriendErrorCode.ALREADY_FRIEND);
+        }
+        return friendRequest;
+    }
 
     @Transactional
     public Long refusalFriendRequest(Long friendId, Long receiverId) {
         Member receiver = memberRepository.findById(receiverId)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new MemberException(MemberErrorCode.INVALID_MEMBER_ID));
 
         Friend friendRequest = validateRefusal(friendId, receiver);
 
@@ -87,19 +121,6 @@ public class FriendService {
     }
 
     private Friend validateRefusal(Long friendId, Member receiver) {
-
-    @Transactional
-    public Long acceptFriendRequest(Long friendId, Long receiverId) {
-        Member receiver = memberRepository.findById(receiverId)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
-
-        Friend friendRequest = validateAccept(friendId, receiver);
-
-        friendRequest.accept();
-
-        return friendRequest.getId();
-    }
-    private Friend validateAccept(Long friendId, Member receiver){
 
         Friend friendRequest = friendRepository.findById(friendId)
                 .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_FRIEND_REQUEST));
@@ -113,19 +134,12 @@ public class FriendService {
         }
 
         return friendRequest;
-
-        if(friendRepository.existsByIdAndReceiveMemberAndStatus(friendId, receiver,FriendStatus.ACCEPT)) {
-            throw new FriendException(FriendErrorCode.ALREADY_FRIEND);
-        }
-
-
-        return friendRequest;
-
+    }
 
     public Long sendProfileFriendRequest(Long requesterId, Long receiverId) {
 
         Member requester = memberRepository.findById(requesterId)
-                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_MEMBER_ID));
+                .orElseThrow(() -> new MemberException(MemberErrorCode.INVALID_MEMBER_ID));
 
         Member receiver = memberRepository.findById(receiverId)
                 .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_MEMBER_ID));
@@ -152,11 +166,5 @@ public class FriendService {
         if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(receiver, requester, FriendStatus.REQUEST)) {
             throw new FriendException(FriendErrorCode.REQUEST_ALREADY_RECEIVED);
         }
-
-    public List<FriendDto> findFriendReceive (Long receiverId) {
-        List<Friend> friends = friendRepository.findReceiveRequests(receiverId);
-        return friends.stream()
-                .map(FriendDto::fromReceived)
-                .toList();
     }
 }

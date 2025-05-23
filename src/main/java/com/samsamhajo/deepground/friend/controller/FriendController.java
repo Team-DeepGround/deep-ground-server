@@ -32,8 +32,10 @@ public class FriendController {
 
 
     @GetMapping("/sent")
-    public ResponseEntity<List<FriendDto>> getSentFriendRequests(@RequestParam Long requesterId) {
-        return ResponseEntity.ok(friendService.findSentFriendRequest(requesterId));
+    public ResponseEntity<SuccessResponse<List<FriendDto>>> getSentFriendRequests(@RequestParam Long requesterId) {
+        List<FriendDto> sentList = friendService.findSentFriendRequest(requesterId);
+        return ResponseEntity.ok(
+                SuccessResponse.of(FriendSuccessCode.FRIEND_SENT_LIST_FOUND, sentList));
     }
 
 
@@ -46,14 +48,11 @@ public class FriendController {
 
     }
 
-
-    @PatchMapping("/receive/{friendId}/refusal")
-    public ResponseEntity<SuccessResponse> refusalFriendRequest(@PathVariable Long friendId,
-                                                                @RequestParam Long receiverId){
-        friendService.refusalFriendRequest(friendId,receiverId);
+    @GetMapping("/receive")
+    public ResponseEntity<SuccessResponse<List<FriendDto>>> getReceiveFriendRequests(@RequestParam Long receiverId) {
+        List<FriendDto> receiveList = friendService.findFriendReceive(receiverId);
         return ResponseEntity
-                .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_REFUSAL,friendId));
-
+                .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_RECEIVE_LIST_FOUND, receiveList));
     }
 
     @PatchMapping("/receive/{friendId}/accept")
@@ -64,6 +63,14 @@ public class FriendController {
                 .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_ACCEPT,result));
     }
 
+    @PatchMapping("/receive/{friendId}/refusal")
+    public ResponseEntity<SuccessResponse> refusalFriendRequest(@PathVariable Long friendId,
+                                                                @RequestParam Long receiverId){
+        friendService.refusalFriendRequest(friendId,receiverId);
+        return ResponseEntity
+                .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_REFUSAL,friendId));
+
+    }
 
     @PostMapping("/from-profile/{receiverId}")
     public ResponseEntity<SuccessResponse> requestProfileFriend(@PathVariable Long receiverId,
@@ -73,9 +80,6 @@ public class FriendController {
                 .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_REQUEST,friendId));
     }
   
-    @GetMapping("/receive")
-    public ResponseEntity<List<FriendDto>> getReceiveFriendRequests(@RequestParam Long receiverId) {
-        return ResponseEntity.ok(friendService.findFriendReceive(receiverId));
-    }
+
 
 }

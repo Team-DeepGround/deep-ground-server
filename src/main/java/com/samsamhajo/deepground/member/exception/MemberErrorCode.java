@@ -7,7 +7,8 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum MemberErrorCode implements ErrorCode {
 
-    MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 사용자가 없습니다");
+    INVALID_MEMBER_ID(HttpStatus.BAD_REQUEST, "입력하신 회원 ID가 올바르지 않거나 존재하지 않습니다.");
+
 
     private final HttpStatus status;
     private final String message;
