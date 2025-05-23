@@ -61,13 +61,14 @@ public class QuestionDeleteTest {
         List<Long> techStack = List.of(1L, 2L);
 
         QuestionRequestDto questionRequestDto = new QuestionRequestDto(title, content, techStack, mediaFiles);
-        Question questionId = questionService.createQuestion(questionRequestDto, memberId);
+        Question question = questionService.createQuestion(questionRequestDto, memberId);
+        Long questionId = question.getId();
         System.out.println(questionId);
-        Long deleteId = questionService.deleteQuestion(questionId.getId(), memberId);
+        Long deleteId = questionService.deleteQuestion(questionId, memberId);
         System.out.println(deleteId);
 
         //questionId가 없어야 함
-        assertThat(questionRepository.findById(questionId.getId()).isPresent()).isFalse();
+        assertThat(questionRepository.findById(questionId).isPresent()).isFalse();
         //questionId, deleteId가 같아야함
         assertThat(deleteId.equals(questionId)).isTrue();
 
