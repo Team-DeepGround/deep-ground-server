@@ -53,9 +53,6 @@ public class AnswerTest {
         memberRepository.save(member);
         memberId = member.getId();
 
-        Member member1 = Member.createLocalMember("test1@naver.com", "password1234", "tester1");
-        memberRepository.save(member1);
-        memberId = member1.getId();
     }
 
     @Test
@@ -79,7 +76,7 @@ public class AnswerTest {
 
         //후에 답변 작성
         AnswerCreateRequestDto answerCreateRequestDto = new AnswerCreateRequestDto(answerContent, mediaFiles, questionId);
-        AnswerCreateResponseDto answerCreateResponseDto = answerService.createAnswer(answerCreateRequestDto, question.getId(), memberId);
+        AnswerCreateResponseDto answerCreateResponseDto = answerService.createAnswer(answerCreateRequestDto, memberId);
 
         //생성된 questionId, Answer에 넘어간 questionId가 같은지 확인
         assertThat(answerCreateResponseDto.getQuestionId()).isEqualTo(question.getId());
@@ -89,4 +86,3 @@ public class AnswerTest {
     }
 
 }
-

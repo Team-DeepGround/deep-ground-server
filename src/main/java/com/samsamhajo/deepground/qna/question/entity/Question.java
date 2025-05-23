@@ -30,13 +30,13 @@ public class Question extends BaseEntity {
     private String content;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "question_status",nullable = false)
+    @Column(name = "question_status", nullable = false)
     private QuestionStatus questionStatus = QuestionStatus.OPEN;
 
-    @Column(name ="answer_count",nullable = false)//DB에 null값이 들어가면 +1 연산할 때 문제가 발생하거나 예외 발생할 수 있어 nullable = false;
+    @Column(name = "answer_count", nullable = false)//DB에 null값이 들어가면 +1 연산할 때 문제가 발생하거나 예외 발생할 수 있어 nullable = false;
     private int answerCount = 0;
 
-    @Column(name = "view_count",nullable = false)
+    @Column(name = "view_count", nullable = false)
     private int viewCount = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -61,12 +61,11 @@ public class Question extends BaseEntity {
 
     public void incrementAnswerCount() {
         this.answerCount++;
+    }
 
-    public void questionUpdate(String title, String content) {
+    public void questionUpdate(String title, String content){
         this.title = title;
         this.content = content;
 
     }
-
 }
-
