@@ -61,7 +61,8 @@ public class QuestionDeleteTest {
         List<Long> techStack = List.of(1L, 2L);
 
         QuestionRequestDto questionRequestDto = new QuestionRequestDto(title, content, techStack, mediaFiles);
-        Long questionId = questionService.createQuestion(questionRequestDto, memberId);
+        Question question = questionService.createQuestion(questionRequestDto, memberId);
+        Long questionId = question.getId();
         System.out.println(questionId);
         Long deleteId = questionService.deleteQuestion(questionId, memberId);
         System.out.println(deleteId);
@@ -92,7 +93,8 @@ public class QuestionDeleteTest {
 
 
         QuestionRequestDto questionRequestDto = new QuestionRequestDto(title, content, techStack, mediaFiles);
-        Long questionId = questionService.createQuestion(questionRequestDto, memberId);
+        Question question = questionService.createQuestion(questionRequestDto, memberId);
+        Long questionId = question.getId();
         System.out.println(questionId);
 
         //질문 생성 후 실제로 DB에 반영됐는지 확인

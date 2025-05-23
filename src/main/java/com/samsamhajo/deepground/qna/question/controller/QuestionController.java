@@ -19,18 +19,17 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/question")
 @RequiredArgsConstructor
-@Slf4j
 public class QuestionController {
 
     private final QuestionService questionService;
     private final QuestionRepository questionRepository;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     public ResponseEntity<SuccessResponse> createQuestion(
-            @Valid @RequestBody QuestionRequestDto questionRequestDto,
+            @Valid @ModelAttribute QuestionRequestDto questionRequestDto,
             @RequestParam Long memberId) {
 
-       Question question = questionService.createQuestion(questionRequestDto, memberId);
+        Question question = questionService.createQuestion(questionRequestDto, memberId);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -41,7 +40,7 @@ public class QuestionController {
     @DeleteMapping("/{questionId}/delete")
     public ResponseEntity<SuccessResponse> deleteQuestion(
             @PathVariable Long questionId
-    ,       @RequestParam Long memberId) {
+            ,       @RequestParam Long memberId) {
 
         questionService.deleteQuestion(questionId, memberId);
 
