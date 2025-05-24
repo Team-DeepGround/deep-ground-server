@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 @Repository
 @RequiredArgsConstructor
-public class RefreshToeknRespository {
+public class RefreshTokenRespository {
 
     private final RedisTemplate<String, String> redisTemplate;
     private static final String KEY_PREFIX = "RT:";
