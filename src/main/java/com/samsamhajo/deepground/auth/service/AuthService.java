@@ -1,15 +1,15 @@
 package com.samsamhajo.deepground.auth.service;
 
-import com.samsamhajo.deepground.auth.dto.LoginRequest;
-import com.samsamhajo.deepground.auth.dto.LoginResponse;
-import com.samsamhajo.deepground.auth.dto.RegisterRequest;
+import com.samsamhajo.deepground.auth.dto.*;
 import com.samsamhajo.deepground.auth.exception.AuthErrorCode;
 import com.samsamhajo.deepground.auth.exception.AuthException;
 import com.samsamhajo.deepground.auth.jwt.JwtProvider;
+import com.samsamhajo.deepground.auth.repository.RefreshToeknRespository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +19,10 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final RefreshToeknRespository refreshToeknRespository;
+
+    @Value("${jwt.refresh-token-validity-in-seconds}")
+    private Long refreshTokenValidityInSeconds;
 
     @Transactional
     public Long register(RegisterRequest request) {
@@ -49,6 +53,12 @@ public class AuthService {
 
         String accessToken = jwtProvider.createAccessToken(member.getId());
         String refreshToken = jwtProvider.createRefreshToken(member.getId());
+
+        refreshToeknRespository.save(
+                member.getId(),
+                refreshToken,
+                refreshTokenValidityInSeconds
+        );
 
         return new LoginResponse(
                 accessToken,
