@@ -4,7 +4,7 @@ import com.samsamhajo.deepground.auth.dto.*;
 import com.samsamhajo.deepground.auth.exception.AuthErrorCode;
 import com.samsamhajo.deepground.auth.exception.AuthException;
 import com.samsamhajo.deepground.auth.jwt.JwtProvider;
-import com.samsamhajo.deepground.auth.repository.RefreshTokenRespository;
+import com.samsamhajo.deepground.auth.repository.RefreshTokenRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
@@ -19,7 +19,7 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
-    private final RefreshTokenRespository refreshTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Value("${jwt.refresh-token-validity-in-seconds}")
     private Long refreshTokenValidityInSeconds;

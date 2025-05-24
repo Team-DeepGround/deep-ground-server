@@ -87,4 +87,8 @@ public class JwtProvider {
         Date expiration = claims.getExpiration();
         return (expiration.getTime() - System.currentTimeMillis()) / 1000;
     }
+
+    public String createTestRefreshToken(Long memberId, long customValidityInSeconds) {
+        return createToken(memberId, customValidityInSeconds * 1000);
+    }
 }
