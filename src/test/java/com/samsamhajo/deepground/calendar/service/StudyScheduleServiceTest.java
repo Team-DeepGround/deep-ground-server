@@ -332,7 +332,7 @@ class StudyScheduleServiceTest {
         studyScheduleService.deleteStudySchedule(studyGroupId, scheduleId);
 
         // then
-        verify(memberStudyScheduleRepository).deleteAllByStudySchedule(schedule);
+        verify(memberStudyScheduleRepository).deleteAllByStudyScheduleId(schedule.getId());
         verify(studyScheduleRepository).delete(schedule);
     }
 

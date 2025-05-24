@@ -94,7 +94,7 @@ public class StudyScheduleService {
             throw new ScheduleException(ScheduleErrorCode.MISMATCHED_GROUP);
         }
 
-        memberStudyScheduleRepository.deleteAllByStudySchedule(schedule);
+        memberStudyScheduleRepository.deleteAllByStudyScheduleId(schedule.getId());
 
         studyScheduleRepository.delete(schedule);
     }
