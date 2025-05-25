@@ -13,6 +13,7 @@ import com.samsamhajo.deepground.member.exception.MemberException;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class FeedLikeService {
     private final MemberRepository memberRepository;
     private final FeedLikeRepository feedLikeRepository;
 
+    @Transactional
     public void feedLikeIncrease(Long feedId, Long memberId) {
         increaseValidate(feedId, memberId);
 
@@ -34,6 +36,7 @@ public class FeedLikeService {
         feedLikeRepository.save(feedLike);
     }
 
+    @Transactional
     public void feedLikeDecrease(Long feedId, Long memberId) {
         FeedLike feedLike = feedLikeRepository.getByFeedIdAndMemberId(feedId, memberId);
 
