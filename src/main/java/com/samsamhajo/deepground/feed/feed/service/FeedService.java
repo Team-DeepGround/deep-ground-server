@@ -98,11 +98,17 @@ public class FeedService {
     }
 
     @Transactional
-    public void deleteFeed(Long feedId) {
+    public void deleteFeed(Long feedId, Long memberId) {
         Feed feed = feedRepository.getById(feedId);
+        
+        // 권한 체크 - 본인 피드만 삭제 가능
+        if (!feed.getMember().getId().equals(memberId)) {
+            throw new FeedException(FeedErrorCode.FEED_UPDATE_PERMISSION_DENIED);
+        }
+        
         feed.softDelete();
         // TODO: FeedLike SoftDelete
-
+        
         feedMediaService.deleteAllByFeedId(feedId);
     }
 }
