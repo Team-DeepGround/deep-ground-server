@@ -167,4 +167,19 @@ public class FriendService {
             throw new FriendException(FriendErrorCode.REQUEST_ALREADY_RECEIVED);
         }
     }
+
+    public List<FriendDto> getFriendByMemberId(Long memberId) {
+
+            List<Friend> friends = friendRepository. findAllByMemberIdAndFriendStatus(memberId, FriendStatus.ACCEPT);
+
+        return friends.stream()
+                .map(friend -> {
+                    if (friend.getReceiveMember().getId().equals(memberId)) {
+                        return FriendDto.fromReceived(friend);
+                    } else {
+                        return FriendDto.fromSent(friend);
+                    }
+                })
+                .toList();
+    }
 }
