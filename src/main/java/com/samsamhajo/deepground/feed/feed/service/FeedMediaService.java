@@ -59,7 +59,7 @@ public class FeedMediaService {
         feedMediaRepository.deleteAllByFeedId(feedId);
     }
 
-    private void updateFeedMedia(Feed feed, FeedUpdateRequest request) {
+    public void updateFeedMedia(Feed feed, FeedUpdateRequest request) {
         // 피드에 연결된 모든 미디어 삭제
         deleteAllByFeedId(feed.getId());
 
