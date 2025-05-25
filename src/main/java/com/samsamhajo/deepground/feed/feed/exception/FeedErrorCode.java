@@ -13,6 +13,7 @@ public enum FeedErrorCode implements ErrorCode {
     FEED_MEDIA_NOT_FOUND(HttpStatus.NOT_FOUND, "피드 미디어를 찾을 수 없습니다."),
 
     FEED_LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 피드 및 좋아요를 찾을 수 없습니다."),
+    FEED_LIKE_MINUS_NOT_ALLOWED(HttpStatus.FORBIDDEN, "좋아요는 음수가 될 수 없습니다."),
     FEED_LIKE_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 좋아요가 눌러져 있습니다."),
 
     ;
