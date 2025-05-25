@@ -66,7 +66,7 @@ public class FeedService {
         feed.updateContent(request.getContent());
 
         // 미디어 업데이트
-        updateFeedMedia(feed, request);
+        feedMediaService.updateFeedMedia(feed, request);
 
         return feed;
     }
@@ -96,14 +96,12 @@ public class FeedService {
     private void saveFeedMedia(FeedCreateRequest request, Feed feed) {
         feedMediaService.createFeedMedia(feed, request.getImages());
     }
-    
-    private void updateFeedMedia(Feed feed, FeedUpdateRequest request) {
-        // 피드에 연결된 모든 미디어 삭제
-        feedMediaService.deleteAllByFeedId(feed.getId());
-        
-        // 새 미디어 추가
-        if (request.getImages() != null && !request.getImages().isEmpty()) {
-            feedMediaService.createFeedMedia(feed, request.getImages());
-        }
+
+    @Transactional
+    public void deleteFeed(Long feedId){
+        Feed feed = feedRepository.getById(feedId);
+        feedRepository.delete(feed);
+
+        feedMediaService.deleteAllByFeedId(feedId);
     }
 }
