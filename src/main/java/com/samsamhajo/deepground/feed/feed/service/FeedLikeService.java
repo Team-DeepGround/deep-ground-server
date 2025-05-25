@@ -23,7 +23,7 @@ public class FeedLikeService {
     private final FeedLikeRepository feedLikeRepository;
 
     public void feedLikeIncrease(Long feedId, Long memberId) {
-        validate(feedId, memberId);
+        increaseValidate(feedId, memberId);
 
         Feed feed = feedRepository.getById(feedId);
         Member member = memberRepository.findById(memberId)
@@ -34,11 +34,17 @@ public class FeedLikeService {
         feedLikeRepository.save(feedLike);
     }
 
+    public void feedLikeDecrease(Long feedId, Long memberId) {
+        FeedLike feedLike = feedLikeRepository.getByFeedIdAndMemberId(feedId, memberId);
+
+        feedLikeRepository.delete(feedLike);
+    }
+
     public int countFeedLikeByFeedId(Long feedId) {
         return feedLikeRepository.countByFeedId(feedId);
     }
 
-    private void validate(Long feedId, Long memberId) {
+    private void increaseValidate(Long feedId, Long memberId) {
         if (feedLikeRepository.existsByFeedIdAndMemberId(feedId, memberId)) {
             throw new FeedException(FeedErrorCode.FEED_LIKE_ALREADY_EXISTS);
         }
