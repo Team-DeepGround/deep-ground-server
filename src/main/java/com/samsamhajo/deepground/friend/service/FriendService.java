@@ -167,4 +167,12 @@ public class FriendService {
             throw new FriendException(FriendErrorCode.REQUEST_ALREADY_RECEIVED);
         }
     }
+
+    public void deleteFriendById(Long friendId) {
+
+        Friend friend = friendRepository.findById(friendId)
+                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_FRIEND));
+
+        friend.softDelete();
+    }
 }
