@@ -38,6 +38,9 @@ public class FeedLikeService {
 
     @Transactional
     public void feedLikeDecrease(Long feedId, Long memberId) {
+        // 이미 0 이거나 음수인 경우 취소하려 할 때, 예외 발생 
+        validateDecrease(feedId);
+
         FeedLike feedLike = feedLikeRepository.getByFeedIdAndMemberId(feedId, memberId);
 
         feedLikeRepository.delete(feedLike);
@@ -45,6 +48,12 @@ public class FeedLikeService {
 
     public int countFeedLikeByFeedId(Long feedId) {
         return feedLikeRepository.countByFeedId(feedId);
+    }
+
+    private void validateDecrease(Long feedId) {
+        if(countFeedLikeByFeedId(feedId) <= 0){
+            throw new FeedException(FeedErrorCode.FEED_LIKE_MINUS_NOT_ALLOWED);
+        }
     }
 
     private void increaseValidate(Long feedId, Long memberId) {
