@@ -9,6 +9,10 @@ import com.samsamhajo.deepground.feed.feed.model.FeedListResponse;
 import com.samsamhajo.deepground.feed.feed.model.FeedResponse;
 import com.samsamhajo.deepground.feed.feed.model.FeedUpdateRequest;
 import com.samsamhajo.deepground.feed.feed.repository.FeedRepository;
+import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.member.exception.MemberErrorCode;
+import com.samsamhajo.deepground.member.exception.MemberException;
+import com.samsamhajo.deepground.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +29,7 @@ public class FeedService {
 
     private final FeedRepository feedRepository;
     private final FeedMediaService feedMediaService;
-    // TODO: private final MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public Feed createFeed(FeedCreateRequest request, Long memberId) {
@@ -33,10 +37,11 @@ public class FeedService {
             throw new FeedException(FeedErrorCode.INVALID_FEED_CONTENT);
         }
 
-        //  TODO: Member member = memberRepository.getById(memberId);
-        //        Feed feed = Feed.of(request.getContent(), member);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(()-> new MemberException(MemberErrorCode.INVALID_MEMBER_ID));
 
-        Feed feed = Feed.of(request.getContent(), null);
+        Feed feed = Feed.of(request.getContent(), member);
+
         feedRepository.save(feed);
 
         saveFeedMedia(request, feed);
