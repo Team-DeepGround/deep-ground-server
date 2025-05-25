@@ -50,4 +50,13 @@ public class FeedController {
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedSuccessCode.FEED_UPDATED));
     }
+
+    @DeleteMapping("/{feedId}")
+    public ResponseEntity<SuccessResponse<Void>> deleteFeed(
+            @PathVariable("feedId") Long feedId) {
+        feedService.deleteFeed(feedId, DEV_MEMBER_ID);
+
+        return ResponseEntity
+                .ok(SuccessResponse.of(FeedSuccessCode.FEED_DELETED));
+    }
 }
