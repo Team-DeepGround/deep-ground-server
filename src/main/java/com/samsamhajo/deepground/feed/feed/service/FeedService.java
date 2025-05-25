@@ -38,7 +38,7 @@ public class FeedService {
         }
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(()-> new MemberException(MemberErrorCode.INVALID_MEMBER_ID));
+                .orElseThrow(() -> new MemberException(MemberErrorCode.INVALID_MEMBER_ID));
 
         Feed feed = Feed.of(request.getContent(), member);
 
@@ -98,9 +98,10 @@ public class FeedService {
     }
 
     @Transactional
-    public void deleteFeed(Long feedId){
+    public void deleteFeed(Long feedId) {
         Feed feed = feedRepository.getById(feedId);
-        feedRepository.delete(feed);
+        feed.softDelete();
+        // TODO: FeedLike SoftDelete
 
         feedMediaService.deleteAllByFeedId(feedId);
     }
