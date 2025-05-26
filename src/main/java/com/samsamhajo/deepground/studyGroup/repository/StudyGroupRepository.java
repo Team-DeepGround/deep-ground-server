@@ -2,6 +2,8 @@ package com.samsamhajo.deepground.studyGroup.repository;
 
 import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -35,5 +37,7 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
       "LEFT JOIN FETCH sg.comments " +
       "WHERE sg.id = :id")
   Optional<StudyGroup> findWithMemberAndCommentsById(@Param("id") Long studyGroupId);
+
+  List<StudyGroupMember> findAllByMemberIdAndIsAllowedTrueOrderByCreatedAtDesc(Long memberId);
 
 }
