@@ -38,6 +38,4 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
       "WHERE sg.id = :id")
   Optional<StudyGroup> findWithMemberAndCommentsById(@Param("id") Long studyGroupId);
 
-  List<StudyGroupMember> findAllByMemberIdAndIsAllowedTrueOrderByCreatedAtDesc(Long memberId);
-
 }
