@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.studyGroup.controller;
 
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.global.utils.GlobalLogger;
+import com.samsamhajo.deepground.studyGroup.dto.StudyGroupParticipationResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupSearchRequest;
 import com.samsamhajo.deepground.studyGroup.service.StudyGroupJoinService;
 import com.samsamhajo.deepground.studyGroup.service.StudyGroupService;
@@ -12,6 +13,7 @@ import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCreateResponse;
 
 import jakarta.validation.Valid;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -82,5 +84,19 @@ public class StudyGroupController {
     return ResponseEntity
         .status(StudyGroupSuccessCode.REQUEST_JOIN_SUCCESS.getStatus())
         .body(SuccessResponse.of(StudyGroupSuccessCode.REQUEST_JOIN_SUCCESS));
+  }
+
+  @GetMapping("/{memberId}/joined")
+  public ResponseEntity<SuccessResponse<List<StudyGroupParticipationResponse>>> getMyParticipatedGroups(
+      @PathVariable Long memberId
+  ) {
+    GlobalLogger.info("참가 중인 스터디 목록 조회", memberId);
+
+    List<StudyGroupParticipationResponse> response =
+        studyGroupService.getStudyGroupsByMember(memberId);
+
+    return ResponseEntity
+        .status(StudyGroupSuccessCode.READ_SUCCESS.getStatus())
+        .body(SuccessResponse.of(StudyGroupSuccessCode.READ_SUCCESS, response));
   }
 }
