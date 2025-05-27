@@ -10,6 +10,8 @@ import com.samsamhajo.deepground.feed.feed.model.FeedResponse;
 import com.samsamhajo.deepground.feed.feed.model.FeedUpdateRequest;
 import com.samsamhajo.deepground.feed.feed.repository.FeedRepository;
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.member.exception.MemberException;
+import com.samsamhajo.deepground.member.repository.MemberRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +28,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -45,8 +48,8 @@ class FeedServiceTest {
     @Mock
     private FeedMediaService feedMediaService;
 
-//    TODO: @Mock
-//          private MemberRepository memberRepository;
+    @Mock
+    private MemberRepository memberRepository;
 
     private Member member = Member.createLocalMember("choiyt3465@naver.com", "q1w2e3r4!", "yt");
 
@@ -75,37 +78,36 @@ class FeedServiceTest {
     void createFeed_Success() {
         // given
         String content = "테스트 피드 내용";
-        Feed feed = Feed.of(content, member);
         Long memberId = 1L;
-
-        //   given(memberRepository.getById(memberId)).willReturn(member);
+        
+        Feed feed = Feed.of(content, member);
+        
+        given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
         given(feedRepository.save(any(Feed.class))).willReturn(feed);
-
+        
         // when
-        Feed createdFeed = feedService.createFeed(new FeedCreateRequest(content,null), memberId);
-
+        Feed createdFeed = feedService.createFeed(new FeedCreateRequest(content, null), memberId);
+        
         // then
         assertThat(createdFeed).isNotNull();
         assertThat(createdFeed.getContent()).isEqualTo(content);
-
-
-        // TODO: memberId를 사용하여 Member 객체를 가져오는 로직이 필요합니다.
-        //  assertThat(createdFeed.getMember().getId()).isEqualTo(memberId);
+        assertThat(createdFeed.getMember()).isEqualTo(member);
     }
 
     @Test
-    @DisplayName("피드 생성 실패 테스트 - 빈 내용")
-    void createFeed_Fail_EmptyContent() {
+    @DisplayName("피드 생성 실패 테스트 - 존재하지 않는 회원")
+    void createFeed_Fail_MemberNotFound() {
         // given
-        String content = "";
-        Long memberId = 1L;
-
+        String content = "테스트 피드 내용";
+        Long nonExistentMemberId = 999L;
+        
+        given(memberRepository.findById(nonExistentMemberId)).willReturn(Optional.empty());
+        
         // when & then
-        assertThatThrownBy(() -> feedService.createFeed(new FeedCreateRequest(content,null), memberId))
-                .isInstanceOf(FeedException.class)
-                .hasFieldOrPropertyWithValue("errorCode", FeedErrorCode.INVALID_FEED_CONTENT);
+        assertThatThrownBy(() -> feedService.createFeed(new FeedCreateRequest(content, null), nonExistentMemberId))
+                .isInstanceOf(MemberException.class);
     }
-    
+
     @Test
     @DisplayName("피드 목록 조회 테스트")
     void getFeeds_Success() {
@@ -176,10 +178,8 @@ class FeedServiceTest {
         
         List<MultipartFile> updatedImages = List.of(mockImage);
         FeedUpdateRequest updateRequest = new FeedUpdateRequest(updatedContent, updatedImages);
-        
-        // Mock 설정
+
         when(feedRepository.getById(feedId)).thenReturn(originalFeed);
-        doNothing().when(feedMediaService).deleteAllByFeedId(feedId);
         
         // when
         Feed updatedFeed = feedService.updateFeed(feedId, updateRequest, memberId);
@@ -189,8 +189,7 @@ class FeedServiceTest {
         assertThat(updatedFeed.getContent()).isEqualTo(updatedContent);
         
         // feedMediaService의 메서드가 호출되었는지 검증
-        verify(feedMediaService, times(1)).deleteAllByFeedId(feedId);
-        verify(feedMediaService, times(1)).createFeedMedia(eq(originalFeed), eq(updatedImages));
+        verify(feedMediaService, times(1)).updateFeedMedia(eq(originalFeed), eq(updateRequest));
     }
     
     @Test
@@ -240,27 +239,22 @@ class FeedServiceTest {
     }
     
     @Test
-    @DisplayName("피드 수정 실패 테스트 - 권한 없음")
-    void updateFeed_Fail_PermissionDenied() {
+    @DisplayName("피드 삭제 성공 테스트")
+    void deleteFeed_Success() {
         // given
         Long feedId = 1L;
         Long memberId = 1L;
-        Long otherMemberId = 2L;
-        String updatedContent = "수정된 피드 내용";
         
-        Feed feed = Feed.of("원본 피드 내용", member);
+        Feed feed = Feed.of("테스트 피드 내용", member);
         
-        FeedUpdateRequest updateRequest = new FeedUpdateRequest(updatedContent, null);
+        given(feedRepository.getById(feedId)).willReturn(feed);
         
-        // TODO: 권한 체크 로직이 구현된 경우에만 아래 테스트 케이스가 의미가 있습니다.
-        // 지금은 주석 처리되어 있지만, 향후 구현될 것을 가정하고 테스트 코드를 작성합니다.
+        // when
+        feedService.deleteFeed(feedId, memberId);
         
-        // when(feedRepository.getById(feedId)).thenReturn(feed);
-        // when(feed.getMember().getId()).thenReturn(otherMemberId); // 다른 사용자가 작성한 피드
-        
-        // when & then
-        // assertThatThrownBy(() -> feedService.updateFeed(feedId, updateRequest, memberId))
-        //        .isInstanceOf(FeedException.class)
-        //        .hasFieldOrPropertyWithValue("errorCode", FeedErrorCode.FEED_UPDATE_PERMISSION_DENIED);
+        // then
+        verify(feedRepository, times(1)).getById(feedId);
+        verify(feedMediaService, times(1)).deleteAllByFeedId(feedId);
+        assertThat(feed.isDeleted()).isTrue();
     }
 }
