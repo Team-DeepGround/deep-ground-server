@@ -74,10 +74,19 @@ public class MediaUtils {
     public static boolean deleteMedia(String mediaUrl) {
         String[] mediaUrlParts = mediaUrl.split("/");
         String mediaName = mediaUrlParts[mediaUrlParts.length - 1];
-        String mediaPath = "/media/" + mediaName;
+        String mediaPath = MEDIA_DIR + mediaName;
 
         File file = new File(mediaPath);
-        return file.exists() && file.delete();
+        if (!file.exists()) {
+            throw new MediaException(MediaErrorCode.MEDIA_NOT_FOUND);
+        }
+        
+        boolean deleted = file.delete();
+        if (!deleted) {
+            throw new MediaException(MediaErrorCode.MEDIA_NOT_SUPPORTED);
+        }
+        
+        return true;
     }
 
     private static String generateRandomString(int length) {
