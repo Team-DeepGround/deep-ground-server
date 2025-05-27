@@ -7,7 +7,6 @@ import com.samsamhajo.deepground.qna.question.Dto.QuestionUpdateRequestDto;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.exception.QuestionErrorCode;
 import com.samsamhajo.deepground.qna.question.exception.QuestionException;
-import com.samsamhajo.deepground.qna.question.repository.QuestionMediaRepository;
 import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +20,6 @@ public class QuestionService{
     private final QuestionRepository questionRepository;
     private final MemberRepository memberRepository;
     private final QuestionMediaService questionMediaService;
-    private final QuestionMediaRepository questionMediaRepository;
 
     //질문 생성
     @Transactional
