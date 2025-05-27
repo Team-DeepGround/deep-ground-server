@@ -83,7 +83,7 @@ public class AuthService {
             throw new AuthException(AuthErrorCode.VERIFICATION_CODE_EXPIRED);
         }
         if (!storedCode.equals(request.getCode())) {
-            throw new AuthException(AuthErrorCode.INVALID_VERFICATION_CODE);
+            throw new AuthException(AuthErrorCode.INVALID_VERIFICATION_CODE);
         }
 
         member.updatePassword(passwordEncoder.encode(request.getNewPassword()));

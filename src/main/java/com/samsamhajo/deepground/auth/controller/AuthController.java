@@ -1,9 +1,6 @@
 package com.samsamhajo.deepground.auth.controller;
 
-import com.samsamhajo.deepground.auth.dto.LoginRequest;
-import com.samsamhajo.deepground.auth.dto.LoginResponse;
-import com.samsamhajo.deepground.auth.dto.RegisterRequest;
-import com.samsamhajo.deepground.auth.dto.RegisterResponse;
+import com.samsamhajo.deepground.auth.dto.*;
 import com.samsamhajo.deepground.auth.service.AuthService;
 import com.samsamhajo.deepground.auth.success.AuthSuccessCode;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
@@ -55,5 +52,25 @@ public class AuthController {
         return ResponseEntity
                 .status(AuthSuccessCode.LOGIN_SUCCESS.getStatus())
                 .body(SuccessResponse.of(AuthSuccessCode.LOGIN_SUCCESS, response));
+    }
+
+    @PostMapping("/password/reset/send")
+    public ResponseEntity<SuccessResponse<PasswordResetEmailResponse>> sendPasswordResetEmail(
+            @Valid @RequestBody PasswordResetRequest request
+    ) {
+        PasswordResetEmailResponse response = authService.sendPasswordResetEmail(request);
+        return ResponseEntity
+                .status(AuthSuccessCode.PASSWORD_RESET_EMAIL_SENT.getStatus())
+                .body(SuccessResponse.of(AuthSuccessCode.PASSWORD_RESET_EMAIL_SENT));
+    }
+
+    @PostMapping("/password/reset")
+    public ResponseEntity<SuccessResponse<PasswordResetResponse>> resetPassword(
+            @Valid @RequestBody PasswordResetVerifyRequest request
+    ) {
+        PasswordResetResponse response = authService.resetPassword(request);
+        return ResponseEntity
+                .status(AuthSuccessCode.PASSWORD_RESET_SUCCESS.getStatus())
+                .body(SuccessResponse.of(AuthSuccessCode.PASSWORD_RESET_SUCCESS, response));
     }
 }
