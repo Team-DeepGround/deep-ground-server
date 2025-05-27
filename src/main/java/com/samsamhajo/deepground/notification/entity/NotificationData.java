@@ -12,7 +12,6 @@ public abstract class NotificationData {
 
     @Id
     @JsonIgnore
-    @Field("notification_data_id")
     private String id;
 
     @Field("type")
