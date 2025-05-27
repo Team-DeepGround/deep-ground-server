@@ -27,9 +27,10 @@ public class FeedController {
     public ResponseEntity<SuccessResponse<Feed>> createFeed(
             @ModelAttribute FeedCreateRequest request) {
 
-        Feed feed = feedService.createFeed(request, DEV_MEMBER_ID);
+        feedService.createFeed(request, DEV_MEMBER_ID);
+
         return ResponseEntity
-                .ok(SuccessResponse.of(FeedSuccessCode.FEED_CREATED, feed));
+                .ok(SuccessResponse.of(FeedSuccessCode.FEED_CREATED));
     }
 
     @GetMapping
