@@ -35,24 +35,27 @@ public class MemberStudySchedule extends BaseEntity {
     @Column(name = "memo")
     private String memo;
 
-    private MemberStudySchedule(StudySchedule studySchedule, Member member, Boolean isAvailable, Boolean isImportant, String memo) {
+    private MemberStudySchedule(StudySchedule studySchedule, Boolean isAvailable, Boolean isImportant, String memo) {
         this.studySchedule = studySchedule;
-        this.member = member;
         this.isAvailable = isAvailable;
         this.isImportant = isImportant;
         this.memo = memo;
-
     }
 
-    // memo가 있는 경우
-    public static MemberStudySchedule of(StudySchedule studySchedule, Member member, Boolean isAvailable, Boolean isImportant, String memo) {
-        return new MemberStudySchedule(studySchedule, member, isAvailable, isImportant, memo);
+    public static MemberStudySchedule of(StudySchedule studySchedule, Boolean isAvailable, Boolean isImportant, String memo) {
+        return new MemberStudySchedule(studySchedule, isAvailable, isImportant, memo);
     }
 
-    // memo가 없는 경우
-    public static MemberStudySchedule of(StudySchedule studySchedule, Member member, Boolean isAvailable, Boolean isImportant) {
-        return new MemberStudySchedule(studySchedule, member, isAvailable, isImportant, "");
+    public void updateAvailable(Boolean isAvailable) {
+        this.isAvailable = isAvailable;
     }
 
+    public void updateImportant(Boolean isImportant) {
+        this.isImportant = isImportant;
+    }
+
+    public void updateMemo(String memo) {
+        this.memo = memo;
+    }
 
 }
