@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.qna.answer.entity;
 
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.qna.answer.dto.AnswerUpdateRequestDto;
 import com.samsamhajo.deepground.qna.comment.entity.Comment;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import jakarta.persistence.*;
@@ -50,5 +51,9 @@ public class Answer {
 
     public static Answer of(String answerContent, Member member, Question question) {
         return new Answer(answerContent, member, question);
+    }
+
+    public void AnswerUpdate(String answerContent) {
+        this.answerContent = answerContent;
     }
 }
