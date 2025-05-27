@@ -57,11 +57,6 @@ public class FeedService {
 
         Feed feed = feedRepository.getById(feedId);
 
-        // TODO: 권한 체크 로직 추가 (본인 피드만 수정 가능)
-        // if (!feed.getMember().getId().equals(memberId)) {
-        //     throw new FeedException(FeedErrorCode.FEED_UPDATE_PERMISSION_DENIED);
-        // }
-
         // 피드 내용 업데이트
         feed.updateContent(request.getContent());
 
