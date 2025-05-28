@@ -38,8 +38,9 @@ public class AnswerController {
             @Valid @PathVariable Long answerId){
 
                 Long memberId = 1L;
+                Long questionId = 1L;
 
-                answerService.deleteAnswer(answerId, memberId);
+                answerService.deleteAnswer(answerId, memberId,questionId);
 
                 return ResponseEntity
                         .status(HttpStatus.OK)

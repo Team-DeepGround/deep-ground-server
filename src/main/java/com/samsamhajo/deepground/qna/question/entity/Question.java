@@ -63,6 +63,10 @@ public class Question extends BaseEntity {
         this.answerCount++;
     }
 
+    public void decrementAnswerCount() {
+        this.answerCount--;
+    }
+
     public void updateQuesiton(String title, String content){
         this.title = title;
         this.content = content;
