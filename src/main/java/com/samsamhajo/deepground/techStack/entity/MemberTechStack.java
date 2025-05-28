@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.techStack.entity;
 
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.member.entity.MemberProfile;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,15 +23,24 @@ public class MemberTechStack {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_profile_id", nullable = false)
+    private MemberProfile memberProfile;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tech_stack_id", nullable = false)
     private TechStack techStack;
 
-    private MemberTechStack(Member member, TechStack techStack) {
+    private MemberTechStack(Member member, MemberProfile memberProfile, TechStack techStack) {
         this.member = member;
+        this.memberProfile = memberProfile;
         this.techStack = techStack;
     }
 
-    public static MemberTechStack of(Member member, TechStack techStack) {
-        return new MemberTechStack(member, techStack);
+    public static MemberTechStack of(Member member,MemberProfile memberProfile,TechStack techStack){
+        return new MemberTechStack(member,memberProfile, techStack);
+    }
+
+    public void registerTo(MemberProfile memberProfile) {
+        this.memberProfile = memberProfile;
     }
 }
