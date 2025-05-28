@@ -32,4 +32,19 @@ public class AnswerController {
                 .body(SuccessResponse.of(AnswerSuccessCode.ANSWER_CREATED, answerCreateResponseDto));
 
     }
+
+    @DeleteMapping("/{answerId}/delete")
+    public ResponseEntity<SuccessResponse> deleteAnswer(
+            @Valid @PathVariable Long answerId){
+
+                Long memberId = 1L;
+
+                answerService.deleteAnswer(answerId, memberId);
+
+                return ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(SuccessResponse.of(AnswerSuccessCode.ANSWER_DELETED));
+    }
+
 }
+
