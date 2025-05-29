@@ -3,6 +3,8 @@ package com.samsamhajo.deepground.qna.answer.controller;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateRequestDto;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
+import com.samsamhajo.deepground.qna.answer.dto.AnswerUpdateRequestDto;
+import com.samsamhajo.deepground.qna.answer.dto.AnswerUpdateResponseDto;
 import com.samsamhajo.deepground.qna.answer.service.AnswerService;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerSuccessCode;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -33,4 +35,18 @@ public class AnswerController {
                 .body(SuccessResponse.of(AnswerSuccessCode.ANSWER_CREATED, answerCreateResponseDto));
 
     }
+
+    @PutMapping
+    public ResponseEntity<SuccessResponse<AnswerUpdateResponseDto>> updateAnswer(
+            @Valid @ModelAttribute AnswerUpdateRequestDto answerUpdateRequestDto
+    ) {
+        Long memberId = 1L; //테스트용 memberId
+        AnswerUpdateResponseDto answerUpdateResponseDto = answerService.updateAnswer(answerUpdateRequestDto, memberId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.of(AnswerSuccessCode.ANSWER_UPDATED, answerUpdateResponseDto));
+
+    }
+
 }
