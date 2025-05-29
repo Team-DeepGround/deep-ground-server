@@ -4,6 +4,8 @@ import com.samsamhajo.deepground.global.message.MessagePublisher;
 import com.samsamhajo.deepground.notification.dto.NotificationResponse;
 import com.samsamhajo.deepground.notification.entity.Notification;
 import com.samsamhajo.deepground.notification.entity.NotificationData;
+import com.samsamhajo.deepground.notification.exception.NotificationErrorCode;
+import com.samsamhajo.deepground.notification.exception.NotificationException;
 import com.samsamhajo.deepground.notification.repository.NotificationDataRepository;
 import com.samsamhajo.deepground.notification.repository.NotificationRepository;
 import java.util.List;
@@ -36,5 +38,21 @@ public class NotificationService {
                 "/notifications",
                 NotificationResponse.from(notification)
         ));
+    }
+
+    public void readNotification(String notificationId, Long receiverId) {
+        Notification notification = notificationRepository.findByIdAndReceiverId(notificationId, receiverId)
+                .orElseThrow(() -> new NotificationException(NotificationErrorCode.NOTIFICATION_NOT_FOUND));
+
+        if (notification.isRead()) {
+            throw new NotificationException(NotificationErrorCode.NOTIFICATION_ALREADY_READ);
+        }
+
+        notification.read();
+        notificationRepository.save(notification);
+    }
+
+    public void readAllNotifications(Long receiverId) {
+        notificationRepository.updateAllByReceiverId(receiverId);
     }
 }

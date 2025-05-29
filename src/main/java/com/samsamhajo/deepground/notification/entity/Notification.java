@@ -14,15 +14,13 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class Notification extends BaseDocument {
 
     @Id
-    @Field("notification_id")
     private String id;
 
     @Field("receiver_id")
     private Long receiverId;
 
     @DBRef
-    @Field("notification_data_id")
-    private NotificationData data;
+    private final NotificationData data;
 
     @Field("is_read")
     private boolean read = false;
