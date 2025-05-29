@@ -136,6 +136,7 @@ public class FriendService {
         return friendRequest;
     }
 
+    @Transactional
     public Long sendProfileFriendRequest(Long requesterId, Long receiverId) {
 
         Member requester = memberRepository.findById(requesterId)
@@ -168,6 +169,7 @@ public class FriendService {
         }
     }
 
+    @Transactional
     public void deleteFriendById(Long friendId) {
 
         Friend friend = friendRepository.findById(friendId)

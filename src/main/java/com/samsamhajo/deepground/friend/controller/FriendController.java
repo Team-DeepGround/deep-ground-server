@@ -80,7 +80,7 @@ public class FriendController {
                 .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_REQUEST,friendId));
     }
 
-    @DeleteMapping("/{friendId}/delete")
+    @DeleteMapping("/{friendId}")
     public ResponseEntity<SuccessResponse> deleteFriend(@PathVariable Long friendId){
 
         friendService.deleteFriendById(friendId);
