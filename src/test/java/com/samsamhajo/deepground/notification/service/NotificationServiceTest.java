@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.samsamhajo.deepground.global.message.MessagePublisher;
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.notification.dto.NotificationListResponse;
 import com.samsamhajo.deepground.notification.dto.NotificationResponse;
 import com.samsamhajo.deepground.notification.entity.Notification;
 import com.samsamhajo.deepground.notification.entity.NotificationData;
@@ -18,7 +19,9 @@ import com.samsamhajo.deepground.notification.exception.NotificationErrorCode;
 import com.samsamhajo.deepground.notification.exception.NotificationException;
 import com.samsamhajo.deepground.notification.repository.NotificationDataRepository;
 import com.samsamhajo.deepground.notification.repository.NotificationRepository;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.IntStream;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -74,6 +77,59 @@ class NotificationServiceTest {
     }
 
     @Nested
+    @DisplayName("알림 목록 조회")
+    public class GetNotification {
+
+        private final Long receiverId = 1L;
+        private final LocalDateTime cursor = LocalDateTime.now();
+        private final int limit = 10;
+
+        @Test
+        @DisplayName("다음 페이지가 존재한다")
+        void getNotifications_hasNextTrue_success() {
+            // given
+            List<Notification> notifications = IntStream.range(0, limit + 1)
+                    .mapToObj(i -> mock(Notification.class))
+                    .toList();
+
+            when(notifications.get(notifications.size() - 2).getCreatedAt())
+                    .thenReturn(cursor);
+            when(notificationRepository.findByReceiverIdWithCursor(eq(receiverId), eq(cursor), eq(limit)))
+                    .thenReturn(notifications);
+
+            // when
+            NotificationListResponse response = notificationService.getNotifications(receiverId, cursor, limit);
+
+            // then
+            assertThat(response.getNotifications()).hasSize(limit);
+            assertThat(response.isHasNext()).isTrue();
+            assertThat(response.getNextCursor()).isNotNull();
+        }
+
+        @Test
+        @DisplayName("다음 페이지가 존재하지 않는다")
+        void getNotifications_hasNextFalse_success() {
+            // given
+            int size = 5;
+            List<Notification> notifications = IntStream.range(0, size)
+                    .mapToObj(i -> mock(Notification.class))
+                    .toList();
+
+            when(notifications.get(size - 1).getCreatedAt())
+                    .thenReturn(cursor);
+            when(notificationRepository.findByReceiverIdWithCursor(eq(receiverId), eq(cursor), eq(limit)))
+                    .thenReturn(notifications);
+
+            // when
+            NotificationListResponse response = notificationService.getNotifications(receiverId, cursor, limit);
+
+            // then
+            assertThat(response.getNotifications()).hasSize(size);
+            assertThat(response.isHasNext()).isFalse();
+            assertThat(response.getNextCursor()).isNotNull();
+        }
+    }
+
     @DisplayName("알림 읽음")
     public class ReadNotification {
 

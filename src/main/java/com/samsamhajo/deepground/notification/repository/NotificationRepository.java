@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.repository.Update;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface NotificationRepository extends MongoRepository<Notification, String> {
+public interface NotificationRepository extends MongoRepository<Notification, String>, NotificationCustomRepository {
 
     Optional<Notification> findByIdAndReceiverId(String id, Long receiverId);
 

@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.notification.service;
 
 import com.samsamhajo.deepground.global.message.MessagePublisher;
+import com.samsamhajo.deepground.notification.dto.NotificationListResponse;
 import com.samsamhajo.deepground.notification.dto.NotificationResponse;
 import com.samsamhajo.deepground.notification.entity.Notification;
 import com.samsamhajo.deepground.notification.entity.NotificationData;
@@ -8,6 +9,7 @@ import com.samsamhajo.deepground.notification.exception.NotificationErrorCode;
 import com.samsamhajo.deepground.notification.exception.NotificationException;
 import com.samsamhajo.deepground.notification.repository.NotificationDataRepository;
 import com.samsamhajo.deepground.notification.repository.NotificationRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,20 @@ public class NotificationService {
                 "/notifications",
                 NotificationResponse.from(notification)
         ));
+    }
+
+    public NotificationListResponse getNotifications(Long receiverId, LocalDateTime cursor, int limit) {
+        List<Notification> notifications = notificationRepository.findByReceiverIdWithCursor(receiverId, cursor, limit);
+
+        boolean hasNext = notifications.size() > limit;
+        if (hasNext) {
+            notifications = notifications.subList(0, limit);
+        }
+
+        LocalDateTime nextCursor = notifications.isEmpty() ? null
+                : notifications.get(notifications.size() - 1).getCreatedAt();
+
+        return NotificationListResponse.of(notifications, nextCursor, hasNext);
     }
 
     public void readNotification(String notificationId, Long receiverId) {
