@@ -4,6 +4,8 @@ import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateRequestDto;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
+import com.samsamhajo.deepground.qna.answer.dto.AnswerUpdateRequestDto;
+import com.samsamhajo.deepground.qna.answer.dto.AnswerUpdateResponseDto;
 import com.samsamhajo.deepground.qna.answer.entity.Answer;
 import com.samsamhajo.deepground.qna.answer.repository.AnswerRepository;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerErrorCode;
@@ -24,6 +26,7 @@ public class AnswerService {
     private final AnswerRepository answerRepository;
     private final MemberRepository memberRepository;
     private final QuestionRepository questionRepository;
+
 
     @Transactional
     public AnswerCreateResponseDto createAnswer(AnswerCreateRequestDto answerCreateRequestDto, Long memberId) {
@@ -71,5 +74,32 @@ public class AnswerService {
         question.decrementAnswerCount();
 
         return answer.getId();
+    }
+
+    @Transactional
+    public AnswerUpdateResponseDto updateAnswer(AnswerUpdateRequestDto answerUpdateRequestDto, Long memberId) {
+
+        Member member = memberRepository.findById(memberId).orElseThrow(() ->
+                new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        Question question = questionRepository.findById(answerUpdateRequestDto.getQuestionId())
+                .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
+
+        Answer answer = answerRepository.findById(answerUpdateRequestDto.getAnswerId())
+                .orElseThrow(()-> new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND));
+
+        if(!StringUtils.hasText(answerUpdateRequestDto.getAnswerContent())) {
+            throw new AnswerException(AnswerErrorCode.ANSWER_CONTENT_REQUIRED);
+        }
+
+        answer.updateAnswer(answerUpdateRequestDto.getAnswerContent());
+
+        return AnswerUpdateResponseDto.of(
+                answer.getAnswerContent(),
+                answer.getQuestion().getId(),
+                answer.getId(),
+                null
+        );
+
     }
 }

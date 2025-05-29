@@ -2,9 +2,8 @@ package com.samsamhajo.deepground.feed.feed.service;
 
 import com.samsamhajo.deepground.feed.feed.entity.Feed;
 import com.samsamhajo.deepground.feed.feed.entity.FeedMedia;
-import com.samsamhajo.deepground.feed.feed.exception.FeedErrorCode;
-import com.samsamhajo.deepground.feed.feed.exception.FeedException;
 import com.samsamhajo.deepground.feed.feed.model.FeedMediaResponse;
+import com.samsamhajo.deepground.feed.feed.model.FeedUpdateRequest;
 import com.samsamhajo.deepground.feed.feed.repository.FeedMediaRepository;
 import com.samsamhajo.deepground.media.MediaUtils;
 import lombok.RequiredArgsConstructor;
@@ -58,5 +57,15 @@ public class FeedMediaService {
         
         // DB에서 삭제 (JPA Query Method 사용)
         feedMediaRepository.deleteAllByFeedId(feedId);
+    }
+
+    public void updateFeedMedia(Feed feed, FeedUpdateRequest request) {
+        // 피드에 연결된 모든 미디어 삭제
+        deleteAllByFeedId(feed.getId());
+
+        // 새 미디어 추가
+        if (request.getImages() != null && !request.getImages().isEmpty()) {
+            createFeedMedia(feed, request.getImages());
+        }
     }
 }

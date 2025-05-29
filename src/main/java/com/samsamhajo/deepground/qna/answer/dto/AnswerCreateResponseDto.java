@@ -13,7 +13,6 @@ public class AnswerCreateResponseDto {
     private Long answerId;
 
 
-
     public AnswerCreateResponseDto(String answerContent, Long questionId, Long memberId, Long answerId) {
         this.answerContent = answerContent;
         this.questionId = questionId;

@@ -3,12 +3,15 @@ package com.samsamhajo.deepground.qna.answer.controller;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateRequestDto;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
+import com.samsamhajo.deepground.qna.answer.dto.AnswerUpdateRequestDto;
+import com.samsamhajo.deepground.qna.answer.dto.AnswerUpdateResponseDto;
 import com.samsamhajo.deepground.qna.answer.service.AnswerService;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerSuccessCode;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +22,7 @@ public class AnswerController {
 
     private final AnswerService answerService;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse> createAnswer  (
             @Valid @RequestBody AnswerCreateRequestDto answerCreateRequestDto
     )
@@ -45,6 +48,22 @@ public class AnswerController {
                 return ResponseEntity
                         .status(HttpStatus.OK)
                         .body(SuccessResponse.of(AnswerSuccessCode.ANSWER_DELETED));
+    }
+
+}
+
+
+    @PutMapping
+    public ResponseEntity<SuccessResponse<AnswerUpdateResponseDto>> updateAnswer(
+            @Valid @ModelAttribute AnswerUpdateRequestDto answerUpdateRequestDto
+    ) {
+        Long memberId = 1L; //테스트용 memberId
+        AnswerUpdateResponseDto answerUpdateResponseDto = answerService.updateAnswer(answerUpdateRequestDto, memberId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.of(AnswerSuccessCode.ANSWER_UPDATED, answerUpdateResponseDto));
+
     }
 
 }
