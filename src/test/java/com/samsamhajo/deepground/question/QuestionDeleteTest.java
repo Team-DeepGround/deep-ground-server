@@ -1,9 +1,9 @@
-package com.samsamhajo.deepground.question;
+package com.samsamhajo.deepground;
 
 
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
-import com.samsamhajo.deepground.qna.question.Dto.QuestionRequestDto;
+import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateRequestDto;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
 import com.samsamhajo.deepground.qna.question.service.QuestionService;
@@ -60,8 +60,8 @@ public class QuestionDeleteTest {
 
         List<Long> techStack = List.of(1L, 2L);
 
-        QuestionRequestDto questionRequestDto = new QuestionRequestDto(title, content, techStack, mediaFiles);
-        Question question = questionService.createQuestion(questionRequestDto, memberId);
+        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStack, mediaFiles);
+        Question question = questionService.createQuestion(questionCreateRequestDto, memberId);
         Long questionId = question.getId();
         System.out.println(questionId);
         Long deleteId = questionService.deleteQuestion(questionId, memberId);
@@ -92,8 +92,8 @@ public class QuestionDeleteTest {
 
 
 
-        QuestionRequestDto questionRequestDto = new QuestionRequestDto(title, content, techStack, mediaFiles);
-        Question question = questionService.createQuestion(questionRequestDto, memberId);
+        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStack, mediaFiles);
+        Question question = questionService.createQuestion(questionCreateRequestDto, memberId);
         Long questionId = question.getId();
         System.out.println(questionId);
 

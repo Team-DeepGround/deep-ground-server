@@ -1,4 +1,4 @@
-package com.samsamhajo.deepground.question;
+package com.samsamhajo.deepground;
 
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
@@ -6,7 +6,7 @@ import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateRequestDto;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
 import com.samsamhajo.deepground.qna.answer.repository.AnswerRepository;
 import com.samsamhajo.deepground.qna.answer.service.AnswerService;
-import com.samsamhajo.deepground.qna.question.Dto.QuestionRequestDto;
+import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateRequestDto;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
 import com.samsamhajo.deepground.qna.question.service.QuestionService;
@@ -71,8 +71,9 @@ public class AnswerTest {
         );
 
         //질문 생성
-        QuestionRequestDto questionRequestDto = new QuestionRequestDto(title, content, techStack, mediaFiles);
-        Question question = questionService.createQuestion(questionRequestDto,memberId);
+        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStack, mediaFiles);
+        Question question = questionService.createQuestion(questionCreateRequestDto,memberId);
+        questionId = question.getId();
 
         //후에 답변 작성
         AnswerCreateRequestDto answerCreateRequestDto = new AnswerCreateRequestDto(answerContent, mediaFiles, questionId);
