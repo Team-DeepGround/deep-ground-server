@@ -53,7 +53,7 @@ public class Answer {
         return new Answer(answerContent, member, question);
     }
 
-    public void AnswerUpdate(String answerContent) {
+    public void updateAnswer(String answerContent) {
         this.answerContent = answerContent;
     }
 }

@@ -70,7 +70,7 @@ public class AnswerService {
             throw new AnswerException(AnswerErrorCode.ANSWER_CONTENT_REQUIRED);
         }
 
-        answer.AnswerUpdate(answerUpdateRequestDto.getAnswerContent());
+        answer.updateAnswer(answerUpdateRequestDto.getAnswerContent());
 
         return AnswerUpdateResponseDto.of(
                 answer.getAnswerContent(),
