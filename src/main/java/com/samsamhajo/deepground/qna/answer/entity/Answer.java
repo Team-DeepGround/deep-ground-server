@@ -40,7 +40,7 @@ public class Answer {
     @JoinColumn(name = "question_id")
     private Question question;
 
-    @OneToMany(mappedBy = "answer")
+    @OneToMany(mappedBy = "answer", cascade = CascadeType.REMOVE)
     private List<Comment> comments = new ArrayList<>();
 
     private Answer(String answerContent, Member member, Question question) {

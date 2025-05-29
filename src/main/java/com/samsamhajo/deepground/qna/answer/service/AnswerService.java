@@ -51,7 +51,29 @@ public class AnswerService {
 
         question.incrementAnswerCount();
 
-        return new AnswerCreateResponseDto(saved.getAnswerContent(), saved.getQuestion().getId(), saved.getMember().getId(), answer.getId());
+        return AnswerCreateResponseDto.of(
+                saved.getAnswerContent(),
+                saved.getQuestion().getId(),
+                saved.getMember().getId(),
+                saved.getId()
+        );
+    }
+
+    @Transactional
+    public Long deleteAnswer(Long answerId, Long memberId, Long questionId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(()->
+                new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        Answer answer = answerRepository.findById(answerId)
+                .orElseThrow(() -> new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND));
+
+        Question question = questionRepository.findById(answer.getQuestion().getId())
+                .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
+
+        answerRepository.deleteById(answer.getId());
+        question.decrementAnswerCount();
+
+        return answer.getId();
     }
 
     @Transactional
@@ -78,5 +100,6 @@ public class AnswerService {
                 answer.getId(),
                 null
         );
+
     }
 }

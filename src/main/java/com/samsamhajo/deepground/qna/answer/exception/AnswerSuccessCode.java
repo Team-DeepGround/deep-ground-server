@@ -8,8 +8,8 @@ import org.springframework.http.HttpStatus;
 public enum AnswerSuccessCode implements SuccessCode {
 
     ANSWER_CREATED(HttpStatus.CREATED, "답변이 성공적으로 생성되었습니다."),
+    ANSWER_DELETED(HttpStatus.OK,"답변이 성공적으로 삭제되었습니다.");
     ANSWER_UPDATED(HttpStatus.OK, "답변이 성공적으로 수정되었습니다.");
-
 
     private final HttpStatus status;
     private final String message;

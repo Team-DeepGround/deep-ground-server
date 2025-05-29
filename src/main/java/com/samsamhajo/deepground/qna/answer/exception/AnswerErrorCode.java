@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum AnswerErrorCode implements ErrorCode {
 
-    ANSWER_CONTENT_REQUIRED(HttpStatus.BAD_REQUEST, "답변은 필수입니다."),
+    ANSWER_CONTENT_REQUIRED(HttpStatus.BAD_REQUEST, "답변 내용을 찾을 수 없습니다."),
     ANSWER_NOT_FOUND(HttpStatus.NOT_FOUND, "답변을 찾을 수 없습니다.");
 
 

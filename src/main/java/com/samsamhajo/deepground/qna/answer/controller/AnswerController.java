@@ -36,6 +36,23 @@ public class AnswerController {
 
     }
 
+    @DeleteMapping("/{answerId}")
+    public ResponseEntity<SuccessResponse> deleteAnswer(
+            @PathVariable Long answerId){
+
+                Long memberId = 1L;
+                Long questionId = 1L;
+
+                answerService.deleteAnswer(answerId, memberId,questionId);
+
+                return ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(SuccessResponse.of(AnswerSuccessCode.ANSWER_DELETED));
+    }
+
+}
+
+
     @PutMapping
     public ResponseEntity<SuccessResponse<AnswerUpdateResponseDto>> updateAnswer(
             @Valid @ModelAttribute AnswerUpdateRequestDto answerUpdateRequestDto
@@ -50,3 +67,4 @@ public class AnswerController {
     }
 
 }
+
