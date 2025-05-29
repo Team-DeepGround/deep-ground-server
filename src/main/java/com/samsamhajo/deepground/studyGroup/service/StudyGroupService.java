@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupDetailResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupParticipationResponse;
+import com.samsamhajo.deepground.studyGroup.dto.StudyGroupMyListResponse;
 import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupSearchRequest;
@@ -108,6 +109,12 @@ public class StudyGroupService {
             member.getStudyGroup(),
             member.getCreatedAt()
         ))
+      
+  public List<StudyGroupMyListResponse> findMyStudyGroups(Long memberId) {
+    List<StudyGroup> groups = studyGroupRepository.findAllByMember_IdOrderByCreatedAtDesc(memberId);
+
+    return groups.stream()
+        .map(StudyGroupMyListResponse::from)
         .toList();
   }
 

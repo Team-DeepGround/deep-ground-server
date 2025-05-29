@@ -32,12 +32,6 @@ public class Member extends BaseEntity {
     @Column(name = "nickname", nullable = false)
     private String nickname;
 
-    @Column(name = "profile_image")
-    private String profileImage;
-
-    @Column(name = "introduction")
-    private String introduction;
-
     @Column(name = "is_verified", nullable = false)
     private boolean isVerified = false;
 
@@ -54,9 +48,6 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member")
     private List<MemberInterest> memberInterests = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    private List<MemberTechStack> memberTechStacks = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
     private List<StudyGroupMember> studyGroupMembers = new ArrayList<>();
@@ -83,6 +74,13 @@ public class Member extends BaseEntity {
 
     public void verify() {
         this.isVerified = true;
+    }
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
     }
 }
 
