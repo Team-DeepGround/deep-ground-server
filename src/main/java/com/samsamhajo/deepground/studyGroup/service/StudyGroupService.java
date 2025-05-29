@@ -1,9 +1,11 @@
 package com.samsamhajo.deepground.studyGroup.service;
 
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupDetailResponse;
+import com.samsamhajo.deepground.studyGroup.dto.StudyGroupMyListResponse;
 import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupSearchRequest;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
@@ -94,6 +96,15 @@ public class StudyGroupService {
 
     return StudyGroupCreateResponse.from(savedGroup);
   }
+
+  public List<StudyGroupMyListResponse> findMyStudyGroups(Long memberId) {
+    List<StudyGroup> groups = studyGroupRepository.findAllByMember_IdOrderByCreatedAtDesc(memberId);
+
+    return groups.stream()
+        .map(StudyGroupMyListResponse::from)
+        .toList();
+  }
+
 
   private void validateRequest(StudyGroupCreateRequest request) {
     LocalDate now = LocalDate.now();

@@ -83,4 +83,18 @@ public class StudyGroupController {
         .status(StudyGroupSuccessCode.REQUEST_JOIN_SUCCESS.getStatus())
         .body(SuccessResponse.of(StudyGroupSuccessCode.REQUEST_JOIN_SUCCESS));
   }
+
+  @GetMapping("/my/{memberId}")
+  public ResponseEntity<SuccessResponse<?>> getMyStudyGroups(
+      @PathVariable Long memberId
+  ) {
+    GlobalLogger.info("사용자 생성 스터디 목록 조회 요청", memberId);
+
+    var response = studyGroupService.findMyStudyGroups(memberId);
+
+    return ResponseEntity
+        .status(StudyGroupSuccessCode.READ_SUCCESS.getStatus())
+        .body(SuccessResponse.of(StudyGroupSuccessCode.READ_SUCCESS, response));
+  }
+
 }
