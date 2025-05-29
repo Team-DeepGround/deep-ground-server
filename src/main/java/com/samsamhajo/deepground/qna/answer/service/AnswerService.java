@@ -48,7 +48,11 @@ public class AnswerService {
 
         question.incrementAnswerCount();
 
-        return new AnswerCreateResponseDto(saved.getAnswerContent(), saved.getQuestion().getId(), saved.getMember().getId(),answer.getId());
+        return AnswerCreateResponseDto.of(
+                saved.getAnswerContent(),
+                saved.getQuestion().getId(),
+                saved.getMember().getId(),
+                saved.getId();
     }
 
     @Transactional

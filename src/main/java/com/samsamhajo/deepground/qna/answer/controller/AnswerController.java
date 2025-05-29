@@ -33,9 +33,9 @@ public class AnswerController {
 
     }
 
-    @DeleteMapping("/{answerId}/delete")
+    @DeleteMapping("/{answerId}")
     public ResponseEntity<SuccessResponse> deleteAnswer(
-            @Valid @PathVariable Long answerId){
+            @PathVariable Long answerId){
 
                 Long memberId = 1L;
                 Long questionId = 1L;
