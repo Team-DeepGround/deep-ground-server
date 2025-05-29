@@ -169,6 +169,7 @@ public class FriendService {
         }
     }
 
+
     @Transactional
     public void deleteFriendById(Long friendId) {
 
@@ -176,5 +177,19 @@ public class FriendService {
                 .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_FRIEND));
 
         friend.softDelete();
+
+    public List<FriendDto> getFriendByMemberId(Long memberId) {
+
+            List<Friend> friends = friendRepository. findAllByMemberIdAndFriendStatus(memberId, FriendStatus.ACCEPT);
+
+        return friends.stream()
+                .map(friend -> {
+                    if (friend.getReceiveMember().getId().equals(memberId)) {
+                        return FriendDto.fromReceived(friend);
+                    } else {
+                        return FriendDto.fromSent(friend);
+                    }
+                })
+                .toList();
     }
 }

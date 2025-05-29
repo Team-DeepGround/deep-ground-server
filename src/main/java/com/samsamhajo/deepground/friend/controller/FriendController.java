@@ -86,6 +86,12 @@ public class FriendController {
         friendService.deleteFriendById(friendId);
         return ResponseEntity
                 .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_DELETE, friendId));
+
+    @GetMapping
+    public  ResponseEntity<SuccessResponse<List<FriendDto>>> getFriendList(@RequestParam Long memberId){
+        List<FriendDto> friends = friendService.getFriendByMemberId(memberId);
+        return ResponseEntity
+                .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_GET_LIST,friends));
     }
   
 

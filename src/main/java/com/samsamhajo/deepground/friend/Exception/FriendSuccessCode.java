@@ -13,6 +13,7 @@ public enum FriendSuccessCode implements SuccessCode {
     FRIEND_SENT_LIST_FOUND(HttpStatus.OK, "요청한 친구 요청 목록을 성공적으로 조회했습니다."),
     FRIEND_RECEIVE_LIST_FOUND(HttpStatus.OK, "수신한 친구 요청 목록을 성공적으로 조회했습니다."),
     FRIEND_SUCCESS_DELETE(HttpStatus.OK, "친구 목록에서 삭제되었습니다.");
+    FRIEND_SUCCESS_GET_LIST(HttpStatus.OK,"친구 목록을 성공적으로 조회했습니다" );
 
 
     private final HttpStatus status;
