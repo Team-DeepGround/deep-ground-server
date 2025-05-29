@@ -18,7 +18,13 @@ public enum AuthSuccessCode implements SuccessCode {
     // 닉네임 중복 검사 성공
     NICKNAME_AVAILABLE(HttpStatus.OK, "사용 가능한 닉네임입니다."),
 
-    LOGIN_SUCCESS(HttpStatus.OK, "로그인에 성공했습니다.");
+    LOGIN_SUCCESS(HttpStatus.OK, "로그인에 성공했습니다."),
+
+    PASSWORD_RESET_EMAIL_SENT(HttpStatus.OK, "비밀번호 재설정 이메일이 전송되었습니다."),
+
+    PASSWORD_RESET_SUCCESS(HttpStatus.OK, "비밀번호가 성공적으로 재설정되었습니다.");
+
+    TOKEN_REFRESHED(HttpStatus.OK, "토큰이 갱신되었습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

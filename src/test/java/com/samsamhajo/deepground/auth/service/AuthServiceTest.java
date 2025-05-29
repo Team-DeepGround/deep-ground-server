@@ -1,10 +1,10 @@
 package com.samsamhajo.deepground.auth.service;
 
-import com.samsamhajo.deepground.auth.dto.LoginRequest;
-import com.samsamhajo.deepground.auth.dto.LoginResponse;
-import com.samsamhajo.deepground.auth.dto.RegisterRequest;
+import com.samsamhajo.deepground.auth.dto.*;
 import com.samsamhajo.deepground.auth.exception.AuthErrorCode;
 import com.samsamhajo.deepground.auth.exception.AuthException;
+import com.samsamhajo.deepground.auth.jwt.JwtProvider;
+import com.samsamhajo.deepground.auth.repository.RefreshTokenRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
@@ -65,8 +65,8 @@ public class AuthServiceTest {
     @Test
     void 이메일_중복_검사_성공() {
         // when & then
-       assertDoesNotThrow(() ->
-               authService.checkEmailDuplicate("test123@example.com"));
+        assertDoesNotThrow(() ->
+                authService.checkEmailDuplicate("test123@example.com"));
     }
 
     @Test

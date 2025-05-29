@@ -136,6 +136,7 @@ public class FriendService {
         return friendRequest;
     }
 
+    @Transactional
     public Long sendProfileFriendRequest(Long requesterId, Long receiverId) {
 
         Member requester = memberRepository.findById(requesterId)
@@ -166,5 +167,29 @@ public class FriendService {
         if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(receiver, requester, FriendStatus.REQUEST)) {
             throw new FriendException(FriendErrorCode.REQUEST_ALREADY_RECEIVED);
         }
+    }
+
+
+    @Transactional
+    public void deleteFriendById(Long friendId) {
+
+        Friend friend = friendRepository.findById(friendId)
+                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_FRIEND));
+
+        friend.softDelete();
+
+    public List<FriendDto> getFriendByMemberId(Long memberId) {
+
+            List<Friend> friends = friendRepository. findAllByMemberIdAndFriendStatus(memberId, FriendStatus.ACCEPT);
+
+        return friends.stream()
+                .map(friend -> {
+                    if (friend.getReceiveMember().getId().equals(memberId)) {
+                        return FriendDto.fromReceived(friend);
+                    } else {
+                        return FriendDto.fromSent(friend);
+                    }
+                })
+                .toList();
     }
 }

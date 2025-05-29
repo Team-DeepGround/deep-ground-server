@@ -9,7 +9,8 @@ public enum QuestionSuccessCode implements SuccessCode {
 
     QUESTION_CREATED(HttpStatus.CREATED, "질문이 성공적으로 생성되었습니다."),
     QUESTION_DELETED(HttpStatus.OK, "질문이 성공적으로 삭제되었습니다."),
-    QUESTION_UPDATED(HttpStatus.OK, "질문이 성공적으로 업데이트 되었습니다.");
+    QUESTION_UPDATED(HttpStatus.OK, "질문이 성공적으로 업데이트 되었습니다."),
+    QUESTION_MEDIA_UPDATED(HttpStatus.OK, "질문 미디어가 성공적으로 수정되었습니다.");
 
 
     private final HttpStatus status;

@@ -1,10 +1,10 @@
-package com.samsamhajo.deepground.question;
+package com.samsamhajo.deepground;
 
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
-import com.samsamhajo.deepground.qna.question.Dto.QuestionRequestDto;
-import com.samsamhajo.deepground.qna.question.Dto.QuestionResponseDto;
-import com.samsamhajo.deepground.qna.question.Dto.QuestionUpdateDto;
+import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateRequestDto;
+import com.samsamhajo.deepground.qna.question.Dto.QuestionUpdateResponseDto;
+import com.samsamhajo.deepground.qna.question.Dto.QuestionUpdateRequestDto;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.exception.QuestionException;
 import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
@@ -66,21 +66,21 @@ public class QuestionUpdateTest {
 
         List<Long> techStack = List.of(1L, 2L);
 
-        QuestionRequestDto questionRequestDto = new QuestionRequestDto(title, content, techStack, mediaFiles);
-        Question question = questionService.createQuestion(questionRequestDto, memberId);
-        QuestionUpdateDto questionUpdateDto =  new QuestionUpdateDto(question.getId(), title1, content1, techStack, mediaFiles);
-        QuestionResponseDto questionResponseDto = questionService.updateQuestion(questionUpdateDto, memberId);
+        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStack, mediaFiles);
+        Question question = questionService.createQuestion(questionCreateRequestDto, memberId);
+        QuestionUpdateRequestDto questionUpdateRequestDto =  new QuestionUpdateRequestDto(question.getId(), title1, content1, techStack, mediaFiles);
+        QuestionUpdateResponseDto questionUpdateResponseDto = questionService.updateQuestion(questionUpdateRequestDto, memberId);
 
         //TODO 후에 media, teckStack함께 수정되는지 Test코드 작성
 
         //MemberId가 서로 동일한지, 동일한 회원이 자신이 작성한 질문을 수정하는지
-        assertThat(question.getMember()).isEqualTo(questionResponseDto.getMemberId());
+        assertThat(question.getMember()).isEqualTo(questionUpdateResponseDto.getMemberId());
         //같은 Question이 수정되고 있는지
-        assertThat(question.getId()).isEqualTo(questionUpdateDto.getQuestionId());
+        assertThat(question.getId()).isEqualTo(questionUpdateRequestDto.getQuestionId());
         //제목이 수정되었는지
-        assertThat(question.getTitle()).isEqualTo(questionUpdateDto.getTitle());
+        assertThat(question.getTitle()).isEqualTo(questionUpdateRequestDto.getTitle());
         //내용이 수정되었는지
-        assertThat(question.getContent()).isEqualTo(questionUpdateDto.getContent());
+        assertThat(question.getContent()).isEqualTo(questionUpdateRequestDto.getContent());
     }
 
     @Test
@@ -101,14 +101,14 @@ public class QuestionUpdateTest {
 
         //TODO 후에 media, teckStack함께 수정되는지 Test코드 작성
 
-        QuestionRequestDto questionRequestDto = new QuestionRequestDto(title, content, techStack, mediaFiles);
-        Question question = questionService.createQuestion(questionRequestDto, memberId);
-        QuestionUpdateDto questionUpdateDto =  new QuestionUpdateDto(question.getId(), title1, content1, techStack, mediaFiles);
-        QuestionResponseDto questionResponseDto = questionService.updateQuestion(questionUpdateDto, memberId);
+        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStack, mediaFiles);
+        Question question = questionService.createQuestion(questionCreateRequestDto, memberId);
+        QuestionUpdateRequestDto questionUpdateRequestDto =  new QuestionUpdateRequestDto(question.getId(), title1, content1, techStack, mediaFiles);
+        QuestionUpdateResponseDto questionUpdateResponseDto = questionService.updateQuestion(questionUpdateRequestDto, memberId);
 
-        assertThat(question.getMember()).isEqualTo(questionResponseDto.getMemberId());
-        assertThat(questionRepository.findById(questionUpdateDto.getQuestionId()).get().getTitle()).isEqualTo(questionUpdateDto.getTitle());
-        assertThat(questionRepository.findById(questionUpdateDto.getQuestionId()).get().getContent()).isEqualTo(questionUpdateDto.getContent());
+        assertThat(question.getMember()).isEqualTo(questionUpdateResponseDto.getMemberId());
+        assertThat(questionRepository.findById(questionUpdateRequestDto.getQuestionId()).get().getTitle()).isEqualTo(questionUpdateRequestDto.getTitle());
+        assertThat(questionRepository.findById(questionUpdateRequestDto.getQuestionId()).get().getContent()).isEqualTo(questionUpdateRequestDto.getContent());
 
     }
 
@@ -127,11 +127,11 @@ public class QuestionUpdateTest {
 
         List<Long> techStack = List.of(1L, 2L);
 
-        QuestionRequestDto questionRequestDto = new QuestionRequestDto(title, content, techStack, mediaFiles);
-        Question question = questionService.createQuestion(questionRequestDto, memberId);
-        QuestionUpdateDto questionUpdateDto =  new QuestionUpdateDto(question.getId(), title1, content1, techStack, mediaFiles);
+        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStack, mediaFiles);
+        Question question = questionService.createQuestion(questionCreateRequestDto, memberId);
+        QuestionUpdateRequestDto questionUpdateRequestDto =  new QuestionUpdateRequestDto(question.getId(), title1, content1, techStack, mediaFiles);
 
-        assertThatThrownBy(() -> questionService.updateQuestion(questionUpdateDto, memberId)
+        assertThatThrownBy(() -> questionService.updateQuestion(questionUpdateRequestDto, memberId)
         ).isInstanceOf(QuestionException.class)
                 .hasMessageContaining("제목을 찾을 수 없습니다.");
     }
@@ -151,11 +151,11 @@ public class QuestionUpdateTest {
 
         List<Long> techStack = List.of(1L, 2L);
 
-        QuestionRequestDto questionRequestDto = new QuestionRequestDto(title, content, techStack, mediaFiles);
-        Question question = questionService.createQuestion(questionRequestDto, memberId);
-        QuestionUpdateDto questionUpdateDto =  new QuestionUpdateDto(question.getId(), title1, content1, techStack, mediaFiles);
+        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStack, mediaFiles);
+        Question question = questionService.createQuestion(questionCreateRequestDto, memberId);
+        QuestionUpdateRequestDto questionUpdateRequestDto =  new QuestionUpdateRequestDto(question.getId(), title1, content1, techStack, mediaFiles);
 
-        assertThatThrownBy(() -> questionService.updateQuestion(questionUpdateDto, memberId)
+        assertThatThrownBy(() -> questionService.updateQuestion(questionUpdateRequestDto, memberId)
         ).isInstanceOf(QuestionException.class)
                 .hasMessageContaining("내용을 찾을 수 없습니다.");
     }
