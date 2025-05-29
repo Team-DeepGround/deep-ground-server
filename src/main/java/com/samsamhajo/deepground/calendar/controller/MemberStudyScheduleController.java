@@ -1,15 +1,16 @@
 package com.samsamhajo.deepground.calendar.controller;
 
+
 import com.samsamhajo.deepground.calendar.dto.MemberScheduleCalendarResponseDto;
+import com.samsamhajo.deepground.calendar.dto.MemberStudyScheduleRequestDto;
+import com.samsamhajo.deepground.calendar.dto.MemberStudyScheduleResponseDto;
 import com.samsamhajo.deepground.calendar.exception.ScheduleSuccessCode;
 import com.samsamhajo.deepground.calendar.service.MemberStudyScheduleService;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,5 +29,14 @@ public class MemberStudyScheduleController {
 
         return ResponseEntity.status(ScheduleSuccessCode.SCHEDULE_FOUND.getStatus())
                 .body(SuccessResponse.of(ScheduleSuccessCode.SCHEDULE_FOUND, memberStudySchedules));
+
+    @PatchMapping("/{memberStudyScheduleId}")
+    public ResponseEntity<SuccessResponse<MemberStudyScheduleResponseDto>> update(
+            @PathVariable Long memberStudyScheduleId,
+            @Valid @RequestBody MemberStudyScheduleRequestDto requestDto
+    ) {
+        MemberStudyScheduleResponseDto responseDto = memberStudyScheduleService.update(memberStudyScheduleId, requestDto);
+        return ResponseEntity.status(ScheduleSuccessCode.SCHEDULE_UPDATED.getStatus())
+                .body(SuccessResponse.of(ScheduleSuccessCode.SCHEDULE_UPDATED, responseDto));
     }
 }
