@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.calendar.dto;
 
+import com.samsamhajo.deepground.calendar.entity.MemberStudySchedule;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -19,4 +20,20 @@ public class MemberScheduleCalendarResponseDto {
     private Boolean isAvailable;
     private Boolean isImportant;
     private String memo;
+
+    public static MemberScheduleCalendarResponseDto from(MemberStudySchedule schedule) {
+        var ss = schedule.getStudySchedule();
+        return MemberScheduleCalendarResponseDto.builder()
+                .memberStudyScheduleId(schedule.getId())
+                .studyScheduleId(ss.getId())
+                .title(ss.getTitle())
+                .startTime(ss.getStartTime())
+                .endTime(ss.getEndTime())
+                .description(ss.getDescription())
+                .location(ss.getLocation())
+                .isAvailable(schedule.getIsAvailable())
+                .isImportant(schedule.getIsImportant())
+                .memo(schedule.getMemo())
+                .build();
+    }
 }

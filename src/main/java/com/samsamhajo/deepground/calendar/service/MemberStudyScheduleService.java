@@ -26,21 +26,7 @@ public class MemberStudyScheduleService {
 
         List<MemberStudySchedule> schedules = memberStudyScheduleRepository.findAllByMemberId(memberId);
         return schedules.stream()
-                .map(schedule -> {
-                    var ss = schedule.getStudySchedule(); // StudySchedule 객체 가져오기
-                    return MemberScheduleCalendarResponseDto.builder()
-                            .memberStudyScheduleId(schedule.getId())
-                            .studyScheduleId(ss.getId())
-                            .title(ss.getTitle())
-                            .startTime(ss.getStartTime())
-                            .endTime(ss.getEndTime())
-                            .description(ss.getDescription())
-                            .location(ss.getLocation())
-                            .isAvailable(schedule.getIsAvailable())
-                            .isImportant(schedule.getIsImportant())
-                            .memo(schedule.getMemo())
-                            .build();
-                })
+                .map(MemberScheduleCalendarResponseDto::from)
                 .toList();
     }
 
