@@ -12,6 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +33,7 @@ public class NotificationController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         Long memberId = userDetails.getMember().getId();
-
+  
         NotificationListResponse notifications = notificationService.getNotifications(
                 memberId,
                 request.getCursor(),
@@ -36,5 +41,28 @@ public class NotificationController {
         );
         return ResponseEntity
                 .ok(SuccessResponse.of(NotificationSuccessCode.NOTIFICATION_RETRIEVED, notifications));
+    }
+
+    @PatchMapping("/{notificationId}/read")
+    public ResponseEntity<SuccessResponse<?>> readNotification(
+            @PathVariable String notificationId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long memberId = userDetails.getMember().getId();
+
+        notificationService.readNotification(notificationId, memberId);
+        return ResponseEntity
+                .ok(SuccessResponse.of(NotificationSuccessCode.NOTIFICATION_READ));
+    }
+
+    @PatchMapping("/read-all")
+    public ResponseEntity<SuccessResponse<?>> readAllNotifications(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long memberId = userDetails.getMember().getId();
+
+        notificationService.readAllNotifications(memberId);
+        return ResponseEntity
+                .ok(SuccessResponse.of(NotificationSuccessCode.NOTIFICATION_READ));
     }
 }
