@@ -61,7 +61,7 @@ public class AuthController {
         PasswordResetEmailResponse response = authService.sendPasswordResetEmail(request);
         return ResponseEntity
                 .status(AuthSuccessCode.PASSWORD_RESET_EMAIL_SENT.getStatus())
-                .body(SuccessResponse.of(AuthSuccessCode.PASSWORD_RESET_EMAIL_SENT));
+                .body(SuccessResponse.of(AuthSuccessCode.PASSWORD_RESET_EMAIL_SENT, response));
     }
 
     @PostMapping("/password/reset")

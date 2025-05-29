@@ -87,7 +87,6 @@ public class AuthService {
         }
 
         member.updatePassword(passwordEncoder.encode(request.getNewPassword()));
-        memberRepository.save(member);
 
         emailVerificationRepository.delete(request.getEmail());
 
