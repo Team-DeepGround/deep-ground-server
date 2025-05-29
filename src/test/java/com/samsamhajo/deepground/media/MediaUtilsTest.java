@@ -13,7 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
+
+import java.io.File;
 
 @ExtendWith(MockitoExtension.class)
 class MediaUtilsTest {
@@ -88,5 +89,41 @@ class MediaUtilsTest {
 
         // then
         assertThat(extension).isEqualTo("png");
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 미디어 파일 삭제 시 실패한다")
+    void deleteMedia_whenFileNotExists_thenReturnsFalse() {
+        // given
+        String nonExistentMediaUrl = "/media/non-existent-file.jpg";
+
+        // when & then
+        assertThatThrownBy(() -> MediaUtils.deleteMedia(nonExistentMediaUrl))
+                .isInstanceOf(MediaException.class);
+    }
+
+    @Test
+    @DisplayName("미디어 파일 삭제 성공 테스트")
+    void deleteMedia_Success() {
+        // given
+        String testFileName = "test-delete-file.txt";
+        String mediaUrl = "/media/" + testFileName;
+        String fullPath = System.getProperty("user.dir") + mediaUrl;
+        
+        // 테스트 파일 생성
+        try {
+            File testFile = new File(fullPath);
+            testFile.getParentFile().mkdirs();
+            testFile.createNewFile();
+        } catch (Exception e) {
+            throw new RuntimeException("테스트 파일 생성 실패", e);
+        }
+
+        // when
+        boolean result = MediaUtils.deleteMedia(mediaUrl);
+
+        // then
+        assertThat(result).isTrue();
+        assertThat(new File(fullPath).exists()).isFalse();
     }
 } 
