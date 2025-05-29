@@ -4,7 +4,11 @@ import com.samsamhajo.deepground.auth.dto.*;
 import com.samsamhajo.deepground.auth.exception.AuthErrorCode;
 import com.samsamhajo.deepground.auth.exception.AuthException;
 import com.samsamhajo.deepground.auth.jwt.JwtProvider;
+import com.samsamhajo.deepground.email.dto.EmailRequest;
+import com.samsamhajo.deepground.email.repository.EmailVerificationRepository;
+import com.samsamhajo.deepground.email.service.EmailService;
 import com.samsamhajo.deepground.auth.repository.RefreshTokenRepository;
+
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
@@ -19,6 +23,8 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final EmailService emailService;
+    private final EmailVerificationRepository emailVerificationRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Value("${jwt.refresh-token-validity-in-seconds}")
@@ -71,6 +77,37 @@ public class AuthService {
         );
     }
 
+    @Transactional
+    public PasswordResetEmailResponse sendPasswordResetEmail(PasswordResetRequest request) {
+        Member member = memberRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AuthException(AuthErrorCode.INVALID_EMAIL));
+
+        EmailRequest emailRequest = new EmailRequest(request.getEmail());
+        emailService.sendVerificationEmail(emailRequest);
+
+        return PasswordResetEmailResponse.of(request.getEmail());
+    }
+
+    @Transactional
+    public PasswordResetResponse resetPassword(PasswordResetVerifyRequest request) {
+        Member member = memberRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AuthException(AuthErrorCode.INVALID_EMAIL));
+
+        String storedCode = emailVerificationRepository.getCode(request.getEmail());
+        if (storedCode == null) {
+            throw new AuthException(AuthErrorCode.VERIFICATION_CODE_EXPIRED);
+        }
+        if (!storedCode.equals(request.getCode())) {
+            throw new AuthException(AuthErrorCode.INVALID_VERIFICATION_CODE);
+        }
+
+        member.updatePassword(passwordEncoder.encode(request.getNewPassword()));
+
+        emailVerificationRepository.delete(request.getEmail());
+
+        return PasswordResetResponse.of(member);
+    }
+    
     @Transactional
     public TokenRefreshResponse refreshAccessToken(TokenRefreshRequest request) {
 

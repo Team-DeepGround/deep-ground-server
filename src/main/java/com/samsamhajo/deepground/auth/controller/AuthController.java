@@ -54,6 +54,25 @@ public class AuthController {
                 .body(SuccessResponse.of(AuthSuccessCode.LOGIN_SUCCESS, response));
     }
 
+    @PostMapping("/password/reset/send")
+    public ResponseEntity<SuccessResponse<PasswordResetEmailResponse>> sendPasswordResetEmail(
+            @Valid @RequestBody PasswordResetRequest request
+    ) {
+        PasswordResetEmailResponse response = authService.sendPasswordResetEmail(request);
+        return ResponseEntity
+                .status(AuthSuccessCode.PASSWORD_RESET_EMAIL_SENT.getStatus())
+                .body(SuccessResponse.of(AuthSuccessCode.PASSWORD_RESET_EMAIL_SENT, response));
+    }
+
+    @PostMapping("/password/reset")
+    public ResponseEntity<SuccessResponse<PasswordResetResponse>> resetPassword(
+            @Valid @RequestBody PasswordResetVerifyRequest request
+    ) {
+        PasswordResetResponse response = authService.resetPassword(request);
+        return ResponseEntity
+                .status(AuthSuccessCode.PASSWORD_RESET_SUCCESS.getStatus())
+                .body(SuccessResponse.of(AuthSuccessCode.PASSWORD_RESET_SUCCESS, response));
+
     @PostMapping("/token/refresh")
     public ResponseEntity<SuccessResponse<TokenRefreshResponse>> refreshAccessToken(
             @Valid @RequestBody TokenRefreshRequest request

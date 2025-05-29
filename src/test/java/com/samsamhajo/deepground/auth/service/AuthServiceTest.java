@@ -65,8 +65,8 @@ public class AuthServiceTest {
     @Test
     void 이메일_중복_검사_성공() {
         // when & then
-       assertDoesNotThrow(() ->
-               authService.checkEmailDuplicate("test123@example.com"));
+        assertDoesNotThrow(() ->
+                authService.checkEmailDuplicate("test123@example.com"));
     }
 
     @Test
