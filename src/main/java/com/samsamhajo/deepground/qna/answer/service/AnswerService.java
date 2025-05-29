@@ -52,7 +52,8 @@ public class AnswerService {
                 saved.getAnswerContent(),
                 saved.getQuestion().getId(),
                 saved.getMember().getId(),
-                saved.getId();
+                saved.getId()
+        );
     }
 
     @Transactional
