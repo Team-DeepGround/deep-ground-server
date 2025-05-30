@@ -49,10 +49,7 @@ public class AnswerController {
                         .status(HttpStatus.OK)
                         .body(SuccessResponse.of(AnswerSuccessCode.ANSWER_DELETED));
     }
-
-}
-
-
+    
     @PutMapping
     public ResponseEntity<SuccessResponse<AnswerUpdateResponseDto>> updateAnswer(
             @Valid @ModelAttribute AnswerUpdateRequestDto answerUpdateRequestDto
@@ -67,4 +64,5 @@ public class AnswerController {
     }
 
 }
+
 
