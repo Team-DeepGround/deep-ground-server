@@ -72,6 +72,7 @@ public class AuthController {
         return ResponseEntity
                 .status(AuthSuccessCode.PASSWORD_RESET_SUCCESS.getStatus())
                 .body(SuccessResponse.of(AuthSuccessCode.PASSWORD_RESET_SUCCESS, response));
+    }
 
     @PostMapping("/token/refresh")
     public ResponseEntity<SuccessResponse<TokenRefreshResponse>> refreshAccessToken(
