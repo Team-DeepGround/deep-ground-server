@@ -66,11 +66,11 @@ public class StudyGroupController {
   }
 
 
-
   /**
    * 스터디 그룹 참가 요청 API
+   *
    * @param studyGroupId 요청 대상 스터디 그룹 ID
-   * @param member 요청자 (JWT 인증 필터를 통해 주입됨)
+   * @param member       요청자 (JWT 인증 필터를 통해 주입됨)
    */
   @PostMapping("/{studyGroupId}/join")
   public ResponseEntity<SuccessResponse<?>> requestJoin(
@@ -95,16 +95,22 @@ public class StudyGroupController {
     List<StudyGroupParticipationResponse> response =
         studyGroupService.getStudyGroupsByMember(memberId);
 
-  @GetMapping("/my/{memberId}")
-  public ResponseEntity<SuccessResponse<?>> getMyStudyGroups(
-      @PathVariable Long memberId
-  ) {
-    GlobalLogger.info("사용자 생성 스터디 목록 조회 요청", memberId);
-
-    var response = studyGroupService.findMyStudyGroups(memberId);
-
     return ResponseEntity
         .status(StudyGroupSuccessCode.READ_SUCCESS.getStatus())
         .body(SuccessResponse.of(StudyGroupSuccessCode.READ_SUCCESS, response));
+
   }
+
+    @GetMapping("/my/{memberId}")
+    public ResponseEntity<SuccessResponse<?>> getMyStudyGroups (
+        @PathVariable Long memberId
+  ){
+      GlobalLogger.info("사용자 생성 스터디 목록 조회 요청", memberId);
+
+      var response = studyGroupService.findMyStudyGroups(memberId);
+
+      return ResponseEntity
+          .status(StudyGroupSuccessCode.READ_SUCCESS.getStatus())
+          .body(SuccessResponse.of(StudyGroupSuccessCode.READ_SUCCESS, response));
+    }
 }

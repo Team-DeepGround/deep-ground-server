@@ -102,13 +102,15 @@ public class StudyGroupService {
 
   public List<StudyGroupParticipationResponse> getStudyGroupsByMember(Long memberId) {
     List<StudyGroupMember> studyGroupMembers =
-        studyGroupMemberRepository.findAllByMemberIdAndIsAllowedTrueOrderByStudyGroupCreatedAtDesc(memberId);
+        studyGroupMemberRepository.findAllByMemberIdAndIsAllowedTrueOrderByStudyGroupCreatedAtDesc(
+            memberId);
 
     return studyGroupMembers.stream()
         .map(member -> StudyGroupParticipationResponse.from(
             member.getStudyGroup(),
             member.getCreatedAt()
-        ))
+        )).toList();
+  }
       
   public List<StudyGroupMyListResponse> findMyStudyGroups(Long memberId) {
     List<StudyGroup> groups = studyGroupRepository.findAllByMember_IdOrderByCreatedAtDesc(memberId);
