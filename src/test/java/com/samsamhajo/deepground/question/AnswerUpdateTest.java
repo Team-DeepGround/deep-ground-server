@@ -10,7 +10,7 @@ import com.samsamhajo.deepground.qna.answer.exception.AnswerErrorCode;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerException;
 import com.samsamhajo.deepground.qna.answer.repository.AnswerRepository;
 import com.samsamhajo.deepground.qna.answer.service.AnswerService;
-import com.samsamhajo.deepground.qna.question.Dto.QuestionRequestDto;
+import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateRequestDto;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
 import com.samsamhajo.deepground.qna.question.service.QuestionService;
@@ -64,8 +64,8 @@ public class AnswerUpdateTest {
         );
 
         //질문 생성
-        QuestionRequestDto questionRequestDto = new QuestionRequestDto(title, content, techStack, mediaFiles);
-        Question question = questionService.createQuestion(questionRequestDto, memberId);
+        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStack, mediaFiles);
+        Question question = questionService.createQuestion(questionCreateRequestDto, memberId);
         Long test1 = question.getId();
 
         //답변 생성
@@ -99,8 +99,8 @@ public class AnswerUpdateTest {
         );
 
         //질문 생성
-        QuestionRequestDto questionRequestDto = new QuestionRequestDto(title, content, techStack, mediaFiles);
-        Question question = questionService.createQuestion(questionRequestDto, memberId);
+        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStack, mediaFiles);
+        Question question = questionService.createQuestion(questionCreateRequestDto, memberId);
         Long test1 = question.getId();
 
         //답변 생성
@@ -129,8 +129,8 @@ public class AnswerUpdateTest {
         );
 
         //질문 생성
-        QuestionRequestDto questionRequestDto = new QuestionRequestDto(title, content, techStack, mediaFiles);
-        Question question = questionService.createQuestion(questionRequestDto, memberId);
+        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStack, mediaFiles);
+        Question question = questionService.createQuestion(questionCreateRequestDto, memberId);
         Long test1 = question.getId();
 
         //답변 생성

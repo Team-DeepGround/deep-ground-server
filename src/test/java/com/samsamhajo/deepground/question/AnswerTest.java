@@ -57,7 +57,7 @@ public class AnswerTest {
 
     @Test
     @DisplayName("댓글 생성 Service 테스트 코드")
-    public void testAnswerService() {
+    public void testAnswerService()     {
 
         String title = "테스트";
         String content = "테스트1";
