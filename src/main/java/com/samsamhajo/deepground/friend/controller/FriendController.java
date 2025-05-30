@@ -81,11 +81,12 @@ public class FriendController {
     }
 
     @DeleteMapping("/{friendId}")
-    public ResponseEntity<SuccessResponse> deleteFriend(@PathVariable Long friendId){
+    public ResponseEntity<SuccessResponse> deleteFriend(@PathVariable Long friendId) {
 
         friendService.deleteFriendById(friendId);
         return ResponseEntity
                 .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_DELETE, friendId));
+    }
 
     @GetMapping
     public  ResponseEntity<SuccessResponse<List<FriendDto>>> getFriendList(@RequestParam Long memberId){
@@ -93,7 +94,4 @@ public class FriendController {
         return ResponseEntity
                 .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_GET_LIST,friends));
     }
-  
-
-
 }

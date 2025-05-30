@@ -177,6 +177,7 @@ public class FriendService {
                 .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_FRIEND));
 
         friend.softDelete();
+    }
 
     public List<FriendDto> getFriendByMemberId(Long memberId) {
 

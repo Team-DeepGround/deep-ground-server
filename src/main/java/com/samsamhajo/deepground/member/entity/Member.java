@@ -78,10 +78,10 @@ public class Member extends BaseEntity {
 
     public void updatePassword(String newPassword) {
         this.password = newPassword;
-
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
     }
+        public void updateNickname (String nickname){
+            this.nickname = nickname;
+        }
 }
 
 

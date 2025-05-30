@@ -13,13 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -71,7 +66,6 @@ public class FriendsTest {
         //then
 
     }*/
-}
 
     @Test
     public void 친구_목록() throws Exception {
