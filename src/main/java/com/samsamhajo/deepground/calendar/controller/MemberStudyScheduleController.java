@@ -29,6 +29,7 @@ public class MemberStudyScheduleController {
 
         return ResponseEntity.status(ScheduleSuccessCode.SCHEDULE_FOUND.getStatus())
                 .body(SuccessResponse.of(ScheduleSuccessCode.SCHEDULE_FOUND, memberStudySchedules));
+    }
 
     @PatchMapping("/{memberStudyScheduleId}")
     public ResponseEntity<SuccessResponse<MemberStudyScheduleResponseDto>> update(
