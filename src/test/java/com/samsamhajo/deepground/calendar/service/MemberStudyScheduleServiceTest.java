@@ -55,7 +55,7 @@ public class MemberStudyScheduleServiceTest {
         when(studySchedule.getDescription()).thenReturn("스터디 일정 설명");
         when(studySchedule.getLocation()).thenReturn("온라인");
 
-        MemberStudySchedule memberStudySchedule = MemberStudySchedule.of(studySchedule, member, true, true, "memo");
+        MemberStudySchedule memberStudySchedule = MemberStudySchedule.of(studySchedule, true, true, "memo");
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
         when(memberStudyScheduleRepository.findAllByMemberId(memberId)).thenReturn(List.of(memberStudySchedule));
@@ -92,9 +92,11 @@ public class MemberStudyScheduleServiceTest {
 
         verify(memberRepository).findById(memberId);
         verify(memberStudyScheduleRepository, never()).findAllByMemberId(anyLong());
+    }
 
+    @Test
     @DisplayName("참석 선택 + 중요 일정 체크/메모 추가 성공")
-    void update_MemberStudySchedule_Success() {
+    void update_MemberStudySchedule_Success () {
         // given
         Long memberStudyScheduleId = 1L;
 
@@ -118,11 +120,11 @@ public class MemberStudyScheduleServiceTest {
         assertThat(response.getIsAvailable()).isTrue();
         assertThat(response.getIsImportant()).isTrue();
         assertThat(response.getMemo()).isEqualTo("memo");
-    }
+        }
 
     @Test
     @DisplayName("업데이트 실패 - 존재하지 않는 스케줄 id")
-    void updateMemberStudySchedule_fail_scheduleNotFound() {
+    void updateMemberStudySchedule_fail_scheduleNotFound () {
         // given
         Long invalidMemberStudyScheduleId = 1L;
 
@@ -138,5 +140,6 @@ public class MemberStudyScheduleServiceTest {
         assertThatThrownBy(() -> memberStudyScheduleService.update(invalidMemberStudyScheduleId, requestDto))
                 .isInstanceOf(ScheduleException.class)
                 .hasMessageContaining(ScheduleErrorCode.SCHEDULE_NOT_FOUND.getMessage());
-    }
+        }
 }
+

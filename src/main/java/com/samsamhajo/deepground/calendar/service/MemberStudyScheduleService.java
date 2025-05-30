@@ -33,13 +33,8 @@ public class MemberStudyScheduleService {
                 .toList();
     }
 
-    private void validateMember(Long memberId) {
-        if (memberRepository.findById(memberId).isEmpty()) {
-            throw new ScheduleException(ScheduleErrorCode.MEMBER_NOT_FOUND);
-        }
-
     @Transactional
-    public MemberStudyScheduleResponseDto update(Long scheduleId, MemberStudyScheduleRequestDto requestDto) {
+    public MemberStudyScheduleResponseDto update (Long scheduleId, MemberStudyScheduleRequestDto requestDto){
 
         MemberStudySchedule schedule = memberStudyScheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.SCHEDULE_NOT_FOUND));
@@ -68,4 +63,10 @@ public class MemberStudyScheduleService {
                 .memo(schedule.getMemo())
                 .build();
     }
+
+    private void validateMember(Long memberId) {
+        memberRepository.findById(memberId)
+                .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.MEMBER_NOT_FOUND));
+    }
 }
+
