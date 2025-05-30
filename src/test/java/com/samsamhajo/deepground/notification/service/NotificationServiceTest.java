@@ -130,6 +130,7 @@ class NotificationServiceTest {
         }
     }
 
+    @Nested
     @DisplayName("알림 읽음")
     public class ReadNotification {
 
