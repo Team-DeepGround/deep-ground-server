@@ -1,12 +1,15 @@
 package com.samsamhajo.deepground.auth.controller;
 
 import com.samsamhajo.deepground.auth.dto.*;
+import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.auth.service.AuthService;
 import com.samsamhajo.deepground.auth.success.AuthSuccessCode;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
+import com.samsamhajo.deepground.member.entity.Member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -84,5 +87,14 @@ public class AuthController {
                 .body(SuccessResponse.of(AuthSuccessCode.TOKEN_REFRESHED, response));
     }
 
-    @PostMapping()
+    @PostMapping("/logout")
+    public ResponseEntity<SuccessResponse<Void>> logout(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long memberId = userDetails.getMember().getId();
+        authService.logout(memberId);
+        return ResponseEntity
+                .status(AuthSuccessCode.LOGOUT_SUCCESS.getStatus())
+                .body(SuccessResponse.of(AuthSuccessCode.LOGOUT_SUCCESS));
+    }
 }
