@@ -83,4 +83,6 @@ public class AuthController {
                 .status(AuthSuccessCode.TOKEN_REFRESHED.getStatus())
                 .body(SuccessResponse.of(AuthSuccessCode.TOKEN_REFRESHED, response));
     }
+
+    @PostMapping()
 }
