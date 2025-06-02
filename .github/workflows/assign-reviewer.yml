@@ -10,6 +10,8 @@ on:
   pull_request_review_comment:
     types: [ created ]
 
+  workflow_dispatch:
+
 # 테스트 용
   push:
     branches:
@@ -34,6 +36,9 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Build
+        run: npm run build
 
       - name: Run reviewer assignment script
         run: npm run assign-reviewer
