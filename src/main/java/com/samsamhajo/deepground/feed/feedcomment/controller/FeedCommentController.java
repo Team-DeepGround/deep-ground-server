@@ -21,7 +21,7 @@ public class FeedCommentController {
     private final Long DEV_MEMBER_ID = 1L;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<SuccessResponse<FeedComment>> createFeedComment(
+    public ResponseEntity<SuccessResponse<?>> createFeedComment(
             @ModelAttribute FeedCommentCreateRequest request) {
 
         feedCommentService.createFeedComment(request, DEV_MEMBER_ID);
@@ -31,7 +31,7 @@ public class FeedCommentController {
     }
 
     @PutMapping(value = "/{feedCommentId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<SuccessResponse<Feed>> updateFeed(
+    public ResponseEntity<SuccessResponse<?>> updateFeed(
             @PathVariable("feedCommentId") Long feedCommentId,
             @ModelAttribute FeedCommentUpdateRequest request) {
 
