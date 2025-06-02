@@ -1,7 +1,5 @@
 package com.samsamhajo.deepground.feed.feedcomment.controller;
 
-import com.samsamhajo.deepground.feed.feed.entity.Feed;
-import com.samsamhajo.deepground.feed.feedcomment.entity.FeedComment;
 import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentSuccessCode;
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentCreateRequest;
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentUpdateRequest;
