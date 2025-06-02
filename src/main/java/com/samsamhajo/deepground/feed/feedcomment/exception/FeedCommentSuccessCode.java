@@ -8,7 +8,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum FeedCommentSuccessCode implements SuccessCode {
-    FEED_COMMENT_CREATED(HttpStatus.CREATED, "댓글이 생성되었습니다.")
+    FEED_COMMENT_CREATED(HttpStatus.CREATED, "댓글이 생성되었습니다."),
+    FEED_COMMENT_UPDATED(HttpStatus.OK, "댓글이 수정되었습니다."),
 
     ;
 
