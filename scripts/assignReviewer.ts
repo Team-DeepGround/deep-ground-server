@@ -26,22 +26,27 @@ function selectReviewerByGroup(prAuthor: string): IReviewer {
     // @ts-ignore
     return filtered[Math.floor(Math.random() * filtered.length)];
 }
-// 3. main 함수
+//3.main 함수
 async function main() {
-    const prCreator = github.context.payload.pull_request.user.login;
+    const pr = github.context.payload.pull_request;
+    if (!pr) {
+        core.setFailed('이 워크플로우는 pull_request 이벤트에서만 실행됩니다.');
+        return;
+    }
+
+    const prCreator = pr.user.login;
     const selectedReviewer = selectReviewerByGroup(prCreator);
 
     await githubClient.rest.pulls.requestReviewers({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
-        pull_number: github.context.issue.number,
+        pull_number: pr.number,
         reviewers: [selectedReviewer.githubName]
     });
 
     // ✅ Discord 메시지 전송
     await sendDiscordMessage(selectedReviewer);
 }
-
 // 4. 실행
 main().catch(err => core.setFailed(err.message));
 

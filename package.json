@@ -1,11 +1,5 @@
-{
-  "dependencies": {
-    "@actions/core": "^1.11.1",
-    "@actions/github": "^6.0.1",
-    "axios": "^1.9.0",
-    "yaml": "^2.8.0"
-  },
-  "devDependencies": {
-    "@types/node": "^22.15.29"
-  }
-}
+{"scripts": {
+  "build": "tsc",
+  "assign-reviewer": "node dist/scripts/assignReviewer.js"
+},"dependencies":{"@actions/core":"^1.11.1","@actions/github":"^6.0.1","axios":"^1.9.0","yaml":"^2.8.0"},
+  "devDependencies":{"@types/node":"^22.15.29","typescript":"^5.8.3"}}
