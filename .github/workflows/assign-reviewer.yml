@@ -2,7 +2,23 @@ name: Assign Reviewer
 
 on:
   pull_request:
-    types: [opened]
+    types: [opened, synchronize]
+
+  pull_request_review:
+    types: [submitted]
+
+  pull_request_review_comment:
+    types: [ created ]
+
+# 테스트 용
+  push:
+    branches:
+      - '**'     # 모든 브랜치에서 push 감지
+  create:
+    branches:
+      - '**'     # 모든 브랜치 생성 감지
+    tags:
+      - '**'
 
 jobs:
   assign-reviewer:
