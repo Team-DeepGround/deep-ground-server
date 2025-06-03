@@ -194,8 +194,8 @@ class FeedReplyServiceTest {
             feedReplyService.deleteFeedReply(feedReplyId);
 
             // then
-            verify(feedReplyMediaService, times(1)).deleteFeedReplyMedia(feedReplyId);
-            verify(feedReply, times(1)).softDelete();
+            verify(feedReplyMediaService, times(1)).deleteAllByFeedReplyId(feedReplyId);
+            verify(feedReplyRepository, times(1)).delete(feedReply);
         }
 
         @Test
