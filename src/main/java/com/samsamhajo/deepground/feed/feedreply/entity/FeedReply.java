@@ -41,4 +41,8 @@ public class FeedReply extends BaseEntity {
     public static FeedReply of(String content, FeedComment feedComment, Member member) {
         return new FeedReply(content, feedComment, member);
     }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }
