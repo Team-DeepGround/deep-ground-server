@@ -63,6 +63,17 @@ public class FeedCommentService {
         return feedComment;
     }
 
+    @Transactional
+    public void deleteFeedComment(Long feedCommentId) {
+        FeedComment feedComment = feedCommentRepository.getById(feedCommentId);
+
+        // 피드 답글 미디어 삭제
+        feedCommentMediaService.deleteAllByFeedCommentId(feedCommentId);
+
+        // 피드 삭제
+        feedCommentRepository.delete(feedComment);
+    }
+
     private void saveFeedCommentMedia(FeedCommentCreateRequest request, FeedComment feedComment) {
         feedCommentMediaService.createFeedCommentMedia(feedComment, request.getImages());
     }
