@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.feed.feedreply.controller;
 
 import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentSuccessCode;
+import com.samsamhajo.deepground.feed.feedreply.exception.FeedReplySuccessCode;
 import com.samsamhajo.deepground.feed.feedreply.model.FeedReplyCreateRequest;
 import com.samsamhajo.deepground.feed.feedreply.service.FeedReplyService;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
@@ -27,6 +28,6 @@ public class FeedReplyController {
         feedReplyService.createFeedReply(request, DEV_MEMBER_ID);
 
         return ResponseEntity
-                .ok(SuccessResponse.of(FeedCommentSuccessCode.FEED_COMMENT_CREATED));
+                .ok(SuccessResponse.of(FeedReplySuccessCode.FEED_REPLY_CREATED));
     }
 } 
