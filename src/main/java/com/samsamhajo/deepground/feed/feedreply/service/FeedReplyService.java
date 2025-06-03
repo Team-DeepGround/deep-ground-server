@@ -65,6 +65,18 @@ public class FeedReplyService {
         return feedReply;
     }
 
+    @Transactional
+    public void deleteFeedReply(Long feedReplyId) {
+        FeedReply feedReply = feedReplyRepository.getById(feedReplyId);
+
+        // 피드 답글 미디어 삭제
+        feedReplyMediaService.deleteFeedReplyMedia(feedReplyId);
+
+        // 논리적 삭제
+        feedReply.softDelete();
+    }
+
+
     private void saveFeedReplyMedia(FeedReplyCreateRequest request, FeedReply feedReply) {
         feedReplyMediaService.createFeedReplyMedia(feedReply, request.getImages());
     }
