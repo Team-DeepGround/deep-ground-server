@@ -32,4 +32,18 @@ public class FeedReplyMediaService {
                         .toList()
         );
     }
+
+    @Transactional
+    public void updateFeedReplyMedia(FeedReply feedReply, List<MultipartFile> images) {
+        if (CollectionUtils.isEmpty(images)) return;
+
+        deleteFeedReplyMedia(feedReply.getId());
+
+        createFeedReplyMedia(feedReply, images);
+    }
+
+    @Transactional
+    public void deleteFeedReplyMedia(Long feedReplyId) {
+        feedReplyMediaRepository.deleteAllByFeedReplyId(feedReplyId);
+    }
 } 
