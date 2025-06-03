@@ -5,7 +5,10 @@ import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentErrorCode
 import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentException;
 import com.samsamhajo.deepground.feed.feedcomment.repository.FeedCommentRepository;
 import com.samsamhajo.deepground.feed.feedreply.entity.FeedReply;
+import com.samsamhajo.deepground.feed.feedreply.exception.FeedReplyErrorCode;
+import com.samsamhajo.deepground.feed.feedreply.exception.FeedReplyException;
 import com.samsamhajo.deepground.feed.feedreply.model.FeedReplyCreateRequest;
+import com.samsamhajo.deepground.feed.feedreply.model.FeedReplyUpdateRequest;
 import com.samsamhajo.deepground.feed.feedreply.repository.FeedReplyRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
@@ -23,7 +26,7 @@ public class FeedReplyService {
 
     private final FeedCommentRepository feedCommentRepository;
     private final FeedReplyRepository feedReplyRepository;
-    private final FeedReplyMediaService feedCommentMediaService;
+    private final FeedReplyMediaService feedReplyMediaService;
     private final MemberRepository memberRepository;
 
     @Transactional
@@ -45,8 +48,24 @@ public class FeedReplyService {
 
         return feedComment;
     }
+    @Transactional
+    public FeedReply updateFeed(Long feedReplyId, FeedReplyUpdateRequest request) {
+        if (!StringUtils.hasText(request.getContent())) {
+            throw new FeedReplyException(FeedReplyErrorCode.INVALID_FEED_REPLY_CONTENT);
+        }
+
+        FeedReply feedReply = feedReplyRepository.getById(feedReplyId);
+
+        // 피드 내용 업데이트
+        feedReply.updateContent(request.getContent());
+
+        // 미디어 업데이트
+        feedReplyMediaService.updateFeedReplyMedia(feedReply, request.getImages());
+
+        return feedReply;
+    }
 
     private void saveFeedReplyMedia(FeedReplyCreateRequest request, FeedReply feedReply) {
-        feedCommentMediaService.createFeedReplyMedia(feedReply, request.getImages());
+        feedReplyMediaService.createFeedReplyMedia(feedReply, request.getImages());
     }
 } 
