@@ -20,7 +20,7 @@ public class FeedCommentLike extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "feed_id")
+    @JoinColumn(name = "feed_comment_id")
     private FeedComment feedComment;
 
     @ManyToOne(fetch = FetchType.LAZY)
