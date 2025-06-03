@@ -47,7 +47,7 @@ public class FeedCommentService {
     }
 
     @Transactional
-    public FeedComment updateFeed(Long feedCommentId, FeedCommentUpdateRequest request) {
+    public FeedComment updateFeedComment(Long feedCommentId, FeedCommentUpdateRequest request) {
         if (!StringUtils.hasText(request.getContent())) {
             throw new FeedCommentException(FeedCommentErrorCode.INVALID_FEED_COMMENT_CONTENT);
         }
@@ -58,7 +58,7 @@ public class FeedCommentService {
         feedComment.updateContent(request.getContent());
 
         // 미디어 업데이트
-        feedCommentMediaService.updateFeedCommentMedia(feedComment, request);
+        feedCommentMediaService.updateFeedCommentMedia(feedComment, request.getImages());
 
         return feedComment;
     }

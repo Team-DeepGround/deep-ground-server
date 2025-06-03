@@ -160,7 +160,7 @@ class FeedCommentServiceTest {
         given(feedCommentRepository.getById(feedCommentId)).willReturn(feedComment);
 
         // when
-        FeedComment updatedComment = feedCommentService.updateFeed(feedCommentId, request);
+        FeedComment updatedComment = feedCommentService.updateFeedComment(feedCommentId, request);
 
         // then
         assertThat(updatedComment).isNotNull();
@@ -168,7 +168,7 @@ class FeedCommentServiceTest {
         assertThat(updatedComment.getMember()).isEqualTo(member);
         assertThat(updatedComment.getFeed()).isEqualTo(feed);
 
-        verify(feedCommentMediaService).updateFeedCommentMedia(any(FeedComment.class), any(FeedCommentUpdateRequest.class));
+        verify(feedCommentMediaService).updateFeedCommentMedia(any(FeedComment.class), any());
     }
 
     @Test
@@ -181,7 +181,7 @@ class FeedCommentServiceTest {
         FeedCommentUpdateRequest request = new FeedCommentUpdateRequest(emptyContent, null);
 
         // when & then
-        assertThatThrownBy(() -> feedCommentService.updateFeed(feedCommentId, request))
+        assertThatThrownBy(() -> feedCommentService.updateFeedComment(feedCommentId, request))
                 .isInstanceOf(FeedCommentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.INVALID_FEED_COMMENT_CONTENT);
 
@@ -201,7 +201,7 @@ class FeedCommentServiceTest {
                 .willThrow(new FeedCommentException(FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND));
 
         // when & then
-        assertThatThrownBy(() -> feedCommentService.updateFeed(nonExistentCommentId, request))
+        assertThatThrownBy(() -> feedCommentService.updateFeedComment(nonExistentCommentId, request))
                 .isInstanceOf(FeedCommentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND);
     }
