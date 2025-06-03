@@ -38,4 +38,14 @@ public class FeedCommentController {
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedCommentSuccessCode.FEED_COMMENT_UPDATED));
     }
+
+    @DeleteMapping("/{feedCommentId}")
+    public ResponseEntity<SuccessResponse<?>> deleteFeedComment(
+            @PathVariable("feedCommentId") Long feedCommentId) {
+
+        feedCommentService.deleteFeedComment(feedCommentId);
+
+        return ResponseEntity
+                .ok(SuccessResponse.of(FeedCommentSuccessCode.FEED_COMMENT_DELETED));
+    }
 } 
