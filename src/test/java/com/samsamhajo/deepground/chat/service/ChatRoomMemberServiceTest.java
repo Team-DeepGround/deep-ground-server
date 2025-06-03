@@ -9,8 +9,8 @@ import static org.mockito.Mockito.when;
 import com.samsamhajo.deepground.chat.entity.ChatMessage;
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
 import com.samsamhajo.deepground.chat.entity.ChatRoomMember;
-import com.samsamhajo.deepground.chat.exception.ChatRoomErrorCode;
-import com.samsamhajo.deepground.chat.exception.ChatRoomException;
+import com.samsamhajo.deepground.chat.exception.ChatErrorCode;
+import com.samsamhajo.deepground.chat.exception.ChatException;
 import com.samsamhajo.deepground.chat.repository.ChatMessageRepository;
 import com.samsamhajo.deepground.chat.repository.ChatRoomMemberRepository;
 import com.samsamhajo.deepground.member.entity.Member;
@@ -83,11 +83,11 @@ class ChatRoomMemberServiceTest {
             // given
             ChatRoomMember chatRoomMember = mock(ChatRoomMember.class);
 
-            when(chatRoomMemberRepository.findByMemberIdAndChatRoomId(memberId, chatRoomId))
+            when(chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, memberId))
                     .thenReturn(Optional.of(chatRoomMember));
 
             // when
-            chatRoomMemberService.leaveChatRoom(memberId, chatRoomId);
+            chatRoomMemberService.leaveChatRoom(chatRoomId, memberId);
 
             // then
             verify(chatRoomMember).softDelete();
@@ -97,13 +97,13 @@ class ChatRoomMemberServiceTest {
         @DisplayName("채팅방 멤버를 찾을 수 없다면 예외가 발생한다")
         void leaveChatRoom_notFound() {
             // given
-            when(chatRoomMemberRepository.findByMemberIdAndChatRoomId(memberId, chatRoomId))
+            when(chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, memberId))
                     .thenReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> chatRoomMemberService.leaveChatRoom(memberId, chatRoomId))
-                    .isInstanceOf(ChatRoomException.class)
-                    .hasMessage(ChatRoomErrorCode.MEMBER_NOT_FOUND.getMessage());
+            assertThatThrownBy(() -> chatRoomMemberService.leaveChatRoom(chatRoomId, memberId))
+                    .isInstanceOf(ChatException.class)
+                    .hasMessage(ChatErrorCode.CHATROOM_MEMBER_NOT_FOUND.getMessage());
         }
     }
 }
