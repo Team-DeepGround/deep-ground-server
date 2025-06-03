@@ -5,7 +5,10 @@ import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentErrorCode
 import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentException;
 import com.samsamhajo.deepground.feed.feedcomment.repository.FeedCommentRepository;
 import com.samsamhajo.deepground.feed.feedreply.entity.FeedReply;
+import com.samsamhajo.deepground.feed.feedreply.exception.FeedReplyErrorCode;
+import com.samsamhajo.deepground.feed.feedreply.exception.FeedReplyException;
 import com.samsamhajo.deepground.feed.feedreply.model.FeedReplyCreateRequest;
+import com.samsamhajo.deepground.feed.feedreply.model.FeedReplyUpdateRequest;
 import com.samsamhajo.deepground.feed.feedreply.repository.FeedReplyRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
@@ -120,6 +123,59 @@ class FeedReplyServiceTest {
             assertThatThrownBy(() -> feedReplyService.createFeedReply(request, memberId))
                     .isInstanceOf(FeedCommentException.class)
                     .hasMessage(FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("답글 수정(업데이트) 케이스")
+    class UpdateCases {
+        @Test
+        @DisplayName("정상적으로 답글 수정")
+        void updateFeed_success() {
+            // given
+            Long feedReplyId = 1L;
+            String newContent = "수정된 답글";
+            java.util.List images = Collections.emptyList();
+            FeedReplyUpdateRequest request = new FeedReplyUpdateRequest(newContent, images);
+
+            FeedReply feedReply = mock(FeedReply.class);
+            when(feedReplyRepository.getById(feedReplyId)).thenReturn(feedReply);
+
+            // when
+            FeedReply result = feedReplyService.updateFeed(feedReplyId, request);
+
+            // then
+            verify(feedReply).updateContent(newContent);
+            verify(feedReplyMediaService, times(1)).updateFeedReplyMedia(feedReply, images);
+            assertThat(result).isEqualTo(feedReply);
+        }
+
+        @Test
+        @DisplayName("답글 내용이 비어있으면 예외 발생")
+        void updateFeed_fail_emptyContent() {
+            // given
+            Long feedReplyId = 1L;
+            FeedReplyUpdateRequest request = new FeedReplyUpdateRequest("", Collections.emptyList());
+
+            // when & then
+            assertThatThrownBy(() -> feedReplyService.updateFeed(feedReplyId, request))
+                    .isInstanceOf(FeedReplyException.class)
+                    .hasMessage(FeedReplyErrorCode.INVALID_FEED_REPLY_CONTENT.getMessage());
+        }
+
+        @Test
+        @DisplayName("답글이 존재하지 않으면 예외 발생")
+        void updateFeed_fail_replyNotFound() {
+            // given
+            Long feedReplyId = 1L;
+            FeedReplyUpdateRequest request = new FeedReplyUpdateRequest("수정내용", Collections.emptyList());
+
+            when(feedReplyRepository.getById(feedReplyId)).thenThrow(new FeedReplyException(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND));
+
+            // when & then
+            assertThatThrownBy(() -> feedReplyService.updateFeed(feedReplyId, request))
+                    .isInstanceOf(FeedReplyException.class)
+                    .hasMessage(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND.getMessage());
         }
     }
 } 
