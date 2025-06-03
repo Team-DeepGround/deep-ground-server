@@ -205,4 +205,34 @@ class FeedCommentServiceTest {
                 .isInstanceOf(FeedCommentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND);
     }
+
+    @Test
+    @DisplayName("피드 댓글 삭제 성공 테스트")
+    void deleteFeedComment_Success() {
+        // given
+        Long feedCommentId = 1L;
+        FeedComment feedComment = FeedComment.of("댓글 내용", feed, member);
+        given(feedCommentRepository.getById(feedCommentId)).willReturn(feedComment);
+
+        // when
+        feedCommentService.deleteFeedComment(feedCommentId);
+
+        // then
+        verify(feedCommentMediaService).deleteAllByFeedCommentId(feedCommentId);
+        verify(feedCommentRepository).delete(feedComment);
+    }
+
+    @Test
+    @DisplayName("피드 댓글 삭제 실패 테스트 - 존재하지 않는 댓글")
+    void deleteFeedComment_Fail_CommentNotFound() {
+        // given
+        Long nonExistentCommentId = 999L;
+        given(feedCommentRepository.getById(nonExistentCommentId))
+                .willThrow(new FeedCommentException(FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND));
+
+        // when & then
+        assertThatThrownBy(() -> feedCommentService.deleteFeedComment(nonExistentCommentId))
+                .isInstanceOf(FeedCommentException.class)
+                .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND);
+    }
 } 
