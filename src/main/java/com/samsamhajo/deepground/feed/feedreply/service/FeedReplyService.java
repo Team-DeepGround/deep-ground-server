@@ -48,6 +48,7 @@ public class FeedReplyService {
 
         return feedComment;
     }
+
     @Transactional
     public FeedReply updateFeedReply(Long feedReplyId, FeedReplyUpdateRequest request) {
         if (!StringUtils.hasText(request.getContent())) {
@@ -70,10 +71,10 @@ public class FeedReplyService {
         FeedReply feedReply = feedReplyRepository.getById(feedReplyId);
 
         // 피드 답글 미디어 삭제
-        feedReplyMediaService.deleteFeedReplyMedia(feedReplyId);
+        feedReplyMediaService.deleteAllByFeedReplyId(feedReplyId);
 
-        // 논리적 삭제
-        feedReply.softDelete();
+        // 피드 삭제
+        feedReplyRepository.delete(feedReply);
     }
 
 
