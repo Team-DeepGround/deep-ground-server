@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "feed_comment_likes")
@@ -21,6 +23,7 @@ public class FeedCommentLike extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_comment_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private FeedComment feedComment;
 
     @ManyToOne(fetch = FetchType.LAZY)
