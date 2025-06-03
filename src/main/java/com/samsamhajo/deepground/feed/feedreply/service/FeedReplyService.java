@@ -49,7 +49,7 @@ public class FeedReplyService {
         return feedComment;
     }
     @Transactional
-    public FeedReply updateFeed(Long feedReplyId, FeedReplyUpdateRequest request) {
+    public FeedReply updateFeedReply(Long feedReplyId, FeedReplyUpdateRequest request) {
         if (!StringUtils.hasText(request.getContent())) {
             throw new FeedReplyException(FeedReplyErrorCode.INVALID_FEED_REPLY_CONTENT);
         }

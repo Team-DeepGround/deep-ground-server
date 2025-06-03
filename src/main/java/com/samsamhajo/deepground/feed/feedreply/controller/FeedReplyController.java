@@ -1,6 +1,5 @@
 package com.samsamhajo.deepground.feed.feedreply.controller;
 
-import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentSuccessCode;
 import com.samsamhajo.deepground.feed.feedreply.exception.FeedReplySuccessCode;
 import com.samsamhajo.deepground.feed.feedreply.model.FeedReplyCreateRequest;
 import com.samsamhajo.deepground.feed.feedreply.model.FeedReplyUpdateRequest;
@@ -34,7 +33,7 @@ public class FeedReplyController {
             @PathVariable("feedReplyId") Long feedReplyId,
             @ModelAttribute FeedReplyUpdateRequest request) {
 
-        feedReplyService.updateFeed(feedReplyId, request);
+        feedReplyService.updateFeedReply(feedReplyId, request);
 
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedReplySuccessCode.FEED_REPLY_UPDATED));

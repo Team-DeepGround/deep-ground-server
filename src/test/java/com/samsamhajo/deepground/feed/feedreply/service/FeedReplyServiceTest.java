@@ -142,7 +142,7 @@ class FeedReplyServiceTest {
             when(feedReplyRepository.getById(feedReplyId)).thenReturn(feedReply);
 
             // when
-            FeedReply result = feedReplyService.updateFeed(feedReplyId, request);
+            FeedReply result = feedReplyService.updateFeedReply(feedReplyId, request);
 
             // then
             verify(feedReply).updateContent(newContent);
@@ -158,7 +158,7 @@ class FeedReplyServiceTest {
             FeedReplyUpdateRequest request = new FeedReplyUpdateRequest("", Collections.emptyList());
 
             // when & then
-            assertThatThrownBy(() -> feedReplyService.updateFeed(feedReplyId, request))
+            assertThatThrownBy(() -> feedReplyService.updateFeedReply(feedReplyId, request))
                     .isInstanceOf(FeedReplyException.class)
                     .hasMessage(FeedReplyErrorCode.INVALID_FEED_REPLY_CONTENT.getMessage());
         }
@@ -173,7 +173,7 @@ class FeedReplyServiceTest {
             when(feedReplyRepository.getById(feedReplyId)).thenThrow(new FeedReplyException(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND));
 
             // when & then
-            assertThatThrownBy(() -> feedReplyService.updateFeed(feedReplyId, request))
+            assertThatThrownBy(() -> feedReplyService.updateFeedReply(feedReplyId, request))
                     .isInstanceOf(FeedReplyException.class)
                     .hasMessage(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND.getMessage());
         }
