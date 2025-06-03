@@ -178,4 +178,37 @@ class FeedReplyServiceTest {
                     .hasMessage(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND.getMessage());
         }
     }
+
+    @Nested
+    @DisplayName("답글 삭제 케이스")
+    class DeleteCases {
+        @Test
+        @DisplayName("정상적으로 답글 삭제")
+        void deleteFeedReply_success() {
+            // given
+            Long feedReplyId = 1L;
+            FeedReply feedReply = mock(FeedReply.class);
+            when(feedReplyRepository.getById(feedReplyId)).thenReturn(feedReply);
+
+            // when
+            feedReplyService.deleteFeedReply(feedReplyId);
+
+            // then
+            verify(feedReplyMediaService, times(1)).deleteFeedReplyMedia(feedReplyId);
+            verify(feedReply, times(1)).softDelete();
+        }
+
+        @Test
+        @DisplayName("답글이 존재하지 않으면 예외 발생")
+        void deleteFeedReply_fail_replyNotFound() {
+            // given
+            Long feedReplyId = 1L;
+            when(feedReplyRepository.getById(feedReplyId)).thenThrow(new FeedReplyException(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND));
+
+            // when & then
+            assertThatThrownBy(() -> feedReplyService.deleteFeedReply(feedReplyId))
+                    .isInstanceOf(FeedReplyException.class)
+                    .hasMessage(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND.getMessage());
+        }
+    }
 } 
