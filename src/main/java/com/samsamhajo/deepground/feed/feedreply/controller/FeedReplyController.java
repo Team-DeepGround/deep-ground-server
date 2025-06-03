@@ -37,6 +37,6 @@ public class FeedReplyController {
         feedReplyService.updateFeed(feedReplyId, request);
 
         return ResponseEntity
-                .ok(SuccessResponse.of(FeedCommentSuccessCode.FEED_COMMENT_UPDATED));
+                .ok(SuccessResponse.of(FeedReplySuccessCode.FEED_REPLY_UPDATED));
     }
 } 
