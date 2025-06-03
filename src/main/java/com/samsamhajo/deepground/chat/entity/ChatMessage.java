@@ -14,7 +14,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class ChatMessage extends BaseDocument {
 
     @Id
-    @Field("chat_message_id")
     private String id;
 
     @Field("chat_room_id")
