@@ -8,6 +8,7 @@ import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentException
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentCreateRequest;
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentUpdateRequest;
 import com.samsamhajo.deepground.feed.feedcomment.repository.FeedCommentRepository;
+import com.samsamhajo.deepground.feed.feedreply.service.FeedReplyService;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
 import com.samsamhajo.deepground.member.exception.MemberException;
@@ -47,6 +48,12 @@ class FeedCommentServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private FeedCommentLikeService feedCommentLikeService;
+
+    @Mock
+    private FeedReplyService feedReplyService;
 
     private Member member = Member.createLocalMember("test@test.com", "password123", "테스트유저");
     private Feed feed = Feed.of("테스트 피드 내용", member);
@@ -211,28 +218,14 @@ class FeedCommentServiceTest {
     void deleteFeedComment_Success() {
         // given
         Long feedCommentId = 1L;
-        FeedComment feedComment = FeedComment.of("댓글 내용", feed, member);
-        given(feedCommentRepository.getById(feedCommentId)).willReturn(feedComment);
 
         // when
         feedCommentService.deleteFeedCommentId(feedCommentId);
 
         // then
+        verify(feedReplyService).deleteAllByFeedCommentId(feedCommentId);
         verify(feedCommentMediaService).deleteAllByFeedCommentId(feedCommentId);
-        verify(feedCommentRepository).delete(feedComment);
-    }
-
-    @Test
-    @DisplayName("피드 댓글 삭제 실패 테스트 - 존재하지 않는 댓글")
-    void deleteFeedComment_Fail_CommentNotFound() {
-        // given
-        Long nonExistentCommentId = 999L;
-        given(feedCommentRepository.getById(nonExistentCommentId))
-                .willThrow(new FeedCommentException(FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND));
-
-        // when & then
-        assertThatThrownBy(() -> feedCommentService.deleteFeedCommentId(nonExistentCommentId))
-                .isInstanceOf(FeedCommentException.class)
-                .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND);
+        verify(feedCommentLikeService).deleteAllByFeedCommentId(feedCommentId);
+        verify(feedCommentRepository).deleteById(feedCommentId);
     }
 } 

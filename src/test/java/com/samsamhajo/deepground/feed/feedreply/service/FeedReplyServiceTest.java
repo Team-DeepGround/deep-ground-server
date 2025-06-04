@@ -43,6 +43,10 @@ class FeedReplyServiceTest {
     @InjectMocks
     private FeedReplyService feedReplyService;
 
+    @Mock
+    private FeedReplyLikeService feedReplyLikeService;
+
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -187,28 +191,14 @@ class FeedReplyServiceTest {
         void deleteFeedReply_success() {
             // given
             Long feedReplyId = 1L;
-            FeedReply feedReply = mock(FeedReply.class);
-            when(feedReplyRepository.getById(feedReplyId)).thenReturn(feedReply);
 
             // when
             feedReplyService.deleteFeedReplyId(feedReplyId);
 
             // then
             verify(feedReplyMediaService, times(1)).deleteAllByFeedReplyId(feedReplyId);
-            verify(feedReplyRepository, times(1)).delete(feedReply);
-        }
-
-        @Test
-        @DisplayName("답글이 존재하지 않으면 예외 발생")
-        void deleteFeedReply_fail_replyNotFound() {
-            // given
-            Long feedReplyId = 1L;
-            when(feedReplyRepository.getById(feedReplyId)).thenThrow(new FeedReplyException(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND));
-
-            // when & then
-            assertThatThrownBy(() -> feedReplyService.deleteFeedReplyId(feedReplyId))
-                    .isInstanceOf(FeedReplyException.class)
-                    .hasMessage(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND.getMessage());
+            verify(feedReplyLikeService, times(1)).deleteAllByFeedReplyId(feedReplyId);
+            verify(feedReplyRepository, times(1)).deleteById(feedReplyId);
         }
     }
 } 
