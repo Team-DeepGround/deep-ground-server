@@ -55,8 +55,9 @@ public class CommentService {
         return CommentCreateResponseDto.of(
                 saved.getCommentContent(),
                 saved.getAnswer().getId(),
-                saved.getMember().getId(),
-                saved.getId()
+                saved.getId(),
+                saved.getMember().getId()
+
         );
     }
     @Transactional
