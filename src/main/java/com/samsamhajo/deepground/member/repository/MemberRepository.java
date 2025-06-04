@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.member.repository;
 
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.member.entity.Provider;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +16,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     boolean existsByNickname(String nickname);
 
     Optional<Member> findByEmail(String email);
+
+    Optional<Member> findByEmailAndProvider(String email, Provider provider);
 
     String email(String email);
 }
