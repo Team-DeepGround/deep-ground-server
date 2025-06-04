@@ -30,6 +30,7 @@ public class FeedCommentService {
     private final FeedRepository feedRepository;
     private final MemberRepository memberRepository;
     private final FeedReplyService feedReplyService;
+    private final FeedCommentLikeService feedCommentLikeService;
 
     @Transactional
     public FeedComment createFeedComment(FeedCommentCreateRequest request, Long memberId) {
@@ -68,31 +69,29 @@ public class FeedCommentService {
     }
 
     @Transactional
-    public void deleteFeedComment(Long feedCommentId) {
-        FeedComment feedComment = feedCommentRepository.getById(feedCommentId);
-
+    public void deleteFeedCommentId(Long feedCommentId) {
         // 관련 엔티티 모두 삭제
         deleteAllRelatedEntities(feedCommentId);
 
         // 피드 댓글 삭제
-        feedCommentRepository.delete(feedComment);
+        feedCommentRepository.deleteById(feedCommentId);
     }
 
     @Transactional
-    public void deleteFeedCommentByFeedId(Long feedId) {
+    public void deleteFeedCommentByFeed(Long feedId) {
         List<FeedComment> feedComments = feedCommentRepository.findAllByFeedId(feedId);
-        List<Long> feedCommentsIds = feedComments.stream().map(FeedComment::getId).toList();
 
         // 댓글과 연관된 데이터 모두 삭제
         feedComments.forEach(feedComment -> deleteAllRelatedEntities(feedComment.getId()));
 
         // 피드와 연결된 모든 댓글 삭제
-        feedCommentRepository.deleteAllByIdInBatch(feedCommentsIds);
+        feedCommentRepository.deleteAll(feedComments);
     }
 
     private void deleteAllRelatedEntities(Long feedCommentId) {
         feedReplyService.deleteAllByFeedCommentId(feedCommentId);
         feedCommentMediaService.deleteAllByFeedCommentId(feedCommentId);
+        feedCommentLikeService.deleteAllByFeedCommentId(feedCommentId);
     }
 
     private void saveFeedCommentMedia(FeedCommentCreateRequest request, FeedComment feedComment) {
