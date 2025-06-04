@@ -48,6 +48,10 @@ public class FeedReplyLikeService {
         return feedReplyLikeRepository.countByFeedReplyId(feedReplyId);
     }
 
+    public void deleteAllByFeedReplyId(Long feedReplyId) {
+        feedReplyLikeRepository.deleteAllByFeedReplyId(feedReplyId);
+    }
+
     private void validateDecrease(Long feedReplyId) {
         if (countFeedReplyLikeByFeedReplyId(feedReplyId) <= 0) {
             throw new FeedReplyException(FeedReplyErrorCode.FEED_LIKE_MINUS_NOT_ALLOWED);
