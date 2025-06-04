@@ -27,7 +27,6 @@ public class FeedComment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Feed feed;
 
     @ManyToOne(fetch = FetchType.LAZY)

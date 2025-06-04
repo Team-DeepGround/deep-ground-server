@@ -28,7 +28,6 @@ public class FeedReplyMedia extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_reply_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private FeedReply feedReply;
 
 
