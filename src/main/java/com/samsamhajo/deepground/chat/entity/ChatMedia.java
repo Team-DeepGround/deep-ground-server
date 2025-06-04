@@ -13,30 +13,26 @@ public class ChatMedia extends BaseDocument {
     @Id
     private String id;
 
-    @Field("media_url")
-    private String mediaUrl;
+    @Field("chat_room_id")
+    private Long chatRoomId;
 
-    @Field("file_name")
-    private String fileName;
+    @Field("member_id")
+    private Long memberId;
 
-    @Field("file_size")
-    private Long fileSize;
-
-    @Field("extension")
-    private String extension;
+    @Field("media")
+    private ChatMessageMedia media;
 
     @Field("file_status")
     private FileStatus status;
 
-    private ChatMedia(String mediaUrl, String fileName, Long fileSize, String extension) {
-        this.mediaUrl = mediaUrl;
-        this.fileName = fileName;
-        this.fileSize = fileSize;
-        this.extension = extension;
+    private ChatMedia(Long chatRoomId, Long memberId, ChatMessageMedia media) {
+        this.chatRoomId = chatRoomId;
+        this.memberId = memberId;
+        this.media = media;
         this.status = FileStatus.PENDING;
     }
 
-    public static ChatMedia of(String mediaUrl, String fileName, Long fileSize, String extension) {
-        return new ChatMedia(mediaUrl, fileName, fileSize, extension);
+    public static ChatMedia of(Long chatRoomId, Long memberId, ChatMessageMedia media) {
+        return new ChatMedia(chatRoomId, memberId, media);
     }
 }
