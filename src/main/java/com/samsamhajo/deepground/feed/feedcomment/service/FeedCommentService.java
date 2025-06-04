@@ -8,6 +8,7 @@ import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentException
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentCreateRequest;
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentUpdateRequest;
 import com.samsamhajo.deepground.feed.feedcomment.repository.FeedCommentRepository;
+import com.samsamhajo.deepground.feed.feedreply.service.FeedReplyService;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
 import com.samsamhajo.deepground.member.exception.MemberException;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +29,7 @@ public class FeedCommentService {
     private final FeedCommentMediaService feedCommentMediaService;
     private final FeedRepository feedRepository;
     private final MemberRepository memberRepository;
+    private final FeedReplyService feedReplyService;
 
     @Transactional
     public FeedComment createFeedComment(FeedCommentCreateRequest request, Long memberId) {
@@ -67,11 +71,28 @@ public class FeedCommentService {
     public void deleteFeedComment(Long feedCommentId) {
         FeedComment feedComment = feedCommentRepository.getById(feedCommentId);
 
-        // 피드 답글 미디어 삭제
-        feedCommentMediaService.deleteAllByFeedCommentId(feedCommentId);
+        // 관련 엔티티 모두 삭제
+        deleteAllRelatedEntities(feedCommentId);
 
-        // 피드 삭제
+        // 피드 댓글 삭제
         feedCommentRepository.delete(feedComment);
+    }
+
+    @Transactional
+    public void deleteFeedCommentByFeedId(Long feedId) {
+        List<FeedComment> feedComments = feedCommentRepository.findAllByFeedId(feedId);
+        List<Long> feedCommentsIds = feedComments.stream().map(FeedComment::getId).toList();
+
+        // 댓글과 연관된 데이터 모두 삭제
+        feedComments.forEach(feedComment -> deleteAllRelatedEntities(feedComment.getId()));
+
+        // 피드와 연결된 모든 댓글 삭제
+        feedCommentRepository.deleteAllByIdInBatch(feedCommentsIds);
+    }
+
+    private void deleteAllRelatedEntities(Long feedCommentId) {
+        feedReplyService.deleteAllByFeedCommentId(feedCommentId);
+        feedCommentMediaService.deleteAllByFeedCommentId(feedCommentId);
     }
 
     private void saveFeedCommentMedia(FeedCommentCreateRequest request, FeedComment feedComment) {
