@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
@@ -52,5 +54,25 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .orElse(attributes.toEntity());
 
         return memberRepository.save(member);
+    }
+
+    // 테스트 용
+    public CustomUserDetails createTestUserDetails(String registrationId, Map<String, Object> attributes) {
+        String userNameAttributeName = switch (registrationId) {
+            case "google" -> "email";
+            case "kakao" -> "id";
+            case "naver" -> "id";
+            default -> "email";
+        };
+        OAuthAttributes oauthAttributes = OAuthAttributes.of(registrationId, userNameAttributeName, attributes);
+
+        Member member = memberRepository.findByEmailAndProvider(oauthAttributes.getEmail(), oauthAttributes.getProvider())
+                .map(entity -> {
+                    entity.update(oauthAttributes.getName());
+                    return memberRepository.save(entity); // 반드시 save 호출!
+                })
+                .orElseGet(() -> memberRepository.save(oauthAttributes.toEntity()));
+
+        return new CustomUserDetails(member, attributes);
     }
 }
