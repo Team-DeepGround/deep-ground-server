@@ -22,4 +22,6 @@ public interface FeedCommentLikeRepository extends JpaRepository<FeedCommentLike
         return findByFeedCommentIdAndMemberId(feedCommentId, memberId)
                 .orElseThrow(() -> new FeedCommentException(FeedCommentErrorCode.FEED_COMMENT_LIKE_NOT_FOUND));
     }
+
+    void deleteAllByFeedCommentId(Long feedCommentId);
 }
