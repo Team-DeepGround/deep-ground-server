@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -70,11 +72,27 @@ public class FeedReplyService {
     public void deleteFeedReply(Long feedReplyId) {
         FeedReply feedReply = feedReplyRepository.getById(feedReplyId);
 
-        // 피드 답글 미디어 삭제
-        feedReplyMediaService.deleteAllByFeedReplyId(feedReplyId);
+        deleteRelatedEntities(feedReply);
 
         // 피드 삭제
         feedReplyRepository.delete(feedReply);
+    }
+
+    private void deleteRelatedEntities(FeedReply feedReply) {
+        // 피드 댓글에 연결된 모든 미디어 삭제
+        feedReplyMediaService.deleteAllByFeedReplyId(feedReply.getId());
+    }
+
+    @Transactional
+    public void deleteAllByFeedCommentId(Long feedCommentId) {
+        List<FeedReply> feedReplies = feedReplyRepository.findAllByFeedCommentId(feedCommentId);
+        List<Long> feedReplyIds = feedReplies.stream().map(FeedReply::getId).toList();
+
+        // 피드 답글에 관련된 모든 미디어 삭제
+        feedReplies.forEach(feedReply -> feedReplyMediaService.deleteAllByFeedReplyId(feedReply.getId()));
+
+        // 피드 댓글에 연결된 모든 답글 삭제
+        feedReplyRepository.deleteAllByIdInBatch(feedReplyIds);
     }
 
 
