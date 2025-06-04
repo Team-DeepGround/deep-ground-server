@@ -215,7 +215,7 @@ class FeedCommentServiceTest {
         given(feedCommentRepository.getById(feedCommentId)).willReturn(feedComment);
 
         // when
-        feedCommentService.deleteFeedComment(feedCommentId);
+        feedCommentService.deleteFeedCommentId(feedCommentId);
 
         // then
         verify(feedCommentMediaService).deleteAllByFeedCommentId(feedCommentId);
@@ -231,7 +231,7 @@ class FeedCommentServiceTest {
                 .willThrow(new FeedCommentException(FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND));
 
         // when & then
-        assertThatThrownBy(() -> feedCommentService.deleteFeedComment(nonExistentCommentId))
+        assertThatThrownBy(() -> feedCommentService.deleteFeedCommentId(nonExistentCommentId))
                 .isInstanceOf(FeedCommentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND);
     }

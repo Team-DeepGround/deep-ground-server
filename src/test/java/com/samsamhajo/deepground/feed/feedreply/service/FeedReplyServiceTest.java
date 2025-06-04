@@ -191,7 +191,7 @@ class FeedReplyServiceTest {
             when(feedReplyRepository.getById(feedReplyId)).thenReturn(feedReply);
 
             // when
-            feedReplyService.deleteFeedReply(feedReplyId);
+            feedReplyService.deleteFeedReplyId(feedReplyId);
 
             // then
             verify(feedReplyMediaService, times(1)).deleteAllByFeedReplyId(feedReplyId);
@@ -206,7 +206,7 @@ class FeedReplyServiceTest {
             when(feedReplyRepository.getById(feedReplyId)).thenThrow(new FeedReplyException(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND));
 
             // when & then
-            assertThatThrownBy(() -> feedReplyService.deleteFeedReply(feedReplyId))
+            assertThatThrownBy(() -> feedReplyService.deleteFeedReplyId(feedReplyId))
                     .isInstanceOf(FeedReplyException.class)
                     .hasMessage(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND.getMessage());
         }
