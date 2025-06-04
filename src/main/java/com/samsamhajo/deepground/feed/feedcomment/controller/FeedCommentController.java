@@ -43,7 +43,7 @@ public class FeedCommentController {
     public ResponseEntity<SuccessResponse<?>> deleteFeedComment(
             @PathVariable("feedCommentId") Long feedCommentId) {
 
-        feedCommentService.deleteFeedComment(feedCommentId);
+        feedCommentService.deleteFeedCommentId(feedCommentId);
 
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedCommentSuccessCode.FEED_COMMENT_DELETED));
