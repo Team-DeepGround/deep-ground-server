@@ -56,8 +56,8 @@ public class CommentService {
         return CommentCreateResponseDto.of(
                 saved.getCommentContent(),
                 saved.getAnswer().getId(),
-                saved.getMember().getId(),
-                saved.getId()
+                saved.getId(),
+                saved.getMember().getId()
         );
     }
     @Transactional
@@ -87,11 +87,31 @@ public class CommentService {
 
         return UpdateCommentResponseDto.of(
                 comment.getCommentContent(),
-                comment.getMember().getId(),
                 comment.getAnswer().getId(),
-                comment.getId()
+                comment.getId(),
+                comment.getMember().getId()
+
 
         );
+    }
 
+    @Transactional
+    public Long deleteComment(Long commentId, Long memberId, Long answerId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        Answer answer = answerRepository.findById(answerId).orElseThrow(() ->
+                new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(()->
+                new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
+        if(!comment.getAnswer().getId().equals(answerId)) {
+            throw new CommentException(CommentErrorCode.COMMENT_ANSWER_MISMATCH);
+        }
+        if(!comment.getMember().getId().equals(memberId)) {
+            throw new CommentException(CommentErrorCode.COMMENT_MEMBER_MISMATCH);
+        }
+        commentRepository.deleteById(commentId);
+        answer.decrementCommentCount();
+
+        return commentId;
     }
 }

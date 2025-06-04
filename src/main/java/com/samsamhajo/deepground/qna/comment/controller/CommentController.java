@@ -33,4 +33,17 @@ public class CommentController {
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.of(CommentSuccessCode.COMMENT_UPDATED, updateCommentResponseDto));
     }
+
+    @DeleteMapping({"/{commentId}"})
+    public ResponseEntity<SuccessResponse> deleteComment(
+            @PathVariable Long commentId,
+            @RequestParam Long memberId, Long answerId
+    ) {
+
+        commentService.deleteComment(commentId, memberId, answerId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.of(CommentSuccessCode.COMMENT_DELETED));
+    }
 }

@@ -60,4 +60,7 @@ public class Answer {
     public void incrementCommentCount() {
         this.commentCount++;
     }
+    public void decrementCommentCount() {
+        this.commentCount--;
+    }
 }
