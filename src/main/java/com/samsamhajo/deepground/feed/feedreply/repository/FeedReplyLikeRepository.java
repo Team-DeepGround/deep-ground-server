@@ -21,4 +21,6 @@ public interface FeedReplyLikeRepository extends JpaRepository<FeedReplyLike, Lo
         return findByFeedReplyIdAndMemberId(feedReplyId, memberId)
                 .orElseThrow(() -> new FeedReplyException(FeedReplyErrorCode.FEED_REPLY_LIKE_NOT_FOUND));
     }
+
+    void deleteAllByFeedReplyId(Long feedReplyId);
 } 
