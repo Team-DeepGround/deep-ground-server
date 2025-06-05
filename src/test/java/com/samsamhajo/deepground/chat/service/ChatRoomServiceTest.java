@@ -8,8 +8,8 @@ import static org.mockito.Mockito.when;
 
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
 import com.samsamhajo.deepground.chat.entity.ChatRoomMember;
-import com.samsamhajo.deepground.chat.exception.ChatRoomErrorCode;
-import com.samsamhajo.deepground.chat.exception.ChatRoomException;
+import com.samsamhajo.deepground.chat.exception.ChatErrorCode;
+import com.samsamhajo.deepground.chat.exception.ChatException;
 import com.samsamhajo.deepground.chat.repository.ChatRoomMemberRepository;
 import com.samsamhajo.deepground.chat.repository.ChatRoomRepository;
 import com.samsamhajo.deepground.member.entity.Member;
@@ -111,8 +111,8 @@ class ChatRoomServiceTest {
                     .thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> chatRoomService.deleteChatRoom(chatRoomId))
-                    .isInstanceOf(ChatRoomException.class)
-                    .hasMessage(ChatRoomErrorCode.ROOM_NOT_FOUND.getMessage());
+                    .isInstanceOf(ChatException.class)
+                    .hasMessage(ChatErrorCode.CHATROOM_NOT_FOUND.getMessage());
         }
     }
 }
