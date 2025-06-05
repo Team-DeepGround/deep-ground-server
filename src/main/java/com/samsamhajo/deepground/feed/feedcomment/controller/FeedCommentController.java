@@ -33,9 +33,19 @@ public class FeedCommentController {
             @PathVariable("feedCommentId") Long feedCommentId,
             @ModelAttribute FeedCommentUpdateRequest request) {
 
-        feedCommentService.updateFeed(feedCommentId, request);
+        feedCommentService.updateFeedComment(feedCommentId, request);
 
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedCommentSuccessCode.FEED_COMMENT_UPDATED));
+    }
+
+    @DeleteMapping("/{feedCommentId}")
+    public ResponseEntity<SuccessResponse<?>> deleteFeedComment(
+            @PathVariable("feedCommentId") Long feedCommentId) {
+
+        feedCommentService.deleteFeedCommentId(feedCommentId);
+
+        return ResponseEntity
+                .ok(SuccessResponse.of(FeedCommentSuccessCode.FEED_COMMENT_DELETED));
     }
 } 
