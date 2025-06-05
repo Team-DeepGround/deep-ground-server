@@ -40,4 +40,8 @@ public class FeedComment extends BaseEntity {
     public static FeedComment of(String content, Feed feed, Member member) {
         return new FeedComment(content, feed, member);
     }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }

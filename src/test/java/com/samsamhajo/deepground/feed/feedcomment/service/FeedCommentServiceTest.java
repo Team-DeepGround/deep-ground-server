@@ -6,7 +6,9 @@ import com.samsamhajo.deepground.feed.feedcomment.entity.FeedComment;
 import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentErrorCode;
 import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentException;
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentCreateRequest;
+import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentUpdateRequest;
 import com.samsamhajo.deepground.feed.feedcomment.repository.FeedCommentRepository;
+import com.samsamhajo.deepground.feed.feedreply.service.FeedReplyService;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
 import com.samsamhajo.deepground.member.exception.MemberException;
@@ -18,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,6 +48,12 @@ class FeedCommentServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private FeedCommentLikeService feedCommentLikeService;
+
+    @Mock
+    private FeedReplyService feedReplyService;
 
     private Member member = Member.createLocalMember("test@test.com", "password123", "테스트유저");
     private Feed feed = Feed.of("테스트 피드 내용", member);
@@ -135,5 +143,89 @@ class FeedCommentServiceTest {
         assertThatThrownBy(() -> feedCommentService.createFeedComment(request, memberId))
                 .isInstanceOf(FeedCommentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("피드 댓글 수정 성공 테스트")
+    void updateFeedComment_Success() {
+        // given
+        Long feedCommentId = 1L;
+        String originalContent = "원본 댓글 내용";
+        String updatedContent = "수정된 댓글 내용";
+
+        FeedComment feedComment = FeedComment.of(originalContent, feed, member);
+
+        MockMultipartFile mockImage = new MockMultipartFile(
+                "image",
+                "test.jpg",
+                "image/jpeg",
+                "테스트 이미지 데이터".getBytes()
+        );
+
+        FeedCommentUpdateRequest request = new FeedCommentUpdateRequest(updatedContent, List.of(mockImage));
+
+        given(feedCommentRepository.getById(feedCommentId)).willReturn(feedComment);
+
+        // when
+        FeedComment updatedComment = feedCommentService.updateFeedComment(feedCommentId, request);
+
+        // then
+        assertThat(updatedComment).isNotNull();
+        assertThat(updatedComment.getContent()).isEqualTo(updatedContent);
+        assertThat(updatedComment.getMember()).isEqualTo(member);
+        assertThat(updatedComment.getFeed()).isEqualTo(feed);
+
+        verify(feedCommentMediaService).updateFeedCommentMedia(any(FeedComment.class), any());
+    }
+
+    @Test
+    @DisplayName("피드 댓글 수정 실패 테스트 - 빈 내용")
+    void updateFeedComment_Fail_EmptyContent() {
+        // given
+        Long feedCommentId = 1L;
+        String emptyContent = "";
+
+        FeedCommentUpdateRequest request = new FeedCommentUpdateRequest(emptyContent, null);
+
+        // when & then
+        assertThatThrownBy(() -> feedCommentService.updateFeedComment(feedCommentId, request))
+                .isInstanceOf(FeedCommentException.class)
+                .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.INVALID_FEED_COMMENT_CONTENT);
+
+        verify(feedCommentRepository, never()).getById(any());
+    }
+
+    @Test
+    @DisplayName("피드 댓글 수정 실패 테스트 - 존재하지 않는 댓글")
+    void updateFeedComment_Fail_CommentNotFound() {
+        // given
+        Long nonExistentCommentId = 999L;
+        String updatedContent = "수정된 댓글 내용";
+
+        FeedCommentUpdateRequest request = new FeedCommentUpdateRequest(updatedContent, null);
+
+        given(feedCommentRepository.getById(nonExistentCommentId))
+                .willThrow(new FeedCommentException(FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND));
+
+        // when & then
+        assertThatThrownBy(() -> feedCommentService.updateFeedComment(nonExistentCommentId, request))
+                .isInstanceOf(FeedCommentException.class)
+                .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("피드 댓글 삭제 성공 테스트")
+    void deleteFeedComment_Success() {
+        // given
+        Long feedCommentId = 1L;
+
+        // when
+        feedCommentService.deleteFeedCommentId(feedCommentId);
+
+        // then
+        verify(feedReplyService).deleteAllByFeedCommentId(feedCommentId);
+        verify(feedCommentMediaService).deleteAllByFeedCommentId(feedCommentId);
+        verify(feedCommentLikeService).deleteAllByFeedCommentId(feedCommentId);
+        verify(feedCommentRepository).deleteById(feedCommentId);
     }
 } 

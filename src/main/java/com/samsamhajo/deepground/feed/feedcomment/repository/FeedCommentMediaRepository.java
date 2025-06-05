@@ -8,5 +8,7 @@ import java.util.List;
 
 @Repository
 public interface FeedCommentMediaRepository extends JpaRepository<FeedCommentMedia, Long> {
+    List<FeedCommentMedia> findAllByFeedCommentId(Long feedCommentId);
 
+    void deleteAllByFeedCommentId(Long feedCommentId);
 }
