@@ -43,6 +43,10 @@ class FeedReplyServiceTest {
     @InjectMocks
     private FeedReplyService feedReplyService;
 
+    @Mock
+    private FeedReplyLikeService feedReplyLikeService;
+
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -142,7 +146,7 @@ class FeedReplyServiceTest {
             when(feedReplyRepository.getById(feedReplyId)).thenReturn(feedReply);
 
             // when
-            FeedReply result = feedReplyService.updateFeed(feedReplyId, request);
+            FeedReply result = feedReplyService.updateFeedReply(feedReplyId, request);
 
             // then
             verify(feedReply).updateContent(newContent);
@@ -158,7 +162,7 @@ class FeedReplyServiceTest {
             FeedReplyUpdateRequest request = new FeedReplyUpdateRequest("", Collections.emptyList());
 
             // when & then
-            assertThatThrownBy(() -> feedReplyService.updateFeed(feedReplyId, request))
+            assertThatThrownBy(() -> feedReplyService.updateFeedReply(feedReplyId, request))
                     .isInstanceOf(FeedReplyException.class)
                     .hasMessage(FeedReplyErrorCode.INVALID_FEED_REPLY_CONTENT.getMessage());
         }
@@ -173,9 +177,28 @@ class FeedReplyServiceTest {
             when(feedReplyRepository.getById(feedReplyId)).thenThrow(new FeedReplyException(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND));
 
             // when & then
-            assertThatThrownBy(() -> feedReplyService.updateFeed(feedReplyId, request))
+            assertThatThrownBy(() -> feedReplyService.updateFeedReply(feedReplyId, request))
                     .isInstanceOf(FeedReplyException.class)
                     .hasMessage(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("답글 삭제 케이스")
+    class DeleteCases {
+        @Test
+        @DisplayName("정상적으로 답글 삭제")
+        void deleteFeedReply_success() {
+            // given
+            Long feedReplyId = 1L;
+
+            // when
+            feedReplyService.deleteFeedReplyId(feedReplyId);
+
+            // then
+            verify(feedReplyMediaService, times(1)).deleteAllByFeedReplyId(feedReplyId);
+            verify(feedReplyLikeService, times(1)).deleteAllByFeedReplyId(feedReplyId);
+            verify(feedReplyRepository, times(1)).deleteById(feedReplyId);
         }
     }
 } 
