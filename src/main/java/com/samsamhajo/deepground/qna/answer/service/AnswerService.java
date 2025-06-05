@@ -26,6 +26,7 @@ public class AnswerService {
     private final AnswerRepository answerRepository;
     private final MemberRepository memberRepository;
     private final QuestionRepository questionRepository;
+    private final AnswerMediaService answerMediaService;
 
 
     @Transactional
@@ -50,6 +51,7 @@ public class AnswerService {
         Answer saved = answerRepository.save(answer);
 
         question.incrementAnswerCount();
+        createAnswerMedia(answerCreateRequestDto, saved);
 
         return AnswerCreateResponseDto.of(
                 saved.getAnswerContent(),
@@ -72,6 +74,7 @@ public class AnswerService {
 
         answerRepository.deleteById(answer.getId());
         question.decrementAnswerCount();
+        answerMediaService.deleteAnswerMedia(answerId);
 
         return answer.getId();
     }
@@ -94,6 +97,9 @@ public class AnswerService {
 
         answer.updateAnswer(answerUpdateRequestDto.getAnswerContent());
 
+        answerMediaService.deleteAnswerMedia(answer.getId());
+        updateAnswerMedia(answerUpdateRequestDto, answer);
+
         return AnswerUpdateResponseDto.of(
                 answer.getAnswerContent(),
                 answer.getQuestion().getId(),
@@ -101,5 +107,12 @@ public class AnswerService {
                 null
         );
 
+    }
+    private void createAnswerMedia(AnswerCreateRequestDto answerCreateRequestDto, Answer answer) {
+        answerMediaService.createAnswerMedia(answer, answerCreateRequestDto.getMediaFiles());
+    }
+
+    private void updateAnswerMedia(AnswerUpdateRequestDto answerUpdateRequestDto, Answer answer) {
+        answerMediaService.createAnswerMedia(answer, answerUpdateRequestDto.getMediaFiles());
     }
 }

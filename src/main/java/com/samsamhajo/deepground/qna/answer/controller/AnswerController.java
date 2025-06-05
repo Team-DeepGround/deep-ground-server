@@ -49,8 +49,8 @@ public class AnswerController {
                         .status(HttpStatus.OK)
                         .body(SuccessResponse.of(AnswerSuccessCode.ANSWER_DELETED));
     }
-    
-    @PutMapping
+
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse<AnswerUpdateResponseDto>> updateAnswer(
             @Valid @ModelAttribute AnswerUpdateRequestDto answerUpdateRequestDto
     ) {
