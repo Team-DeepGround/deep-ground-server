@@ -51,8 +51,6 @@ public class CommentService {
 
         Comment saved = commentRepository.save(comment);
 
-        answer.incrementCommentCount();
-
         return CommentCreateResponseDto.of(
                 saved.getCommentContent(),
                 saved.getAnswer().getId(),
@@ -110,7 +108,6 @@ public class CommentService {
             throw new CommentException(CommentErrorCode.COMMENT_MEMBER_MISMATCH);
         }
         commentRepository.deleteById(commentId);
-        answer.decrementCommentCount();
 
         return commentId;
     }
