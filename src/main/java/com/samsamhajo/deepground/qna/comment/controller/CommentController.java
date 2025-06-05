@@ -5,6 +5,7 @@ import com.samsamhajo.deepground.qna.comment.dto.CommentCreateRequestDto;
 import com.samsamhajo.deepground.qna.comment.dto.CommentCreateResponseDto;
 import com.samsamhajo.deepground.qna.comment.exception.CommentSuccessCode;
 import com.samsamhajo.deepground.qna.comment.service.CommentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<SuccessResponse> createComment(
-            @ModelAttribute CommentCreateRequestDto commentCreateRequestDto
+            @Valid @ModelAttribute CommentCreateRequestDto commentCreateRequestDto
     ) {
         Long memberId = 1L;
         CommentCreateResponseDto commentCreateResponseDto = commentService.createComment(commentCreateRequestDto, memberId);

@@ -56,8 +56,4 @@ public class Answer {
     public void updateAnswer(String answerContent) {
         this.answerContent = answerContent;
     }
-
-    public void incrementCommentCount() {
-        this.commentCount++;
-    }
 }

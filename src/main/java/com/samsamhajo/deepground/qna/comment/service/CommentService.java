@@ -48,8 +48,6 @@ public class CommentService {
 
         Comment saved = commentRepository.save(comment);
 
-        answer.incrementCommentCount();
-
         return CommentCreateResponseDto.of(
                 saved.getCommentContent(),
                 saved.getAnswer().getId(),
