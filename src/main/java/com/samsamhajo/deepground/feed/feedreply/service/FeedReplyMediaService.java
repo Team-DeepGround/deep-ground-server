@@ -34,16 +34,25 @@ public class FeedReplyMediaService {
     }
 
     @Transactional
-    public void updateFeedReplyMedia(FeedReply feedReply, List<MultipartFile> images) {
-        if (CollectionUtils.isEmpty(images)) return;
+    public void deleteAllByFeedReplyId(Long feedReplyId) {
+        // 파일 시스템에서 물리적 미디어 파일 삭제
+        List<FeedReplyMedia> mediaList = feedReplyMediaRepository.findAllByFeedReplyId(feedReplyId);
+        for (FeedReplyMedia media : mediaList) {
+            MediaUtils.deleteMedia(media.getMediaUrl());
+        }
 
-        deleteFeedReplyMedia(feedReply.getId());
-
-        createFeedReplyMedia(feedReply, images);
+        // DB에서 삭제 (JPA Query Method 사용)
+        feedReplyMediaRepository.deleteAllByFeedReplyId(feedReplyId);
     }
 
     @Transactional
-    public void deleteFeedReplyMedia(Long feedReplyId) {
-        feedReplyMediaRepository.deleteAllByFeedReplyId(feedReplyId);
+    public void updateFeedReplyMedia(FeedReply feedReply, List<MultipartFile> images) {
+        if (CollectionUtils.isEmpty(images)) return;
+
+        // 피드에 연결된 모든 미디어 삭제
+        deleteAllByFeedReplyId(feedReply.getId());
+
+        // 새 미디어 추가
+        createFeedReplyMedia(feedReply, images);
     }
 } 

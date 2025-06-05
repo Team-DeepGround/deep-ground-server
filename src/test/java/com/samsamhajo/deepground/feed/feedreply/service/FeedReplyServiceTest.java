@@ -43,6 +43,10 @@ class FeedReplyServiceTest {
     @InjectMocks
     private FeedReplyService feedReplyService;
 
+    @Mock
+    private FeedReplyLikeService feedReplyLikeService;
+
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -176,6 +180,25 @@ class FeedReplyServiceTest {
             assertThatThrownBy(() -> feedReplyService.updateFeedReply(feedReplyId, request))
                     .isInstanceOf(FeedReplyException.class)
                     .hasMessage(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("답글 삭제 케이스")
+    class DeleteCases {
+        @Test
+        @DisplayName("정상적으로 답글 삭제")
+        void deleteFeedReply_success() {
+            // given
+            Long feedReplyId = 1L;
+
+            // when
+            feedReplyService.deleteFeedReplyId(feedReplyId);
+
+            // then
+            verify(feedReplyMediaService, times(1)).deleteAllByFeedReplyId(feedReplyId);
+            verify(feedReplyLikeService, times(1)).deleteAllByFeedReplyId(feedReplyId);
+            verify(feedReplyRepository, times(1)).deleteById(feedReplyId);
         }
     }
 } 
