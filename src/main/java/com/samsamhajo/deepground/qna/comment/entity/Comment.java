@@ -23,7 +23,7 @@ public class Comment extends BaseEntity {
     private String commentContent;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memebr_id")
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,5 +38,9 @@ public class Comment extends BaseEntity {
 
     public static Comment of(String commentContent, Member member, Answer answer) {
         return new Comment(commentContent, member, answer);
+    }
+
+    public void updateCommentContent(String commentContent) {
+        this.commentContent = commentContent;
     }
 }

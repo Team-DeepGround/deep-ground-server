@@ -8,6 +8,8 @@ import com.samsamhajo.deepground.qna.answer.exception.AnswerException;
 import com.samsamhajo.deepground.qna.answer.repository.AnswerRepository;
 import com.samsamhajo.deepground.qna.comment.dto.CommentCreateRequestDto;
 import com.samsamhajo.deepground.qna.comment.dto.CommentCreateResponseDto;
+import com.samsamhajo.deepground.qna.comment.dto.UpdateCommentRequestDto;
+import com.samsamhajo.deepground.qna.comment.dto.UpdateCommentResponseDto;
 import com.samsamhajo.deepground.qna.comment.entity.Comment;
 import com.samsamhajo.deepground.qna.comment.exception.CommentErrorCode;
 import com.samsamhajo.deepground.qna.comment.exception.CommentException;
@@ -17,8 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class CommentService {
 
     private final CommentRepository commentRepository;
@@ -48,11 +50,48 @@ public class CommentService {
 
         Comment saved = commentRepository.save(comment);
 
+
+        answer.incrementCommentCount();
+
         return CommentCreateResponseDto.of(
                 saved.getCommentContent(),
                 saved.getAnswer().getId(),
-                saved.getMember().getId(),
-                saved.getId()
+                saved.getId(),
+                saved.getMember().getId()
+
+        );
+    }
+    @Transactional
+    public UpdateCommentResponseDto updateComment(UpdateCommentRequestDto updateCommentRequestDto, Long memberId) {
+
+        Member member = memberRepository.findById(memberId).orElseThrow(() ->
+                new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        Answer answer = answerRepository.findById(updateCommentRequestDto.getAnswerId()).orElseThrow(() ->
+                new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND));
+
+        Comment comment = commentRepository.findById(updateCommentRequestDto.getCommentId()).orElseThrow(() ->
+                new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
+
+        if(!StringUtils.hasText(updateCommentRequestDto.getCommentContent())) {
+            throw new CommentException(CommentErrorCode.COMMENT_REQUIRED);
+        }
+
+        if(!comment.getAnswer().getId().equals(updateCommentRequestDto.getAnswerId())) {
+            throw new CommentException(CommentErrorCode.COMMENT_ANSWER_MISMATCH);
+        }
+
+        if(!comment.getMember().getId().equals(memberId)) {
+            throw new CommentException(CommentErrorCode.COMMENT_MEMBER_MISMATCH);
+        }
+        comment.updateCommentContent(updateCommentRequestDto.getCommentContent());
+
+        return UpdateCommentResponseDto.of(
+                comment.getCommentContent(),
+                comment.getMember().getId(),
+                comment.getAnswer().getId(),
+                comment.getId()
+
         );
 
 
