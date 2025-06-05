@@ -54,7 +54,7 @@ public class MemberStudyScheduleServiceTest {
         when(studySchedule.getStartTime()).thenReturn(LocalDateTime.of(2025, 5, 30, 14, 0));
         when(studySchedule.getEndTime()).thenReturn(LocalDateTime.of(2025, 5, 30, 16, 0));
 
-        MemberStudySchedule memberStudySchedule = MemberStudySchedule.of(studySchedule, true, true, "memo");
+        MemberStudySchedule memberStudySchedule = MemberStudySchedule.of(member, studySchedule, true, true, "memo");
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
         when(memberStudyScheduleRepository.findAllByMemberId(memberId)).thenReturn(List.of(memberStudySchedule));
@@ -139,12 +139,14 @@ public class MemberStudyScheduleServiceTest {
 
     @Test
     @DisplayName("참석 선택 + 중요 일정 체크/메모 추가 성공")
-    void update_MemberStudySchedule_Success () {
+    void updateMemberStudySchedule_Success () {
         // given
         Long memberStudyScheduleId = 1L;
 
         StudySchedule studySchedule = mock(StudySchedule.class);
-        MemberStudySchedule memberStudySchedule = MemberStudySchedule.of(studySchedule, false, false, null);
+        Member member = mock(Member.class);
+
+        MemberStudySchedule memberStudySchedule = MemberStudySchedule.of(member, studySchedule, false, false, null);
 
         MemberStudyScheduleRequestDto requestDto = MemberStudyScheduleRequestDto.builder()
                 .isAvailable(true)

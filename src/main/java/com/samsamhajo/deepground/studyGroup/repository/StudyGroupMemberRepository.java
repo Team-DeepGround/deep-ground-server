@@ -18,6 +18,8 @@ public interface StudyGroupMemberRepository extends JpaRepository<StudyGroupMemb
 
   List<StudyGroupMember> findAllByMemberIdAndIsAllowedTrueOrderByStudyGroupCreatedAtDesc(Long memberId);
 
+  List<StudyGroupMember> findAllByStudyGroupIdAndIsAllowedTrue(Long studyGroupId);
+
   @Query("SELECT m FROM StudyGroupMember m JOIN FETCH m.member WHERE m.studyGroup.id = :studyGroupId")
   List<StudyGroupMember> findAllWithMemberByStudyGroupId(@Param("studyGroupId") Long studyGroupId);
 
