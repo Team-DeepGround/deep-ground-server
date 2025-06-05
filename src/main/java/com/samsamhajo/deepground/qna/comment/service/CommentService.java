@@ -1,4 +1,3 @@
-
 package com.samsamhajo.deepground.qna.comment.service;
 
 import com.samsamhajo.deepground.member.entity.Member;
@@ -39,7 +38,8 @@ public class CommentService {
                 new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND)
         );
 
-        if (!StringUtils.hasText(commentCreateRequestDto.getCommentContent())) {
+
+        if(!StringUtils.hasText(commentCreateRequestDto.getCommentContent())) {
             throw new CommentException(CommentErrorCode.COMMENT_REQUIRED);
         }
 
@@ -56,8 +56,10 @@ public class CommentService {
                 saved.getAnswer().getId(),
                 saved.getId(),
                 saved.getMember().getId()
+
         );
     }
+  
     @Transactional
     public UpdateCommentResponseDto updateComment(UpdateCommentRequestDto updateCommentRequestDto, Long memberId) {
 
@@ -88,8 +90,6 @@ public class CommentService {
                 comment.getAnswer().getId(),
                 comment.getId(),
                 comment.getMember().getId()
-
-
         );
     }
 
@@ -112,3 +112,5 @@ public class CommentService {
         return commentId;
     }
 }
+
+

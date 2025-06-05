@@ -23,4 +23,5 @@ public class CommentCreateResponseDto {
     public static CommentCreateResponseDto of(String commentContent, Long answerId, Long commentId, Long memberId) {
         return new CommentCreateResponseDto(commentContent, answerId, commentId,  memberId);
     }
+
 }

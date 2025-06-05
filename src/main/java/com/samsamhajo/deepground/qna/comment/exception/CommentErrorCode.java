@@ -19,4 +19,5 @@ public enum CommentErrorCode implements ErrorCode {
         this.status = status;
         this.message = message;
     }
+
 }

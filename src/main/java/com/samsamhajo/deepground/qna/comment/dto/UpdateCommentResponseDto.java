@@ -24,4 +24,6 @@ public class UpdateCommentResponseDto {
     public static UpdateCommentResponseDto of(String commentContent, Long memberId, Long answerId, Long commentId) {
         return new UpdateCommentResponseDto(commentContent, memberId, answerId, commentId);
     }
+
 }
+

@@ -18,4 +18,6 @@ public enum CommentSuccessCode implements SuccessCode {
         this.status = status;
         this.message = message;
     }
+
 }
+
