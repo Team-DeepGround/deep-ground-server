@@ -38,6 +38,7 @@ public class CommentService {
                 new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND)
         );
 
+
         if(!StringUtils.hasText(commentCreateRequestDto.getCommentContent())) {
             throw new CommentException(CommentErrorCode.COMMENT_REQUIRED);
         }
@@ -50,9 +51,6 @@ public class CommentService {
 
         Comment saved = commentRepository.save(comment);
 
-
-        answer.incrementCommentCount();
-
         return CommentCreateResponseDto.of(
                 saved.getCommentContent(),
                 saved.getAnswer().getId(),
@@ -61,6 +59,7 @@ public class CommentService {
 
         );
     }
+  
     @Transactional
     public UpdateCommentResponseDto updateComment(UpdateCommentRequestDto updateCommentRequestDto, Long memberId) {
 
@@ -88,12 +87,30 @@ public class CommentService {
 
         return UpdateCommentResponseDto.of(
                 comment.getCommentContent(),
-                comment.getMember().getId(),
                 comment.getAnswer().getId(),
-                comment.getId()
-
+                comment.getId(),
+                comment.getMember().getId()
         );
+    }
 
+    @Transactional
+    public Long deleteComment(Long commentId, Long memberId, Long answerId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        Answer answer = answerRepository.findById(answerId).orElseThrow(() ->
+                new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(()->
+                new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
+        if(!comment.getAnswer().getId().equals(answerId)) {
+            throw new CommentException(CommentErrorCode.COMMENT_ANSWER_MISMATCH);
+        }
+        if(!comment.getMember().getId().equals(memberId)) {
+            throw new CommentException(CommentErrorCode.COMMENT_MEMBER_MISMATCH);
+        }
+        commentRepository.deleteById(commentId);
 
+        return commentId;
     }
 }
+
+

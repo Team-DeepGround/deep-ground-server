@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
 @RestController
 @RequestMapping("/comment")
 @RequiredArgsConstructor
@@ -32,6 +33,7 @@ public class CommentController {
     public ResponseEntity<SuccessResponse> updateComment(
             @Valid @ModelAttribute UpdateCommentRequestDto updateCommentRequestDto,
             @RequestParam Long memberId
+
             ) {
 
         UpdateCommentResponseDto updateCommentResponseDto = commentService.updateComment(updateCommentRequestDto, memberId);
@@ -39,6 +41,22 @@ public class CommentController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.of(CommentSuccessCode.COMMENT_UPDATED, updateCommentResponseDto));
+    }
+
+    @DeleteMapping({"/{commentId}"})
+    public ResponseEntity<SuccessResponse> deleteComment(
+            @PathVariable Long commentId,
+            @RequestParam Long memberId,
+            @RequestParam Long answerId
+    ) {
+
+        commentService.deleteComment(commentId, memberId, answerId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.of(CommentSuccessCode.COMMENT_DELETED));
+    }
+
 
     @PostMapping
     public ResponseEntity<SuccessResponse> createComment(
@@ -54,3 +72,4 @@ public class CommentController {
 
     }
 }
+
