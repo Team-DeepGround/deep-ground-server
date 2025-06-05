@@ -6,6 +6,8 @@ import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -15,4 +17,10 @@ public interface StudyGroupMemberRepository extends JpaRepository<StudyGroupMemb
   Optional<StudyGroupMember> findByMemberAndStudyGroup(Member member, StudyGroup studyGroup);
 
   List<StudyGroupMember> findAllByMemberIdAndIsAllowedTrueOrderByStudyGroupCreatedAtDesc(Long memberId);
+
+  @Query("SELECT m FROM StudyGroupMember m JOIN FETCH m.member WHERE m.studyGroup.id = :studyGroupId")
+  List<StudyGroupMember> findAllWithMemberByStudyGroupId(@Param("studyGroupId") Long studyGroupId);
+
+  int countByStudyGroup_IdAndIsAllowedTrue(Long studyGroupId);
+  int countByStudyGroup_IdAndIsAllowedFalse(Long studyGroupId);
 }
