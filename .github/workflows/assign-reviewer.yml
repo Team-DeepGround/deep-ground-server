@@ -8,19 +8,13 @@ on:
     types: [submitted]
 
   pull_request_review_comment:
-    types: [ created ]
+    types: [created]
 
   workflow_dispatch:
 
-# 테스트 용
-  push:
-    branches:
-      - '**'     # 모든 브랜치에서 push 감지
-  create:
-    branches:
-      - '**'     # 모든 브랜치 생성 감지
-    tags:
-      - '**'
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   assign-reviewer:
@@ -37,11 +31,21 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build
+      - name: Build TypeScript (force show logs)
         run: npm run build
+        continue-on-error: true
 
-      - name: Run reviewer assignment script
-        run: npm run assign-reviewer
+      - name: Check build output
+        run: ls -R dist
+
+      - name: Copy reviewers.yml
+        run: mkdir -p dist/.github && cp .github/reviewers.yml dist/.github/reviewers.yml
+
+      - name: Check build output
+        run: ls -R dist
+
+      - name: Run reviewer assignment script directly
+        run: node dist/scripts/assignReviewer.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
