@@ -136,6 +136,12 @@ public class AuthService {
         return new TokenRefreshResponse(newAccessToken, currentRefreshToken);
     }
 
+    @Transactional
+    public void logout(Long memberId) {
+        //Redis에서 Refresh Token 삭제
+        refreshTokenRepository.deleteByMemberId(memberId);
+    }
+
     public void checkEmailDuplicate(String email) {
         if (memberRepository.existsByEmail(email)) {
             throw new AuthException(AuthErrorCode.DUPLICATE_EMAIL);

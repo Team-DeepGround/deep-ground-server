@@ -8,38 +8,45 @@ import { sendDiscordMessage } from './discord'; // ✅ 디스코드 알림용 �
 const githubClient = github.getOctokit(process.env.GITHUB_TOKEN!);
 
 // 2. 그룹 기반 리뷰어 선택
-function selectReviewerByGroup(prAuthor: string): IReviewer {
+function selectReviewersFromSameGroup(prAuthor: string): IReviewer[] {
     const groups = getReviewerGroups();
-
     const groupA = groups.groupA;
     const groupB = groups.groupB;
 
     const isAuthorInA = groupA.some(r => r.githubName === prAuthor);
-    const targetGroup = isAuthorInA ? groupB : groupA;
+    const targetGroup = isAuthorInA ? groupA : groupB;
 
-    const filtered = targetGroup.filter(r => r.githubName !== prAuthor);
+    // 자신 제외한 같은 그룹의 나머지 인원
+    const reviewers = targetGroup.filter(r => r.githubName !== prAuthor);
 
-    if (filtered.length === 0) {
-        throw new Error(`리뷰어 후보가 없습니다. PR 작성자(${prAuthor}) 외의 사용자가 필요합니다.`);
+    if (reviewers.length === 0) {
+        throw new Error(`같은 그룹 내에 PR 작성자를 제외한 리뷰어가 없습니다.`);
     }
 
-    // @ts-ignore
-    return filtered[Math.floor(Math.random() * filtered.length)];
+    return reviewers;
 }
-// 3. main 함수
-async function main() {
-    const prCreator = github.context.payload.pull_request.user.login;
-    const selectedReviewer = selectReviewerByGroup(prCreator);
 
+//3.main 함수
+async function main() {
+    const pr = github.context.payload.pull_request;
+    if (!pr) {
+        core.setFailed('이 워크플로우는 pull_request 이벤트에서만 실행됩니다.');
+        return;
+    }
+
+    const prCreator = pr.user.login;
+    const reviewers = selectReviewersFromSameGroup(prCreator);
+
+    // GitHub 리뷰어 요청
     await githubClient.rest.pulls.requestReviewers({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
-        pull_number: github.context.issue.number,
-        reviewers: [selectedReviewer.githubName]
+        pull_number: pr.number,
+        reviewers: reviewers.map(r => r.githubName),
     });
 
-    // ✅ Discord 메시지 전송
-    await sendDiscordMessage(selectedReviewer);
+    // Discord 알림
+    await sendDiscordMessage(reviewers);
 }
 
 // 4. 실행

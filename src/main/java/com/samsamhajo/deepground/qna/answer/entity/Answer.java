@@ -56,4 +56,5 @@ public class Answer {
     public void updateAnswer(String answerContent) {
         this.answerContent = answerContent;
     }
+
 }

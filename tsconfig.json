@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "outDir": "dist",
+    "rootDir": ".",             // 루트에서 scripts 디렉토리 포함
+    "esModuleInterop": true,
+    "strict": true
+  },
+  "include": ["scripts/**/*.ts"]
+}

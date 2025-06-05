@@ -15,11 +15,7 @@ public class MemberScheduleCalendarResponseDto {
     private String title;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private String description;
-    private String location;
-    private Boolean isAvailable;
-    private Boolean isImportant;
-    private String memo;
+
 
     public static MemberScheduleCalendarResponseDto from(MemberStudySchedule schedule) {
         var ss = schedule.getStudySchedule();
@@ -29,11 +25,6 @@ public class MemberScheduleCalendarResponseDto {
                 .title(ss.getTitle())
                 .startTime(ss.getStartTime())
                 .endTime(ss.getEndTime())
-                .description(ss.getDescription())
-                .location(ss.getLocation())
-                .isAvailable(schedule.getIsAvailable())
-                .isImportant(schedule.getIsImportant())
-                .memo(schedule.getMemo())
                 .build();
     }
 }

@@ -79,9 +79,16 @@ public class Member extends BaseEntity {
     public void updatePassword(String newPassword) {
         this.password = newPassword;
     }
-        public void updateNickname (String nickname){
-            this.nickname = nickname;
-        }
+
+    public void updateNickname(String nickname){
+        this.nickname = nickname;
+    }
+
+    // 소셜 로그인 시 닉네임 동기화
+    public Member update(String nickname) {
+        this.nickname = nickname;
+        return this;
+    }
 }
 
 
