@@ -38,7 +38,7 @@ public class CommentService {
                 new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND)
         );
 
-        if (!StringUtils.hasText(commentCreateRequestDto.getCommentContent())) {
+        if(!StringUtils.hasText(commentCreateRequestDto.getCommentContent())) {
             throw new CommentException(CommentErrorCode.COMMENT_REQUIRED);
         }
 
@@ -49,6 +49,7 @@ public class CommentService {
         );
 
         Comment saved = commentRepository.save(comment);
+
 
         answer.incrementCommentCount();
 
@@ -92,6 +93,7 @@ public class CommentService {
                 comment.getId()
 
         );
+
 
     }
 }

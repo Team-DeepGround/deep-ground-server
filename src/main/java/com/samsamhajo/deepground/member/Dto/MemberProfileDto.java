@@ -29,7 +29,7 @@ public class MemberProfileDto {
     @NotBlank (message = "사는 지역을 입력해주세요")
     private String liveIn;
     private String education;
-    @NotBlank (message = "기술 스택을 입력해주세요")
+    @NotNull (message = "한가지 이상의 기술 스택을 입력해주세요")
     private List<String> techStack ;
     @URL(message = "올바른 URL 형식이 아닙니다.")
     private String githubUrl;

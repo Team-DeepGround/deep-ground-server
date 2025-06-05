@@ -137,9 +137,9 @@ public class FriendService {
     }
 
     @Transactional
-    public Long sendProfileFriendRequest(Long requesterId, Long receiverId) {
+    public Long sendProfileFriendRequest(Long memberId, Long receiverId) {
 
-        Member requester = memberRepository.findById(requesterId)
+        Member requester = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.INVALID_MEMBER_ID));
 
         Member receiver = memberRepository.findById(receiverId)

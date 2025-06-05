@@ -5,6 +5,8 @@ import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.entity.MemberProfile;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
 import com.samsamhajo.deepground.member.exception.MemberException;
+import com.samsamhajo.deepground.member.exception.ProfileErrorCode;
+import com.samsamhajo.deepground.member.exception.ProfileException;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.member.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +27,8 @@ public class MemberService {
 
         member.updateNickname(memberProfileDto.getNickname());
 
-        MemberProfile profile = profileRepository.findByMemberId(memberId).get();
+        MemberProfile profile = profileRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new ProfileException(ProfileErrorCode.INVALID_PROFILE_ID));
 
         profile.update(memberProfileDto);
 
