@@ -6,8 +6,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "feed_reply_media")
@@ -28,7 +26,6 @@ public class FeedReplyMedia extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_reply_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private FeedReply feedReply;
 
 

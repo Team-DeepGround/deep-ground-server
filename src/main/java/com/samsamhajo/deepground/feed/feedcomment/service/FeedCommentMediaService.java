@@ -34,14 +34,14 @@ public class FeedCommentMediaService {
         );
     }
 
-    public void updateFeedCommentMedia(FeedComment feedComment, FeedCommentUpdateRequest request) {
-        // 피드 댓글에 연결된 모든 미디어 삭제
+    public void updateFeedCommentMedia(FeedComment feedComment, List<MultipartFile> images) {
+        if (CollectionUtils.isEmpty(images)) return;
+
+        // 피드 댓글에에 연결된 모든 미디어 삭제
         deleteAllByFeedCommentId(feedComment.getId());
 
         // 새 미디어 추가
-        if (request.getImages() != null && !request.getImages().isEmpty()) {
-            createFeedCommentMedia(feedComment, request.getImages());
-        }
+        createFeedCommentMedia(feedComment, images);
     }
 
     @Transactional

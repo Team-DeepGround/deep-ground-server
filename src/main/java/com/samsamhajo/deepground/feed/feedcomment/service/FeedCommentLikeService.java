@@ -50,6 +50,10 @@ public class FeedCommentLikeService {
         return feedCommentLikeRepository.countByFeedCommentId(feedId);
     }
 
+    public void deleteAllByFeedCommentId(Long feedCommentId) {
+        feedCommentLikeRepository.deleteAllByFeedCommentId(feedCommentId);
+    }
+
     private void validateDecrease(Long feedId) {
         if (countFeedCommentLikeByFeedId(feedId) <= 0) {
             throw new FeedCommentException(FeedCommentErrorCode.FEED_LIKE_MINUS_NOT_ALLOWED);

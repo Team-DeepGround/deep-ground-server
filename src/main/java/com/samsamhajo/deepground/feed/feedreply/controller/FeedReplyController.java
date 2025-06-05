@@ -43,7 +43,7 @@ public class FeedReplyController {
     public ResponseEntity<SuccessResponse<?>> deleteFeedReply(
             @PathVariable("feedReplyId") Long feedReplyId) {
 
-        feedReplyService.deleteFeedReply(feedReplyId);
+        feedReplyService.deleteFeedReplyId(feedReplyId);
 
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedReplySuccessCode.FEED_REPLY_DELETED));

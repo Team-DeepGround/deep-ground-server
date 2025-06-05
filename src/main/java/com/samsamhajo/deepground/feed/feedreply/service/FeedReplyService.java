@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -26,8 +28,9 @@ public class FeedReplyService {
 
     private final FeedCommentRepository feedCommentRepository;
     private final FeedReplyRepository feedReplyRepository;
-    private final FeedReplyMediaService feedReplyMediaService;
     private final MemberRepository memberRepository;
+    private final FeedReplyMediaService feedReplyMediaService;
+    private final FeedReplyLikeService feedReplyLikeService;
 
     @Transactional
     public FeedComment createFeedReply(FeedReplyCreateRequest request, Long memberId) {
@@ -67,16 +70,32 @@ public class FeedReplyService {
     }
 
     @Transactional
-    public void deleteFeedReply(Long feedReplyId) {
-        FeedReply feedReply = feedReplyRepository.getById(feedReplyId);
-
-        // 피드 답글 미디어 삭제
-        feedReplyMediaService.deleteAllByFeedReplyId(feedReplyId);
+    public void deleteFeedReplyId(Long feedReplyId) {
+        // 연관관계 엔티티 모두 삭제
+        deleteRelatedEntities(feedReplyId);
 
         // 피드 삭제
-        feedReplyRepository.delete(feedReply);
+        feedReplyRepository.deleteById(feedReplyId);
     }
 
+    @Transactional
+    public void deleteAllByFeedCommentId(Long feedCommentId) {
+        List<FeedReply> feedReplies = feedReplyRepository.findAllByFeedCommentId(feedCommentId);
+
+        // 피드 답글에 관련된 모든 요소 삭제
+        feedReplies.forEach(feedReply -> deleteRelatedEntities(feedReply.getId()));
+
+        // 피드 댓글에 연결된 모든 답글 삭제
+        feedReplyRepository.deleteAll(feedReplies);
+    }
+
+    private void deleteRelatedEntities(Long feedReplyId) {
+        // 피드 댓글에 연결된 모든 미디어 삭제
+        feedReplyMediaService.deleteAllByFeedReplyId(feedReplyId);
+
+        // 피드 댓글에 관련된 좋아요 모두 삭제
+        feedReplyLikeService.deleteAllByFeedReplyId(feedReplyId);
+    }
 
     private void saveFeedReplyMedia(FeedReplyCreateRequest request, FeedReply feedReply) {
         feedReplyMediaService.createFeedReplyMedia(feedReply, request.getImages());
