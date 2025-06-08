@@ -24,5 +24,10 @@ public interface StudyGroupMemberRepository extends JpaRepository<StudyGroupMemb
   List<StudyGroupMember> findAllWithMemberByStudyGroupId(@Param("studyGroupId") Long studyGroupId);
 
   int countByStudyGroup_IdAndIsAllowedTrue(Long studyGroupId);
+
   int countByStudyGroup_IdAndIsAllowedFalse(Long studyGroupId);
+
+  Optional<StudyGroupMember> findByStudyGroupIdAndMemberId(Long studyGroupId, Long memberId);
+
+  void deleteByStudyGroupIdAndMemberId(Long studyGroupId, Long memberId);
 }

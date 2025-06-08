@@ -41,7 +41,4 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
 
   List<StudyGroup> findAllByMember_IdOrderByCreatedAtDesc(Long memberId);
 
-  Optional<StudyGroupMember> findByStudyGroupIdAndMemberId(Long studyGroupId, Long memberId);
-
-  void deleteByStudyGroupIdAndMemberId(Long studyGroupId, Long memberId);
 }
