@@ -107,7 +107,7 @@ public class FeedReplyService {
         feedReplyMediaService.createFeedReplyMedia(feedReply, request.getImages());
     }
 
-    public FetchFeedRepliesResponse getFeedReplies(Long feedCommentId) {
+    public FetchFeedRepliesResponse getFeedReplies(Long feedCommentId, Long memberId) {
         return FetchFeedRepliesResponse.of(
                 feedReplyRepository.findAllByFeedCommentId(feedCommentId).stream()
                         .map(feedReply -> FetchFeedReplyResponse.builder()
@@ -118,6 +118,7 @@ public class FeedReplyService {
                                 .memberName(feedReply.getMember().getNickname())
                                 .mediaIds(feedReplyMediaService.getFeedReplyMediaIds(feedReply.getId()))
                                 .likeCount(feedReplyLikeService.countFeedReplyLikeByFeedReplyId(feedReply.getId()))
+                                .isLiked(feedReplyLikeService.isLiked(feedReply.getId(), memberId))
                                 .build()).toList());
     }
 } 

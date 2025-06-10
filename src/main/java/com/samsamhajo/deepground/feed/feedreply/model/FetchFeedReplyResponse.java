@@ -15,6 +15,7 @@ public class FetchFeedReplyResponse {
     private String content;
     private int likeCount;
     private int profileImageId;
+    private boolean isLiked;
     private LocalDate createdAt;
     private List<Long> mediaIds;
 } 

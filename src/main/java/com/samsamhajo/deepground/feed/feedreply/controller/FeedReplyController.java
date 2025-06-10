@@ -54,7 +54,7 @@ public class FeedReplyController {
     public ResponseEntity<SuccessResponse<?>> getFeedReplies(
             @PathVariable("feedReplyId") Long feedCommentId) {
 
-        FetchFeedRepliesResponse response = feedReplyService.getFeedReplies(feedCommentId);
+        FetchFeedRepliesResponse response = feedReplyService.getFeedReplies(feedCommentId, DEV_MEMBER_ID);
 
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedReplySuccessCode.FEED_REPLY_LIST_FETCHED, response));
