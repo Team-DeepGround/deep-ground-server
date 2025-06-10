@@ -1,6 +1,5 @@
 package com.samsamhajo.deepground.notification.service;
 
-import com.samsamhajo.deepground.global.message.MessagePublisher;
 import com.samsamhajo.deepground.notification.dto.NotificationListResponse;
 import com.samsamhajo.deepground.notification.dto.NotificationResponse;
 import com.samsamhajo.deepground.notification.entity.Notification;
@@ -9,6 +8,9 @@ import com.samsamhajo.deepground.notification.exception.NotificationErrorCode;
 import com.samsamhajo.deepground.notification.exception.NotificationException;
 import com.samsamhajo.deepground.notification.repository.NotificationDataRepository;
 import com.samsamhajo.deepground.notification.repository.NotificationRepository;
+import com.samsamhajo.deepground.sse.dto.SseEvent;
+import com.samsamhajo.deepground.sse.dto.SseEventType;
+import com.samsamhajo.deepground.sse.service.SseEmitterService;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +20,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class NotificationService {
 
-    private final MessagePublisher messagePublisher;
     private final NotificationRepository notificationRepository;
     private final NotificationDataRepository notificationDataRepository;
+    private final SseEmitterService sseEmitterService;
 
     public void sendNotification(Long receiverId, NotificationData data) {
         sendNotification(List.of(receiverId), data);
@@ -35,11 +37,11 @@ public class NotificationService {
 
         notificationRepository.saveAll(notifications);
 
-        notifications.forEach(notification -> messagePublisher.convertAndSendToUser(
-                String.valueOf(notification.getReceiverId()),
-                "/notifications",
-                NotificationResponse.from(notification)
-        ));
+        notifications.forEach(notification -> {
+            NotificationResponse response = NotificationResponse.from(notification);
+            SseEvent event = SseEvent.of(SseEventType.NOTIFICATION, response);
+            sseEmitterService.broadcast(notification.getReceiverId(), event);
+        });
     }
 
     public NotificationListResponse getNotifications(Long receiverId, LocalDateTime cursor, int limit) {
