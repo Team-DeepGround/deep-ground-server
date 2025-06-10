@@ -50,9 +50,9 @@ public class FeedReplyController {
                 .ok(SuccessResponse.of(FeedReplySuccessCode.FEED_REPLY_DELETED));
     }
 
-    @GetMapping("/list/{feedCommentId}")
+    @GetMapping("/list/{feedReplyId}")
     public ResponseEntity<SuccessResponse<?>> getFeedReplies(
-            @PathVariable("feedCommentId") Long feedCommentId) {
+            @PathVariable("feedReplyId") Long feedCommentId) {
 
         FetchFeedRepliesResponse response = feedReplyService.getFeedReplies(feedCommentId);
 

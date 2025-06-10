@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/feed/comment/media")
+@RequestMapping("/feed/reply/media")
 public class FeedReplyMediaController {
 
     private final FeedCommentMediaService feedCommentMediaService;
