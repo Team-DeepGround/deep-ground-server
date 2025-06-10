@@ -2,15 +2,18 @@ package com.samsamhajo.deepground.feed.feedcomment.service;
 
 import com.samsamhajo.deepground.feed.feedcomment.entity.FeedComment;
 import com.samsamhajo.deepground.feed.feedcomment.entity.FeedCommentMedia;
-import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentUpdateRequest;
 import com.samsamhajo.deepground.feed.feedcomment.repository.FeedCommentMediaRepository;
+import com.samsamhajo.deepground.media.MediaErrorCode;
+import com.samsamhajo.deepground.media.MediaException;
 import com.samsamhajo.deepground.media.MediaUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -34,6 +37,13 @@ public class FeedCommentMediaService {
         );
     }
 
+    public List<Long> getFeedCommentMediaIds(Long feedCommentId) {
+        return feedCommentMediaRepository.findAllByFeedCommentId(feedCommentId)
+                .stream()
+                .map(FeedCommentMedia::getId)
+                .toList();
+    }
+
     public void updateFeedCommentMedia(FeedComment feedComment, List<MultipartFile> images) {
         if (CollectionUtils.isEmpty(images)) return;
 
@@ -55,6 +65,13 @@ public class FeedCommentMediaService {
 
         // DB에서 삭제 (JPA Query Method 사용)
         feedCommentMediaRepository.deleteAllByFeedCommentId(feedCommentId);
+    }
+
+    public InputStreamResource getMediaById(Long mediaId) {
+        FeedCommentMedia media = feedCommentMediaRepository.findById(mediaId)
+                .orElseThrow(() -> new MediaException(MediaErrorCode.MEDIA_NOT_FOUND));
+
+        return MediaUtils.getMedia(media.getMediaUrl());
     }
 
 } 
