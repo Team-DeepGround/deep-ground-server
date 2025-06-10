@@ -89,6 +89,10 @@ public class FeedReplyService {
         feedReplyRepository.deleteAll(feedReplies);
     }
 
+    public int countFeedRepliesByFeedCommentId(Long feedCommentId) {
+        return feedReplyRepository.countByFeedCommentId(feedCommentId);
+    }
+
     private void deleteRelatedEntities(Long feedReplyId) {
         // 피드 댓글에 연결된 모든 미디어 삭제
         feedReplyMediaService.deleteAllByFeedReplyId(feedReplyId);
