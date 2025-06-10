@@ -23,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,8 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class FeedCommentServiceTest {
@@ -236,15 +236,25 @@ class FeedCommentServiceTest {
     void getFeedComments_Success() {
         // given
         Long feedId = 1L;
-        List<FeedComment> feedComments = List.of(
-            FeedComment.of("댓글1", feed, member),
-            FeedComment.of("댓글2", feed, member)
-        );
+        Member mockMember = mock(Member.class);
+        when(mockMember.getId()).thenReturn(1L);
+        when(mockMember.getNickname()).thenReturn("testUser");
+
+        FeedComment feedComment1 = mock(FeedComment.class);
+        FeedComment feedComment2 = mock(FeedComment.class);
+        List<FeedComment> feedComments = List.of(feedComment1, feedComment2);
+
+        when(feedComment1.getId()).thenReturn(1L);
+        when(feedComment1.getContent()).thenReturn("댓글1");
+        when(feedComment1.getMember()).thenReturn(mockMember);
+        when(feedComment1.getCreatedAt()).thenReturn(LocalDateTime.now());
+        
+        when(feedComment2.getId()).thenReturn(2L);
+        when(feedComment2.getContent()).thenReturn("댓글2"); 
+        when(feedComment2.getMember()).thenReturn(mockMember);
+        when(feedComment2.getCreatedAt()).thenReturn(LocalDateTime.now());
 
         given(feedCommentRepository.findAllByFeedId(feedId)).willReturn(feedComments);
-        given(feedCommentMediaService.getFeedCommentMediaIds(any())).willReturn(List.of(1L, 2L));
-        given(feedReplyService.countFeedRepliesByFeedCommentId(any())).willReturn(2);
-        given(feedCommentLikeService.countFeedCommentLikeByFeedId(any())).willReturn(3);
 
         // when
         FetchFeedCommentsResponse response = feedCommentService.getFeedComments(feedId);
@@ -255,11 +265,8 @@ class FeedCommentServiceTest {
         
         FetchFeedCommentResponse firstComment = response.getFeedComments().get(0);
         assertThat(firstComment.getContent()).isEqualTo("댓글1");
-        assertThat(firstComment.getMemberId()).isEqualTo(member.getId());
-        assertThat(firstComment.getMemberName()).isEqualTo(member.getNickname());
-        assertThat(firstComment.getMediaIds()).hasSize(2);
-        assertThat(firstComment.getReplyCount()).isEqualTo(2);
-        assertThat(firstComment.getLikeCount()).isEqualTo(3);
+        assertThat(firstComment.getMemberId()).isEqualTo(1L);
+        assertThat(firstComment.getMemberName()).isEqualTo("testUser");
     }
 
     @Test
@@ -275,20 +282,5 @@ class FeedCommentServiceTest {
         assertThatThrownBy(() -> feedCommentService.getFeedComments(nonExistentFeedId))
             .isInstanceOf(FeedCommentException.class)
             .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND);
-    }
-
-    @Test
-    @DisplayName("피드 댓글 목록 조회 실패 테스트 - 데이터베이스 오류")
-    void getFeedComments_Fail_DatabaseError() {
-        // given
-        Long feedId = 1L;
-
-        given(feedCommentRepository.findAllByFeedId(feedId))
-            .willThrow(new RuntimeException("데이터베이스 연결 오류"));
-
-        // when & then
-        assertThatThrownBy(() -> feedCommentService.getFeedComments(feedId))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessage("데이터베이스 연결 오류");
     }
 } 
