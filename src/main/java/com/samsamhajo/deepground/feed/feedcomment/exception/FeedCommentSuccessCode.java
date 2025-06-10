@@ -13,6 +13,7 @@ public enum FeedCommentSuccessCode implements SuccessCode {
     FEED_COMMENT_LIKED(HttpStatus.OK, "댓글이 좋아요 되었습니다."),
     FEED_COMMENT_DISLIKED(HttpStatus.OK, "댓글 좋아요가 취소되었습니다."),
     FEED_COMMENT_DELETED(HttpStatus.OK, "댓글이 삭제되었습니다."),
+    FEED_COMMENT_LIST_FETCHED(HttpStatus.OK, "댓글 목록이 조회되었습니다."),
 
     ;
 
