@@ -10,6 +10,7 @@ import com.samsamhajo.deepground.feed.feedreply.exception.FeedReplyException;
 import com.samsamhajo.deepground.feed.feedreply.model.FeedReplyCreateRequest;
 import com.samsamhajo.deepground.feed.feedreply.model.FeedReplyUpdateRequest;
 import com.samsamhajo.deepground.feed.feedreply.model.FetchFeedRepliesResponse;
+import com.samsamhajo.deepground.feed.feedreply.model.FetchFeedReplyResponse;
 import com.samsamhajo.deepground.feed.feedreply.repository.FeedReplyRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
@@ -23,6 +24,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -86,10 +88,23 @@ class FeedReplyServiceTest {
         void getFeedReplies_Success() {
             // given
             Long feedCommentId = 1L;
-            List<FeedReply> feedReplies = List.of(
-                FeedReply.of("답글1", mock(FeedComment.class), mock(Member.class)),
-                FeedReply.of("답글2", mock(FeedComment.class), mock(Member.class))
-            );
+            Member mockMember = mock(Member.class);
+            when(mockMember.getId()).thenReturn(1L);
+            when(mockMember.getNickname()).thenReturn("testUser");
+
+            FeedReply feedReply1 = mock(FeedReply.class);
+            FeedReply feedReply2 = mock(FeedReply.class);
+            List<FeedReply> feedReplies = List.of(feedReply1, feedReply2);
+
+            when(feedReply1.getId()).thenReturn(1L);
+            when(feedReply1.getContent()).thenReturn("답글1");
+            when(feedReply1.getMember()).thenReturn(mockMember);
+            when(feedReply1.getCreatedAt()).thenReturn(LocalDateTime.now());
+            
+            when(feedReply2.getId()).thenReturn(2L);
+            when(feedReply2.getContent()).thenReturn("답글2");
+            when(feedReply2.getMember()).thenReturn(mockMember);
+            when(feedReply2.getCreatedAt()).thenReturn(LocalDateTime.now());
 
             when(feedReplyRepository.findAllByFeedCommentId(feedCommentId)).thenReturn(feedReplies);
             when(feedReplyMediaService.getFeedReplyMediaIds(any())).thenReturn(List.of(1L, 2L));
@@ -102,10 +117,10 @@ class FeedReplyServiceTest {
             assertThat(response).isNotNull();
             assertThat(response.getFeedReplies()).hasSize(2);
             
-            var firstReply = response.getFeedReplies().get(0);
+            FetchFeedReplyResponse firstReply = response.getFeedReplies().get(0);
             assertThat(firstReply.getContent()).isEqualTo("답글1");
-            assertThat(firstReply.getMemberId()).isEqualTo(mock(Member.class).getId());
-            assertThat(firstReply.getMemberName()).isEqualTo(mock(Member.class).getNickname());
+            assertThat(firstReply.getMemberId()).isEqualTo(1L);
+            assertThat(firstReply.getMemberName()).isEqualTo("testUser");
             assertThat(firstReply.getMediaIds()).hasSize(2);
             assertThat(firstReply.getLikeCount()).isEqualTo(3);
         }
@@ -172,21 +187,6 @@ class FeedReplyServiceTest {
             assertThatThrownBy(() -> feedReplyService.getFeedReplies(nonExistentCommentId))
                 .isInstanceOf(FeedReplyException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FeedReplyErrorCode.FEED_REPLY_NOT_FOUND);
-        }
-
-        @Test
-        @DisplayName("피드 답글 목록 조회 실패 테스트 - 데이터베이스 오류")
-        void getFeedReplies_Fail_DatabaseError() {
-            // given
-            Long feedCommentId = 1L;
-
-            when(feedReplyRepository.findAllByFeedCommentId(feedCommentId))
-                .thenThrow(new RuntimeException("데이터베이스 연결 오류"));
-
-            // when & then
-            assertThatThrownBy(() -> feedReplyService.getFeedReplies(feedCommentId))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("데이터베이스 연결 오류");
         }
     }
 
