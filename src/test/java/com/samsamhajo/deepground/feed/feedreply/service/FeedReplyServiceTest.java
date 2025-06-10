@@ -100,7 +100,7 @@ class FeedReplyServiceTest {
             when(feedReply1.getContent()).thenReturn("답글1");
             when(feedReply1.getMember()).thenReturn(mockMember);
             when(feedReply1.getCreatedAt()).thenReturn(LocalDateTime.now());
-            
+
             when(feedReply2.getId()).thenReturn(2L);
             when(feedReply2.getContent()).thenReturn("답글2");
             when(feedReply2.getMember()).thenReturn(mockMember);
@@ -111,12 +111,12 @@ class FeedReplyServiceTest {
             when(feedReplyLikeService.countFeedReplyLikeByFeedReplyId(any())).thenReturn(3);
 
             // when
-            FetchFeedRepliesResponse response = feedReplyService.getFeedReplies(feedCommentId);
+            FetchFeedRepliesResponse response = feedReplyService.getFeedReplies(feedCommentId, mockMember.getId());
 
             // then
             assertThat(response).isNotNull();
             assertThat(response.getFeedReplies()).hasSize(2);
-            
+
             FetchFeedReplyResponse firstReply = response.getFeedReplies().get(0);
             assertThat(firstReply.getContent()).isEqualTo("답글1");
             assertThat(firstReply.getMemberId()).isEqualTo(1L);
@@ -181,12 +181,12 @@ class FeedReplyServiceTest {
             Long nonExistentCommentId = 999L;
 
             when(feedReplyRepository.findAllByFeedCommentId(nonExistentCommentId))
-                .thenThrow(new FeedReplyException(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND));
+                    .thenThrow(new FeedReplyException(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND));
 
             // when & then
-            assertThatThrownBy(() -> feedReplyService.getFeedReplies(nonExistentCommentId))
-                .isInstanceOf(FeedReplyException.class)
-                .hasFieldOrPropertyWithValue("errorCode", FeedReplyErrorCode.FEED_REPLY_NOT_FOUND);
+            assertThatThrownBy(() -> feedReplyService.getFeedReplies(nonExistentCommentId, 1L))
+                    .isInstanceOf(FeedReplyException.class)
+                    .hasFieldOrPropertyWithValue("errorCode", FeedReplyErrorCode.FEED_REPLY_NOT_FOUND);
         }
     }
 

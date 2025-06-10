@@ -248,21 +248,21 @@ class FeedCommentServiceTest {
         when(feedComment1.getContent()).thenReturn("댓글1");
         when(feedComment1.getMember()).thenReturn(mockMember);
         when(feedComment1.getCreatedAt()).thenReturn(LocalDateTime.now());
-        
+
         when(feedComment2.getId()).thenReturn(2L);
-        when(feedComment2.getContent()).thenReturn("댓글2"); 
+        when(feedComment2.getContent()).thenReturn("댓글2");
         when(feedComment2.getMember()).thenReturn(mockMember);
         when(feedComment2.getCreatedAt()).thenReturn(LocalDateTime.now());
 
         given(feedCommentRepository.findAllByFeedId(feedId)).willReturn(feedComments);
 
         // when
-        FetchFeedCommentsResponse response = feedCommentService.getFeedComments(feedId);
+        FetchFeedCommentsResponse response = feedCommentService.getFeedComments(feedId, mockMember.getId());
 
         // then
         assertThat(response).isNotNull();
         assertThat(response.getFeedComments()).hasSize(2);
-        
+
         FetchFeedCommentResponse firstComment = response.getFeedComments().get(0);
         assertThat(firstComment.getContent()).isEqualTo("댓글1");
         assertThat(firstComment.getMemberId()).isEqualTo(1L);
@@ -276,11 +276,11 @@ class FeedCommentServiceTest {
         Long nonExistentFeedId = 999L;
 
         given(feedCommentRepository.findAllByFeedId(nonExistentFeedId))
-            .willThrow(new FeedCommentException(FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND));
+                .willThrow(new FeedCommentException(FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND));
 
         // when & then
-        assertThatThrownBy(() -> feedCommentService.getFeedComments(nonExistentFeedId))
-            .isInstanceOf(FeedCommentException.class)
-            .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND);
+        assertThatThrownBy(() -> feedCommentService.getFeedComments(nonExistentFeedId, 1L))
+                .isInstanceOf(FeedCommentException.class)
+                .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND);
     }
 } 
