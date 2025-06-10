@@ -7,6 +7,8 @@ import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentErrorCode
 import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentException;
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentCreateRequest;
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentUpdateRequest;
+import com.samsamhajo.deepground.feed.feedcomment.model.FetchFeedCommentResponse;
+import com.samsamhajo.deepground.feed.feedcomment.model.FetchFeedCommentsResponse;
 import com.samsamhajo.deepground.feed.feedcomment.repository.FeedCommentRepository;
 import com.samsamhajo.deepground.feed.feedreply.service.FeedReplyService;
 import com.samsamhajo.deepground.member.entity.Member;
@@ -227,5 +229,66 @@ class FeedCommentServiceTest {
         verify(feedCommentMediaService).deleteAllByFeedCommentId(feedCommentId);
         verify(feedCommentLikeService).deleteAllByFeedCommentId(feedCommentId);
         verify(feedCommentRepository).deleteById(feedCommentId);
+    }
+
+    @Test
+    @DisplayName("피드 댓글 목록 조회 성공 테스트")
+    void getFeedComments_Success() {
+        // given
+        Long feedId = 1L;
+        List<FeedComment> feedComments = List.of(
+            FeedComment.of("댓글1", feed, member),
+            FeedComment.of("댓글2", feed, member)
+        );
+
+        given(feedCommentRepository.findAllByFeedId(feedId)).willReturn(feedComments);
+        given(feedCommentMediaService.getFeedCommentMediaIds(any())).willReturn(List.of(1L, 2L));
+        given(feedReplyService.countFeedRepliesByFeedCommentId(any())).willReturn(2);
+        given(feedCommentLikeService.countFeedCommentLikeByFeedId(any())).willReturn(3);
+
+        // when
+        FetchFeedCommentsResponse response = feedCommentService.getFeedComments(feedId);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getFeedComments()).hasSize(2);
+        
+        FetchFeedCommentResponse firstComment = response.getFeedComments().get(0);
+        assertThat(firstComment.getContent()).isEqualTo("댓글1");
+        assertThat(firstComment.getMemberId()).isEqualTo(member.getId());
+        assertThat(firstComment.getMemberName()).isEqualTo(member.getNickname());
+        assertThat(firstComment.getMediaIds()).hasSize(2);
+        assertThat(firstComment.getReplyCount()).isEqualTo(2);
+        assertThat(firstComment.getLikeCount()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("피드 댓글 목록 조회 실패 테스트 - 존재하지 않는 피드")
+    void getFeedComments_Fail_FeedNotFound() {
+        // given
+        Long nonExistentFeedId = 999L;
+
+        given(feedCommentRepository.findAllByFeedId(nonExistentFeedId))
+            .willThrow(new FeedCommentException(FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND));
+
+        // when & then
+        assertThatThrownBy(() -> feedCommentService.getFeedComments(nonExistentFeedId))
+            .isInstanceOf(FeedCommentException.class)
+            .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("피드 댓글 목록 조회 실패 테스트 - 데이터베이스 오류")
+    void getFeedComments_Fail_DatabaseError() {
+        // given
+        Long feedId = 1L;
+
+        given(feedCommentRepository.findAllByFeedId(feedId))
+            .willThrow(new RuntimeException("데이터베이스 연결 오류"));
+
+        // when & then
+        assertThatThrownBy(() -> feedCommentService.getFeedComments(feedId))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("데이터베이스 연결 오류");
     }
 } 
