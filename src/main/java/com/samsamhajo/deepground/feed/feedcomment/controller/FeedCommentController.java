@@ -48,4 +48,14 @@ public class FeedCommentController {
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedCommentSuccessCode.FEED_COMMENT_DELETED));
     }
+
+    @GetMapping("/list/{feedId}")
+    public ResponseEntity<SuccessResponse<?>> getFeedComments(
+            @PathVariable("feedId") Long feedId) {
+
+        var response = feedCommentService.getFeedComments(feedId);
+
+        return ResponseEntity
+                .ok(SuccessResponse.of(FeedCommentSuccessCode.FEED_COMMENT_LIST_FETCHED, response));
+    }
 } 
