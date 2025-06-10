@@ -16,6 +16,7 @@ public class FetchFeedCommentResponse {
     private String content;
     private int replyCount;
     private int likeCount;
+    private boolean isLiked;
     private int profileImageId;
     private LocalDate createdAt;
 
