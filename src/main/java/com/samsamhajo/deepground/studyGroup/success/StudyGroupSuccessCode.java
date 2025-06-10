@@ -8,6 +8,7 @@ public enum StudyGroupSuccessCode implements SuccessCode {
   READ_SUCCESS(HttpStatus.OK, "스터디 그룹 상세 조회 성공"),
   SEARCH_SUCCESS(HttpStatus.FOUND, "스터디 그룹 조회 성공"),
   COMMENT_CREATE_SUCCESS(HttpStatus.CREATED, "스터디 댓글이 작성되었습니다."),
+  DELETE_SUCCESS(HttpStatus.OK, "스터디 그룹이 삭제되었습니다."),
   REQUEST_JOIN_SUCCESS(HttpStatus.OK, "스터디 참가 요청이 완료되었습니다.");
 
   private final HttpStatus status;
