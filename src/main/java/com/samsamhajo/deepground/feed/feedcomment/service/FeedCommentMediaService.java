@@ -61,6 +61,13 @@ public class FeedCommentMediaService {
         feedCommentMediaRepository.deleteAllByFeedCommentId(feedCommentId);
     }
 
+    public List<Long> getFeedCommentMediaIds(Long feedCommentId) {
+        return feedCommentMediaRepository.findAllByFeedCommentId(feedCommentId)
+                .stream()
+                .map(FeedCommentMedia::getId)
+                .toList();
+    }
+
     public void updateFeedCommentMedia(FeedComment feedComment, List<MultipartFile> images) {
         // 피드 댓글에 연결된 모든 미디어 삭제
         deleteAllByFeedCommentId(feedComment.getId());
