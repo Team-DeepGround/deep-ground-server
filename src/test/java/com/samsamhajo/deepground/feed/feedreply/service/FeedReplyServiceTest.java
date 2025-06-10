@@ -9,6 +9,7 @@ import com.samsamhajo.deepground.feed.feedreply.exception.FeedReplyErrorCode;
 import com.samsamhajo.deepground.feed.feedreply.exception.FeedReplyException;
 import com.samsamhajo.deepground.feed.feedreply.model.FeedReplyCreateRequest;
 import com.samsamhajo.deepground.feed.feedreply.model.FeedReplyUpdateRequest;
+import com.samsamhajo.deepground.feed.feedreply.model.FetchFeedRepliesResponse;
 import com.samsamhajo.deepground.feed.feedreply.repository.FeedReplyRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
@@ -23,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -45,7 +47,6 @@ class FeedReplyServiceTest {
 
     @Mock
     private FeedReplyLikeService feedReplyLikeService;
-
 
     @BeforeEach
     void setUp() {
@@ -78,6 +79,35 @@ class FeedReplyServiceTest {
             assertThat(result).isEqualTo(feedComment);
             verify(feedReplyRepository, times(1)).save(any(FeedReply.class));
             verify(feedReplyMediaService, times(1)).createFeedReplyMedia(any(FeedReply.class), eq(Collections.emptyList()));
+        }
+
+        @Test
+        @DisplayName("피드 답글 목록 조회 성공 테스트")
+        void getFeedReplies_Success() {
+            // given
+            Long feedCommentId = 1L;
+            List<FeedReply> feedReplies = List.of(
+                FeedReply.of("답글1", mock(FeedComment.class), mock(Member.class)),
+                FeedReply.of("답글2", mock(FeedComment.class), mock(Member.class))
+            );
+
+            when(feedReplyRepository.findAllByFeedCommentId(feedCommentId)).thenReturn(feedReplies);
+            when(feedReplyMediaService.getFeedReplyMediaIds(any())).thenReturn(List.of(1L, 2L));
+            when(feedReplyLikeService.countFeedReplyLikeByFeedReplyId(any())).thenReturn(3);
+
+            // when
+            FetchFeedRepliesResponse response = feedReplyService.getFeedReplies(feedCommentId);
+
+            // then
+            assertThat(response).isNotNull();
+            assertThat(response.getFeedReplies()).hasSize(2);
+            
+            var firstReply = response.getFeedReplies().get(0);
+            assertThat(firstReply.getContent()).isEqualTo("답글1");
+            assertThat(firstReply.getMemberId()).isEqualTo(mock(Member.class).getId());
+            assertThat(firstReply.getMemberName()).isEqualTo(mock(Member.class).getNickname());
+            assertThat(firstReply.getMediaIds()).hasSize(2);
+            assertThat(firstReply.getLikeCount()).isEqualTo(3);
         }
     }
 
@@ -127,6 +157,36 @@ class FeedReplyServiceTest {
             assertThatThrownBy(() -> feedReplyService.createFeedReply(request, memberId))
                     .isInstanceOf(FeedCommentException.class)
                     .hasMessage(FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND.getMessage());
+        }
+
+        @Test
+        @DisplayName("피드 답글 목록 조회 실패 테스트 - 존재하지 않는 댓글")
+        void getFeedReplies_Fail_CommentNotFound() {
+            // given
+            Long nonExistentCommentId = 999L;
+
+            when(feedReplyRepository.findAllByFeedCommentId(nonExistentCommentId))
+                .thenThrow(new FeedReplyException(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND));
+
+            // when & then
+            assertThatThrownBy(() -> feedReplyService.getFeedReplies(nonExistentCommentId))
+                .isInstanceOf(FeedReplyException.class)
+                .hasFieldOrPropertyWithValue("errorCode", FeedReplyErrorCode.FEED_REPLY_NOT_FOUND);
+        }
+
+        @Test
+        @DisplayName("피드 답글 목록 조회 실패 테스트 - 데이터베이스 오류")
+        void getFeedReplies_Fail_DatabaseError() {
+            // given
+            Long feedCommentId = 1L;
+
+            when(feedReplyRepository.findAllByFeedCommentId(feedCommentId))
+                .thenThrow(new RuntimeException("데이터베이스 연결 오류"));
+
+            // when & then
+            assertThatThrownBy(() -> feedReplyService.getFeedReplies(feedCommentId))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("데이터베이스 연결 오류");
         }
     }
 
