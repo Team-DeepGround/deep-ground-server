@@ -1,0 +1,25 @@
+package com.samsamhajo.deepground.feed.feed.model;
+
+import lombok.Builder;
+import lombok.Getter;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Getter
+@Builder
+public class FetchFeedResponse {
+    private long memberId;
+    private long feedId;
+    private String memberName;
+    private String content;
+    private int likeCount;
+
+    private boolean isLiked;
+
+    private int commentCount;
+    private int shareCount;
+    private int profileImageId;
+    private LocalDate createdAt;
+    private List<Long> mediaIds;
+} 
