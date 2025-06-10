@@ -5,10 +5,10 @@ import com.samsamhajo.deepground.feed.feedreply.entity.FeedReplyMedia;
 import com.samsamhajo.deepground.feed.feedreply.repository.FeedReplyMediaRepository;
 import com.samsamhajo.deepground.media.MediaUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -54,5 +54,12 @@ public class FeedReplyMediaService {
 
         // 새 미디어 추가
         createFeedReplyMedia(feedReply, images);
+    }
+
+    public List<Long> getFeedReplyMediaIds(Long feedReplyId) {
+        return feedReplyMediaRepository.findAllByFeedReplyId(feedReplyId)
+                .stream()
+                .map(FeedReplyMedia::getId)
+                .toList();
     }
 } 
