@@ -1,20 +1,19 @@
 package com.samsamhajo.deepground.feed.feedcomment.controller;
 
 import com.samsamhajo.deepground.feed.feedcomment.service.FeedCommentMediaService;
-import com.samsamhajo.deepground.media.MediaErrorCode;
-import com.samsamhajo.deepground.media.MediaException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/feed-comments/media")
+@RequestMapping("/feed/comment/media")
 public class FeedCommentMediaController {
 
     private final FeedCommentMediaService feedCommentMediaService;
