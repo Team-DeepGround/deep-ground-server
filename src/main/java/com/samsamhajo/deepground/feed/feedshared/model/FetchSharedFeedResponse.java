@@ -21,10 +21,6 @@ public class FetchSharedFeedResponse {
 
 
     public static FetchSharedFeedResponse toDto(SharedFeed sharedFeed, List<Long> mediaIds) {
-        if(sharedFeed == null){
-            return null;
-        }
-
         Feed originFeed = sharedFeed.getOriginFeed();
 
         return FetchSharedFeedResponse.builder()
