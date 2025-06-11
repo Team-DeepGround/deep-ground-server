@@ -50,7 +50,15 @@ public class ChatRoomMember extends BaseEntity {
         return new ChatRoomMember(member, chatRoom);
     }
 
-    public void updateLastReadMessageTime(LocalDateTime lastReadMessageTime) {
-        this.lastReadMessageTime = lastReadMessageTime;
+    public boolean updateLastReadMessageTime(LocalDateTime lastReadMessageTime) {
+        if (lastReadMessageTime == null || lastReadMessageTime.isAfter(LocalDateTime.now())) {
+            return false;
+        }
+
+        if (this.lastReadMessageTime == null || this.lastReadMessageTime.isBefore(lastReadMessageTime)) {
+            this.lastReadMessageTime = lastReadMessageTime;
+            return true;
+        }
+        return false;
     }
 }

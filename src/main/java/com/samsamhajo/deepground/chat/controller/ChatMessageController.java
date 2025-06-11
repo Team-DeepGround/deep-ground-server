@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.chat.controller;
 
 import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.chat.dto.ChatMessageRequest;
+import com.samsamhajo.deepground.chat.dto.ReadMessageRequest;
 import com.samsamhajo.deepground.chat.service.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -25,5 +26,15 @@ public class ChatMessageController {
     ) {
         Long memberId = userDetails.getMember().getId();
         chatMessageService.sendMessage(chatRoomId, memberId, request);
+    }
+
+    @MessageMapping("/read")
+    public void read(
+            @DestinationVariable Long chatRoomId,
+            @Payload ReadMessageRequest request,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long memberId = userDetails.getMember().getId();
+        chatMessageService.readMessage(chatRoomId, memberId, request.getLastReadMessageTime());
     }
 }
