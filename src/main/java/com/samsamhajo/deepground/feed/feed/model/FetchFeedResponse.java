@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.feed.feed.model;
 
+import com.samsamhajo.deepground.feed.feedshared.model.FetchSharedFeedResponse;
 import lombok.Builder;
 import lombok.Getter;
 

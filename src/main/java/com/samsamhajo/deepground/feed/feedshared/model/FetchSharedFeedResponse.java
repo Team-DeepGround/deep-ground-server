@@ -1,4 +1,4 @@
-package com.samsamhajo.deepground.feed.feed.model;
+package com.samsamhajo.deepground.feed.feedshared.model;
 
 import com.samsamhajo.deepground.feed.feed.entity.Feed;
 import com.samsamhajo.deepground.feed.feedshared.entity.SharedFeed;

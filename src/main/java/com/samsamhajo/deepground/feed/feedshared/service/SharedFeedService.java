@@ -1,7 +1,7 @@
 package com.samsamhajo.deepground.feed.feedshared.service;
 
 import com.samsamhajo.deepground.feed.feed.entity.Feed;
-import com.samsamhajo.deepground.feed.feed.model.FetchSharedFeedResponse;
+import com.samsamhajo.deepground.feed.feedshared.model.FetchSharedFeedResponse;
 import com.samsamhajo.deepground.feed.feed.repository.FeedRepository;
 import com.samsamhajo.deepground.feed.feed.service.FeedMediaService;
 import com.samsamhajo.deepground.feed.feedshared.dto.SharedFeedRequest;
