@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.chat.service;
 
+import com.samsamhajo.deepground.chat.dto.ChatRoomMemberInfo;
 import com.samsamhajo.deepground.chat.entity.ChatMessage;
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
 import com.samsamhajo.deepground.chat.entity.ChatRoomMember;
@@ -9,6 +10,7 @@ import com.samsamhajo.deepground.chat.repository.ChatMessageRepository;
 import com.samsamhajo.deepground.chat.repository.ChatRoomMemberRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,5 +48,16 @@ public class ChatRoomMemberService {
     @Transactional(readOnly = true)
     public boolean isChatRoomMember(Long chatRoomId, Long memberId) {
         return chatRoomMemberRepository.existsByChatRoomIdAndMemberId(chatRoomId, memberId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ChatRoomMemberInfo> getChatRoomMemberInfos(Long chatRoomId) {
+        return chatRoomMemberRepository.findByChatRoomId(chatRoomId).stream()
+                .map(member -> ChatRoomMemberInfo.builder()
+                        .memberId(member.getMember().getId())
+                        .nickname(member.getMember().getNickname())
+                        .lastReadMessageTime(member.getLastReadMessageTime())
+                        .build())
+                .toList();
     }
 }

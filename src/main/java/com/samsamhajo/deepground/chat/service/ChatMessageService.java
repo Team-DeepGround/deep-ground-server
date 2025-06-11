@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.chat.service;
 
+import com.samsamhajo.deepground.chat.dto.ChatMessageListResponse;
 import com.samsamhajo.deepground.chat.dto.ReadMessageResponse;
 import com.samsamhajo.deepground.chat.dto.ChatMessageRequest;
 import com.samsamhajo.deepground.chat.dto.ChatMessageResponse;
@@ -35,6 +36,20 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatMediaRepository chatMediaRepository;
     private final SseEmitterService sseEmitterService;
+
+    public ChatMessageListResponse getMessages(Long chatRoomId, LocalDateTime cursor, int limit) {
+        List<ChatMessage> messages = chatMessageRepository.findByChatRoomIdWithCursor(chatRoomId, cursor, limit);
+
+        boolean hasNext = messages.size() > limit;
+        if (hasNext) {
+            messages = messages.subList(0, limit);
+        }
+
+        LocalDateTime nextCursor = messages.isEmpty() ? null
+                : messages.get(messages.size() - 1).getCreatedAt();
+
+        return ChatMessageListResponse.of(messages, nextCursor, hasNext);
+    }
 
     @Transactional
     public void sendMessage(Long chatRoomId, Long memberId, ChatMessageRequest request) {
