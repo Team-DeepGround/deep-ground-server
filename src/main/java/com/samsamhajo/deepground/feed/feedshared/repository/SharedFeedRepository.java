@@ -18,4 +18,8 @@ public interface SharedFeedRepository extends JpaRepository<SharedFeed, Long> {
         return findByFeedId(feedId)
                 .orElseThrow(() -> new SharedFeedException(SharedFeedErrorCode.SHARED_FEED_NOT_FOUND));
     }
+
+    default SharedFeed getOrNullByFeedId(Long feedId){
+        return findByFeedId(feedId).orElse(null);
+    }
 } 
