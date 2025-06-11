@@ -92,7 +92,7 @@ public class FeedService {
 
         deleteRelatedEntities(feedId);
 
-        feedMediaService.deleteAllByFeedId(feedId);
+        feedRepository.deleteById(feedId);
     }
 
     public void deleteRelatedEntities(Long feedId) {
