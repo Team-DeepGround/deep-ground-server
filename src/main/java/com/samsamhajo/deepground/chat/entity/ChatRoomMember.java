@@ -40,14 +40,14 @@ public class ChatRoomMember extends BaseEntity {
     @Column(name = "last_read_message_time")
     private LocalDateTime lastReadMessageTime;
 
-    private ChatRoomMember(Member member, ChatRoom chatRoom) {
+    private ChatRoomMember(Member member, ChatRoom chatRoom, LocalDateTime lastReadMessageTime) {
         this.member = member;
         this.chatRoom = chatRoom;
-        this.lastReadMessageTime = null;
+        this.lastReadMessageTime = lastReadMessageTime;
     }
 
-    public static ChatRoomMember of(Member member, ChatRoom chatRoom) {
-        return new ChatRoomMember(member, chatRoom);
+    public static ChatRoomMember of(Member member, ChatRoom chatRoom, LocalDateTime lastReadMessageTime) {
+        return new ChatRoomMember(member, chatRoom, lastReadMessageTime);
     }
 
     public boolean updateLastReadMessageTime(LocalDateTime lastReadMessageTime) {
@@ -55,7 +55,7 @@ public class ChatRoomMember extends BaseEntity {
             return false;
         }
 
-        if (this.lastReadMessageTime == null || this.lastReadMessageTime.isBefore(lastReadMessageTime)) {
+        if (this.lastReadMessageTime.isBefore(lastReadMessageTime)) {
             this.lastReadMessageTime = lastReadMessageTime;
             return true;
         }
