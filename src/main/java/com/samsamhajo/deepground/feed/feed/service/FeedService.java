@@ -3,16 +3,14 @@ package com.samsamhajo.deepground.feed.feed.service;
 import com.samsamhajo.deepground.feed.feed.entity.Feed;
 import com.samsamhajo.deepground.feed.feed.exception.FeedErrorCode;
 import com.samsamhajo.deepground.feed.feed.exception.FeedException;
-import com.samsamhajo.deepground.feed.feed.model.FeedCreateRequest;
-import com.samsamhajo.deepground.feed.feed.model.FeedUpdateRequest;
-import com.samsamhajo.deepground.feed.feed.model.FetchFeedResponse;
-import com.samsamhajo.deepground.feed.feed.model.FetchFeedsResponse;
+import com.samsamhajo.deepground.feed.feed.model.*;
 import com.samsamhajo.deepground.feed.feed.repository.FeedRepository;
 import com.samsamhajo.deepground.feed.feedcomment.service.FeedCommentService;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
 import com.samsamhajo.deepground.member.exception.MemberException;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
+import com.samsamhajo.deepground.feed.feedshared.service.SharedFeedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,6 +27,7 @@ public class FeedService {
     private final MemberRepository memberRepository;
     private final FeedCommentService feedCommentService;
     private final FeedLikeService feedLikeService;
+    private final SharedFeedService sharedFeedService;
 
     @Transactional
     public Feed createFeed(FeedCreateRequest request, Long memberId) {
@@ -69,18 +68,26 @@ public class FeedService {
     public FetchFeedsResponse getFeeds(Pageable pageable, Long memberId) {
         return FetchFeedsResponse.of(
                 feedRepository.findAll(pageable).stream()
-                        .map(feed -> FetchFeedResponse.builder()
-                                .feedId(feed.getId())
-                                .content(feed.getContent())
-                                .createdAt(feed.getCreatedAt().toLocalDate())
-                                .memberId(feed.getMember().getId())
-                                .memberName(feed.getMember().getNickname())
-                                .mediaIds(feedMediaService.findAllMediaIdsByFeedId(feed.getId()))
-                                .shareCount(0) // TODO : share 구현 시 추가
-                                .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))
-                                .likeCount(feedLikeService.countFeedLikeByFeedId(feed.getId()))
-                                .isLiked(feedLikeService.isLiked(feed.getId(), memberId))
-                                .build()).toList());
+                        .map(feed -> {
+                            FetchSharedFeedResponse sharedFeedResponse =
+                                    sharedFeedService.getSharedFeedResponse(feed.getId());
+
+                            return FetchFeedResponse.builder()
+                                    .feedId(feed.getId())
+                                    .content(feed.getContent())
+                                    .createdAt(feed.getCreatedAt().toLocalDate())
+                                    .memberId(feed.getMember().getId())
+                                    .memberName(feed.getMember().getNickname())
+                                    .mediaIds(feedMediaService.findAllMediaIdsByFeedId(feed.getId()))
+                                    .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId())) // TODO : share 구현 시 추가
+                                    .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))
+                                    .likeCount(feedLikeService.countFeedLikeByFeedId(feed.getId()))
+                                    .isLiked(feedLikeService.isLiked(feed.getId(), memberId))
+                                    .isShared(sharedFeedResponse != null)
+                                    .sharedFeed(sharedFeedResponse)
+                                    .build();
+                        }
+                        ).toList());
     }
 
     private void saveFeedMedia(FeedCreateRequest request, Feed feed) {
@@ -95,7 +102,7 @@ public class FeedService {
         feedRepository.deleteById(feedId);
     }
 
-    public void deleteRelatedEntities(Long feedId) {
+    private void deleteRelatedEntities(Long feedId) {
         feedCommentService.deleteFeedCommentByFeed(feedId);
         feedLikeService.deleteAllByFeedId(feedId);
         feedMediaService.deleteAllByFeedId(feedId);
