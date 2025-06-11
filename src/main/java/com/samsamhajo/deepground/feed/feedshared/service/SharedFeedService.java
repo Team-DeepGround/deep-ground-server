@@ -36,4 +36,12 @@ public class SharedFeedService {
         
         return sharedFeed;
     }
+
+    public int countSharedFeedByOriginFeedId(Long originFeedId) {
+        return sharedFeedRepository.countAllByOriginFeedId(originFeedId);
+    }
+
+    public SharedFeed findByFeedId(Long feedId) {
+        return sharedFeedRepository.getByFeedId(feedId);
+    }
 } 
