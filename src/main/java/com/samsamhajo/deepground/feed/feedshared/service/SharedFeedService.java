@@ -45,6 +45,10 @@ public class SharedFeedService {
     public FetchSharedFeedResponse getSharedFeedResponse(Long feedId){
         SharedFeed sharedFeed = findOrNullByFeedId(feedId);
 
+        if(sharedFeed == null){
+            return null;
+        }
+
         List<Long> sharedFeedMediaIds =
                 feedMediaService.findAllMediaIdsByFeedId(sharedFeed.getOriginFeed().getId());
 
