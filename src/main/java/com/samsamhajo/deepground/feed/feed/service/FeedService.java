@@ -80,7 +80,7 @@ public class FeedService {
                                     .memberId(feed.getMember().getId())
                                     .memberName(feed.getMember().getNickname())
                                     .mediaIds(feedMediaService.findAllMediaIdsByFeedId(feed.getId()))
-                                    .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId())) // TODO : share 구현 시 추가
+                                    .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId()))
                                     .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))
                                     .likeCount(feedLikeService.countFeedLikeByFeedId(feed.getId()))
                                     .isLiked(feedLikeService.isLiked(feed.getId(), memberId))
