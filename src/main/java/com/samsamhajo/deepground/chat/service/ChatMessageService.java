@@ -3,6 +3,7 @@ package com.samsamhajo.deepground.chat.service;
 import com.samsamhajo.deepground.chat.dto.ReadMessageResponse;
 import com.samsamhajo.deepground.chat.dto.ChatMessageRequest;
 import com.samsamhajo.deepground.chat.dto.ChatMessageResponse;
+import com.samsamhajo.deepground.chat.dto.UnreadCountResponse;
 import com.samsamhajo.deepground.chat.entity.ChatMedia;
 import com.samsamhajo.deepground.chat.entity.ChatMessage;
 import com.samsamhajo.deepground.chat.entity.ChatMessageMedia;
@@ -13,8 +14,12 @@ import com.samsamhajo.deepground.chat.repository.ChatMediaRepository;
 import com.samsamhajo.deepground.chat.repository.ChatMessageRepository;
 import com.samsamhajo.deepground.chat.repository.ChatRoomMemberRepository;
 import com.samsamhajo.deepground.global.message.MessagePublisher;
+import com.samsamhajo.deepground.sse.dto.SseEvent;
+import com.samsamhajo.deepground.sse.dto.SseEventType;
+import com.samsamhajo.deepground.sse.service.SseEmitterService;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +34,7 @@ public class ChatMessageService {
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatMediaRepository chatMediaRepository;
+    private final SseEmitterService sseEmitterService;
 
     @Transactional
     public void sendMessage(Long chatRoomId, Long memberId, ChatMessageRequest request) {
@@ -49,7 +55,8 @@ public class ChatMessageService {
         // 메시지를 전송한 멤버는 읽음 처리
         readMessage(chatRoomId, memberId, chatMessage.getCreatedAt());
 
-        // TODO: 읽지 않은 메시지 개수 로직
+        // 읽지 않은 메시지 개수를 채팅방 멤버에게 전송
+        sendUnreadCount(chatRoomId, memberId, chatMessage.getCreatedAt());
     }
 
     private ChatMessage messageTextAndMedia(Long chatRoomId, Long memberId, ChatMessageRequest request) {
@@ -70,11 +77,11 @@ public class ChatMessageService {
     }
 
     @Transactional
-    public void readMessage(Long chatRoomId, Long memberId, LocalDateTime lastReadMessageTime) {
+    public void readMessage(Long chatRoomId, Long memberId, LocalDateTime latestMessageTime) {
         ChatRoomMember member = chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, memberId)
                 .orElseThrow(() -> new ChatMessageException(ChatMessageErrorCode.CHATROOM_MEMBER_NOT_FOUND));
 
-        boolean isUpdated = member.updateLastReadMessageTime(lastReadMessageTime);
+        boolean isUpdated = member.updateLastReadMessageTime(latestMessageTime);
         if (!isUpdated) {
             throw new ChatMessageException(ChatMessageErrorCode.INVALID_MESSAGE_TIME);
         }
@@ -82,7 +89,24 @@ public class ChatMessageService {
         String destination = "/chatrooms/" + chatRoomId + "/read-receipt";
         messagePublisher.convertAndSend(
                 destination,
-                ReadMessageResponse.of(memberId, lastReadMessageTime)
+                ReadMessageResponse.of(memberId, latestMessageTime)
         );
+    }
+
+    private void sendUnreadCount(Long chatRoomId, Long memberId, LocalDateTime latestMessageTime) {
+        List<ChatRoomMember> members = chatRoomMemberRepository.findByChatRoomId(chatRoomId).stream()
+                .filter(member -> !Objects.equals(member.getMember().getId(), memberId))
+                .toList();
+
+        members.forEach(member -> {
+            Long unreadCount = chatMessageRepository.countByChatRoomIdAndCreatedAtAfter(
+                    chatRoomId,
+                    member.getLastReadMessageTime()
+            );
+
+            UnreadCountResponse response = UnreadCountResponse.of(chatRoomId, unreadCount, latestMessageTime);
+            SseEvent event = SseEvent.of(SseEventType.UNREAD_COUNT, response);
+            sseEmitterService.broadcast(member.getMember().getId(), event);
+        });
     }
 }
