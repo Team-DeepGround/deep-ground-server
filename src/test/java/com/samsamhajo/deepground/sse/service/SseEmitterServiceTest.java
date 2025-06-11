@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.samsamhajo.deepground.sse.dto.SseEvent;
 import com.samsamhajo.deepground.sse.dto.SseEventType;
+import com.samsamhajo.deepground.sse.event.SseSubscribeEvent;
 import com.samsamhajo.deepground.sse.repository.SseEmitterRepository;
 import java.io.IOException;
 import java.util.Collections;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,6 +33,9 @@ class SseEmitterServiceTest {
 
     @Mock
     private SseEmitterRepository sseEmitterRepository;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     private final Long memberId = 1L;
     private SseEmitter sseEmitter;
@@ -51,6 +56,7 @@ class SseEmitterServiceTest {
 
         // then
         verify(sseEmitterRepository).save(eq(memberId), any(SseEmitter.class));
+        verify(eventPublisher).publishEvent(any(SseSubscribeEvent.class));
         assertThat(result).isNotNull();
     }
 
