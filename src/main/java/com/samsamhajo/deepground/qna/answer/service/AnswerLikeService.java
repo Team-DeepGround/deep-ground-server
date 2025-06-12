@@ -41,9 +41,6 @@ public class AnswerLikeService {
         @Transactional
     public void answerUnLike(Long answerId, Long memberId) {
 
-        Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
         Answer answer = answerRepository.findById(answerId).orElseThrow(
                 () -> new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND));
 

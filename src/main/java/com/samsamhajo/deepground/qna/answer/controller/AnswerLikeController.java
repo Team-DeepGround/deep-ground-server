@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AnswerLikeController {
 
-    private final AnswerLikeRepository answerLikeRepository;
     private final AnswerLikeService answerLikeService;
 
     private final Long memberId = 1L;
