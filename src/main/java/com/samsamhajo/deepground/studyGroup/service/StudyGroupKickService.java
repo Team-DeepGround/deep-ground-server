@@ -35,7 +35,7 @@ public class StudyGroupKickService {
             request.getStudyGroupId(), request.getTargetMemberId())
         .orElseThrow(() -> new IllegalArgumentException("대상 멤버가 스터디에 존재하지 않습니다."));
 
-    studyGroupMemberRepository.delete(target);
+    target.softDelete();
   }
 }
 
