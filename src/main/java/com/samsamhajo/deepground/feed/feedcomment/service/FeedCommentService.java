@@ -90,7 +90,7 @@ public class FeedCommentService {
         feedCommentRepository.deleteAll(feedComments);
     }
 
-    public FetchFeedCommentsResponse getFeedComments(Long feedId) {
+    public FetchFeedCommentsResponse getFeedComments(Long feedId, Long memberId) {
         return FetchFeedCommentsResponse.of(
                 feedCommentRepository.findAllByFeedId(feedId).stream()
                         .map(feedComment -> FetchFeedCommentResponse.builder()
@@ -102,7 +102,12 @@ public class FeedCommentService {
                                 .mediaIds(feedCommentMediaService.getFeedCommentMediaIds(feedComment.getId()))
                                 .replyCount(feedReplyService.countFeedRepliesByFeedCommentId(feedComment.getId()))
                                 .likeCount(feedCommentLikeService.countFeedCommentLikeByFeedId(feedComment.getId()))
+                                .isLiked(feedCommentLikeService.isLiked(feedComment.getId(),memberId))
                                 .build()).toList());
+    }
+
+    public int countFeedCommentsByFeedId(Long feedId) {
+        return feedCommentRepository.countByFeedId(feedId);
     }
 
     private void deleteAllRelatedEntities(Long feedCommentId) {

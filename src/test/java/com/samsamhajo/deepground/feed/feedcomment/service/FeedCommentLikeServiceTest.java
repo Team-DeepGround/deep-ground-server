@@ -11,137 +11,158 @@ import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
 import com.samsamhajo.deepground.member.exception.MemberException;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class FeedCommentLikeServiceTest {
 
-    @InjectMocks
-    private FeedCommentLikeService feedCommentLikeService;
-
     @Mock
     private FeedCommentRepository feedCommentRepository;
-
     @Mock
     private MemberRepository memberRepository;
-
     @Mock
     private FeedCommentLikeRepository feedCommentLikeRepository;
 
-    private final Member member = Member.createLocalMember("test@naver.com", "password", "testUser");
-    private final Feed feed = Feed.of("테스트 피드 내용", member);
-    private final FeedComment feedComment = FeedComment.of("테스트 댓글 내용", feed, member);
+    @InjectMocks
+    private FeedCommentLikeService feedCommentLikeService;
 
-    @Test
-    @DisplayName("피드 댓글 좋아요 증가 성공 테스트")
-    void feedLikeIncrease_Success() {
-        // given
-        Long feedCommentId = 1L;
-        Long memberId = 1L;
-        FeedComment feedComment = mock(FeedComment.class);
-        Member member = mock(Member.class);
+    private static final String TEST_CONTENT = "테스트 댓글 내용입니다.";
+    private static final String TEST_EMAIL = "test@example.com";
+    private static final String TEST_PASSWORD = "password123";
+    private static final String TEST_NICKNAME = "테스트유저";
 
-        given(feedCommentRepository.getById(feedCommentId)).willReturn(feedComment);
-        given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
-        given(feedCommentLikeRepository.existsByFeedCommentIdAndMemberId(feedCommentId, memberId)).willReturn(false);
+    private Member testMember;
+    private Feed testFeed;
+    private FeedComment testFeedComment;
+    private FeedCommentLike testFeedCommentLike;
 
-        // when
-        feedCommentLikeService.feedLikeIncrease(feedCommentId, memberId);
+    @BeforeEach
+    void setUp() {
+        testMember = Member.createLocalMember(TEST_EMAIL, TEST_PASSWORD, TEST_NICKNAME);
+        testFeed = Feed.of(TEST_CONTENT, testMember);
+        testFeedComment = FeedComment.of(TEST_CONTENT, testFeed, testMember);
+        testFeedCommentLike = FeedCommentLike.of(testFeedComment, testMember);
 
-        // then
-        verify(feedCommentLikeRepository, times(1)).save(any(FeedCommentLike.class));
+        ReflectionTestUtils.setField(testMember, "id", 1L);
+        ReflectionTestUtils.setField(testFeed, "id", 1L);
+        ReflectionTestUtils.setField(testFeedComment, "id", 1L);
+        ReflectionTestUtils.setField(testFeedCommentLike, "id", 1L);
     }
 
     @Test
-    @DisplayName("피드 댓글 좋아요 증가 실패 테스트 - 이미 좋아요한 경우")
-    void feedLikeIncrease_Fail_AlreadyLiked() {
+    @DisplayName("피드 댓글 좋아요 증가 성공")
+    void feedLikeIncreaseSuccess() {
         // given
-        Long feedCommentId = 1L;
-        Long memberId = 1L;
+        when(feedCommentRepository.getById(1L)).thenReturn(testFeedComment);
+        when(memberRepository.findById(1L)).thenReturn(Optional.of(testMember));
+        when(feedCommentLikeRepository.existsByFeedCommentIdAndMemberId(1L, 1L)).thenReturn(false);
+        when(feedCommentLikeRepository.save(any(FeedCommentLike.class))).thenReturn(testFeedCommentLike);
 
-        given(feedCommentLikeRepository.existsByFeedCommentIdAndMemberId(feedCommentId, memberId)).willReturn(true);
+        // when
+        feedCommentLikeService.feedLikeIncrease(1L, 1L);
+
+        // then
+        verify(feedCommentLikeRepository).save(any(FeedCommentLike.class));
+    }
+
+    @Test
+    @DisplayName("피드 댓글 좋아요 증가 실패 - 이미 좋아요한 경우")
+    void feedLikeIncreaseFailWithAlreadyLiked() {
+        // given
+        when(feedCommentLikeRepository.existsByFeedCommentIdAndMemberId(1L, 1L)).thenReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> feedCommentLikeService.feedLikeIncrease(feedCommentId, memberId))
+        assertThatThrownBy(() -> feedCommentLikeService.feedLikeIncrease(1L, 1L))
                 .isInstanceOf(FeedCommentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.FEED_COMMENT_LIKE_ALREADY_EXISTS);
     }
 
     @Test
-    @DisplayName("피드 댓글 좋아요 증가 실패 테스트 - 존재하지 않는 회원")
-    void feedLikeIncrease_Fail_MemberNotFound() {
+    @DisplayName("피드 댓글 좋아요 증가 실패 - 존재하지 않는 회원")
+    void feedLikeIncreaseFailWithInvalidMember() {
         // given
-        Long feedCommentId = 1L;
-        Long nonExistentMemberId = 999L;
-
-        given(feedCommentLikeRepository.existsByFeedCommentIdAndMemberId(feedCommentId, nonExistentMemberId)).willReturn(false);
-        given(memberRepository.findById(nonExistentMemberId)).willReturn(Optional.empty());
+        when(memberRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> feedCommentLikeService.feedLikeIncrease(feedCommentId, nonExistentMemberId))
+        assertThatThrownBy(() -> feedCommentLikeService.feedLikeIncrease(1L, 1L))
                 .isInstanceOf(MemberException.class)
                 .hasFieldOrPropertyWithValue("errorCode", MemberErrorCode.INVALID_MEMBER_ID);
     }
 
     @Test
-    @DisplayName("피드 댓글 좋아요 감소 성공 테스트")
-    void feedLikeDecrease_Success() {
+    @DisplayName("피드 댓글 좋아요 감소 성공")
+    void feedLikeDecreaseSuccess() {
         // given
-        Long feedCommentId = 1L;
-        Long memberId = 1L;
-        FeedCommentLike feedCommentLike = mock(FeedCommentLike.class);
-
-        given(feedCommentLikeRepository.countByFeedCommentId(feedCommentId)).willReturn(1);
-        given(feedCommentLikeRepository.getByFeedCommentIdAndMemberId(feedCommentId, memberId)).willReturn(feedCommentLike);
+        when(feedCommentLikeRepository.countByFeedCommentId(1L)).thenReturn(1);
+        when(feedCommentLikeRepository.getByFeedCommentIdAndMemberId(1L, 1L)).thenReturn(testFeedCommentLike);
 
         // when
-        feedCommentLikeService.feedLikeDecrease(feedCommentId, memberId);
+        feedCommentLikeService.feedLikeDecrease(1L, 1L);
 
         // then
-        verify(feedCommentLikeRepository, times(1)).delete(feedCommentLike);
+        verify(feedCommentLikeRepository).delete(testFeedCommentLike);
     }
 
     @Test
-    @DisplayName("피드 댓글 좋아요 감소 실패 테스트 - 좋아요가 없는 경우")
-    void feedLikeDecrease_Fail_NoLikes() {
+    @DisplayName("피드 댓글 좋아요 감소 실패 - 좋아요가 없는 경우")
+    void feedLikeDecreaseFailWithNoLikes() {
         // given
-        Long feedCommentId = 1L;
-        Long memberId = 1L;
-
-        given(feedCommentLikeRepository.countByFeedCommentId(feedCommentId)).willReturn(0);
+        when(feedCommentLikeRepository.countByFeedCommentId(1L)).thenReturn(0);
 
         // when & then
-        assertThatThrownBy(() -> feedCommentLikeService.feedLikeDecrease(feedCommentId, memberId))
+        assertThatThrownBy(() -> feedCommentLikeService.feedLikeDecrease(1L, 1L))
                 .isInstanceOf(FeedCommentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.FEED_LIKE_MINUS_NOT_ALLOWED);
     }
 
     @Test
-    @DisplayName("피드 댓글 좋아요 수 조회 테스트")
-    void countFeedCommentLikeByFeedId_Success() {
+    @DisplayName("피드 댓글 좋아요 수 조회 성공")
+    void countFeedCommentLikeByFeedIdSuccess() {
         // given
-        Long feedCommentId = 1L;
-        int expectedCount = 5;
-
-        given(feedCommentLikeRepository.countByFeedCommentId(feedCommentId)).willReturn(expectedCount);
+        when(feedCommentLikeRepository.countByFeedCommentId(1L)).thenReturn(5);
 
         // when
-        int actualCount = feedCommentLikeService.countFeedCommentLikeByFeedId(feedCommentId);
+        int count = feedCommentLikeService.countFeedCommentLikeByFeedId(1L);
 
         // then
-        assertThat(actualCount).isEqualTo(expectedCount);
+        assertThat(count).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("피드 댓글 좋아요 삭제 성공")
+    void deleteAllByFeedCommentIdSuccess() {
+        // when
+        feedCommentLikeService.deleteAllByFeedCommentId(1L);
+
+        // then
+        verify(feedCommentLikeRepository).deleteAllByFeedCommentId(1L);
+    }
+
+    @Test
+    @DisplayName("피드 댓글 좋아요 여부 확인 성공")
+    void isLikedSuccess() {
+        // given
+        when(feedCommentLikeRepository.existsByFeedCommentIdAndMemberId(1L, 1L)).thenReturn(true);
+
+        // when
+        boolean isLiked = feedCommentLikeService.isLiked(1L, 1L);
+
+        // then
+        assertThat(isLiked).isTrue();
     }
 } 

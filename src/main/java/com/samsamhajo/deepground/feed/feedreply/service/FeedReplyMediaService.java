@@ -2,9 +2,13 @@ package com.samsamhajo.deepground.feed.feedreply.service;
 
 import com.samsamhajo.deepground.feed.feedreply.entity.FeedReply;
 import com.samsamhajo.deepground.feed.feedreply.entity.FeedReplyMedia;
+import com.samsamhajo.deepground.feed.feedreply.model.FeedReplyMediaResponse;
 import com.samsamhajo.deepground.feed.feedreply.repository.FeedReplyMediaRepository;
+import com.samsamhajo.deepground.media.MediaErrorCode;
+import com.samsamhajo.deepground.media.MediaException;
 import com.samsamhajo.deepground.media.MediaUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -54,5 +58,20 @@ public class FeedReplyMediaService {
 
         // 새 미디어 추가
         createFeedReplyMedia(feedReply, images);
+    }
+
+    public List<Long> getFeedReplyMediaIds(Long feedReplyId) {
+        return feedReplyMediaRepository.findAllByFeedReplyId(feedReplyId)
+                .stream()
+                .map(FeedReplyMedia::getId)
+                .toList();
+    }
+
+    public FeedReplyMediaResponse fetchFeedReplyMedia(Long mediaId) {
+        FeedReplyMedia media = feedReplyMediaRepository.findById(mediaId)
+                .orElseThrow(() -> new MediaException(MediaErrorCode.MEDIA_NOT_FOUND));
+
+        InputStreamResource image = MediaUtils.getMedia(media.getMediaUrl());
+        return FeedReplyMediaResponse.of(image, media.getExtension());
     }
 } 

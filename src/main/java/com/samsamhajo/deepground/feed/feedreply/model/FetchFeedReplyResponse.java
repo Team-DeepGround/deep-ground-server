@@ -1,4 +1,4 @@
-package com.samsamhajo.deepground.feed.feedcomment.model;
+package com.samsamhajo.deepground.feed.feedreply.model;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -8,17 +8,14 @@ import java.util.List;
 
 @Getter
 @Builder
-public class FetchFeedCommentResponse {
-
+public class FetchFeedReplyResponse {
     private long memberId;
-    private long feedCommentId;
+    private long feedReplyId;
     private String memberName;
     private String content;
-    private int replyCount;
     private int likeCount;
-    private boolean isLiked;
     private int profileImageId;
+    private boolean isLiked;
     private LocalDate createdAt;
-
     private List<Long> mediaIds;
-}
+} 

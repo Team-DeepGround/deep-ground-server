@@ -9,6 +9,8 @@ import com.samsamhajo.deepground.feed.feedreply.exception.FeedReplyErrorCode;
 import com.samsamhajo.deepground.feed.feedreply.exception.FeedReplyException;
 import com.samsamhajo.deepground.feed.feedreply.model.FeedReplyCreateRequest;
 import com.samsamhajo.deepground.feed.feedreply.model.FeedReplyUpdateRequest;
+import com.samsamhajo.deepground.feed.feedreply.model.FetchFeedRepliesResponse;
+import com.samsamhajo.deepground.feed.feedreply.model.FetchFeedReplyResponse;
 import com.samsamhajo.deepground.feed.feedreply.repository.FeedReplyRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
@@ -103,5 +105,20 @@ public class FeedReplyService {
 
     private void saveFeedReplyMedia(FeedReplyCreateRequest request, FeedReply feedReply) {
         feedReplyMediaService.createFeedReplyMedia(feedReply, request.getImages());
+    }
+
+    public FetchFeedRepliesResponse getFeedReplies(Long feedCommentId, Long memberId) {
+        return FetchFeedRepliesResponse.of(
+                feedReplyRepository.findAllByFeedCommentId(feedCommentId).stream()
+                        .map(feedReply -> FetchFeedReplyResponse.builder()
+                                .feedReplyId(feedReply.getId())
+                                .content(feedReply.getContent())
+                                .createdAt(feedReply.getCreatedAt().toLocalDate())
+                                .memberId(feedReply.getMember().getId())
+                                .memberName(feedReply.getMember().getNickname())
+                                .mediaIds(feedReplyMediaService.getFeedReplyMediaIds(feedReply.getId()))
+                                .likeCount(feedReplyLikeService.countFeedReplyLikeByFeedReplyId(feedReply.getId()))
+                                .isLiked(feedReplyLikeService.isLiked(feedReply.getId(), memberId))
+                                .build()).toList());
     }
 } 

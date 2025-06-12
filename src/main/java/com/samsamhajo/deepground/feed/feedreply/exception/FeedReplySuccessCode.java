@@ -12,7 +12,8 @@ public enum FeedReplySuccessCode implements SuccessCode {
     FEED_REPLY_UPDATED(HttpStatus.OK, "답글이 수정되었습니다."),
     FEED_REPLY_LIKED(HttpStatus.OK, "답글이 좋아요 되었습니다."),
     FEED_REPLY_DISLIKED(HttpStatus.OK, "답글 좋아요가 취소되었습니다."),
-    FEED_REPLY_DELETED(HttpStatus.OK, "답글이 삭제되었습니다.")
+    FEED_REPLY_DELETED(HttpStatus.OK, "답글이 삭제되었습니다."),
+    FEED_REPLY_LIST_FETCHED(HttpStatus.OK, "답글 목록이 조회되었습니다."),
 
     ;
 
