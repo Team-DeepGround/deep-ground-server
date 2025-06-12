@@ -2,13 +2,17 @@ package com.samsamhajo.deepground.feed.feedreply.service;
 
 import com.samsamhajo.deepground.feed.feedreply.entity.FeedReply;
 import com.samsamhajo.deepground.feed.feedreply.entity.FeedReplyMedia;
+import com.samsamhajo.deepground.feed.feedreply.model.FeedReplyMediaResponse;
 import com.samsamhajo.deepground.feed.feedreply.repository.FeedReplyMediaRepository;
+import com.samsamhajo.deepground.media.MediaErrorCode;
+import com.samsamhajo.deepground.media.MediaException;
 import com.samsamhajo.deepground.media.MediaUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -61,5 +65,13 @@ public class FeedReplyMediaService {
                 .stream()
                 .map(FeedReplyMedia::getId)
                 .toList();
+    }
+
+    public FeedReplyMediaResponse fetchFeedReplyMedia(Long mediaId) {
+        FeedReplyMedia media = feedReplyMediaRepository.findById(mediaId)
+                .orElseThrow(() -> new MediaException(MediaErrorCode.MEDIA_NOT_FOUND));
+
+        InputStreamResource image = MediaUtils.getMedia(media.getMediaUrl());
+        return FeedReplyMediaResponse.of(image, media.getExtension());
     }
 } 

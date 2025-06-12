@@ -50,6 +50,14 @@ public class FeedLikeService {
         return feedLikeRepository.countByFeedId(feedId);
     }
 
+    public void deleteAllByFeedId(Long feedId) {
+        feedLikeRepository.deleteAllByFeedId(feedId);
+    }
+
+    public boolean isLiked(Long feedId, Long memberId) {
+        return feedLikeRepository.existsByFeedIdAndMemberId(feedId, memberId);
+    }
+
     private void validateDecrease(Long feedId) {
         if(countFeedLikeByFeedId(feedId) <= 0){
             throw new FeedException(FeedErrorCode.FEED_LIKE_MINUS_NOT_ALLOWED);

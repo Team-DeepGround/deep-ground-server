@@ -17,7 +17,7 @@ public interface FeedLikeRepository extends JpaRepository<FeedLike, Long> {
 
     boolean existsByFeedIdAndMemberId(Long feedId, Long memberId);
 
-    List<FeedLike> findByFeedId(Long feedId);
+    void deleteAllByFeedId(Long feedId);
 
     Optional<FeedLike> findByFeedIdAndMemberId(Long feed, Long memberId);
 

@@ -13,6 +13,7 @@ public enum FeedSuccessCode implements SuccessCode {
     FEED_MEDIA_UPDATED(HttpStatus.OK, "피드 미디어가 성공적으로 수정되었습니다."),
     FEED_LIKED(HttpStatus.OK, "피드가 성공적으로 좋아요 되었습니다."),
     FEED_UNLIKED(HttpStatus.OK, "피드 좋아요가 취소되었습니다."),
+    FEED_LIST_FETCHED(HttpStatus.OK, "피드 목록이 성공적으로 조회되었습니다.")
 
     ;
 

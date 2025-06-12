@@ -68,4 +68,11 @@ public class FeedMediaService {
             createFeedMedia(feed, request.getImages());
         }
     }
+
+    public List<Long> findAllMediaIdsByFeedId(Long feedId) {
+        return feedMediaRepository.findAllByFeedId(feedId)
+                .stream()
+                .map(FeedMedia::getId)
+                .toList();
+    }
 }
