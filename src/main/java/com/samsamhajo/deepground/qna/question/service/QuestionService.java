@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.qna.question.service;
 
+import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateRequestDto;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateResponseDto;
@@ -29,13 +30,13 @@ public class QuestionService{
     private final QuestionMediaService questionMediaService;
     private final QuestionTagRepository questionTagRepository;
     private final TechStackRepository techStackRepository;
-    private final QuestionTagService questionTagService;
+    private final MemberRepository memberRepository;
 
     //질문 생성
     @Transactional
     public QuestionCreateResponseDto createQuestion(QuestionCreateRequestDto questionCreateRequestDto, Long memberId) {
-//       Member member = memberRepository.findById(memberId)
-//                .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다."));
+       Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
         if(!StringUtils.hasText(questionCreateRequestDto.getTitle())) {
             throw new QuestionException(QuestionErrorCode.QUESTION_TITLE_REQUIRED);
@@ -48,7 +49,7 @@ public class QuestionService{
         Question question = Question.of(
                 questionCreateRequestDto.getTitle(),
                 questionCreateRequestDto.getContent(),
-                null
+                member
         );
 
         Question saved = questionRepository.save(question);
@@ -61,13 +62,12 @@ public class QuestionService{
             QuestionTag questionTag = QuestionTag.of(saved, techStack);
             questionTagRepository.save(questionTag);
         }
-        System.out.println(techStacks);
 
         return QuestionCreateResponseDto.of(
                 saved.getId(),
                 saved.getTitle(),
                 saved.getContent(),
-                null,
+                memberId,
                 techStacks
         );
     }
@@ -91,8 +91,8 @@ public class QuestionService{
     @Transactional
     public QuestionUpdateResponseDto updateQuestion(QuestionUpdateRequestDto questionUpdateRequestDto, Long memberId) {
 
-//        Member member = memberRepository.findById(memberId)
-//                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
         if(!StringUtils.hasText(questionUpdateRequestDto.getTitle())) {
             throw new QuestionException(QuestionErrorCode.QUESTION_TITLE_REQUIRED);
@@ -120,7 +120,7 @@ public class QuestionService{
                 questionUpdateRequestDto.getQuestionId(),
                 questionUpdateRequestDto.getTitle(),
                 questionUpdateRequestDto.getContent(),
-                null,
+                memberId,
                 techStacks
         );
 
