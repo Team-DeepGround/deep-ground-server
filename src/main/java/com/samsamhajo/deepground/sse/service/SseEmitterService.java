@@ -2,10 +2,13 @@ package com.samsamhajo.deepground.sse.service;
 
 import com.samsamhajo.deepground.sse.dto.SseEvent;
 import com.samsamhajo.deepground.sse.dto.SseEventType;
+import com.samsamhajo.deepground.sse.event.SseSubscribeEvent;
+import com.samsamhajo.deepground.sse.event.SseUnsubscribeEvent;
 import com.samsamhajo.deepground.sse.repository.SseEmitterRepository;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -19,6 +22,7 @@ public class SseEmitterService {
     private static final SseEvent HEARTBEAT_EVENT = SseEvent.of(SseEventType.HEARTBEAT, "ping");
 
     private final SseEmitterRepository sseEmitterRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public SseEmitter subscribe(Long memberId) {
         SseEmitter sseEmitter = new SseEmitter(DEFAULT_TIMEOUT);
@@ -28,6 +32,7 @@ public class SseEmitterService {
         sseEmitter.onTimeout(sseEmitter::complete);
         sseEmitter.onError(sseEmitter::completeWithError);
 
+        eventPublisher.publishEvent(new SseSubscribeEvent(this, memberId));
         broadcast(memberId, CONNECTED_EVENT);
         return sseEmitter;
     }
@@ -56,6 +61,7 @@ public class SseEmitterService {
     }
 
     private void unsubscribe(Long memberId, SseEmitter sseEmitter) {
+        eventPublisher.publishEvent(new SseUnsubscribeEvent(this, memberId));
         sseEmitterRepository.delete(memberId, sseEmitter);
     }
 }
