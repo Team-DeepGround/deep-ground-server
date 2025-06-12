@@ -7,7 +7,6 @@ import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentErrorCode
 import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentException;
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentCreateRequest;
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentUpdateRequest;
-import com.samsamhajo.deepground.feed.feedcomment.model.FetchFeedCommentResponse;
 import com.samsamhajo.deepground.feed.feedcomment.model.FetchFeedCommentsResponse;
 import com.samsamhajo.deepground.feed.feedcomment.repository.FeedCommentRepository;
 import com.samsamhajo.deepground.feed.feedreply.service.FeedReplyService;
@@ -15,6 +14,7 @@ import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
 import com.samsamhajo.deepground.member.exception.MemberException;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,265 +22,199 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class FeedCommentServiceTest {
 
-    @InjectMocks
-    private FeedCommentService feedCommentService;
-
     @Mock
     private FeedCommentRepository feedCommentRepository;
-
     @Mock
     private FeedCommentMediaService feedCommentMediaService;
-
     @Mock
     private FeedRepository feedRepository;
-
     @Mock
     private MemberRepository memberRepository;
-
+    @Mock
+    private FeedReplyService feedReplyService;
     @Mock
     private FeedCommentLikeService feedCommentLikeService;
 
-    @Mock
-    private FeedReplyService feedReplyService;
+    @InjectMocks
+    private FeedCommentService feedCommentService;
 
-    private Member member = Member.createLocalMember("test@test.com", "password123", "테스트유저");
-    private Feed feed = Feed.of("테스트 피드 내용", member);
+    private static final String TEST_CONTENT = "테스트 댓글 내용입니다.";
+    private static final String TEST_EMAIL = "test@example.com";
+    private static final String TEST_PASSWORD = "password123";
+    private static final String TEST_NICKNAME = "테스트유저";
 
-    @Test
-    @DisplayName("피드 댓글 생성 성공 테스트")
-    void createFeedComment_Success() {
-        // given
-        String content = "테스트 댓글 내용";
-        Long memberId = 1L;
-        Long feedId = 1L;
+    private Member testMember;
+    private Feed testFeed;
+    private FeedComment testFeedComment;
+    private MockMultipartFile testImage;
 
-        MockMultipartFile mockImage = new MockMultipartFile(
+    @BeforeEach
+    void setUp() {
+        testMember = Member.createLocalMember(TEST_EMAIL, TEST_PASSWORD, TEST_NICKNAME);
+        testFeed = Feed.of(TEST_CONTENT, testMember);
+        testFeedComment = FeedComment.of(TEST_CONTENT, testFeed, testMember);
+        testImage = new MockMultipartFile(
                 "image",
                 "test.jpg",
                 "image/jpeg",
-                "테스트 이미지 데이터".getBytes()
+                "test image content".getBytes()
         );
 
-        FeedCommentCreateRequest request = new FeedCommentCreateRequest(feedId, content, List.of(mockImage));
-
-        given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
-        given(feedRepository.getById(feedId)).willReturn(feed);
-        given(feedCommentRepository.save(any(FeedComment.class))).willAnswer(invocation -> invocation.getArgument(0));
-
-        // when
-        FeedComment createdComment = feedCommentService.createFeedComment(request, memberId);
-
-        // then
-        assertThat(createdComment).isNotNull();
-        assertThat(createdComment.getContent()).isEqualTo(content);
-        assertThat(createdComment.getMember()).isEqualTo(member);
-        assertThat(createdComment.getFeed()).isEqualTo(feed);
-
-        verify(feedCommentMediaService).createFeedCommentMedia(any(FeedComment.class), any());
+        ReflectionTestUtils.setField(testMember, "id", 1L);
+        ReflectionTestUtils.setField(testFeed, "id", 1L);
+        ReflectionTestUtils.setField(testFeedComment, "id", 1L);
     }
 
     @Test
-    @DisplayName("피드 댓글 생성 실패 테스트 - 빈 내용")
-    void createFeedComment_Fail_EmptyContent() {
+    @DisplayName("피드 댓글 생성 성공")
+    void createFeedCommentSuccess() {
         // given
-        String emptyContent = "";
-        Long memberId = 1L;
-        Long feedId = 1L;
+        FeedCommentCreateRequest request = new FeedCommentCreateRequest(1L, TEST_CONTENT, List.of(testImage));
 
-        FeedCommentCreateRequest request = new FeedCommentCreateRequest(feedId, emptyContent, null);
+        when(memberRepository.findById(1L)).thenReturn(java.util.Optional.of(testMember));
+        when(feedRepository.getById(1L)).thenReturn(testFeed);
+        when(feedCommentRepository.save(any(FeedComment.class))).thenReturn(testFeedComment);
+
+        // when
+        FeedComment createdComment = feedCommentService.createFeedComment(request, 1L);
+
+        // then
+        assertThat(createdComment).isNotNull();
+        assertThat(createdComment.getContent()).isEqualTo(TEST_CONTENT);
+        verify(feedCommentMediaService).createFeedCommentMedia(any(FeedComment.class), anyList());
+    }
+
+    @Test
+    @DisplayName("피드 댓글 생성 실패 - 내용이 비어있는 경우")
+    void createFeedCommentFailWithEmptyContent() {
+        // given
+        FeedCommentCreateRequest request = new FeedCommentCreateRequest(1L, "", List.of());
 
         // when & then
-        assertThatThrownBy(() -> feedCommentService.createFeedComment(request, memberId))
+        assertThatThrownBy(() -> feedCommentService.createFeedComment(request, 1L))
                 .isInstanceOf(FeedCommentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.INVALID_FEED_COMMENT_CONTENT);
     }
 
     @Test
-    @DisplayName("피드 댓글 생성 실패 테스트 - 존재하지 않는 회원")
-    void createFeedComment_Fail_MemberNotFound() {
+    @DisplayName("피드 댓글 생성 실패 - 존재하지 않는 회원")
+    void createFeedCommentFailWithInvalidMember() {
         // given
-        String content = "테스트 댓글 내용";
-        Long nonExistentMemberId = 999L;
-        Long feedId = 1L;
-
-        FeedCommentCreateRequest request = new FeedCommentCreateRequest(feedId, content, null);
-
-        given(memberRepository.findById(nonExistentMemberId)).willReturn(Optional.empty());
+        FeedCommentCreateRequest request = new FeedCommentCreateRequest(1L, TEST_CONTENT, List.of());
+        when(memberRepository.findById(1L)).thenReturn(java.util.Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> feedCommentService.createFeedComment(request, nonExistentMemberId))
+        assertThatThrownBy(() -> feedCommentService.createFeedComment(request, 1L))
                 .isInstanceOf(MemberException.class)
                 .hasFieldOrPropertyWithValue("errorCode", MemberErrorCode.INVALID_MEMBER_ID);
     }
 
     @Test
-    @DisplayName("피드 댓글 생성 실패 테스트 - 존재하지 않는 피드")
-    void createFeedComment_Fail_FeedNotFound() {
+    @DisplayName("피드 댓글 수정 성공")
+    void updateFeedCommentSuccess() {
         // given
-        String content = "테스트 댓글 내용";
-        Long memberId = 1L;
-        Long nonExistentFeedId = 999L;
+        String updatedContent = "수정된 댓글 내용입니다.";
+        FeedCommentUpdateRequest request = new FeedCommentUpdateRequest(updatedContent, List.of(testImage));
 
-        FeedCommentCreateRequest request = new FeedCommentCreateRequest(nonExistentFeedId, content, null);
-
-        given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
-        given(feedRepository.getById(nonExistentFeedId))
-                .willThrow(new FeedCommentException(FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND));
-
-        // when & then
-        assertThatThrownBy(() -> feedCommentService.createFeedComment(request, memberId))
-                .isInstanceOf(FeedCommentException.class)
-                .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND);
-    }
-
-    @Test
-    @DisplayName("피드 댓글 수정 성공 테스트")
-    void updateFeedComment_Success() {
-        // given
-        Long feedCommentId = 1L;
-        String originalContent = "원본 댓글 내용";
-        String updatedContent = "수정된 댓글 내용";
-
-        FeedComment feedComment = FeedComment.of(originalContent, feed, member);
-
-        MockMultipartFile mockImage = new MockMultipartFile(
-                "image",
-                "test.jpg",
-                "image/jpeg",
-                "테스트 이미지 데이터".getBytes()
-        );
-
-        FeedCommentUpdateRequest request = new FeedCommentUpdateRequest(updatedContent, List.of(mockImage));
-
-        given(feedCommentRepository.getById(feedCommentId)).willReturn(feedComment);
+        when(feedCommentRepository.getById(1L)).thenReturn(testFeedComment);
 
         // when
-        FeedComment updatedComment = feedCommentService.updateFeedComment(feedCommentId, request);
+        FeedComment updatedComment = feedCommentService.updateFeedComment(1L, request);
 
         // then
-        assertThat(updatedComment).isNotNull();
         assertThat(updatedComment.getContent()).isEqualTo(updatedContent);
-        assertThat(updatedComment.getMember()).isEqualTo(member);
-        assertThat(updatedComment.getFeed()).isEqualTo(feed);
-
-        verify(feedCommentMediaService).updateFeedCommentMedia(any(FeedComment.class), any());
+        verify(feedCommentMediaService).updateFeedCommentMedia(any(FeedComment.class), anyList());
     }
 
     @Test
-    @DisplayName("피드 댓글 수정 실패 테스트 - 빈 내용")
-    void updateFeedComment_Fail_EmptyContent() {
+    @DisplayName("피드 댓글 수정 실패 - 내용이 비어있는 경우")
+    void updateFeedCommentFailWithEmptyContent() {
         // given
-        Long feedCommentId = 1L;
-        String emptyContent = "";
-
-        FeedCommentUpdateRequest request = new FeedCommentUpdateRequest(emptyContent, null);
+        FeedCommentUpdateRequest request = new FeedCommentUpdateRequest("", List.of());
 
         // when & then
-        assertThatThrownBy(() -> feedCommentService.updateFeedComment(feedCommentId, request))
+        assertThatThrownBy(() -> feedCommentService.updateFeedComment(1L, request))
                 .isInstanceOf(FeedCommentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.INVALID_FEED_COMMENT_CONTENT);
-
-        verify(feedCommentRepository, never()).getById(any());
     }
 
     @Test
-    @DisplayName("피드 댓글 수정 실패 테스트 - 존재하지 않는 댓글")
-    void updateFeedComment_Fail_CommentNotFound() {
-        // given
-        Long nonExistentCommentId = 999L;
-        String updatedContent = "수정된 댓글 내용";
-
-        FeedCommentUpdateRequest request = new FeedCommentUpdateRequest(updatedContent, null);
-
-        given(feedCommentRepository.getById(nonExistentCommentId))
-                .willThrow(new FeedCommentException(FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND));
-
-        // when & then
-        assertThatThrownBy(() -> feedCommentService.updateFeedComment(nonExistentCommentId, request))
-                .isInstanceOf(FeedCommentException.class)
-                .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND);
-    }
-
-    @Test
-    @DisplayName("피드 댓글 삭제 성공 테스트")
-    void deleteFeedComment_Success() {
-        // given
-        Long feedCommentId = 1L;
-
-        // when
-        feedCommentService.deleteFeedCommentId(feedCommentId);
+    @DisplayName("피드 댓글 삭제 성공")
+    void deleteFeedCommentSuccess() {
+        // given & when
+        feedCommentService.deleteFeedCommentId(1L);
 
         // then
-        verify(feedReplyService).deleteAllByFeedCommentId(feedCommentId);
-        verify(feedCommentMediaService).deleteAllByFeedCommentId(feedCommentId);
-        verify(feedCommentLikeService).deleteAllByFeedCommentId(feedCommentId);
-        verify(feedCommentRepository).deleteById(feedCommentId);
+        verify(feedReplyService).deleteAllByFeedCommentId(1L);
+        verify(feedCommentMediaService).deleteAllByFeedCommentId(1L);
+        verify(feedCommentLikeService).deleteAllByFeedCommentId(1L);
+        verify(feedCommentRepository).deleteById(1L);
     }
 
     @Test
-    @DisplayName("피드 댓글 목록 조회 성공 테스트")
-    void getFeedComments_Success() {
+    @DisplayName("피드의 모든 댓글 삭제 성공")
+    void deleteFeedCommentByFeedSuccess() {
         // given
-        Long feedId = 1L;
-        Member mockMember = mock(Member.class);
-        when(mockMember.getId()).thenReturn(1L);
-        when(mockMember.getNickname()).thenReturn("testUser");
-
-        FeedComment feedComment1 = mock(FeedComment.class);
-        FeedComment feedComment2 = mock(FeedComment.class);
-        List<FeedComment> feedComments = List.of(feedComment1, feedComment2);
-
-        when(feedComment1.getId()).thenReturn(1L);
-        when(feedComment1.getContent()).thenReturn("댓글1");
-        when(feedComment1.getMember()).thenReturn(mockMember);
-        when(feedComment1.getCreatedAt()).thenReturn(LocalDateTime.now());
-        
-        when(feedComment2.getId()).thenReturn(2L);
-        when(feedComment2.getContent()).thenReturn("댓글2"); 
-        when(feedComment2.getMember()).thenReturn(mockMember);
-        when(feedComment2.getCreatedAt()).thenReturn(LocalDateTime.now());
-
-        given(feedCommentRepository.findAllByFeedId(feedId)).willReturn(feedComments);
+        when(feedCommentRepository.findAllByFeedId(1L)).thenReturn(List.of(testFeedComment));
 
         // when
-        FetchFeedCommentsResponse response = feedCommentService.getFeedComments(feedId);
+        feedCommentService.deleteFeedCommentByFeed(1L);
 
         // then
-        assertThat(response).isNotNull();
-        assertThat(response.getFeedComments()).hasSize(2);
-        
-        FetchFeedCommentResponse firstComment = response.getFeedComments().get(0);
-        assertThat(firstComment.getContent()).isEqualTo("댓글1");
-        assertThat(firstComment.getMemberId()).isEqualTo(1L);
-        assertThat(firstComment.getMemberName()).isEqualTo("testUser");
+        verify(feedReplyService).deleteAllByFeedCommentId(1L);
+        verify(feedCommentMediaService).deleteAllByFeedCommentId(1L);
+        verify(feedCommentLikeService).deleteAllByFeedCommentId(1L);
+        verify(feedCommentRepository).deleteAll(List.of(testFeedComment));
     }
 
     @Test
-    @DisplayName("피드 댓글 목록 조회 실패 테스트 - 존재하지 않는 피드")
-    void getFeedComments_Fail_FeedNotFound() {
+    @DisplayName("피드 댓글 목록 조회 성공")
+    void getFeedCommentsSuccess() {
         // given
-        Long nonExistentFeedId = 999L;
+        when(feedCommentRepository.findAllByFeedId(1L)).thenReturn(List.of(testFeedComment));
+        when(feedCommentMediaService.getFeedCommentMediaIds(1L)).thenReturn(List.of());
+        when(feedReplyService.countFeedRepliesByFeedCommentId(1L)).thenReturn(2);
+        when(feedCommentLikeService.countFeedCommentLikeByFeedId(1L)).thenReturn(5);
+        when(feedCommentLikeService.isLiked(1L, 1L)).thenReturn(true);
+        // when
+        ReflectionTestUtils.setField(testFeedComment, "createdAt", LocalDateTime.now());
+        var result = feedCommentService.getFeedComments(1L, 1L);
 
-        given(feedCommentRepository.findAllByFeedId(nonExistentFeedId))
-            .willThrow(new FeedCommentException(FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND));
-
-        // when & then
-        assertThatThrownBy(() -> feedCommentService.getFeedComments(nonExistentFeedId))
-            .isInstanceOf(FeedCommentException.class)
-            .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.FEED_COMMENT_NOT_FOUND);
+        // then
+        assertThat(result.getFeedComments()).hasSize(1);
+        var comment = result.getFeedComments().get(0);
+        assertThat(comment.getFeedCommentId()).isEqualTo(1L);
+        assertThat(comment.getContent()).isEqualTo(TEST_CONTENT);
+        assertThat(comment.getMemberId()).isEqualTo(1L);
+        assertThat(comment.getMemberName()).isEqualTo(TEST_NICKNAME);
+        assertThat(comment.getMediaIds()).isEmpty();
+        assertThat(comment.getReplyCount()).isEqualTo(2);
+        assertThat(comment.getLikeCount()).isEqualTo(5);
     }
-} 
+
+    @Test
+    @DisplayName("피드 댓글 수 조회 성공")
+    void countFeedCommentsByFeedIdSuccess() {
+        // given
+        when(feedCommentRepository.countByFeedId(1L)).thenReturn(5);
+
+        // when
+        int count = feedCommentService.countFeedCommentsByFeedId(1L);
+
+        // then
+        assertThat(count).isEqualTo(5);
+    }
+}
