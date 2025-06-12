@@ -8,6 +8,7 @@ import com.samsamhajo.deepground.chat.exception.ChatException;
 import com.samsamhajo.deepground.chat.repository.ChatMessageRepository;
 import com.samsamhajo.deepground.chat.repository.ChatRoomMemberRepository;
 import com.samsamhajo.deepground.member.entity.Member;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,13 +23,13 @@ public class ChatRoomMemberService {
 
     @Transactional
     public void joinChatRoom(Member member, ChatRoom chatRoom) {
-        ChatRoomMember chatRoomMember = ChatRoomMember.of(member, chatRoom);
-
         // 채팅방에 메시지가 있다면 마지막으로 읽은 메시지 시간을 업데이트
         Optional<ChatMessage> chatMessage = chatMessageRepository.findFirstByChatRoomIdOrderByCreatedAtDesc(
                 chatRoom.getId());
-        chatMessage.ifPresent(message ->
-                chatRoomMember.updateLastReadMessageTime(message.getCreatedAt()));
+
+        ChatRoomMember chatRoomMember = chatMessage
+                .map(m -> ChatRoomMember.of(member, chatRoom, m.getCreatedAt()))
+                .orElseGet(() -> ChatRoomMember.of(member, chatRoom, LocalDateTime.now()));
 
         chatRoomMemberRepository.save(chatRoomMember);
     }
