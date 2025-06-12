@@ -27,6 +27,7 @@ public class AnswerService {
     private final MemberRepository memberRepository;
     private final QuestionRepository questionRepository;
     private final AnswerMediaService answerMediaService;
+    private final AnswerLikeService answerLikeService;
 
 
     @Transactional
@@ -75,6 +76,7 @@ public class AnswerService {
         answerRepository.deleteById(answer.getId());
         question.decrementAnswerCount();
         answerMediaService.deleteAnswerMedia(answerId);
+        answerLikeService.deleteAllByAnswerId(answerId);
 
         return answer.getId();
     }
