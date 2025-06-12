@@ -57,4 +57,10 @@ public class Answer {
         this.answerContent = answerContent;
     }
 
+    public void incrementAnswerLikeCount() {
+        answerLikeCount++;
+    }
+    public void decrementAnswerLikeCount() {
+        if (answerLikeCount>0) answerLikeCount--;
+    }
 }
