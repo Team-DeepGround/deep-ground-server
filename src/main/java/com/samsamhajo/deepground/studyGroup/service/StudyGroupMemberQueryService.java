@@ -32,6 +32,6 @@ public class StudyGroupMemberQueryService {
             .isOwner(group.getMember().getId().equals(member.getMember().getId()))
             .joinedAt(member.getCreatedAt())
             .build())
-        .collect(Collectors.toList());
+        .toList();
   }
 }
