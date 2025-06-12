@@ -13,6 +13,7 @@ public interface FeedReplyRepository extends JpaRepository<FeedReply, Long> {
     default FeedReply getById(Long feedReplyId) {
         return findById(feedReplyId).orElseThrow(() -> new FeedReplyException(FeedReplyErrorCode.FEED_REPLY_NOT_FOUND));
     }
-
     List<FeedReply> findAllByFeedCommentId(Long feedCommentId);
+
+    int countByFeedCommentId(Long feedCommentId);
 } 

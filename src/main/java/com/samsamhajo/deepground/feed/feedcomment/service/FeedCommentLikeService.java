@@ -46,12 +46,16 @@ public class FeedCommentLikeService {
         feedCommentLikeRepository.delete(feedCommentLike);
     }
 
-    public int countFeedCommentLikeByFeedId(Long feedId) {
-        return feedCommentLikeRepository.countByFeedCommentId(feedId);
+    public int countFeedCommentLikeByFeedId(Long feedCommentId) {
+        return feedCommentLikeRepository.countByFeedCommentId(feedCommentId);
     }
 
     public void deleteAllByFeedCommentId(Long feedCommentId) {
         feedCommentLikeRepository.deleteAllByFeedCommentId(feedCommentId);
+    }
+
+    public boolean isLiked(Long feedCommentId, Long memberId) {
+        return feedCommentLikeRepository.existsByFeedCommentIdAndMemberId(feedCommentId, memberId);
     }
 
     private void validateDecrease(Long feedId) {

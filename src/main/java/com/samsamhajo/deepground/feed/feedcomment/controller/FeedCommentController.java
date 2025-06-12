@@ -3,6 +3,7 @@ package com.samsamhajo.deepground.feed.feedcomment.controller;
 import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentSuccessCode;
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentCreateRequest;
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentUpdateRequest;
+import com.samsamhajo.deepground.feed.feedcomment.model.FetchFeedCommentsResponse;
 import com.samsamhajo.deepground.feed.feedcomment.service.FeedCommentService;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -47,5 +48,15 @@ public class FeedCommentController {
 
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedCommentSuccessCode.FEED_COMMENT_DELETED));
+    }
+
+    @GetMapping("/list/{feedId}")
+    public ResponseEntity<SuccessResponse<FetchFeedCommentsResponse>> getFeedComments(
+            @PathVariable("feedId") Long feedId) {
+
+        FetchFeedCommentsResponse response = feedCommentService.getFeedComments(feedId, DEV_MEMBER_ID);
+
+        return ResponseEntity
+                .ok(SuccessResponse.of(FeedCommentSuccessCode.FEED_COMMENT_LIST_FETCHED, response));
     }
 } 

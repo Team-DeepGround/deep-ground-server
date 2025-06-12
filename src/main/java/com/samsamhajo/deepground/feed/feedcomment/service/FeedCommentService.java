@@ -7,6 +7,8 @@ import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentErrorCode
 import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentException;
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentCreateRequest;
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentUpdateRequest;
+import com.samsamhajo.deepground.feed.feedcomment.model.FetchFeedCommentResponse;
+import com.samsamhajo.deepground.feed.feedcomment.model.FetchFeedCommentsResponse;
 import com.samsamhajo.deepground.feed.feedcomment.repository.FeedCommentRepository;
 import com.samsamhajo.deepground.feed.feedreply.service.FeedReplyService;
 import com.samsamhajo.deepground.member.entity.Member;
@@ -86,6 +88,26 @@ public class FeedCommentService {
 
         // 피드와 연결된 모든 댓글 삭제
         feedCommentRepository.deleteAll(feedComments);
+    }
+
+    public FetchFeedCommentsResponse getFeedComments(Long feedId, Long memberId) {
+        return FetchFeedCommentsResponse.of(
+                feedCommentRepository.findAllByFeedId(feedId).stream()
+                        .map(feedComment -> FetchFeedCommentResponse.builder()
+                                .feedCommentId(feedComment.getId())
+                                .content(feedComment.getContent())
+                                .createdAt(feedComment.getCreatedAt().toLocalDate())
+                                .memberId(feedComment.getMember().getId())
+                                .memberName(feedComment.getMember().getNickname())
+                                .mediaIds(feedCommentMediaService.getFeedCommentMediaIds(feedComment.getId()))
+                                .replyCount(feedReplyService.countFeedRepliesByFeedCommentId(feedComment.getId()))
+                                .likeCount(feedCommentLikeService.countFeedCommentLikeByFeedId(feedComment.getId()))
+                                .isLiked(feedCommentLikeService.isLiked(feedComment.getId(),memberId))
+                                .build()).toList());
+    }
+
+    public int countFeedCommentsByFeedId(Long feedId) {
+        return feedCommentRepository.countByFeedId(feedId);
     }
 
     private void deleteAllRelatedEntities(Long feedCommentId) {
