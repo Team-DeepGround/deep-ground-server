@@ -38,9 +38,8 @@ public class ChatRoomMemberService {
 
     @Transactional
     public void leaveChatRoom(Long chatRoomId, Long memberId) {
-        ChatRoomMember chatRoomMember =
-                chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, memberId)
-                        .orElseThrow(() -> new ChatException(ChatErrorCode.CHATROOM_MEMBER_NOT_FOUND));
+        ChatRoomMember chatRoomMember = chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, memberId)
+                .orElseThrow(() -> new ChatException(ChatErrorCode.CHATROOM_MEMBER_NOT_FOUND));
 
         chatRoomMember.softDelete();
     }
@@ -51,13 +50,21 @@ public class ChatRoomMemberService {
     }
 
     @Transactional(readOnly = true)
+    public ChatRoomMemberInfo getChatRoomMemberInfo(Long chatRoomId, Long memberId, Long otherMemberId) {
+        if (!isChatRoomMember(chatRoomId, memberId)) {
+            throw new ChatException(ChatErrorCode.CHATROOM_ACCESS_DENIED);
+        }
+
+        ChatRoomMember chatRoomMember = chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, otherMemberId)
+                .orElseThrow(() -> new ChatException(ChatErrorCode.CHATROOM_MEMBER_NOT_FOUND));
+
+        return ChatRoomMemberInfo.from(chatRoomMember);
+    }
+
+    @Transactional(readOnly = true)
     public List<ChatRoomMemberInfo> getChatRoomMemberInfos(Long chatRoomId) {
         return chatRoomMemberRepository.findByChatRoomId(chatRoomId).stream()
-                .map(member -> ChatRoomMemberInfo.builder()
-                        .memberId(member.getMember().getId())
-                        .nickname(member.getMember().getNickname())
-                        .lastReadMessageTime(member.getLastReadMessageTime())
-                        .build())
+                .map(ChatRoomMemberInfo::from)
                 .toList();
     }
 }
