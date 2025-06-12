@@ -40,4 +40,5 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
   Optional<StudyGroup> findWithMemberAndCommentsById(@Param("id") Long studyGroupId);
 
   List<StudyGroup> findAllByMember_IdOrderByCreatedAtDesc(Long memberId);
+
 }
