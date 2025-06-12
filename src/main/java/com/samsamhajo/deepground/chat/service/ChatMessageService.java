@@ -9,6 +9,8 @@ import com.samsamhajo.deepground.chat.entity.ChatMedia;
 import com.samsamhajo.deepground.chat.entity.ChatMessage;
 import com.samsamhajo.deepground.chat.entity.ChatMessageMedia;
 import com.samsamhajo.deepground.chat.entity.ChatRoomMember;
+import com.samsamhajo.deepground.chat.exception.ChatErrorCode;
+import com.samsamhajo.deepground.chat.exception.ChatException;
 import com.samsamhajo.deepground.chat.exception.ChatMessageErrorCode;
 import com.samsamhajo.deepground.chat.exception.ChatMessageException;
 import com.samsamhajo.deepground.chat.repository.ChatMediaRepository;
@@ -36,6 +38,15 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatMediaRepository chatMediaRepository;
     private final SseEmitterService sseEmitterService;
+
+    @Transactional(readOnly = true)
+    public ChatMessageListResponse getMessages(Long chatRoomId, Long memberId, LocalDateTime cursor, int limit) {
+        if (!chatRoomMemberRepository.existsByChatRoomIdAndMemberId(chatRoomId, memberId)) {
+            throw new ChatException(ChatErrorCode.CHATROOM_ACCESS_DENIED);
+        }
+
+        return getMessages(chatRoomId, cursor, limit);
+    }
 
     public ChatMessageListResponse getMessages(Long chatRoomId, LocalDateTime cursor, int limit) {
         List<ChatMessage> messages = chatMessageRepository.findByChatRoomIdWithCursor(chatRoomId, cursor, limit);
