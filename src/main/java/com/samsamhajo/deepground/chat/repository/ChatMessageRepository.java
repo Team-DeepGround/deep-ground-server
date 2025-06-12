@@ -7,7 +7,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ChatMessageRepository extends MongoRepository<ChatMessage, String> {
+public interface ChatMessageRepository extends MongoRepository<ChatMessage, String>, ChatMessageCustomRepository {
+
     Optional<ChatMessage> findFirstByChatRoomIdOrderByCreatedAtDesc(Long chatRoomId);
 
     Long countByChatRoomIdAndCreatedAtAfter(Long chatRoomId, LocalDateTime lastReadMessageTime);
