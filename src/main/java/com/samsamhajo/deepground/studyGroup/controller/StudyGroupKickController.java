@@ -18,7 +18,7 @@ public class StudyGroupKickController {
 
   private final StudyGroupKickService studyGroupKickService;
 
-  @PostMapping("/kick")
+  @DeleteMapping("/kick")
   public ResponseEntity<SuccessResponse<?>> kickMember(
       @RequestBody @Valid StudyGroupKickRequest request,
       @RequestAttribute("member") Member requester
