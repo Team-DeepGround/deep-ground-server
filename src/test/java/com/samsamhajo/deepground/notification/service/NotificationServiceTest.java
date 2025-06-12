@@ -8,10 +8,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.samsamhajo.deepground.global.message.MessagePublisher;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.notification.dto.NotificationListResponse;
-import com.samsamhajo.deepground.notification.dto.NotificationResponse;
 import com.samsamhajo.deepground.notification.entity.Notification;
 import com.samsamhajo.deepground.notification.entity.NotificationData;
 import com.samsamhajo.deepground.notification.entity.data.FriendNotificationData;
@@ -19,6 +17,8 @@ import com.samsamhajo.deepground.notification.exception.NotificationErrorCode;
 import com.samsamhajo.deepground.notification.exception.NotificationException;
 import com.samsamhajo.deepground.notification.repository.NotificationDataRepository;
 import com.samsamhajo.deepground.notification.repository.NotificationRepository;
+import com.samsamhajo.deepground.sse.dto.SseEvent;
+import com.samsamhajo.deepground.sse.service.SseEmitterService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -41,13 +41,13 @@ class NotificationServiceTest {
     private NotificationService notificationService;
 
     @Mock
-    private MessagePublisher messagePublisher;
-
-    @Mock
     private NotificationRepository notificationRepository;
 
     @Mock
     private NotificationDataRepository notificationDataRepository;
+
+    @Mock
+    private SseEmitterService sseEmitterService;
 
     @Test
     @DisplayName("수신자에게 알림을 전송한다")
@@ -69,10 +69,9 @@ class NotificationServiceTest {
         List<Notification> savedNotifications = captor.getValue();
         assertThat(savedNotifications).hasSize(1);
 
-        verify(messagePublisher).convertAndSendToUser(
-                eq(String.valueOf(receiverId)),
-                eq("/notifications"),
-                any(NotificationResponse.class)
+        verify(sseEmitterService).broadcast(
+                eq(receiverId),
+                any(SseEvent.class)
         );
     }
 
