@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.qna.question.Dto;
 
+import com.samsamhajo.deepground.qna.question.entity.QuestionTag;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,7 @@ public class QuestionUpdateRequestDto {
     private String title;
     @NotBlank(message = "내용은 필수입니다.")
     private String content;
-    private List<Long> techStacks;
+    private List<String> techStacks;
     private List<MultipartFile> images;
 
 }

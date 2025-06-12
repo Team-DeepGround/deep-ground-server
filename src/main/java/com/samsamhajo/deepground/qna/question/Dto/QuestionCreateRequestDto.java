@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.qna.question.Dto;
 
 
+import com.samsamhajo.deepground.qna.question.entity.QuestionTag;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +20,6 @@ public class QuestionCreateRequestDto {
     @Size(max = 100, message = "제목은 100자 이내로 작성해주세요.")
     private String title;
     private String content;
-    private List<Long> techStacksId;
+    private List<String> techStacks;
     private List<MultipartFile> images;
-
 }
