@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.feed.feed.model;
 
+import com.samsamhajo.deepground.feed.feedshared.model.FetchSharedFeedResponse;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -22,4 +23,7 @@ public class FetchFeedResponse {
     private int profileImageId;
     private LocalDate createdAt;
     private List<Long> mediaIds;
+
+    private boolean isShared;
+    private FetchSharedFeedResponse sharedFeed;
 } 
