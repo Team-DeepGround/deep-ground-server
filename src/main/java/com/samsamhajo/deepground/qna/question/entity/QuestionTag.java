@@ -23,7 +23,7 @@ public class QuestionTag extends BaseEntity {
     private Question question;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "teck_stack_id")
+    @JoinColumn(name = "tech_stack_id")
     private TechStack techStack;
 
     private QuestionTag(Question question, TechStack techStack) {

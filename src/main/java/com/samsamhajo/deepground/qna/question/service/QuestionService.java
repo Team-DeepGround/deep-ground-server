@@ -2,28 +2,38 @@ package com.samsamhajo.deepground.qna.question.service;
 
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateRequestDto;
+import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateResponseDto;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionUpdateResponseDto;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionUpdateRequestDto;
 import com.samsamhajo.deepground.qna.question.entity.Question;
+import com.samsamhajo.deepground.qna.question.entity.QuestionTag;
 import com.samsamhajo.deepground.qna.question.exception.QuestionErrorCode;
 import com.samsamhajo.deepground.qna.question.exception.QuestionException;
 import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
+import com.samsamhajo.deepground.qna.question.repository.QuestionTagRepository;
+import com.samsamhajo.deepground.techStack.entity.TechStack;
+import com.samsamhajo.deepground.techStack.repository.TechStackRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class QuestionService{
 
     private final QuestionRepository questionRepository;
-    private final MemberRepository memberRepository;
     private final QuestionMediaService questionMediaService;
+    private final QuestionTagRepository questionTagRepository;
+    private final TechStackRepository techStackRepository;
+    private final QuestionTagService questionTagService;
 
     //질문 생성
     @Transactional
-    public Question createQuestion(QuestionCreateRequestDto questionCreateRequestDto, Long memberId) {
+    public QuestionCreateResponseDto createQuestion(QuestionCreateRequestDto questionCreateRequestDto, Long memberId) {
 //       Member member = memberRepository.findById(memberId)
 //                .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다."));
 
@@ -41,10 +51,25 @@ public class QuestionService{
                 null
         );
 
-        questionRepository.save(question);
+        Question saved = questionRepository.save(question);
         createQuestionMedia(questionCreateRequestDto, question);
 
-        return question;
+        List<String> techStacks = questionCreateRequestDto.getTechStacks();
+        for (String name : techStacks) {
+            TechStack techStack = techStackRepository.findByName(name)
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 태그: " + name));
+            QuestionTag questionTag = QuestionTag.of(saved, techStack);
+            questionTagRepository.save(questionTag);
+        }
+        System.out.println(techStacks);
+
+        return QuestionCreateResponseDto.of(
+                saved.getId(),
+                saved.getTitle(),
+                saved.getContent(),
+                null,
+                techStacks
+        );
     }
 
     @Transactional
@@ -57,12 +82,13 @@ public class QuestionService{
 
         questionMediaService.deleteQuestionMedia(questionId);
         questionRepository.deleteById(questionId);
-
+        questionTagRepository.deleteAllByQuestionId(questionId);
 
         return question.getId();
 
     }
 
+    @Transactional
     public QuestionUpdateResponseDto updateQuestion(QuestionUpdateRequestDto questionUpdateRequestDto, Long memberId) {
 
 //        Member member = memberRepository.findById(memberId)
@@ -79,12 +105,23 @@ public class QuestionService{
         Question question = questionRepository.findById(questionUpdateRequestDto.getQuestionId())
                 .orElseThrow(()-> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
 
+        questionTagRepository.deleteAllByQuestionId(question.getId());
+
+        List<String> techStacks = questionUpdateRequestDto.getTechStacks(); // ["Java", "Spring", ...]
+        for (String name : techStacks) {
+            TechStack techStack = techStackRepository.findByName(name)
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 태그: " + name));
+            QuestionTag questionTag = QuestionTag.of(question, techStack);
+            questionTagRepository.save(questionTag);
+        }
+
+
         QuestionUpdateResponseDto questionUpdateResponseDto = QuestionUpdateResponseDto.of(
                 questionUpdateRequestDto.getQuestionId(),
                 questionUpdateRequestDto.getTitle(),
                 questionUpdateRequestDto.getContent(),
-                null
-
+                null,
+                techStacks
         );
 
         question.updateQuesiton(questionUpdateRequestDto.getTitle(), questionUpdateRequestDto.getContent());
