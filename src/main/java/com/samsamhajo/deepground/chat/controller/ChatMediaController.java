@@ -3,7 +3,7 @@ package com.samsamhajo.deepground.chat.controller;
 import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.chat.dto.ChatMediaResponse;
 import com.samsamhajo.deepground.chat.service.ChatMediaService;
-import com.samsamhajo.deepground.chat.success.ChatMediaSuccessCode;
+import com.samsamhajo.deepground.chat.success.ChatSuccessCode;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +34,6 @@ public class ChatMediaController {
 
         ChatMediaResponse response = chatMediaService.uploadChatMedia(chatRoomId, memberId, files);
         return ResponseEntity
-                .ok(SuccessResponse.of(ChatMediaSuccessCode.CHAT_MEDIA_UPLOADED, response));
+                .ok(SuccessResponse.of(ChatSuccessCode.CHAT_MEDIA_UPLOADED, response));
     }
 }
