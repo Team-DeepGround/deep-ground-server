@@ -22,11 +22,11 @@ public class MemberController {
     private final MemberService memberService;
 
     @PutMapping("/profile")
-    public ResponseEntity<SuccessResponse> editMemberProfile(@RequestBody @Valid MemberProfileDto memberprofile,
+    public ResponseEntity<SuccessResponse> editMemberProfile(@RequestBody @Valid MemberProfileDto memberProfile,
                                                              @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         Long memberId = userDetails.getMember().getId();
-        MemberProfileDto profile = memberService.editMemberProfile(memberId, memberprofile);
+        MemberProfileDto profile = memberService.editMemberProfile(memberId, memberProfile);
         return ResponseEntity
                 .ok(SuccessResponse.of(ProfileSuccessCode.PROFILE_SUCCESS_CODE,profile));
 
