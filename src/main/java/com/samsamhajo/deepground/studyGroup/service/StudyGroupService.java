@@ -89,7 +89,8 @@ public class StudyGroupService {
         request.getGroupMemberCount(),
         creator,
         request.getIsOffline(),
-        request.getStudyLocation()
+        request.getStudyLocation(),
+        request.getTechTags()
     );
 
     StudyGroup savedGroup = studyGroupRepository.save(studyGroup);

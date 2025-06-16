@@ -16,24 +16,24 @@ public class SwaggerConfig {
 
   @Bean
   public OpenAPI openAPI() {
-//    SecurityScheme securityScheme = getSecurityScheme();
-//    SecurityRequirement securityRequirement = getSecurityRequireMent();
+    SecurityScheme securityScheme = getSecurityScheme();
+    SecurityRequirement securityRequirement = getSecurityRequireMent();
 
     return new OpenAPI()
         .info(new Info()
             .title("DeepGround Server API")
             .description("DeepGround APIs")
-            .version("1.0.0"));
-//        .components(new Components().addSecuritySchemes("bearerAuth", securityScheme))
-//        .security(List.of(securityRequirement))
+            .version("1.0.0"))
+        .components(new Components().addSecuritySchemes("bearerAuth", securityScheme))
+        .security(List.of(securityRequirement));
   }
 
-//  private SecurityScheme getSecurityScheme() {
-//    return new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")
-//        .in(SecurityScheme.In.HEADER).name("Authorization");
-//  }
-//
-//  private SecurityRequirement getSecurityRequireMent() {
-//    return new SecurityRequirement().addList("bearerAuth");
-//  }
+  private SecurityScheme getSecurityScheme() {
+    return new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")
+        .in(SecurityScheme.In.HEADER).name("Authorization");
+  }
+
+  private SecurityRequirement getSecurityRequireMent() {
+    return new SecurityRequirement().addList("bearerAuth");
+  }
 }

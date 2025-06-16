@@ -56,6 +56,10 @@ public class StudyGroup extends BaseEntity {
     @Column(name = "study_location")
     private String studyLocation;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    private Set<TechTag> techTags = new HashSet<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
@@ -74,7 +78,7 @@ public class StudyGroup extends BaseEntity {
         ChatRoom chatRoom, String title, String explanation,
         LocalDate studyStartDate, LocalDate studyEndDate,
         LocalDate recruitStartDate, LocalDate recruitEndDate,
-        Integer groupMemberCount, Member member, Boolean isOffline, String studyLocation
+        Integer groupMemberCount, Member member, Boolean isOffline, String studyLocation, Set<TechTag> techTags
     ) {
         this.chatRoom = chatRoom;
         this.title = title;
@@ -87,19 +91,20 @@ public class StudyGroup extends BaseEntity {
         this.member = member;
         this.isOffline = isOffline;
         this.studyLocation = studyLocation;
+        this.techTags = techTags;
     }
 
   public static StudyGroup of(
         ChatRoom chatRoom, String title, String explanation,
         LocalDate studyStartDate, LocalDate studyEndDate,
         LocalDate recruitStartDate, LocalDate recruitEndDate,
-        Integer groupMemberCount, Member member, Boolean isOffline, String studyLocation
+        Integer groupMemberCount, Member member, Boolean isOffline, String studyLocation, Set<TechTag> techTags
     ) {
         return new StudyGroup(
             chatRoom, title, explanation,
             studyStartDate, studyEndDate,
             recruitStartDate, recruitEndDate,
-            groupMemberCount, member, isOffline, studyLocation
+            groupMemberCount, member, isOffline, studyLocation, techTags
         );
     }
 
