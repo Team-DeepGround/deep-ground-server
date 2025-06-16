@@ -1,11 +1,9 @@
 package com.samsamhajo.deepground.qna.question.controller;
 
 import com.samsamhajo.deepground.global.success.SuccessResponse;
-import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateRequestDto;
-import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateResponseDto;
-import com.samsamhajo.deepground.qna.question.Dto.QuestionUpdateRequestDto;
-import com.samsamhajo.deepground.qna.question.Dto.QuestionUpdateResponseDto;
+import com.samsamhajo.deepground.qna.question.Dto.*;
 import com.samsamhajo.deepground.qna.question.exception.QuestionSuccessCode;
+import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
 import com.samsamhajo.deepground.qna.question.service.QuestionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -58,6 +56,18 @@ public class QuestionController {
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.of(QuestionSuccessCode.QUESTION_DELETED, questionId));
 
+    }
+
+    @PatchMapping("/{questionId}/status")
+    public ResponseEntity<SuccessResponse> updateStatusQuestion(
+            @ModelAttribute QuestionUpdateStatusRequestDto questionUpdateStatusRequestDto,
+            @PathVariable Long questionId, @RequestParam Long memberId) {
+
+        QuestionUpdateStatusResponseDto questionUpdateStatusResponseDto = questionService.updateQuestionStatus(questionUpdateStatusRequestDto, memberId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.of(QuestionSuccessCode.QUESTION_STATUS_UPDATED, questionUpdateStatusResponseDto));
     }
 
 
