@@ -22,11 +22,11 @@ public class MemberController {
 
     @PutMapping("/{memberId}/profile")
     public ResponseEntity<SuccessResponse> editMemberProfile(@RequestParam Long memberId,
-                                                             @RequestBody @Valid MemberProfileDto memberprofile) {
+        @RequestBody @Valid MemberProfileDto memberprofile) {
 
         MemberProfileDto profile = memberService.editMemberProfile(memberId, memberprofile);
         return ResponseEntity
-                .ok(SuccessResponse.of(ProfileSuccessCode.PROFILE_SUCCESS_CODE,profile));
+            .ok(SuccessResponse.of(ProfileSuccessCode.PROFILE_SUCCESS_CODE,profile));
 
     }
 }

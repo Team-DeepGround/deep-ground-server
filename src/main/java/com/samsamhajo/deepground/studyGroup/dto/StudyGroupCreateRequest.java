@@ -1,6 +1,8 @@
 package com.samsamhajo.deepground.studyGroup.dto;
 
+import com.samsamhajo.deepground.studyGroup.entity.TechTag;
 import jakarta.validation.constraints.*;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,4 +43,6 @@ public class StudyGroupCreateRequest {
   private Boolean isOffline;
 
   private String studyLocation; // isOffline이 true일 때만 필요
+
+  private Set<TechTag> techTags;
 }

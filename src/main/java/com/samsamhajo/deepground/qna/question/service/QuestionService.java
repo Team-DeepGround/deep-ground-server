@@ -28,6 +28,7 @@ public class QuestionService{
     private final QuestionTagRepository questionTagRepository;
     private final TechStackRepository techStackRepository;
     private final MemberRepository memberRepository;
+    private final QuestionTagService questionTagService;
 
     //질문 생성
     @Transactional
@@ -51,21 +52,16 @@ public class QuestionService{
 
         Question saved = questionRepository.save(question);
         createQuestionMedia(questionCreateRequestDto, question);
+        questionTagService.createQuestionTag(question, questionCreateRequestDto.getTechStacks());
 
-        List<String> techStacks = questionCreateRequestDto.getTechStacks();
-        for (String name : techStacks) {
-            TechStack techStack = techStackRepository.findByName(name)
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 태그: " + name));
-            QuestionTag questionTag = QuestionTag.of(saved, techStack);
-            questionTagRepository.save(questionTag);
-        }
+
 
         return QuestionCreateResponseDto.of(
                 saved.getId(),
                 saved.getTitle(),
                 saved.getContent(),
                 memberId,
-                techStacks
+                questionCreateRequestDto.getTechStacks()
         );
     }
 
@@ -77,9 +73,9 @@ public class QuestionService{
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
 
+        questionTagRepository.deleteAllByQuestionId(questionId);
         questionMediaService.deleteQuestionMedia(questionId);
         questionRepository.deleteById(questionId);
-        questionTagRepository.deleteAllByQuestionId(questionId);
 
         return question.getId();
 
@@ -104,7 +100,7 @@ public class QuestionService{
 
         questionTagRepository.deleteAllByQuestionId(question.getId());
 
-        List<String> techStacks = questionUpdateRequestDto.getTechStacks(); // ["Java", "Spring", ...]
+        List<String> techStacks = questionUpdateRequestDto.getTechStacks();
         for (String name : techStacks) {
             TechStack techStack = techStackRepository.findByName(name)
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 태그: " + name));
@@ -122,7 +118,6 @@ public class QuestionService{
         );
 
         question.updateQuesiton(questionUpdateRequestDto.getTitle(), questionUpdateRequestDto.getContent());
-
         questionMediaService.deleteQuestionMedia(question.getId());
         updateQuestionMedia(questionUpdateRequestDto, question);
 

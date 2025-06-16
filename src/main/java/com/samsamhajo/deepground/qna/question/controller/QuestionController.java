@@ -2,7 +2,6 @@ package com.samsamhajo.deepground.qna.question.controller;
 
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.qna.question.Dto.*;
-import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.exception.QuestionSuccessCode;
 import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
 import com.samsamhajo.deepground.qna.question.service.QuestionService;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 public class QuestionController {
 
     private final QuestionService questionService;
-    private final QuestionRepository questionRepository;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse> createQuestion(
@@ -50,7 +48,7 @@ public class QuestionController {
     @DeleteMapping("/{questionId}")
     public ResponseEntity<SuccessResponse> deleteQuestion(
             @PathVariable Long questionId
-            ,       @RequestParam Long memberId) {
+            ,@RequestParam Long memberId) {
 
         questionService.deleteQuestion(questionId, memberId);
 
