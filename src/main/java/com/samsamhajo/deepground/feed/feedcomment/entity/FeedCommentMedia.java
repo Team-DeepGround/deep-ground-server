@@ -25,7 +25,7 @@ public class FeedCommentMedia extends BaseEntity {
     private String extension;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "feed_id")
+    @JoinColumn(name = "feed_comment_id")
     private FeedComment feedComment;
 
     private FeedCommentMedia(String mediaUrl, String extension, FeedComment feedComment) {

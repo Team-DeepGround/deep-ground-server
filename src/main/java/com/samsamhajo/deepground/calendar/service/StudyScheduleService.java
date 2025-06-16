@@ -2,12 +2,16 @@ package com.samsamhajo.deepground.calendar.service;
 
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleRequestDto;
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleResponseDto;
+import com.samsamhajo.deepground.calendar.entity.MemberStudySchedule;
 import com.samsamhajo.deepground.calendar.entity.StudySchedule;
 import com.samsamhajo.deepground.calendar.exception.ScheduleErrorCode;
 import com.samsamhajo.deepground.calendar.exception.ScheduleException;
 import com.samsamhajo.deepground.calendar.repository.MemberStudyScheduleRepository;
 import com.samsamhajo.deepground.calendar.repository.StudyScheduleRepository;
+import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
+import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +26,7 @@ public class StudyScheduleService {
     private final StudyScheduleRepository studyScheduleRepository;
     private final StudyGroupRepository studyGroupRepository;
     private final MemberStudyScheduleRepository memberStudyScheduleRepository;
+    private final StudyGroupMemberRepository studyGroupMemberRepository;
 
     @Transactional
     public StudyScheduleResponseDto createStudySchedule(Long studyGroupId, StudyScheduleRequestDto requestDto) {
@@ -39,6 +44,18 @@ public class StudyScheduleService {
         );
 
         StudySchedule savedSchedule = studyScheduleRepository.save(studySchedule);
+
+        List<Member> members = studyGroupMemberRepository
+                .findAllByStudyGroupIdAndIsAllowedTrue(studyGroupId)
+                .stream()
+                .map(StudyGroupMember::getMember)
+                .toList();
+
+        List<MemberStudySchedule> memberStudySchedules = members.stream()
+                .map(member -> MemberStudySchedule.of(member, studySchedule, null, false, null))
+                .toList();
+
+        memberStudyScheduleRepository.saveAll(memberStudySchedules);
 
         return StudyScheduleResponseDto.from(savedSchedule);
     }

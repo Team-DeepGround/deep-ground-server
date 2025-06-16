@@ -2,8 +2,11 @@ package com.samsamhajo.deepground.global.config;
 
 import com.samsamhajo.deepground.auth.jwt.JwtAuthenticationFilter;
 import com.samsamhajo.deepground.auth.jwt.JwtProvider;
+import com.samsamhajo.deepground.auth.oauth.CustomOAuth2UserService;
+import com.samsamhajo.deepground.auth.oauth.OAuth2AuthenticationSuccessHandler;
 import com.samsamhajo.deepground.auth.security.CustomUserDetailsService;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -17,7 +20,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
     private static final String[] PERMIT_URL_ARRAY = {
             "/v3/api-docs/**",
@@ -41,8 +48,7 @@ public class SecurityConfig {
             HttpSecurity http,
             JwtProvider jwtProvider,
             CustomUserDetailsService userDetailsService,
-            MemberRepository memberRepository
-    ) throws Exception {
+            MemberRepository memberRepository) throws Exception {
         http.authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(PERMIT_URL_ARRAY).permitAll()
                         .anyRequest().authenticated())
@@ -51,8 +57,13 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(
                         new JwtAuthenticationFilter(jwtProvider, userDetailsService, memberRepository),
-                        UsernamePasswordAuthenticationFilter.class
-                );
+                        UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService))
+                        .redirectionEndpoint(redirection -> redirection
+                                .baseUri("/auth/oauth/*/callback"))
+                        .successHandler(oAuth2AuthenticationSuccessHandler));
 
         return http.build();
     }

@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.calendar.service;
 
 import com.samsamhajo.deepground.calendar.dto.MemberScheduleCalendarResponseDto;
+import com.samsamhajo.deepground.calendar.dto.MemberScheduleDetailResponseDto;
 import com.samsamhajo.deepground.calendar.dto.MemberStudyScheduleRequestDto;
 import com.samsamhajo.deepground.calendar.dto.MemberStudyScheduleResponseDto;
 import com.samsamhajo.deepground.calendar.entity.MemberStudySchedule;
@@ -52,10 +53,8 @@ public class MemberStudyScheduleServiceTest {
         when(studySchedule.getTitle()).thenReturn("스터디 일정 제목");
         when(studySchedule.getStartTime()).thenReturn(LocalDateTime.of(2025, 5, 30, 14, 0));
         when(studySchedule.getEndTime()).thenReturn(LocalDateTime.of(2025, 5, 30, 16, 0));
-        when(studySchedule.getDescription()).thenReturn("스터디 일정 설명");
-        when(studySchedule.getLocation()).thenReturn("온라인");
 
-        MemberStudySchedule memberStudySchedule = MemberStudySchedule.of(studySchedule, true, true, "memo");
+        MemberStudySchedule memberStudySchedule = MemberStudySchedule.of(member, studySchedule, true, true, "memo");
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
         when(memberStudyScheduleRepository.findAllByMemberId(memberId)).thenReturn(List.of(memberStudySchedule));
@@ -71,11 +70,6 @@ public class MemberStudyScheduleServiceTest {
         assertThat(dto.getTitle()).isEqualTo("스터디 일정 제목");
         assertThat(dto.getStartTime()).isEqualTo(LocalDateTime.of(2025, 5, 30, 14, 0));
         assertThat(dto.getEndTime()).isEqualTo(LocalDateTime.of(2025, 5, 30, 16, 0));
-        assertThat(dto.getDescription()).isEqualTo("스터디 일정 설명");
-        assertThat(dto.getLocation()).isEqualTo("온라인");
-        assertThat(dto.getIsAvailable()).isTrue();
-        assertThat(dto.getIsImportant()).isTrue();
-        assertThat(dto.getMemo()).isEqualTo("memo");
     }
 
     @Test
@@ -95,13 +89,64 @@ public class MemberStudyScheduleServiceTest {
     }
 
     @Test
+    @DisplayName("멤버 스터디 일정 상세 정보 조회 성공")
+    void getMemberStudySchedule_success() {
+        // given
+        Long memberStudyScheduleId = 1L;
+
+        // studySchedule mock 설정
+        StudySchedule studySchedule = mock(StudySchedule.class);
+        when(studySchedule.getTitle()).thenReturn("자바 스터디");
+        when(studySchedule.getStartTime()).thenReturn(LocalDateTime.of(2025, 6, 4, 14, 0));
+        when(studySchedule.getEndTime()).thenReturn(LocalDateTime.of(2025, 6, 4, 16, 0));
+        when(studySchedule.getDescription()).thenReturn("자바 공부");
+        when(studySchedule.getLocation()).thenReturn("온라인");
+
+        // memberStudySchedule mock 설정\
+        MemberStudySchedule memberStudySchedule = mock(MemberStudySchedule.class);
+        when(memberStudySchedule.getId()).thenReturn(memberStudyScheduleId);
+        when(memberStudySchedule.getIsAvailable()).thenReturn(true);
+        when(memberStudySchedule.getIsImportant()).thenReturn(true);
+        when(memberStudySchedule.getMemo()).thenReturn("메모");
+        when(memberStudySchedule.getStudySchedule()).thenReturn(studySchedule);
+
+        when(memberStudyScheduleRepository.findById(memberStudyScheduleId))
+                .thenReturn(Optional.of(memberStudySchedule));
+
+        // when
+        MemberScheduleDetailResponseDto responseDto = memberStudyScheduleService.getScheduleByMemberScheduleId(memberStudyScheduleId);
+
+        // then
+        assertThat(responseDto.getIsAvailable()).isTrue();
+        assertThat(responseDto.getIsImportant()).isTrue();
+        assertThat(responseDto.getMemo()).isEqualTo("메모");
+        assertThat(responseDto.getTitle()).isEqualTo("자바 스터디");
+        assertThat(responseDto.getStartTime()).isEqualTo(LocalDateTime.of(2025, 6, 4, 14, 0));
+    }
+
+    @Test
+    @DisplayName("멤버 스터디 일정 상세 정보 조회 실패 - 존재하지 않는 일정")
+    void getMemberStudySchedule_fail_scheduleNotFound() {
+        // given
+        Long memberStudyScheduleId = 1L;
+        when(memberStudyScheduleRepository.findById(memberStudyScheduleId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> memberStudyScheduleService.getScheduleByMemberScheduleId(memberStudyScheduleId))
+                .isInstanceOf(ScheduleException.class)
+                .hasMessageContaining(ScheduleErrorCode.SCHEDULE_NOT_FOUND.getMessage());
+    }
+
+    @Test
     @DisplayName("참석 선택 + 중요 일정 체크/메모 추가 성공")
-    void update_MemberStudySchedule_Success () {
+    void updateMemberStudySchedule_Success () {
         // given
         Long memberStudyScheduleId = 1L;
 
         StudySchedule studySchedule = mock(StudySchedule.class);
-        MemberStudySchedule memberStudySchedule = MemberStudySchedule.of(studySchedule, false, false, null);
+        Member member = mock(Member.class);
+
+        MemberStudySchedule memberStudySchedule = MemberStudySchedule.of(member, studySchedule, false, false, null);
 
         MemberStudyScheduleRequestDto requestDto = MemberStudyScheduleRequestDto.builder()
                 .isAvailable(true)
@@ -113,7 +158,7 @@ public class MemberStudyScheduleServiceTest {
                 .thenReturn(Optional.of(memberStudySchedule));
 
         // when
-        MemberStudyScheduleResponseDto response = memberStudyScheduleService.update(memberStudyScheduleId, requestDto);
+        MemberStudyScheduleResponseDto response = memberStudyScheduleService.updateMemberStudySchedule(memberStudyScheduleId, requestDto);
 
         // then
         assertThat(response.getId()).isEqualTo(memberStudySchedule.getId());
@@ -137,7 +182,7 @@ public class MemberStudyScheduleServiceTest {
         when(memberStudyScheduleRepository.findById(invalidMemberStudyScheduleId))
                 .thenReturn(Optional.empty());
         // when & then
-        assertThatThrownBy(() -> memberStudyScheduleService.update(invalidMemberStudyScheduleId, requestDto))
+        assertThatThrownBy(() -> memberStudyScheduleService.updateMemberStudySchedule(invalidMemberStudyScheduleId, requestDto))
                 .isInstanceOf(ScheduleException.class)
                 .hasMessageContaining(ScheduleErrorCode.SCHEDULE_NOT_FOUND.getMessage());
         }

@@ -8,6 +8,7 @@ import com.samsamhajo.deepground.calendar.exception.ScheduleException;
 import com.samsamhajo.deepground.calendar.repository.MemberStudyScheduleRepository;
 import com.samsamhajo.deepground.calendar.repository.StudyScheduleRepository;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
+import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,6 +39,9 @@ class StudyScheduleServiceTest {
 
     @Mock
     private MemberStudyScheduleRepository memberStudyScheduleRepository;
+
+    @Mock
+    private StudyGroupMemberRepository studyGroupMemberRepository;
 
     @InjectMocks
     private StudyScheduleService studyScheduleService;
@@ -97,6 +101,7 @@ class StudyScheduleServiceTest {
                 eq(requestDto.getEndTime())
         );
         verify(studyScheduleRepository, times(1)).save(any(StudySchedule.class));
+        verify(memberStudyScheduleRepository,times(1)).saveAll(anyList());
     }
 
     @Test

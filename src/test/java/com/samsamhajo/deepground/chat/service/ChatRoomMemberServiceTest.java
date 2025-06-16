@@ -2,19 +2,22 @@ package com.samsamhajo.deepground.chat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.samsamhajo.deepground.chat.dto.ChatRoomMemberInfo;
 import com.samsamhajo.deepground.chat.entity.ChatMessage;
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
 import com.samsamhajo.deepground.chat.entity.ChatRoomMember;
-import com.samsamhajo.deepground.chat.exception.ChatRoomErrorCode;
-import com.samsamhajo.deepground.chat.exception.ChatRoomException;
+import com.samsamhajo.deepground.chat.exception.ChatErrorCode;
+import com.samsamhajo.deepground.chat.exception.ChatException;
 import com.samsamhajo.deepground.chat.repository.ChatMessageRepository;
 import com.samsamhajo.deepground.chat.repository.ChatRoomMemberRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,6 +45,7 @@ class ChatRoomMemberServiceTest {
     private ChatRoom chatRoom;
     private final Long memberId = 1L;
     private final Long chatRoomId = 1L;
+    private final Long otherMemberId = 100L;
 
     @BeforeEach
     void setUp() {
@@ -83,11 +87,11 @@ class ChatRoomMemberServiceTest {
             // given
             ChatRoomMember chatRoomMember = mock(ChatRoomMember.class);
 
-            when(chatRoomMemberRepository.findByMemberIdAndChatRoomId(memberId, chatRoomId))
+            when(chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, memberId))
                     .thenReturn(Optional.of(chatRoomMember));
 
             // when
-            chatRoomMemberService.leaveChatRoom(memberId, chatRoomId);
+            chatRoomMemberService.leaveChatRoom(chatRoomId, memberId);
 
             // then
             verify(chatRoomMember).softDelete();
@@ -97,13 +101,88 @@ class ChatRoomMemberServiceTest {
         @DisplayName("채팅방 멤버를 찾을 수 없다면 예외가 발생한다")
         void leaveChatRoom_notFound() {
             // given
-            when(chatRoomMemberRepository.findByMemberIdAndChatRoomId(memberId, chatRoomId))
+            when(chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, memberId))
                     .thenReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> chatRoomMemberService.leaveChatRoom(memberId, chatRoomId))
-                    .isInstanceOf(ChatRoomException.class)
-                    .hasMessage(ChatRoomErrorCode.MEMBER_NOT_FOUND.getMessage());
+            assertThatThrownBy(() -> chatRoomMemberService.leaveChatRoom(chatRoomId, memberId))
+                    .isInstanceOf(ChatException.class)
+                    .hasMessage(ChatErrorCode.CHATROOM_MEMBER_NOT_FOUND.getMessage());
         }
+    }
+
+    @Test
+    @DisplayName("채팅방 멤버를 조회한다")
+    void getChatRoomMemberInfo_success() {
+        // given
+        ChatRoom chatRoom = mock(ChatRoom.class);
+        LocalDateTime lastReadMessageTime = LocalDateTime.now();
+        Member member = Member.createLocalMember("test@test.com", "password", "test");
+        ChatRoomMember otherMember = ChatRoomMember.of(member, chatRoom, lastReadMessageTime);
+
+        when(chatRoomMemberRepository.existsByChatRoomIdAndMemberId(chatRoomId, memberId)).thenReturn(true);
+        when(chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, otherMemberId))
+                .thenReturn(Optional.of(otherMember));
+
+        // when
+        ChatRoomMemberInfo info = chatRoomMemberService.getChatRoomMemberInfo(chatRoomId, memberId, otherMemberId);
+
+        // then
+        verify(chatRoomMemberRepository).findByChatRoomIdAndMemberId(eq(chatRoomId), eq(otherMemberId));
+        assertThat(info).isNotNull();
+        assertThat(info.getNickname()).isEqualTo(member.getNickname());
+        assertThat(info.getLastReadMessageTime()).isEqualTo(otherMember.getLastReadMessageTime());
+    }
+
+    @Test
+    @DisplayName("채팅방에 접근할 수 없다면 예외가 발생한다")
+    void getChatRoomMemberInfo_accessDenied_throwsException() {
+        // given
+        when(chatRoomMemberRepository.existsByChatRoomIdAndMemberId(chatRoomId, memberId)).thenReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> chatRoomMemberService.getChatRoomMemberInfo(chatRoomId, memberId, otherMemberId))
+                .isInstanceOf(ChatException.class)
+                .hasMessage(ChatErrorCode.CHATROOM_ACCESS_DENIED.getMessage());
+    }
+
+    @Test
+    @DisplayName("채팅방 멤버를 찾을 수 없다면 예외가 발생한다")
+    void getChatRoomMemberInfo_notFound_throwsException() {
+        // given
+        when(chatRoomMemberRepository.existsByChatRoomIdAndMemberId(chatRoomId, memberId)).thenReturn(true);
+        when(chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, otherMemberId))
+                .thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> chatRoomMemberService.getChatRoomMemberInfo(chatRoomId, memberId, otherMemberId))
+                .isInstanceOf(ChatException.class)
+                .hasMessage(ChatErrorCode.CHATROOM_MEMBER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("채팅방의 모든 멤버를 조회한다")
+    void getChatRoomMemberInfos_success() {
+        // given
+        ChatRoom chatRoom = mock(ChatRoom.class);
+        LocalDateTime lastReadMessageTime = LocalDateTime.now();
+        Member member1 = Member.createLocalMember("a@test.com", "password", "test1");
+        Member member2 = Member.createLocalMember("b@test.com", "password", "test2");
+        Member member3 = Member.createLocalMember("c@test.com", "password", "test3");
+        List<ChatRoomMember> members = List.of(
+                ChatRoomMember.of(member1, chatRoom, lastReadMessageTime),
+                ChatRoomMember.of(member2, chatRoom, lastReadMessageTime),
+                ChatRoomMember.of(member3, chatRoom, lastReadMessageTime)
+        );
+
+        when(chatRoomMemberRepository.findByChatRoomId(chatRoomId)).thenReturn(members);
+
+        // when
+        List<ChatRoomMemberInfo> infos = chatRoomMemberService.getChatRoomMemberInfos(chatRoomId);
+
+        // then
+        verify(chatRoomMemberRepository).findByChatRoomId(eq(chatRoomId));
+        assertThat(infos).isNotNull();
+        assertThat(infos).hasSize(3);
     }
 }

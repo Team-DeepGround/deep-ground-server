@@ -3,11 +3,12 @@ package com.samsamhajo.deepground.chat.service;
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
 import com.samsamhajo.deepground.chat.entity.ChatRoomMember;
 import com.samsamhajo.deepground.chat.entity.ChatRoomType;
-import com.samsamhajo.deepground.chat.exception.ChatRoomErrorCode;
-import com.samsamhajo.deepground.chat.exception.ChatRoomException;
+import com.samsamhajo.deepground.chat.exception.ChatErrorCode;
+import com.samsamhajo.deepground.chat.exception.ChatException;
 import com.samsamhajo.deepground.chat.repository.ChatRoomMemberRepository;
 import com.samsamhajo.deepground.chat.repository.ChatRoomRepository;
 import com.samsamhajo.deepground.member.entity.Member;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +43,9 @@ public class ChatRoomService {
     }
 
     private void addInitialMember(ChatRoom chatRoom, Member... members) {
+        LocalDateTime lastReadMessageTime = LocalDateTime.now();
         List<ChatRoomMember> chatRoomMembers = Arrays.stream(members)
-                .map(member -> ChatRoomMember.of(member, chatRoom))
+                .map(member -> ChatRoomMember.of(member, chatRoom, lastReadMessageTime))
                 .toList();
         chatRoomMemberRepository.saveAll(chatRoomMembers);
     }
@@ -51,7 +53,7 @@ public class ChatRoomService {
     @Transactional
     public void deleteChatRoom(Long chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new ChatRoomException(ChatRoomErrorCode.ROOM_NOT_FOUND));
+                .orElseThrow(() -> new ChatException(ChatErrorCode.CHATROOM_NOT_FOUND));
 
         chatRoomMemberRepository.softDeleteByChatRoomId(chatRoomId);
         chatRoom.softDelete();

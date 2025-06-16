@@ -42,8 +42,10 @@ public class MemberStudySchedule extends BaseEntity {
         this.memo = memo;
     }
 
-    public static MemberStudySchedule of(StudySchedule studySchedule, Boolean isAvailable, Boolean isImportant, String memo) {
-        return new MemberStudySchedule(studySchedule, isAvailable, isImportant, memo);
+    public static MemberStudySchedule of(Member member, StudySchedule studySchedule, Boolean isAvailable, Boolean isImportant, String memo) {
+        MemberStudySchedule memberStudySchedule =  new MemberStudySchedule(studySchedule, isAvailable, isImportant, memo);
+        memberStudySchedule.member = member;
+        return memberStudySchedule;
     }
 
     public void updateAvailable(Boolean isAvailable) {

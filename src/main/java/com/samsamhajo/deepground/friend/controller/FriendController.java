@@ -77,6 +77,7 @@ public class FriendController {
     public ResponseEntity<SuccessResponse> requestProfileFriend(@PathVariable Long receiverId,
                                                                 @AuthenticationPrincipal Member member) {
         Long friendId = friendService.sendProfileFriendRequest(member.getId(), receiverId);
+
         return ResponseEntity
                 .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_REQUEST,friendId));
     }

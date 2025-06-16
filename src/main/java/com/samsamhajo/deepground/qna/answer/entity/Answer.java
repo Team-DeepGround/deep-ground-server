@@ -56,4 +56,11 @@ public class Answer {
     public void updateAnswer(String answerContent) {
         this.answerContent = answerContent;
     }
+
+    public void incrementAnswerLikeCount() {
+        answerLikeCount++;
+    }
+    public void decrementAnswerLikeCount() {
+        if (answerLikeCount>0) answerLikeCount--;
+    }
 }
