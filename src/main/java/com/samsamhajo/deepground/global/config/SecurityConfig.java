@@ -6,6 +6,9 @@ import com.samsamhajo.deepground.auth.oauth.CustomOAuth2UserService;
 import com.samsamhajo.deepground.auth.oauth.OAuth2AuthenticationSuccessHandler;
 import com.samsamhajo.deepground.auth.security.CustomUserDetailsService;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,7 +38,8 @@ public class SecurityConfig {
             "/v3/api-docs.yaml",
             "/auth/**",
             "/ws/**",
-            "/**"
+            "/auth/**",
+//            "/**"
     };
 
     @Bean
@@ -55,6 +59,19 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception
+                    .authenticationEntryPoint((request, response, authException) -> {
+                        Logger logger = LoggerFactory.getLogger("SecurityExceptionLogger");
+
+                        // 로그 출력
+                        logger.warn("인증 실패: {} - {}",
+                            request.getRequestURI(),
+                            authException.getMessage());
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"message\": \"Unauthorized\"}");
+                    })
+                )
                 .addFilterBefore(
                         new JwtAuthenticationFilter(jwtProvider, userDetailsService, memberRepository),
                         UsernamePasswordAuthenticationFilter.class)

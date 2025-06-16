@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.studyGroup.controller;
 
+import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.global.utils.GlobalLogger;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupParticipationResponse;
@@ -16,6 +17,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -54,8 +56,9 @@ public class StudyGroupController {
   @PostMapping
   public ResponseEntity<SuccessResponse<StudyGroupCreateResponse>> createStudyGroup(
       @RequestBody @Valid StudyGroupCreateRequest request,
-      @RequestAttribute("member") Member member
+      @AuthenticationPrincipal CustomUserDetails customUserDetails
   ) {
+    Member member = customUserDetails.getMember();
     GlobalLogger.info("스터디 생성 요청", member.getEmail(), request.getTitle());
 
     StudyGroupCreateResponse response = studyGroupService.createStudyGroup(request, member);
