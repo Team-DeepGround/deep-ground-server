@@ -91,7 +91,7 @@ public class QuestionStatusTest {
         QuestionUpdateStatusResponseDto questionUpdateStatusResponseDto =
                 questionService.updateQuestionStatus(questionUpdateStatusRequestDto, memberId);
 
-       
+
         assertThat(questionUpdateStatusRequestDto.getStatus()).isEqualTo(QuestionStatus.CLOSED);
 
         //2.수정확인
