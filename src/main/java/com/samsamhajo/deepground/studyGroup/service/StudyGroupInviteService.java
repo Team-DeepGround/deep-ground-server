@@ -25,7 +25,7 @@ public class StudyGroupInviteService {
     StudyGroup group = studyGroupRepository.findById(request.getStudyGroupId())
         .orElseThrow(() -> new IllegalArgumentException("스터디 그룹이 존재하지 않습니다."));
 
-    if (!group.getMember().getId().equals(inviter.getId())) {
+    if (!group.getCreator().getId().equals(inviter.getId())) {
       throw new SecurityException("스터디 생성자만 초대할 수 있습니다.");
     }
 

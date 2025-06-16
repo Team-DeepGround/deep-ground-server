@@ -16,6 +16,24 @@ import org.springframework.data.repository.query.Param;
 @Repository
 public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
 
+  @Query("""
+    SELECT DISTINCT sg FROM StudyGroup sg
+    LEFT JOIN FETCH sg.creator
+    LEFT JOIN sg.techTags tag
+    WHERE (:status IS NULL OR sg.groupStatus = :status)
+      AND (
+          (:keyword IS NULL OR LOWER(sg.title) LIKE LOWER(CONCAT('%', :keyword, '%')))
+          OR (:keyword IS NULL OR LOWER(sg.explanation) LIKE LOWER(CONCAT('%', :keyword, '%')))
+      )
+      AND (:tags IS NULL OR tag IN :tags)
+""")
+  Page<StudyGroup> searchWithFilters(
+      @Param("status") GroupStatus status,
+      @Param("keyword") String keyword,
+      @Param("tags") List<String> tags,
+      Pageable pageable
+  );
+
   Page<StudyGroup> findByGroupStatusAndTitleContainingIgnoreCaseOrGroupStatusAndExplanationContainingIgnoreCase(
       GroupStatus status1, String titleKeyword,
       GroupStatus status2, String explanationKeyword,
@@ -33,12 +51,12 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
   );
   
   @Query("SELECT sg FROM StudyGroup sg " +
-      "LEFT JOIN FETCH sg.member " +
+      "LEFT JOIN FETCH sg.creator " +
       "LEFT JOIN FETCH sg.members " +
       "LEFT JOIN FETCH sg.comments " +
       "WHERE sg.id = :id")
-  Optional<StudyGroup> findWithMemberAndCommentsById(@Param("id") Long studyGroupId);
+  Optional<StudyGroup> findWithCreatorAndCommentsById(@Param("id") Long studyGroupId);
 
-  List<StudyGroup> findAllByMember_IdOrderByCreatedAtDesc(Long memberId);
+  List<StudyGroup> findAllByCreator_IdOrderByCreatedAtDesc(Long memberId);
 
 }

@@ -27,7 +27,7 @@ public class StudyGroupDetailResponse {
         .id(group.getId())
         .title(group.getTitle())
         .explanation(group.getExplanation())
-        .writer(group.getMember().getNickname())
+        .writer(group.getCreator().getNickname())
         .memberCount(group.getMembers().size())
         .groupLimit(group.getGroupMemberCount())
         .location(group.getStudyLocation())

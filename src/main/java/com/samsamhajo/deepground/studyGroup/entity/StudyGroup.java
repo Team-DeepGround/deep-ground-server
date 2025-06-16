@@ -60,15 +60,15 @@ public class StudyGroup extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Set<TechTag> techTags = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    private Member creator;
 
 
     @OneToOne(fetch = FetchType.LAZY)
     private ChatRoom chatRoom;
 
-    @OneToMany(mappedBy = "studyGroup")
+    @OneToMany(mappedBy = "studyGroup", fetch = FetchType.EAGER)
     private final Set<StudyGroupMember> members = new HashSet<>();
 
     @OneToMany(mappedBy = "studyGroup")
@@ -88,7 +88,7 @@ public class StudyGroup extends BaseEntity {
         this.recruitStartDate = recruitStartDate;
         this.recruitEndDate = recruitEndDate;
         this.groupMemberCount = groupMemberCount;
-        this.member = member;
+        this.creator = member;
         this.isOffline = isOffline;
         this.studyLocation = studyLocation;
         this.techTags = techTags;

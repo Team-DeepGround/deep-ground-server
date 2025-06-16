@@ -29,7 +29,7 @@ public class StudyGroupMemberQueryService {
         .map(member -> StudyGroupMemberSummary.builder()
             .memberId(member.getMember().getId())
             .nickname(member.getMember().getNickname())
-            .isOwner(group.getMember().getId().equals(member.getMember().getId()))
+            .isOwner(group.getCreator().getId().equals(member.getMember().getId()))
             .joinedAt(member.getCreatedAt())
             .build())
         .toList();
