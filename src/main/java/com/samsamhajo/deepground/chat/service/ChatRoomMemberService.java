@@ -7,6 +7,7 @@ import com.samsamhajo.deepground.chat.dto.ChatRoomResponse;
 import com.samsamhajo.deepground.chat.entity.ChatMessage;
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
 import com.samsamhajo.deepground.chat.entity.ChatRoomMember;
+import com.samsamhajo.deepground.chat.entity.ChatRoomType;
 import com.samsamhajo.deepground.chat.exception.ChatErrorCode;
 import com.samsamhajo.deepground.chat.exception.ChatException;
 import com.samsamhajo.deepground.chat.repository.ChatMessageRepository;
@@ -74,9 +75,11 @@ public class ChatRoomMemberService {
     }
 
     @Transactional(readOnly = true)
-    public ChatRoomListResponse getChatrooms(Long memberId, Pageable pageable) {
-        Page<ChatRoomInfo> infos = chatRoomMemberRepository.findByMemberIdAndChatRoomTypeFriend(
-                memberId, pageable);
+    public ChatRoomListResponse getChatrooms(Long memberId, ChatRoomType type, Pageable pageable) {
+        Page<ChatRoomInfo> infos = switch (type) {
+            case FRIEND -> chatRoomMemberRepository.findByMemberIdAndChatRoomTypeFriend(memberId, pageable);
+            case STUDY_GROUP -> chatRoomMemberRepository.findByMemberIdAndChatRoomTypeStudyGroup(memberId, pageable);
+        };
 
         List<ChatRoomResponse> chatRooms = infos.getContent().stream()
                 .map(info -> {

@@ -5,6 +5,7 @@ import com.samsamhajo.deepground.chat.dto.ChatMessageListRequest;
 import com.samsamhajo.deepground.chat.dto.ChatMessageListResponse;
 import com.samsamhajo.deepground.chat.dto.ChatRoomListResponse;
 import com.samsamhajo.deepground.chat.dto.ChatRoomMemberInfo;
+import com.samsamhajo.deepground.chat.entity.ChatRoomType;
 import com.samsamhajo.deepground.chat.service.ChatMessageService;
 import com.samsamhajo.deepground.chat.service.ChatRoomMemberService;
 import com.samsamhajo.deepground.chat.success.ChatSuccessCode;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -33,12 +35,13 @@ public class ChatRoomController {
 
     @GetMapping
     public ResponseEntity<SuccessResponse<ChatRoomListResponse>> getChatRooms(
+            @RequestParam(defaultValue = "FRIEND") ChatRoomType type,
             Pageable pageable,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         Long memberId = userDetails.getMember().getId();
 
-        ChatRoomListResponse response = chatRoomMemberService.getChatrooms(memberId, pageable);
+        ChatRoomListResponse response = chatRoomMemberService.getChatrooms(memberId, type, pageable);
         return ResponseEntity
                 .ok(SuccessResponse.of(ChatSuccessCode.CHATROOM_RETRIEVED, response));
     }

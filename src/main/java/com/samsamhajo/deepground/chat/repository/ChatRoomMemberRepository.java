@@ -31,6 +31,15 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
             + "ORDER BY crm.lastReadMessageTime DESC")
     Page<ChatRoomInfo> findByMemberIdAndChatRoomTypeFriend(Long memberId, Pageable pageable);
 
+    @Query("SELECT NEW com.samsamhajo.deepground.chat.dto.ChatRoomInfo("
+            + "cr.id, sg.title, crm.lastReadMessageTime) "
+            + "FROM ChatRoomMember crm "
+            + "JOIN crm.chatRoom cr "
+            + "JOIN StudyGroup sg ON sg.chatRoom.id = cr.id "
+            + "WHERE crm.member.id = :memberId AND cr.type = 'STUDY_GROUP' "
+            + "ORDER BY crm.lastReadMessageTime DESC")
+    Page<ChatRoomInfo> findByMemberIdAndChatRoomTypeStudyGroup(Long memberId, Pageable pageable);
+
     boolean existsByChatRoomIdAndMemberId(Long chatRoomId, Long memberId);
 
     @Modifying
