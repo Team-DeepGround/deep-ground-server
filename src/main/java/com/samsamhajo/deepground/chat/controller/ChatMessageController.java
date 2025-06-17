@@ -4,7 +4,7 @@ import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.chat.dto.ChatMessageListResponse;
 import com.samsamhajo.deepground.chat.dto.ChatMessageRequest;
 import com.samsamhajo.deepground.chat.dto.ChatRoomMemberInfo;
-import com.samsamhajo.deepground.chat.dto.ChatRoomResponse;
+import com.samsamhajo.deepground.chat.dto.ChatRoomInitResponse;
 import com.samsamhajo.deepground.chat.dto.ReadMessageRequest;
 import com.samsamhajo.deepground.chat.service.ChatMessageService;
 import com.samsamhajo.deepground.chat.service.ChatRoomMemberService;
@@ -26,12 +26,12 @@ public class ChatMessageController {
     private final ChatMessageService chatMessageService;
 
     @SubscribeMapping("/init")
-    public ChatRoomResponse init(
+    public ChatRoomInitResponse init(
             @DestinationVariable Long chatRoomId
     ) {
         List<ChatRoomMemberInfo> memberInfos = chatRoomMemberService.getChatRoomMemberInfos(chatRoomId);
         ChatMessageListResponse chatMessage = chatMessageService.getMessages(chatRoomId, null, 20);
-        return ChatRoomResponse.of(memberInfos, chatMessage);
+        return ChatRoomInitResponse.of(memberInfos, chatMessage);
     }
 
     @MessageMapping("/message")
