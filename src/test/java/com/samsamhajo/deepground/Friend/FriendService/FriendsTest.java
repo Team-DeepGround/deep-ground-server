@@ -3,6 +3,8 @@ package com.samsamhajo.deepground.Friend.FriendService;
 
 
 import com.samsamhajo.deepground.friend.Dto.FriendDto;
+import com.samsamhajo.deepground.friend.Exception.FriendErrorCode;
+import com.samsamhajo.deepground.friend.Exception.FriendException;
 import com.samsamhajo.deepground.friend.entity.Friend;
 import com.samsamhajo.deepground.friend.repository.FriendRepository;
 import com.samsamhajo.deepground.friend.service.FriendService;
@@ -58,16 +60,20 @@ public class FriendsTest {
     }
 
     @Test
-    public void 친구_삭제_성공() throws Exception {
-        //given
-        Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
-        friendService.acceptFriendRequest(friendId, receiver.getId());
+    public void 친구_삭제_성공() {
+        // given
+        Long requesterId = requester.getId(); // 로그인 사용자
+        Long receiverId = receiver.getId();
 
-        //when
-        friendService.deleteFriendById(friendId);
+        Long friendId = friendService.sendFriendRequest(requesterId, receiver.getEmail());
+        friendService.acceptFriendRequest(friendId, receiverId);
 
+        // when
+        friendService.deleteFriendByMemberId(friendId, requesterId);
+
+        // then
         Friend deletedFriend = friendRepository.findById(friendId)
-                .orElseThrow(() -> new RuntimeException("삭제된 친구가 DB에 존재하지 않음"));
+                .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_FRIEND));
 
         assertTrue(deletedFriend.isDeleted());
     }
