@@ -6,6 +6,7 @@ import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateRequestDto;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateResponseDto;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionUpdateResponseDto;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionUpdateRequestDto;
+import com.samsamhajo.deepground.qna.question.exception.QuestionErrorCode;
 import com.samsamhajo.deepground.qna.question.exception.QuestionException;
 import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
 import com.samsamhajo.deepground.qna.question.service.QuestionService;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Transactional
 @ExtendWith(SpringExtension.class)
@@ -44,6 +46,7 @@ public class QuestionUpdateTest {
     private MemberRepository memberRepository;
 
     private Long memberId;
+    private Long memberId2;
     @Autowired
     private TechStackRepository techStackRepository;
 
@@ -51,8 +54,11 @@ public class QuestionUpdateTest {
     void 테스트용_멤버_저장() {
         // 테스트용 멤버 저장
         Member member = Member.createLocalMember("test@naver.com", "password123", "tester");
+        Member member2 = Member.createLocalMember("test@naver.com", "password123", "tester");
         memberRepository.save(member);
+
         memberId = member.getId();
+        memberId2 = member2.getId();
     }
 
     @Test
@@ -91,6 +97,16 @@ public class QuestionUpdateTest {
         assertThat(questionUpdateResponseDto.getTitle()).isEqualTo(title1);
         //내용이 수정되었는지
         assertThat(questionUpdateResponseDto.getContent()).isEqualTo(content1);
+        System.out.println(memberId);
+        System.out.println(memberId2);
+        //질문을 쓴 사용자만 업데이트가 가능한지
+        QuestionException exception = assertThrows(QuestionException.class, () -> {
+            if(!questionUpdateResponseDto.getMemberId().equals(memberId2)) {
+                throw new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH);
+            }
+        });
+        assertThat(exception.getMessage()).isEqualTo("질문을 작성한 사용자가 아닙니다.");
+        System.out.println(exception.getMessage());
     }
 
     @Test

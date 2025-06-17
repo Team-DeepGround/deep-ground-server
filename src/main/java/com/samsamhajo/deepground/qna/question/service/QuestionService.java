@@ -73,6 +73,10 @@ public class QuestionService{
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
 
+        if(!question.getMember().getId().equals(memberId)) {
+            throw new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH);
+        }
+
         questionTagRepository.deleteAllByQuestionId(questionId);
         questionMediaService.deleteQuestionMedia(questionId);
         questionRepository.deleteById(questionId);
@@ -97,6 +101,10 @@ public class QuestionService{
 
         Question question = questionRepository.findById(questionUpdateRequestDto.getQuestionId())
                 .orElseThrow(()-> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
+
+        if(!question.getMember().getId().equals(memberId)) {
+            throw new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH);
+        }
 
         questionTagRepository.deleteAllByQuestionId(question.getId());
 

@@ -4,6 +4,8 @@ import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateRequestDto;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
+import com.samsamhajo.deepground.qna.answer.exception.AnswerErrorCode;
+import com.samsamhajo.deepground.qna.answer.exception.AnswerException;
 import com.samsamhajo.deepground.qna.answer.repository.AnswerRepository;
 import com.samsamhajo.deepground.qna.answer.service.AnswerService;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateRequestDto;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -42,12 +45,15 @@ public class AnswerDeleteTest {
     private TechStackRepository techStackRepository;
 
     private Long memberId;
+    private Long memberId2;
 
     @BeforeEach
     public void 회원_생성() {
         Member member = Member.createLocalMember("ds@gmail.com", "test", "test");
+        Member member2 = Member.createLocalMember("ds@gmail.com", "test", "test");
         memberRepository.save(member);
         memberId = member.getId();
+        memberId2 = member2.getId();
     }
 
     @Test
@@ -85,6 +91,15 @@ public class AnswerDeleteTest {
         assertThat(deleteId.equals(test2)).isTrue();
 
         assertThat(answerRepository.findById(deleteId).isEmpty());
-    }
 
+        AnswerException exception = assertThrows(AnswerException.class, () -> {
+                if(!answerCreateResponseDto.getMemberId().equals(memberId2)) {
+                    throw new AnswerException(AnswerErrorCode.ANSWER_MEMBER_MISMTACH);
+                }
+        });
+
+        assertThat(exception.getMessage()).isEqualTo("답변을 작성한 사용자가 아닙니다.");
+        System.out.println(exception.getMessage());
+
+    }
 }
