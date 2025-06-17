@@ -1,6 +1,9 @@
 package com.samsamhajo.deepground.chat.service;
 
+import com.samsamhajo.deepground.chat.dto.ChatRoomListResponse;
 import com.samsamhajo.deepground.chat.dto.ChatRoomMemberInfo;
+import com.samsamhajo.deepground.chat.dto.ChatRoomInfo;
+import com.samsamhajo.deepground.chat.dto.ChatRoomResponse;
 import com.samsamhajo.deepground.chat.entity.ChatMessage;
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
 import com.samsamhajo.deepground.chat.entity.ChatRoomMember;
@@ -13,6 +16,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,5 +71,21 @@ public class ChatRoomMemberService {
         return chatRoomMemberRepository.findByChatRoomId(chatRoomId).stream()
                 .map(ChatRoomMemberInfo::from)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ChatRoomListResponse getChatrooms(Long memberId, Pageable pageable) {
+        Page<ChatRoomInfo> infos = chatRoomMemberRepository.findByMemberIdAndChatRoomTypeFriend(
+                memberId, pageable);
+
+        List<ChatRoomResponse> chatRooms = infos.getContent().stream()
+                .map(info -> {
+                    Long unreadCount = chatMessageRepository.countByChatRoomIdAndCreatedAtAfter(
+                            info.getChatRoomId(), info.getLastReadMessageTime());
+
+                    return ChatRoomResponse.of(info, unreadCount);
+                }).toList();
+
+        return ChatRoomListResponse.of(chatRooms, infos.getNumber(), infos.hasNext());
     }
 }
