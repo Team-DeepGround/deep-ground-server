@@ -79,7 +79,7 @@ public class AnswerDeleteTest {
         System.out.println(answerCreateResponseDto.getAnswerContent());
         Long test2 = answerCreateResponseDto.getAnswerId();
 
-        Long deleteId = answerService.deleteAnswer(test2, memberId, test1);
+        Long deleteId = answerService.deleteAnswer(test2, memberId);
 
         assertThat(answerRepository.findById(test2).isEmpty()).isTrue();
         assertThat(deleteId.equals(test2)).isTrue();

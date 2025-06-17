@@ -39,11 +39,5 @@ public class QuestionMediaService {
         questionMediaRepository.deleteAllByQuestionId(questionId);
     }
 
-    public void validQustionMedia(List<MultipartFile> images) {
-        if(images == null || images.isEmpty()) {
-
-        }
-    }
-
 }
 

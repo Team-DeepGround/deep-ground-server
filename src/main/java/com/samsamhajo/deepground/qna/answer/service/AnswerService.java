@@ -63,13 +63,16 @@ public class AnswerService {
     }
 
     @Transactional
-    public Long deleteAnswer(Long answerId, Long memberId, Long questionId) {
+    public Long deleteAnswer(Long answerId, Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(()->
                 new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         Answer answer = answerRepository.findById(answerId)
                 .orElseThrow(() -> new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND));
 
+        if (!answer.getMember().getId().equals(memberId)) {
+            throw new AnswerException(AnswerErrorCode.ANSWER_MEMBER_MISMTACH);
+        }
         Question question = questionRepository.findById(answer.getQuestion().getId())
                 .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
 
@@ -106,7 +109,7 @@ public class AnswerService {
                 answer.getAnswerContent(),
                 answer.getQuestion().getId(),
                 answer.getId(),
-                null
+                member.getId()
         );
 
     }
