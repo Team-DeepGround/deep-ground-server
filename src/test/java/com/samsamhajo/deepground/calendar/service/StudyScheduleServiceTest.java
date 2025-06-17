@@ -7,8 +7,8 @@ import com.samsamhajo.deepground.calendar.exception.ScheduleErrorCode;
 import com.samsamhajo.deepground.calendar.exception.ScheduleException;
 import com.samsamhajo.deepground.calendar.repository.MemberStudyScheduleRepository;
 import com.samsamhajo.deepground.calendar.repository.StudyScheduleRepository;
+import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
-import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,14 +40,12 @@ class StudyScheduleServiceTest {
     @Mock
     private MemberStudyScheduleRepository memberStudyScheduleRepository;
 
-    @Mock
-    private StudyGroupMemberRepository studyGroupMemberRepository;
-
     @InjectMocks
     private StudyScheduleService studyScheduleService;
 
     private StudyGroup studyGroup;
     private StudyScheduleRequestDto requestDto;
+    private final Long userId = 1L;
 
     @BeforeEach
     void setup() {
@@ -59,6 +57,10 @@ class StudyScheduleServiceTest {
                 .description("스터디 설명")
                 .location("온라인")
                 .build();
+
+        Member leader = mock(Member.class);
+        when(leader.getId()).thenReturn(userId);
+        when(studyGroup.getMember()).thenReturn(leader);
     }
 
     @Test
@@ -84,7 +86,7 @@ class StudyScheduleServiceTest {
                 });
 
         // when
-        StudyScheduleResponseDto responseDto = studyScheduleService.createStudySchedule(1L, requestDto);
+        StudyScheduleResponseDto responseDto = studyScheduleService.createStudySchedule(1L, userId, requestDto);
 
         // then
         assertThat(responseDto).isNotNull();
@@ -119,7 +121,7 @@ class StudyScheduleServiceTest {
                 .build();
 
         // when & then
-        assertThatThrownBy(() -> studyScheduleService.createStudySchedule(1L, requestDto))
+        assertThatThrownBy(() -> studyScheduleService.createStudySchedule(1L, userId, requestDto))
                 .isInstanceOf(ScheduleException.class)
                 .hasMessageContaining(ScheduleErrorCode.INVALID_DATE_RANGE.getMessage());
 
@@ -133,7 +135,7 @@ class StudyScheduleServiceTest {
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> studyScheduleService.createStudySchedule(1L, requestDto))
+        assertThatThrownBy(() -> studyScheduleService.createStudySchedule(1L, userId, requestDto))
                 .isInstanceOf(ScheduleException.class)
                 .hasMessageContaining(ScheduleErrorCode.STUDY_GROUP_NOT_FOUND.getMessage());
 
@@ -152,13 +154,30 @@ class StudyScheduleServiceTest {
         )).thenReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> studyScheduleService.createStudySchedule(1L, requestDto))
+        assertThatThrownBy(() -> studyScheduleService.createStudySchedule(1L, userId, requestDto))
                 .isInstanceOf(ScheduleException.class)
                 .hasMessageContaining(ScheduleErrorCode.DUPLICATE_SCHEDULE.getMessage());
 
         verify(studyScheduleRepository, never()).save(any(StudySchedule.class));
     }
 
+    @Test
+    @DisplayName("스터디 일정 생성 실패 - 스터디 장이 아닌 경우")
+    void createStudySchedule_Fail_NotLeader() {
+        // given
+        Member notLeader = mock(Member.class);
+        when(notLeader.getId()).thenReturn(9L);
+
+        when(studyGroup.getMember()).thenReturn(notLeader);
+        when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
+
+        // when & then
+        assertThatThrownBy(() -> studyScheduleService.createStudySchedule(1L, userId, requestDto))
+                .isInstanceOf(ScheduleException.class)
+                .hasMessageContaining(ScheduleErrorCode.UNAUTHORIZED_USER.getMessage());
+
+        verify(studyScheduleRepository, never()).save(any(StudySchedule.class));
+    }
 
     @Test
     @DisplayName("스터디 그룹 ID로 일정 조회 성공")
@@ -228,7 +247,7 @@ class StudyScheduleServiceTest {
                 .location("Online")
                 .build();
         // when
-        StudyScheduleResponseDto responseDto = studyScheduleService.updateStudySchedule(studyGroup.getId(), existingSchedule.getId(), updateRequestDto);
+        StudyScheduleResponseDto responseDto = studyScheduleService.updateStudySchedule(studyGroup.getId(), userId, existingSchedule.getId(), updateRequestDto);
 
         // then
         assertThat(responseDto).isNotNull();
@@ -243,7 +262,7 @@ class StudyScheduleServiceTest {
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, 1L, requestDto))
+        assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, userId, 1L, requestDto))
                 .isInstanceOf(ScheduleException.class)
                 .hasMessageContaining(ScheduleErrorCode.STUDY_GROUP_NOT_FOUND.getMessage());
     }
@@ -256,7 +275,7 @@ class StudyScheduleServiceTest {
         when(studyScheduleRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, 1L, requestDto))
+        assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, userId, 1L, requestDto))
                 .isInstanceOf(ScheduleException.class)
                 .hasMessageContaining(ScheduleErrorCode.SCHEDULE_NOT_FOUND.getMessage());
     }
@@ -293,7 +312,7 @@ class StudyScheduleServiceTest {
         )).thenReturn(false);
 
         // when & then
-        assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, 1L, request))
+        assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, userId, 1L, request))
                 .isInstanceOf(ScheduleException.class)
                 .hasMessageContaining(ScheduleErrorCode.INVALID_DATE_RANGE.getMessage());
     }
@@ -314,9 +333,27 @@ class StudyScheduleServiceTest {
         )).thenReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, 1L, requestDto))
+        assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, userId, 1L, requestDto))
                 .isInstanceOf(ScheduleException.class)
                 .hasMessageContaining(ScheduleErrorCode.DUPLICATE_SCHEDULE.getMessage());
+    }
+
+    @Test
+    @DisplayName("스터디 일정 수정 실패 - 스터디 장이 아닌 경우")
+    void updateStudySchedule_Fail_NotLeader() {
+        // given
+        Member notLeader = mock(Member.class);
+        when(notLeader.getId()).thenReturn(999L);
+        when(studyGroup.getMember()).thenReturn(notLeader);
+        when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
+
+        StudySchedule schedule = mock(StudySchedule.class);
+        when(studyScheduleRepository.findById(anyLong())).thenReturn(Optional.of(schedule));
+
+        // when & then
+        assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, userId, 1L, requestDto))
+                .isInstanceOf(ScheduleException.class)
+                .hasMessageContaining(ScheduleErrorCode.UNAUTHORIZED_USER.getMessage());
     }
 
     @Test
@@ -326,7 +363,6 @@ class StudyScheduleServiceTest {
         Long studyGroupId = 1L;
         Long scheduleId = 1L;
 
-        StudyGroup studyGroup = mock(StudyGroup.class);
         when(studyGroup.getId()).thenReturn(studyGroupId);
 
         StudySchedule schedule = mock(StudySchedule.class);
@@ -334,7 +370,7 @@ class StudyScheduleServiceTest {
         when(studyScheduleRepository.findById(scheduleId)).thenReturn(Optional.of(schedule));
 
         // when
-        studyScheduleService.deleteStudySchedule(studyGroupId, scheduleId);
+        studyScheduleService.deleteStudySchedule(studyGroupId, userId, scheduleId);
 
         // then
         verify(memberStudyScheduleRepository).deleteAllByStudyScheduleId(schedule.getId());
@@ -351,9 +387,33 @@ class StudyScheduleServiceTest {
         when(studyScheduleRepository.findById(scheduleId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> studyScheduleService.deleteStudySchedule(studyGroupId, scheduleId))
+        assertThatThrownBy(() -> studyScheduleService.deleteStudySchedule(studyGroupId, userId, scheduleId))
                 .isInstanceOf(ScheduleException.class)
                 .hasMessageContaining(ScheduleErrorCode.SCHEDULE_NOT_FOUND.getMessage());
+
+        verify(studyScheduleRepository, never()).delete(any());
+    }
+
+    @Test
+    @DisplayName("스터디 일정 삭제 실패 - 스터디 장이 아닌 경우")
+    void deleteStudySchedule_Fail_NotLeader() {
+        // given
+        Long studyGroupId = 1L;
+        Long scheduleId = 1L;
+
+        Member notLeader = mock(Member.class);
+        when(notLeader.getId()).thenReturn(999L);
+        when(studyGroup.getMember()).thenReturn(notLeader);
+        when(studyGroup.getId()).thenReturn(studyGroupId);
+
+        StudySchedule schedule = mock(StudySchedule.class);
+        when(schedule.getStudyGroup()).thenReturn(studyGroup);
+        when(studyScheduleRepository.findById(scheduleId)).thenReturn(Optional.of(schedule));
+
+        // when & then
+        assertThatThrownBy(() -> studyScheduleService.deleteStudySchedule(studyGroupId, userId, scheduleId))
+                .isInstanceOf(ScheduleException.class)
+                .hasMessageContaining(ScheduleErrorCode.UNAUTHORIZED_USER.getMessage());
 
         verify(studyScheduleRepository, never()).delete(any());
     }
