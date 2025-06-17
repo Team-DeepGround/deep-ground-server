@@ -21,9 +21,10 @@ public class MemberController {
     private final MemberService memberService;
 
     @PutMapping("/{memberId}/profile")
-    public ResponseEntity<SuccessResponse> editMemberProfile(@RequestParam Long memberId,
-        @RequestBody @Valid MemberProfileDto memberprofile) {
+    public ResponseEntity<SuccessResponse> editMemberProfile( @AuthenticationPrincipal CustomUserDetails userDetails,
+                                                              @RequestBody @Valid MemberProfileDto memberprofile) {
 
+        Long memberId = userDetails.getMember().getId();
         MemberProfileDto profile = memberService.editMemberProfile(memberId, memberprofile);
         return ResponseEntity
             .ok(SuccessResponse.of(ProfileSuccessCode.PROFILE_SUCCESS_CODE,profile));
