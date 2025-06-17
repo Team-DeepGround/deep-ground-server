@@ -1,7 +1,6 @@
 package com.samsamhajo.deepground.qna.question.Dto;
 
 
-import com.samsamhajo.deepground.qna.question.entity.QuestionTag;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

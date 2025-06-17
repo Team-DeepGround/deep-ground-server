@@ -8,7 +8,6 @@ import com.samsamhajo.deepground.qna.answer.dto.AnswerUpdateRequestDto;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerUpdateResponseDto;
 import com.samsamhajo.deepground.qna.answer.service.AnswerService;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerSuccessCode;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

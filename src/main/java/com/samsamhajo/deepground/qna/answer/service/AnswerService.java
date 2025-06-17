@@ -100,6 +100,10 @@ public class AnswerService {
             throw new AnswerException(AnswerErrorCode.ANSWER_CONTENT_REQUIRED);
         }
 
+        if(!answer.getMember().getId().equals(memberId)) {
+            throw new AnswerException(AnswerErrorCode.ANSWER_MEMBER_MISMTACH);
+        }
+
         answer.updateAnswer(answerUpdateRequestDto.getAnswerContent());
 
         answerMediaService.deleteAnswerMedia(answer.getId());
