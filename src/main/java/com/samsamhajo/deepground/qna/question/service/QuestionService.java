@@ -15,8 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -68,7 +68,8 @@ public class QuestionService{
     @Transactional
     public Long deleteQuestion(Long questionId, Long memberId) {
 
-        //TODO : question을 작성한 멤버가 맞는지, 삭제권한 있는지 추후 로직 작성
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                ()-> new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH));
 
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
@@ -85,7 +86,7 @@ public class QuestionService{
     public QuestionUpdateResponseDto updateQuestion(QuestionUpdateRequestDto questionUpdateRequestDto, Long memberId) {
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH));
 
         if(!StringUtils.hasText(questionUpdateRequestDto.getTitle())) {
             throw new QuestionException(QuestionErrorCode.QUESTION_TITLE_REQUIRED);
@@ -118,8 +119,10 @@ public class QuestionService{
         );
 
         question.updateQuesiton(questionUpdateRequestDto.getTitle(), questionUpdateRequestDto.getContent());
-        questionMediaService.deleteQuestionMedia(question.getId());
         updateQuestionMedia(questionUpdateRequestDto, question);
+        questionMediaService.deleteQuestionMedia(question.getId());
+
+
 
         return questionUpdateResponseDto;
 
@@ -133,12 +136,12 @@ public class QuestionService{
     }
 
     @Transactional
-    public QuestionUpdateStatusResponseDto updateQuestionStatus(QuestionUpdateStatusRequestDto questionUpdateStatusRequestDto, Long memberId) {
+    public QuestionUpdateStatusResponseDto updateQuestionStatus(QuestionUpdateStatusRequestDto questionUpdateStatusRequestDto, Long memberId, Long questionId) {
 
-        Member member = memberRepository.findById(questionUpdateStatusRequestDto.getMemberId()).orElseThrow(
-                ()-> new IllegalArgumentException("존재하는 사용자가 아닙니다."));
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                ()-> new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH));
 
-        Question question = questionRepository.findById(questionUpdateStatusRequestDto.getQuestionId()).orElseThrow(
+        Question question = questionRepository.findById(questionId).orElseThrow(
                 () -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
 
         if(!member.getId().equals(memberId)) {

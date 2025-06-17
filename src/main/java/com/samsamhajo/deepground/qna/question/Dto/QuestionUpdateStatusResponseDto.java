@@ -4,7 +4,6 @@ import com.samsamhajo.deepground.qna.question.entity.QuestionStatus;
 import lombok.Getter;
 
 @Getter
-
 public class QuestionUpdateStatusResponseDto {
 
     private Long questionId;

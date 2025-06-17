@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.qna.question.controller;
 
+import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.qna.question.Dto.*;
 import com.samsamhajo.deepground.qna.question.exception.QuestionSuccessCode;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,10 +24,10 @@ public class QuestionController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse> createQuestion(
             @Valid @ModelAttribute QuestionCreateRequestDto questionRequestDto,
-            @RequestParam Long memberId) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
 
-        QuestionCreateResponseDto questionCreateResponseDto = questionService.createQuestion(questionRequestDto, memberId);
+        QuestionCreateResponseDto questionCreateResponseDto = questionService.createQuestion(questionRequestDto, customUserDetails.getMember().getId());
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -36,9 +38,9 @@ public class QuestionController {
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse> updateQuestion(
             @Valid @ModelAttribute QuestionUpdateRequestDto questionUpdateRequestDto,
-            @RequestParam Long memberId) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        QuestionUpdateResponseDto questionResponseDto = questionService.updateQuestion(questionUpdateRequestDto, memberId);
+        QuestionUpdateResponseDto questionResponseDto = questionService.updateQuestion(questionUpdateRequestDto, customUserDetails.getMember().getId());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -48,9 +50,9 @@ public class QuestionController {
     @DeleteMapping("/{questionId}")
     public ResponseEntity<SuccessResponse> deleteQuestion(
             @PathVariable Long questionId
-            ,@RequestParam Long memberId) {
+            ,@AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        questionService.deleteQuestion(questionId, memberId);
+        questionService.deleteQuestion(questionId, customUserDetails.getMember().getId());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -60,10 +62,15 @@ public class QuestionController {
 
     @PatchMapping("/{questionId}/status")
     public ResponseEntity<SuccessResponse> updateStatusQuestion(
-            @ModelAttribute QuestionUpdateStatusRequestDto questionUpdateStatusRequestDto,
-            @PathVariable Long questionId, @RequestParam Long memberId) {
+            @Valid @RequestBody QuestionUpdateStatusRequestDto questionUpdateStatusRequestDto,
+            @PathVariable Long questionId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        QuestionUpdateStatusResponseDto questionUpdateStatusResponseDto = questionService.updateQuestionStatus(questionUpdateStatusRequestDto, memberId);
+        System.out.println("questionId = " + questionId);
+        System.out.println("memberId = " + customUserDetails.getMember().getId());
+
+        QuestionUpdateStatusResponseDto questionUpdateStatusResponseDto = questionService.updateQuestionStatus(questionUpdateStatusRequestDto,
+                customUserDetails.getMember().getId(), questionId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

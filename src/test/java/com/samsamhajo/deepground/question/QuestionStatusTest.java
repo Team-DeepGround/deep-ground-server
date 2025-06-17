@@ -81,15 +81,11 @@ public class QuestionStatusTest {
 
 
         QuestionUpdateStatusRequestDto questionUpdateStatusRequestDto =
-                new QuestionUpdateStatusRequestDto(
-                        questionCreateResponseDto.getQuestionId(),
-                        QuestionStatus.CLOSED,
-                        questionCreateResponseDto.getMemberId()
-                );
+                new QuestionUpdateStatusRequestDto( QuestionStatus.CLOSED );
 
 
         QuestionUpdateStatusResponseDto questionUpdateStatusResponseDto =
-                questionService.updateQuestionStatus(questionUpdateStatusRequestDto, memberId);
+                questionService.updateQuestionStatus(questionUpdateStatusRequestDto, memberId, question.getId());
 
 
         assertThat(questionUpdateStatusRequestDto.getStatus()).isEqualTo(QuestionStatus.CLOSED);

@@ -1,6 +1,5 @@
 package com.samsamhajo.deepground.qna.question.Dto;
 
-import com.samsamhajo.deepground.qna.question.entity.QuestionTag;
 import lombok.Getter;
 
 import java.util.List;
