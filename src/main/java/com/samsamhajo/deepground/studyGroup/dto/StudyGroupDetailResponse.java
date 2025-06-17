@@ -1,6 +1,8 @@
 package com.samsamhajo.deepground.studyGroup.dto;
 
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupReply;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -21,8 +23,9 @@ public class StudyGroupDetailResponse {
   private String recruitEndDate;
   private int commentCount;
   private List<String> participants;
+  private List<CommentWithRepliesResponse> comments;
 
-  public static StudyGroupDetailResponse from(StudyGroup group) {
+  public static StudyGroupDetailResponse from(StudyGroup group, Map<Long, List<StudyGroupReply>> replyMap) {
     return StudyGroupDetailResponse.builder()
         .id(group.getId())
         .title(group.getTitle())
@@ -38,6 +41,11 @@ public class StudyGroupDetailResponse {
             group.getMembers().stream()
                 .map(m -> m.getMember().getNickname())
                 .collect(Collectors.toList())
+        )
+        .comments(
+            group.getComments().stream()
+                .map(comment -> CommentWithRepliesResponse.from(comment, replyMap.getOrDefault(comment.getId(), List.of())))
+                .toList()
         )
         .build();
   }

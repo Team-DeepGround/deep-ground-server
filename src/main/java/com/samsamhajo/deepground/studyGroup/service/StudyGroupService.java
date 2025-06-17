@@ -1,15 +1,15 @@
 package com.samsamhajo.deepground.studyGroup.service;
 
-import static java.util.stream.Collectors.toList;
-
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupDetailResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupParticipationResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupMyListResponse;
 import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupComment;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupReply;
 import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupSearchRequest;
-import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
@@ -24,7 +24,7 @@ import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepositor
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
+import java.util.*;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -36,13 +36,23 @@ public class StudyGroupService {
   private final StudyGroupRepository studyGroupRepository;
   private final StudyGroupMemberRepository studyGroupMemberRepository;
   private final ChatRoomRepository chatRoomRepository;
-  
-  
+
+
+  @Transactional
   public StudyGroupDetailResponse getStudyGroupDetail(Long studyGroupId) {
     StudyGroup group = studyGroupRepository.findWithCreatorAndCommentsById(studyGroupId)
         .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
 
-    return StudyGroupDetailResponse.from(group);
+    List<Long> commentIds = group.getComments().stream()
+        .map(StudyGroupComment::getId)
+        .toList();
+
+    List<StudyGroupReply> replies = studyGroupRepository.findRepliesByCommentIds(commentIds);
+
+    Map<Long, List<StudyGroupReply>> replyMap = replies.stream()
+        .collect(Collectors.groupingBy(r -> r.getComment().getId()));
+
+    return StudyGroupDetailResponse.from(group, replyMap);
   }
 
 

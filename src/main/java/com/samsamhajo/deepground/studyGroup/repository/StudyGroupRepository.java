@@ -4,6 +4,7 @@ import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupReply;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,14 +50,26 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
       GroupStatus groupStatus,
       Pageable pageable
   );
-  
-  @Query("SELECT sg FROM StudyGroup sg " +
-      "LEFT JOIN FETCH sg.creator " +
-      "LEFT JOIN FETCH sg.members " +
-      "LEFT JOIN FETCH sg.comments " +
-      "WHERE sg.id = :id")
-  Optional<StudyGroup> findWithCreatorAndCommentsById(@Param("id") Long studyGroupId);
+
+  @Query("""
+  SELECT DISTINCT sg FROM StudyGroup sg
+  LEFT JOIN FETCH sg.creator
+  LEFT JOIN FETCH sg.members
+  LEFT JOIN FETCH sg.comments c
+  LEFT JOIN FETCH c.member
+  WHERE sg.id = :id
+""")
+  Optional<StudyGroup> findWithCreatorAndCommentsById(@Param("id") Long id);
+
+  @Query("""
+  SELECT r FROM StudyGroupReply r
+  JOIN FETCH r.member
+  WHERE r.comment.id IN :commentIds
+""")
+  List<StudyGroupReply> findRepliesByCommentIds(@Param("commentIds") List<Long> commentIds);
 
   List<StudyGroup> findAllByCreator_IdOrderByCreatedAtDesc(Long memberId);
+
+
 
 }
