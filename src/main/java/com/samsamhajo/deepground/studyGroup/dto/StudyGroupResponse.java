@@ -45,11 +45,11 @@ public class StudyGroupResponse {
         .recruitmentPeriod(group.getRecruitStartDate().format(formatter) + " ~ " + group.getRecruitEndDate().format(formatter))
         .tags(group.getTechTags())
         .maxMembers(group.getGroupMemberCount())
-        .currentMembers(group.getMembers().size()) // 현재 참여 인원
+        .currentMembers(group.getMembers().size())
         .organizer(
             OrganizerDto.builder()
                 .name(creator.getNickname())
-                .avatar("/placeholder.svg?height=40&width=40") // 실제 아바타 경로 설정 가능
+                .avatar("/placeholder.svg?height=40&width=40")
                 .build()
         )
         .isOnline(!group.getIsOffline())

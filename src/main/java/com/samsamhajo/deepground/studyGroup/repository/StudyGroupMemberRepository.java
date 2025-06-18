@@ -16,7 +16,15 @@ public interface StudyGroupMemberRepository extends JpaRepository<StudyGroupMemb
 
   Optional<StudyGroupMember> findByMemberAndStudyGroup(Member member, StudyGroup studyGroup);
 
-  List<StudyGroupMember> findAllByMemberIdAndIsAllowedTrueOrderByStudyGroupCreatedAtDesc(Long memberId);
+  @Query("""
+  SELECT m FROM StudyGroupMember m
+  JOIN FETCH m.studyGroup sg
+  WHERE m.member.id = :memberId
+    AND m.isAllowed = true
+    AND sg.creator.id <> :memberId
+  ORDER BY sg.createdAt DESC
+""")
+  List<StudyGroupMember> findAllByMemberIdAndIsAllowedTrueAndNotCreator(@Param("memberId") Long memberId);
 
   List<StudyGroupMember> findAllByStudyGroupIdAndIsAllowedTrue(Long studyGroupId);
 

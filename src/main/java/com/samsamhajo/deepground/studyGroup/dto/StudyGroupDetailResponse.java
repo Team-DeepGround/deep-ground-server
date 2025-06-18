@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.studyGroup.dto;
 
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupReply;
+import java.time.LocalDate;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +21,10 @@ public class StudyGroupDetailResponse {
   private int groupLimit;
   private String location;
   private boolean isOffline;
-  private String recruitEndDate;
+  private LocalDate recruitStartDate;
+  private LocalDate recruitEndDate;
+  private LocalDate studyStartDate;
+  private LocalDate studyEndDate;
   private int commentCount;
   private List<String> participants;
   private List<CommentWithRepliesResponse> comments;
@@ -35,7 +39,10 @@ public class StudyGroupDetailResponse {
         .groupLimit(group.getGroupMemberCount())
         .location(group.getStudyLocation())
         .isOffline(group.getIsOffline())
-        .recruitEndDate(group.getRecruitEndDate().toString())
+        .recruitStartDate(group.getRecruitStartDate())
+        .recruitEndDate(group.getRecruitEndDate())
+        .studyStartDate(group.getStudyStartDate())
+        .studyEndDate(group.getStudyEndDate())
         .commentCount(group.getComments().size())
         .participants(
             group.getMembers().stream()

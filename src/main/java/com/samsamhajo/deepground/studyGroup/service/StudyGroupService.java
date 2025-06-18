@@ -103,7 +103,7 @@ public class StudyGroupService {
 
   public List<StudyGroupParticipationResponse> getStudyGroupsByMember(Long memberId) {
     List<StudyGroupMember> studyGroupMembers =
-        studyGroupMemberRepository.findAllByMemberIdAndIsAllowedTrueOrderByStudyGroupCreatedAtDesc(
+        studyGroupMemberRepository.findAllByMemberIdAndIsAllowedTrueAndNotCreator(
             memberId);
 
     return studyGroupMembers.stream()
