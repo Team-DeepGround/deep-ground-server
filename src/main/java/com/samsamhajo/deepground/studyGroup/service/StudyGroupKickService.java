@@ -23,7 +23,7 @@ public class StudyGroupKickService {
     StudyGroup group = studyGroupRepository.findById(request.getStudyGroupId())
         .orElseThrow(() -> new StudyGroupNotFoundException(request.getStudyGroupId()));
 
-    if (!group.getMember().getId().equals(requester.getId())) {
+    if (!group.getCreator().getId().equals(requester.getId())) {
       throw new IllegalArgumentException("스터디장만 강퇴할 수 있습니다.");
     }
 

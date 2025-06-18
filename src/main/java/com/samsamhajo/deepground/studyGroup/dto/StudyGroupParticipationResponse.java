@@ -19,7 +19,7 @@ public class StudyGroupParticipationResponse {
     return StudyGroupParticipationResponse.builder()
         .studyGroupId(studyGroup.getId())
         .title(studyGroup.getTitle())
-        .createdBy(studyGroup.getMember().getNickname())
+        .createdBy(studyGroup.getCreator().getNickname())
         .participatedAt(participatedAt)
         .build();
   }
