@@ -1,22 +1,31 @@
 package com.samsamhajo.deepground.qna.question.service;
 
+import com.samsamhajo.deepground.feed.feed.model.FetchFeedResponse;
+import com.samsamhajo.deepground.feed.feed.model.FetchFeedsResponse;
+import com.samsamhajo.deepground.feed.feedshared.model.FetchSharedFeedResponse;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
+import com.samsamhajo.deepground.qna.answer.service.AnswerService;
 import com.samsamhajo.deepground.qna.question.Dto.*;
 import com.samsamhajo.deepground.qna.question.entity.Question;
+import com.samsamhajo.deepground.qna.question.entity.QuestionMedia;
 import com.samsamhajo.deepground.qna.question.entity.QuestionTag;
 import com.samsamhajo.deepground.qna.question.exception.QuestionErrorCode;
 import com.samsamhajo.deepground.qna.question.exception.QuestionException;
+import com.samsamhajo.deepground.qna.question.repository.QuestionMediaRepository;
 import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
 import com.samsamhajo.deepground.qna.question.repository.QuestionTagRepository;
 import com.samsamhajo.deepground.techStack.entity.TechStack;
 import com.samsamhajo.deepground.techStack.repository.TechStackRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +37,9 @@ public class QuestionService{
     private final TechStackRepository techStackRepository;
     private final MemberRepository memberRepository;
     private final QuestionTagService questionTagService;
+    private final AnswerService answerService;
+    private final QuestionTagService tagService;
+    private final QuestionMediaRepository questionMediaRepository;
 
     //질문 생성
     @Transactional
@@ -162,5 +174,47 @@ public class QuestionService{
                 memberId
         );
     }
+
+
+    @Transactional(readOnly = true)
+    public QuestionListResponseDto getQuestions(Pageable pageable) {
+        Page<Question> questionPage = questionRepository.findAll(pageable);
+
+        List<QuestionSummaryDto> summaries = questionPage.stream()
+                .map(question -> {
+                    List<String> teckStacks = tagService.getStackNamesByQuestionId(question.getId());
+                    int answerCount = answerService.countAnswersByQuestionId(question.getId());
+
+                    return QuestionSummaryDto.of(question, teckStacks, answerCount);
+                }).toList();
+
+        return QuestionListResponseDto.of(summaries, questionPage.getTotalPages());
+    }
+
+    @Transactional(readOnly = true)
+    public QuestionDetailResponseDto getQuestionDetail(Long questionId, Long memberId) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
+        List<QuestionMedia> questionMedia = questionMediaRepository.findAllByQuestionId(questionId);
+        int answerCount = answerService.countAnswersByQuestionId(questionId);
+        List<String> techStacks = tagService.getStackNamesByQuestionId(questionId);
+        List<String> imageUrls = questionMedia.stream()
+                .map(QuestionMedia::getQuestionContentUrl)
+                .collect(Collectors.toList());
+
+
+        return QuestionDetailResponseDto.of(
+                question.getId(),
+                question.getTitle(),
+                question.getContent(),
+                question.getMember().getId(),
+                question.getMember().getNickname(),
+                techStacks,
+                answerCount,
+                question.getQuestionStatus(),
+                imageUrls
+        );
+    }
+
 
 }

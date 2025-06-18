@@ -47,4 +47,10 @@ public class QuestionTagService {
                 .toList();
     }
 
+    public List<String> getStackNamesByQuestionId(Long questionId) {
+        List<QuestionTag> questionTags = questionTagRepository.findAllByQuestionId(questionId);
+        return questionTags.stream()
+                .map(qt -> qt.getTechStack().getName())
+                .collect(Collectors.toList());
+    }
 }

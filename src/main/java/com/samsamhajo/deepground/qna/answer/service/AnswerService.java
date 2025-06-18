@@ -124,4 +124,11 @@ public class AnswerService {
     private void updateAnswerMedia(AnswerUpdateRequestDto answerUpdateRequestDto, Answer answer) {
         answerMediaService.createAnswerMedia(answer, answerUpdateRequestDto.getMediaFiles());
     }
+
+    public int countAnswersByQuestionId(Long questionId) {
+        Question question = questionRepository.findById(questionId).orElseThrow(()-> {
+            throw new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND);
+        });
+        return question.getAnswerCount();
+    }
 }
