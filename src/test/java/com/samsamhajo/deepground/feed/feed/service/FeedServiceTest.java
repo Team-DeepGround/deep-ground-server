@@ -11,9 +11,6 @@ import com.samsamhajo.deepground.feed.feedcomment.service.FeedCommentService;
 import com.samsamhajo.deepground.feed.feedshared.model.FetchSharedFeedResponse;
 import com.samsamhajo.deepground.feed.feedshared.service.SharedFeedService;
 import com.samsamhajo.deepground.member.entity.Member;
-import com.samsamhajo.deepground.member.exception.MemberErrorCode;
-import com.samsamhajo.deepground.member.exception.MemberException;
-import com.samsamhajo.deepground.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +32,6 @@ class FeedServiceTest {
 
     private FeedRepository feedRepository;
     private FeedMediaService feedMediaService;
-    private MemberRepository memberRepository;
     private FeedCommentService feedCommentService;
     private FeedLikeService feedLikeService;
     private SharedFeedService sharedFeedService;
@@ -50,14 +46,12 @@ class FeedServiceTest {
     void setUp() {
         feedRepository = mock(FeedRepository.class);
         feedMediaService = mock(FeedMediaService.class);
-        memberRepository = mock(MemberRepository.class);
         feedCommentService = mock(FeedCommentService.class);
         feedLikeService = mock(FeedLikeService.class);
         sharedFeedService = mock(SharedFeedService.class);
         feedService = new FeedService(
             feedRepository,
             feedMediaService,
-            memberRepository,
             feedCommentService,
             feedLikeService, sharedFeedService
         );
@@ -71,11 +65,10 @@ class FeedServiceTest {
         FeedCreateRequest request = new FeedCreateRequest(TEST_CONTENT, List.of());
         Feed expectedFeed = Feed.of(TEST_CONTENT, testMember);
 
-        when(memberRepository.findById(testMember.getId())).thenReturn(Optional.of(testMember));
         when(feedRepository.save(any(Feed.class))).thenReturn(expectedFeed);
 
         // when
-        Feed createdFeed = feedService.createFeed(request, testMember.getId());
+        Feed createdFeed = feedService.createFeed(request, testMember);
 
         // then
         assertThat(createdFeed).isNotNull();
@@ -90,26 +83,12 @@ class FeedServiceTest {
     void createFeedFailWithEmptyContent() {
         // given
         FeedCreateRequest request = new FeedCreateRequest("", List.of());
+        Member testMember = Member.createLocalMember(TEST_EMAIL, TEST_PASSWORD, TEST_NICKNAME);
 
         // when & then
-        assertThatThrownBy(() -> feedService.createFeed(request, 1L))
+        assertThatThrownBy(() -> feedService.createFeed(request, testMember))
                 .isInstanceOf(FeedException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FeedErrorCode.INVALID_FEED_CONTENT);
-    }
-
-    @Test
-    @DisplayName("피드 생성 실패 - 존재하지 않는 회원")
-    void createFeedFailWithInvalidMember() {
-        // given
-        FeedCreateRequest request = new FeedCreateRequest(TEST_CONTENT, List.of());
-        Long invalidMemberId = 999L;
-
-        when(memberRepository.findById(invalidMemberId)).thenReturn(Optional.empty());
-
-        // when & then
-        assertThatThrownBy(() -> feedService.createFeed(request, invalidMemberId))
-                .isInstanceOf(MemberException.class)
-                .hasFieldOrPropertyWithValue("errorCode", MemberErrorCode.INVALID_MEMBER_ID);
     }
 
     @Test

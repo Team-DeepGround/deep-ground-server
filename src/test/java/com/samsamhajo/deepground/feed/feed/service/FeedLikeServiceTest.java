@@ -9,7 +9,6 @@ import com.samsamhajo.deepground.feed.feed.repository.FeedRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
 import com.samsamhajo.deepground.member.exception.MemberException;
-import com.samsamhajo.deepground.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +24,6 @@ import static org.mockito.Mockito.*;
 class FeedLikeServiceTest {
 
     private FeedRepository feedRepository;
-    private MemberRepository memberRepository;
     private FeedLikeRepository feedLikeRepository;
     private FeedLikeService feedLikeService;
 
@@ -37,12 +35,10 @@ class FeedLikeServiceTest {
     @BeforeEach
     void setUp() {
         feedRepository = mock(FeedRepository.class);
-        memberRepository = mock(MemberRepository.class);
         feedLikeRepository = mock(FeedLikeRepository.class);
         
         feedLikeService = new FeedLikeService(
             feedRepository,
-            memberRepository,
             feedLikeRepository
         );
     }
@@ -60,12 +56,11 @@ class FeedLikeServiceTest {
         ReflectionTestUtils.setField(feedLike, "id", 1L);
 
         when(feedRepository.getById(1L)).thenReturn(testFeed);
-        when(memberRepository.findById(1L)).thenReturn(Optional.of(testMember));
         when(feedLikeRepository.existsByFeedIdAndMemberId(1L, 1L)).thenReturn(false);
         when(feedLikeRepository.save(any(FeedLike.class))).thenReturn(feedLike);
 
         // when
-        feedLikeService.feedLikeIncrease(1L, 1L);
+        feedLikeService.feedLikeIncrease(1L, testMember);
 
         // then
         verify(feedLikeRepository).save(any(FeedLike.class));
@@ -75,25 +70,16 @@ class FeedLikeServiceTest {
     @DisplayName("피드 좋아요 증가 실패 - 이미 좋아요를 누른 경우")
     void feedLikeIncreaseFailWithAlreadyLiked() {
         // given
+        Member testMember = Member.createLocalMember(TEST_EMAIL, TEST_PASSWORD, TEST_NICKNAME);
+
+        // given
         when(feedLikeRepository.existsByFeedIdAndMemberId(1L, 1L)).thenReturn(true);
+        when(testMember.getId()).thenReturn(1L);
 
         // when & then
-        assertThatThrownBy(() -> feedLikeService.feedLikeIncrease(1L, 1L))
+        assertThatThrownBy(() -> feedLikeService.feedLikeIncrease(1L, testMember))
                 .isInstanceOf(FeedException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FeedErrorCode.FEED_LIKE_ALREADY_EXISTS);
-    }
-
-    @Test
-    @DisplayName("피드 좋아요 증가 실패 - 존재하지 않는 회원")
-    void feedLikeIncreaseFailWithInvalidMember() {
-        // given
-        when(feedLikeRepository.existsByFeedIdAndMemberId(1L, 1L)).thenReturn(false);
-        when(memberRepository.findById(1L)).thenReturn(Optional.empty());
-
-        // when & then
-        assertThatThrownBy(() -> feedLikeService.feedLikeIncrease(1L, 1L))
-                .isInstanceOf(MemberException.class)
-                .hasFieldOrPropertyWithValue("errorCode", MemberErrorCode.INVALID_MEMBER_ID);
     }
 
     @Test
@@ -122,6 +108,7 @@ class FeedLikeServiceTest {
     @DisplayName("피드 좋아요 감소 실패 - 좋아요가 없는 경우")
     void feedLikeDecreaseFailWithNoLike() {
         // given
+
         when(feedLikeRepository.countByFeedId(1L)).thenReturn(0);
 
         // when & then
