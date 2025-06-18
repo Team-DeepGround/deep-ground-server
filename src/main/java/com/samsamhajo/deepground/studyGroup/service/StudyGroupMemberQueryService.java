@@ -1,8 +1,10 @@
 package com.samsamhajo.deepground.studyGroup.service;
 
 
+import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupMemberSummary;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
@@ -31,6 +33,24 @@ public class StudyGroupMemberQueryService {
             .nickname(member.getMember().getNickname())
             .isOwner(group.getCreator().getId().equals(member.getMember().getId()))
             .joinedAt(member.getCreatedAt())
+            .build())
+        .toList();
+  }
+
+  public List<StudyGroupMemberSummary> getPendingApplicantsAsCreator(Long studyGroupId, Member requester) {
+    StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
+        .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
+
+    if (!studyGroup.getCreator().getId().equals(requester.getId())) {
+      throw new IllegalArgumentException("스터디장만 신청자 목록을 조회할 수 있습니다.");
+    }
+
+    List<StudyGroupMember> pending = studyGroupMemberRepository.findAllByStudyGroupIdAndIsAllowedFalse(studyGroupId);
+
+    return pending.stream()
+        .map(m -> StudyGroupMemberSummary.builder()
+            .memberId(m.getMember().getId())
+            .nickname(m.getMember().getNickname())
             .build())
         .toList();
   }

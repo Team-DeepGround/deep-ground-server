@@ -51,6 +51,7 @@ public class StudyGroupDetailResponse {
         )
         .comments(
             group.getComments().stream()
+                .distinct()
                 .map(comment -> CommentWithRepliesResponse.from(comment, replyMap.getOrDefault(comment.getId(), List.of())))
                 .toList()
         )
