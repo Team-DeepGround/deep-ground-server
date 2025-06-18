@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.feed.feed.controller;
 
+import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.feed.feed.entity.Feed;
 import com.samsamhajo.deepground.feed.feed.exception.FeedSuccessCode;
 import com.samsamhajo.deepground.feed.feed.model.FeedCreateRequest;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,13 +23,13 @@ import org.springframework.web.bind.annotation.*;
 public class FeedController {
 
     private final FeedService feedService;
-    private final Long DEV_MEMBER_ID = 1L;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse<Feed>> createFeed(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @ModelAttribute FeedCreateRequest request) {
 
-        feedService.createFeed(request, DEV_MEMBER_ID);
+        feedService.createFeed(request, userDetails.getMember());
 
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedSuccessCode.FEED_CREATED));
@@ -35,8 +37,11 @@ public class FeedController {
 
     @GetMapping("/list")
     public ResponseEntity<SuccessResponse<FetchFeedsResponse>> getFeeds(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        FetchFeedsResponse response = feedService.getFeeds(pageable, DEV_MEMBER_ID);
+
+        Long memberId = userDetails.getMember().getId();
+        FetchFeedsResponse response = feedService.getFeeds(pageable, memberId);
 
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedSuccessCode.FEED_LIST_FETCHED, response));
@@ -44,9 +49,12 @@ public class FeedController {
     
     @PutMapping(value = "/{feedId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse<Feed>> updateFeed(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable("feedId") Long feedId,
             @ModelAttribute FeedUpdateRequest request) {
-        feedService.updateFeed(feedId, request, DEV_MEMBER_ID);
+
+        Long memberId = userDetails.getMember().getId();
+        feedService.updateFeed(feedId, request, memberId);
         
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedSuccessCode.FEED_UPDATED));

@@ -8,8 +8,6 @@ import com.samsamhajo.deepground.feed.feed.exception.FeedException;
 import com.samsamhajo.deepground.feed.feed.repository.FeedLikeRepository;
 import com.samsamhajo.deepground.feed.feed.repository.FeedRepository;
 import com.samsamhajo.deepground.member.entity.Member;
-import com.samsamhajo.deepground.member.exception.MemberErrorCode;
-import com.samsamhajo.deepground.member.exception.MemberException;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,16 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class FeedLikeService {
 
     private final FeedRepository feedRepository;
-    private final MemberRepository memberRepository;
     private final FeedLikeRepository feedLikeRepository;
 
     @Transactional
-    public void feedLikeIncrease(Long feedId, Long memberId) {
-        increaseValidate(feedId, memberId);
+    public void feedLikeIncrease(Long feedId, Member member) {
+        increaseValidate(feedId, member.getId());
 
         Feed feed = feedRepository.getById(feedId);
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.INVALID_MEMBER_ID));
 
         FeedLike feedLike = FeedLike.of(feed, member);
 
@@ -39,7 +34,7 @@ public class FeedLikeService {
     @Transactional
     public void feedLikeDecrease(Long feedId, Long memberId) {
         // 이미 0 이거나 음수인 경우 취소하려 할 때, 예외 발생 
-        validateDecrease(feedId);
+        decreaseValidate(feedId);
 
         FeedLike feedLike = feedLikeRepository.getByFeedIdAndMemberId(feedId, memberId);
 
@@ -58,7 +53,7 @@ public class FeedLikeService {
         return feedLikeRepository.existsByFeedIdAndMemberId(feedId, memberId);
     }
 
-    private void validateDecrease(Long feedId) {
+    private void decreaseValidate(Long feedId) {
         if(countFeedLikeByFeedId(feedId) <= 0){
             throw new FeedException(FeedErrorCode.FEED_LIKE_MINUS_NOT_ALLOWED);
         }
