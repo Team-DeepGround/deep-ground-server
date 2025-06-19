@@ -5,6 +5,8 @@ import com.samsamhajo.deepground.feed.feed.model.FetchFeedsResponse;
 import com.samsamhajo.deepground.feed.feedshared.model.FetchSharedFeedResponse;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
+import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateRequestDto;
+import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
 import com.samsamhajo.deepground.qna.answer.service.AnswerService;
 import com.samsamhajo.deepground.qna.question.Dto.*;
 import com.samsamhajo.deepground.qna.question.entity.Question;
@@ -202,6 +204,8 @@ public class QuestionService{
                 .map(QuestionMedia::getQuestionContentUrl)
                 .collect(Collectors.toList());
 
+        List<AnswerCreateResponseDto> answers = answerService.getAnswersByQuestionId(questionId);
+
 
         return QuestionDetailResponseDto.of(
                 question.getId(),
@@ -212,7 +216,8 @@ public class QuestionService{
                 techStacks,
                 answerCount,
                 question.getQuestionStatus(),
-                imageUrls
+                imageUrls,
+                answers
         );
     }
 

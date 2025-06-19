@@ -2,15 +2,15 @@ package com.samsamhajo.deepground.qna.answer.service;
 
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
-import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateRequestDto;
-import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
-import com.samsamhajo.deepground.qna.answer.dto.AnswerUpdateRequestDto;
-import com.samsamhajo.deepground.qna.answer.dto.AnswerUpdateResponseDto;
+import com.samsamhajo.deepground.qna.answer.dto.*;
 import com.samsamhajo.deepground.qna.answer.entity.Answer;
+import com.samsamhajo.deepground.qna.answer.entity.AnswerMedia;
+import com.samsamhajo.deepground.qna.answer.repository.AnswerMediaRepository;
 import com.samsamhajo.deepground.qna.answer.repository.AnswerRepository;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerErrorCode;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerException;
 import com.samsamhajo.deepground.qna.question.entity.Question;
+import com.samsamhajo.deepground.qna.question.entity.QuestionMedia;
 import com.samsamhajo.deepground.qna.question.exception.QuestionErrorCode;
 import com.samsamhajo.deepground.qna.question.exception.QuestionException;
 import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
@@ -18,6 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,7 @@ public class AnswerService {
     private final QuestionRepository questionRepository;
     private final AnswerMediaService answerMediaService;
     private final AnswerLikeService answerLikeService;
+    private final AnswerMediaRepository answerMediaRepository;
 
 
     @Transactional
@@ -87,6 +91,7 @@ public class AnswerService {
     @Transactional
     public AnswerUpdateResponseDto updateAnswer(AnswerUpdateRequestDto answerUpdateRequestDto, Long memberId) {
 
+
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
@@ -130,5 +135,38 @@ public class AnswerService {
             throw new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND);
         });
         return question.getAnswerCount();
+    }
+
+    public List<AnswerCreateResponseDto> getAnswersByQuestionId(Long questionId) {
+        List<Answer> answers = answerRepository.findAllByQuestionId(questionId);
+        return answers.stream()
+                .map(answer -> new AnswerCreateResponseDto(
+                        answer.getAnswerContent(),
+                        answer.getQuestion().getId(),
+                        answer.getMember().getId(),
+                        answer.getId()
+
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public AnswerDetailDto getAnswer(Long answerId, Long memberId) {
+
+        Answer answer = answerRepository.findById(answerId).orElseThrow(
+                () -> new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND));
+        List<AnswerMedia> answerMedia = answerMediaRepository.findAllByAnswerId(answerId);
+        List<String> imageUrls = answerMedia.stream()
+                .map(AnswerMedia::getAnswerCommentUrl)
+                .collect(Collectors.toList());
+
+        return AnswerDetailDto.of(
+                answer.getAnswerContent(),
+                answer.getQuestion().getId(),
+                answer.getMember().getId(),
+                answerId,
+                imageUrls
+        );
+
     }
 }
