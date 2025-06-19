@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.calendar.controller;
 
+import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleRequestDto;
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleResponseDto;
 import com.samsamhajo.deepground.calendar.exception.ScheduleSuccessCode;
@@ -8,6 +9,7 @@ import com.samsamhajo.deepground.global.success.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,9 +24,12 @@ public class StudyScheduleController {
     @PostMapping("/schedules")
     public ResponseEntity<SuccessResponse<StudyScheduleResponseDto>> createSchedule(
             @PathVariable Long studyGroupId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody StudyScheduleRequestDto requestDto
     ) {
-        StudyScheduleResponseDto responseDto = studyScheduleService.createStudySchedule(studyGroupId, requestDto);
+        Long userId = userDetails.getMember().getId();
+
+        StudyScheduleResponseDto responseDto = studyScheduleService.createStudySchedule(studyGroupId, userId, requestDto);
         return ResponseEntity.status(ScheduleSuccessCode.SCHEDULE_CREATED.getStatus())
                 .body(SuccessResponse.of(ScheduleSuccessCode.SCHEDULE_CREATED, responseDto));
     }
@@ -41,10 +46,13 @@ public class StudyScheduleController {
     @PatchMapping("/schedules/{scheduleId}")
     public ResponseEntity<SuccessResponse<StudyScheduleResponseDto>> updateSchedule(
             @PathVariable Long studyGroupId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long scheduleId,
             @Valid @RequestBody StudyScheduleRequestDto requestDto
     ) {
-        StudyScheduleResponseDto responseDto = studyScheduleService.updateStudySchedule(studyGroupId, scheduleId, requestDto);
+        Long userId = userDetails.getMember().getId();
+
+        StudyScheduleResponseDto responseDto = studyScheduleService.updateStudySchedule(studyGroupId, userId, scheduleId, requestDto);
         return ResponseEntity.status(ScheduleSuccessCode.SCHEDULE_UPDATED.getStatus())
                 .body(SuccessResponse.of(ScheduleSuccessCode.SCHEDULE_UPDATED, responseDto));
     }
@@ -52,9 +60,12 @@ public class StudyScheduleController {
     @DeleteMapping("/schedules/{scheduleId}")
     public ResponseEntity<Void> deleteSchedule(
             @PathVariable Long studyGroupId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long scheduleId
     ) {
-        studyScheduleService.deleteStudySchedule(studyGroupId, scheduleId);
+        Long userId = userDetails.getMember().getId();
+
+        studyScheduleService.deleteStudySchedule(studyGroupId, userId, scheduleId);
         return ResponseEntity.noContent().build();
     }
 

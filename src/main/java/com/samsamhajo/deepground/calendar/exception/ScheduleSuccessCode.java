@@ -15,4 +15,13 @@ public enum ScheduleSuccessCode implements SuccessCode {
     private final HttpStatus status;
     private final String message;
 
+    @Override
+    public HttpStatus getStatus() {
+        return status;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
 }
