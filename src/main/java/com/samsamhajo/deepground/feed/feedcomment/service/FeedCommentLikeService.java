@@ -20,16 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class FeedCommentLikeService {
 
     private final FeedCommentRepository feedCommentRepository;
-    private final MemberRepository memberRepository;
     private final FeedCommentLikeRepository feedCommentLikeRepository;
 
     @Transactional
-    public void feedLikeIncrease(Long feedId, Long memberId) {
-        increaseValidate(feedId, memberId);
+    public void feedLikeIncrease(Long feedId, Member member) {
+        increaseValidate(feedId, member.getId());
 
         FeedComment feedComment = feedCommentRepository.getById(feedId);
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.INVALID_MEMBER_ID));
 
         FeedCommentLike feedCommentLike = FeedCommentLike.of(feedComment, member);
 

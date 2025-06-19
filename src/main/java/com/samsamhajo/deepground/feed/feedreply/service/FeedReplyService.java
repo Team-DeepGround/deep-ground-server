@@ -30,18 +30,14 @@ public class FeedReplyService {
 
     private final FeedCommentRepository feedCommentRepository;
     private final FeedReplyRepository feedReplyRepository;
-    private final MemberRepository memberRepository;
     private final FeedReplyMediaService feedReplyMediaService;
     private final FeedReplyLikeService feedReplyLikeService;
 
     @Transactional
-    public FeedComment createFeedReply(FeedReplyCreateRequest request, Long memberId) {
+    public FeedComment createFeedReply(FeedReplyCreateRequest request, Member member) {
         if (!StringUtils.hasText(request.getContent())) {
             throw new FeedCommentException(FeedCommentErrorCode.INVALID_FEED_COMMENT_CONTENT);
         }
-
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.INVALID_MEMBER_ID));
 
         FeedComment feedComment = feedCommentRepository.getById(request.getFeedCommentId());
 

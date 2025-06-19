@@ -12,7 +12,6 @@ import com.samsamhajo.deepground.feed.feedshared.repository.SharedFeedRepository
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
 import com.samsamhajo.deepground.member.exception.MemberException;
-import com.samsamhajo.deepground.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,7 +19,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -31,7 +29,6 @@ class SharedFeedServiceTest {
 
     private SharedFeedRepository sharedFeedRepository;
     private FeedRepository feedRepository;
-    private MemberRepository memberRepository;
     private FeedMediaService feedMediaService;
     private SharedFeedService sharedFeedService;
 
@@ -44,12 +41,10 @@ class SharedFeedServiceTest {
     void setUp() {
         sharedFeedRepository = mock(SharedFeedRepository.class);
         feedRepository = mock(FeedRepository.class);
-        memberRepository = mock(MemberRepository.class);
         feedMediaService = mock(FeedMediaService.class);
         sharedFeedService = new SharedFeedService(
                 sharedFeedRepository,
                 feedRepository,
-                memberRepository,
                 feedMediaService
         );
     }
@@ -62,26 +57,24 @@ class SharedFeedServiceTest {
         Feed originFeed = Feed.of(TEST_CONTENT, testMember);
         Feed newFeed = Feed.of(TEST_CONTENT, testMember);
         SharedFeed sharedFeed = SharedFeed.of(newFeed, originFeed, testMember);
-        
+
         ReflectionTestUtils.setField(testMember, "id", 1L);
         ReflectionTestUtils.setField(originFeed, "id", 1L);
         ReflectionTestUtils.setField(newFeed, "id", 2L);
-        
+
         SharedFeedRequest request = new SharedFeedRequest();
         ReflectionTestUtils.setField(request, "originFeedId", 1L);
         ReflectionTestUtils.setField(request, "content", TEST_CONTENT);
 
-        when(memberRepository.findById(1L)).thenReturn(Optional.of(testMember));
         when(feedRepository.getById(1L)).thenReturn(originFeed);
         when(feedRepository.save(any(Feed.class))).thenReturn(newFeed);
         when(sharedFeedRepository.save(any(SharedFeed.class))).thenReturn(sharedFeed);
 
         // when
-        SharedFeed result = sharedFeedService.createSharedFeed(request, 1L);
+        SharedFeed result = sharedFeedService.createSharedFeed(request, testMember);
 
         // then
         assertThat(result).isNotNull();
-        verify(memberRepository).findById(1L);
         verify(feedRepository).getById(1L);
         verify(feedRepository).save(any(Feed.class));
         verify(sharedFeedRepository).save(any(SharedFeed.class));
@@ -91,14 +84,15 @@ class SharedFeedServiceTest {
     @DisplayName("공유 피드 생성 실패 - 존재하지 않는 회원")
     void createSharedFeedFailWithInvalidMember() {
         // given
+        Member testMember = Member.createLocalMember(TEST_EMAIL, TEST_PASSWORD, TEST_NICKNAME);
         SharedFeedRequest request = new SharedFeedRequest();
         ReflectionTestUtils.setField(request, "originFeedId", 1L);
         ReflectionTestUtils.setField(request, "content", TEST_CONTENT);
 
-        when(memberRepository.findById(1L)).thenReturn(Optional.empty());
-
         // when & then
-        assertThatThrownBy(() -> sharedFeedService.createSharedFeed(request, 1L))
+        when(testMember.getId()).thenReturn(1L);
+
+        assertThatThrownBy(() -> sharedFeedService.createSharedFeed(request, testMember))
                 .isInstanceOf(MemberException.class)
                 .hasFieldOrPropertyWithValue("errorCode", MemberErrorCode.INVALID_MEMBER_ID);
     }

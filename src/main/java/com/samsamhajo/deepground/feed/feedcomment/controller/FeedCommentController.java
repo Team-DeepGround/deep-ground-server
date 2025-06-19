@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.feed.feedcomment.controller;
 
+import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentSuccessCode;
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentCreateRequest;
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentUpdateRequest;
@@ -9,6 +10,7 @@ import com.samsamhajo.deepground.global.success.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,13 +19,13 @@ import org.springframework.web.bind.annotation.*;
 public class FeedCommentController {
 
     private final FeedCommentService feedCommentService;
-    private final Long DEV_MEMBER_ID = 1L;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse<?>> createFeedComment(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @ModelAttribute FeedCommentCreateRequest request) {
 
-        feedCommentService.createFeedComment(request, DEV_MEMBER_ID);
+        feedCommentService.createFeedComment(request, userDetails.getMember());
 
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedCommentSuccessCode.FEED_COMMENT_CREATED));
@@ -52,9 +54,11 @@ public class FeedCommentController {
 
     @GetMapping("/list/{feedId}")
     public ResponseEntity<SuccessResponse<FetchFeedCommentsResponse>> getFeedComments(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable("feedId") Long feedId) {
 
-        FetchFeedCommentsResponse response = feedCommentService.getFeedComments(feedId, DEV_MEMBER_ID);
+        FetchFeedCommentsResponse response =
+                feedCommentService.getFeedComments(feedId, userDetails.getMember().getId());
 
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedCommentSuccessCode.FEED_COMMENT_LIST_FETCHED, response));
