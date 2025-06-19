@@ -171,11 +171,17 @@ public class FriendService {
 
 
     @Transactional
-    public void deleteFriendById(Long friendId) {
+    public void deleteFriendByMemberId(Long friendId, Long memberId) {
 
         Friend friend = friendRepository.findById(friendId)
                 .orElseThrow(() -> new FriendException(FriendErrorCode.INVALID_FRIEND));
 
+        boolean isRequester = friend.getRequestMember().getId().equals(memberId);
+        boolean isReceiver = friend.getReceiveMember().getId().equals(memberId);
+
+        if (!isRequester && !isReceiver) {
+            throw new FriendException(FriendErrorCode.UNAUTHORIZED_ACCESS);
+        }
         friend.softDelete();
     }
 
@@ -192,4 +198,6 @@ public class FriendService {
                 })
                 .toList();
     }
+
+
 }
