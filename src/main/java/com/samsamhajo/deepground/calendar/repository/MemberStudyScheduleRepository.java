@@ -13,6 +13,12 @@ public interface MemberStudyScheduleRepository extends JpaRepository<MemberStudy
 
     void deleteAllByStudyScheduleId(Long scheduleId);
 
-    @Query("SELECT mss FROM MemberStudySchedule mss JOIN FETCH mss.studySchedule WHERE mss.member.id = :memberId")
+    @Query("""
+    SELECT mss
+    FROM MemberStudySchedule mss
+    JOIN FETCH mss.studySchedule ss
+    JOIN FETCH ss.studyGroup
+    WHERE mss.member.id = :memberId
+    """)
     List<MemberStudySchedule> findAllByMemberId(@Param("memberId") Long memberId);
 }
