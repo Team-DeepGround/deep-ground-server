@@ -11,6 +11,7 @@ public class ChatRoomResponse {
     private Long chatRoomId;
     private String name;
     private LocalDateTime lastReadMessageTime;
+    private long memberCount;
     private Long unreadCount;
 
     public static ChatRoomResponse of(ChatRoomInfo info, Long unreadCount) {
@@ -18,6 +19,7 @@ public class ChatRoomResponse {
                 .chatRoomId(info.getChatRoomId())
                 .name(info.getName())
                 .lastReadMessageTime(info.getLastReadMessageTime())
+                .memberCount(info.getMemberCount())
                 .unreadCount(unreadCount)
                 .build();
     }

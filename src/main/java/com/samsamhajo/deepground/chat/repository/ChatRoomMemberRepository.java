@@ -22,7 +22,7 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
     Optional<ChatRoomMember> findByChatRoomIdAndMemberId(Long chatRoomId, Long memberId);
 
     @Query("SELECT NEW com.samsamhajo.deepground.chat.dto.ChatRoomInfo("
-            + "cr.id, friend.nickname, crm.lastReadMessageTime) "
+            + "cr.id, friend.nickname, crm.lastReadMessageTime, 2) "
             + "FROM ChatRoomMember crm "
             + "JOIN crm.chatRoom cr "
             + "JOIN ChatRoomMember friendCrm ON friendCrm.chatRoom.id = cr.id AND friendCrm.member.id != crm.member.id "
@@ -32,11 +32,13 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
     Page<ChatRoomInfo> findByMemberIdAndChatRoomTypeFriend(Long memberId, Pageable pageable);
 
     @Query("SELECT NEW com.samsamhajo.deepground.chat.dto.ChatRoomInfo("
-            + "cr.id, sg.title, crm.lastReadMessageTime) "
+            + "cr.id, sg.title, crm.lastReadMessageTime, COUNT(members)) "
             + "FROM ChatRoomMember crm "
             + "JOIN crm.chatRoom cr "
             + "JOIN StudyGroup sg ON sg.chatRoom.id = cr.id "
+            + "JOIN ChatRoomMember members ON members.chatRoom.id = cr.id "
             + "WHERE crm.member.id = :memberId AND cr.type = 'STUDY_GROUP' "
+            + "GROUP BY cr.id, sg.title, crm.lastReadMessageTime "
             + "ORDER BY crm.lastReadMessageTime DESC")
     Page<ChatRoomInfo> findByMemberIdAndChatRoomTypeStudyGroup(Long memberId, Pageable pageable);
 

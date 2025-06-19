@@ -11,4 +11,5 @@ public class ChatRoomInfo {
     private Long chatRoomId;
     private String name;
     private LocalDateTime lastReadMessageTime;
+    private long memberCount;
 }
