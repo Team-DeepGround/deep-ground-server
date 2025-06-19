@@ -12,6 +12,7 @@ public class MemberScheduleCalendarResponseDto {
 
     private Long memberStudyScheduleId;
     private Long studyScheduleId;
+    private Long studyGroupId;
     private String title;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
@@ -19,9 +20,11 @@ public class MemberScheduleCalendarResponseDto {
 
     public static MemberScheduleCalendarResponseDto from(MemberStudySchedule schedule) {
         var ss = schedule.getStudySchedule();
+        var sg = ss.getStudyGroup();
         return MemberScheduleCalendarResponseDto.builder()
                 .memberStudyScheduleId(schedule.getId())
                 .studyScheduleId(ss.getId())
+                .studyGroupId(sg.getId())
                 .title(ss.getTitle())
                 .startTime(ss.getStartTime())
                 .endTime(ss.getEndTime())
