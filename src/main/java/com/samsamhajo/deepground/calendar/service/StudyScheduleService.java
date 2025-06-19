@@ -150,7 +150,7 @@ public class StudyScheduleService {
         }
     }
     private void validateStudyLeader(Long userId, StudyGroup studyGroup) {
-        if (!studyGroup.getMember().getId().equals(userId)) {
+        if (!studyGroup.getCreator().getId().equals(userId)) {
             throw new ScheduleException(ScheduleErrorCode.UNAUTHORIZED_USER);
         }
     }

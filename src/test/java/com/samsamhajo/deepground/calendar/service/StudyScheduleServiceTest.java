@@ -60,7 +60,7 @@ class StudyScheduleServiceTest {
 
         Member leader = mock(Member.class);
         when(leader.getId()).thenReturn(userId);
-        when(studyGroup.getMember()).thenReturn(leader);
+        when(studyGroup.getCreator()).thenReturn(leader);
     }
 
     @Test
@@ -168,7 +168,7 @@ class StudyScheduleServiceTest {
         Member notLeader = mock(Member.class);
         when(notLeader.getId()).thenReturn(9L);
 
-        when(studyGroup.getMember()).thenReturn(notLeader);
+        when(studyGroup.getCreator()).thenReturn(notLeader);
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
 
         // when & then
@@ -344,7 +344,7 @@ class StudyScheduleServiceTest {
         // given
         Member notLeader = mock(Member.class);
         when(notLeader.getId()).thenReturn(999L);
-        when(studyGroup.getMember()).thenReturn(notLeader);
+        when(studyGroup.getCreator()).thenReturn(notLeader);
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
 
         StudySchedule schedule = mock(StudySchedule.class);
@@ -403,7 +403,7 @@ class StudyScheduleServiceTest {
 
         Member notLeader = mock(Member.class);
         when(notLeader.getId()).thenReturn(999L);
-        when(studyGroup.getMember()).thenReturn(notLeader);
+        when(studyGroup.getCreator()).thenReturn(notLeader);
         when(studyGroup.getId()).thenReturn(studyGroupId);
 
         StudySchedule schedule = mock(StudySchedule.class);
