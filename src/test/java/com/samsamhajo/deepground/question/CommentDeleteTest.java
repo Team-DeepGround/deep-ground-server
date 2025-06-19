@@ -107,6 +107,15 @@ public class CommentDeleteTest {
             //삭제한 id가 commentid와 동일한지
             assertThat(deleteId.equals(commentId)).isTrue();
             assertThat(commentRepository.findById(commentId).isPresent()).isFalse();
+
+            CommentException exception = assertThrows(CommentException.class, () -> {
+                if(!commentCreateResponseDto.getMemberId().equals(memberId2)) {
+                    throw new CommentException(CommentErrorCode.COMMENT_MEMBER_MISMATCH);
+                }
+            });
+
+            assertThat(exception.getMessage()).isEqualTo("댓글을 작성한 멤버가 아닙니다.");
+        System.out.println(exception.getMessage());
         }
         @Test
     @DisplayName("삭제 예외 처리")

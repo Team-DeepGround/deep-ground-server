@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.question;
 
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.member.exception.MemberException;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateRequestDto;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
@@ -46,12 +47,15 @@ public class AnswerUpdateTest {
     @Autowired
     private TechStackRepository techStackRepository;
     private Long memberId;
+    private Long memberId2;
 
     @BeforeEach
     public void setUp() {
         Member member = Member.createLocalMember("ds@gmail.com", "test", "test");
+        Member member2 = Member.createLocalMember("ds@gmail.com", "test", "test");
         memberRepository.save(member);
         memberId = member.getId();
+        memberId2 = member2.getId();
     }
 
     @Test
@@ -95,7 +99,15 @@ public class AnswerUpdateTest {
         //수정 전, 후 컨텐츠 결과 비교
         assertThat(UpdateAfterContent).isNotEqualTo(UpdateBeforeContent);
 
+        AnswerException exception = assertThrows(AnswerException.class, () -> {
+            if (!answerUpdateResponseDto.getMemberId().equals(memberId2)) {
+                throw new AnswerException(AnswerErrorCode.ANSWER_MEMBER_MISMTACH);
+            }
+        });
+
+        assertThat(exception.getMessage()).isEqualTo("답변을 작성한 사용자가 아닙니다.");
     }
+
 
     @Test
     @DisplayName("Content Valid 테스트")

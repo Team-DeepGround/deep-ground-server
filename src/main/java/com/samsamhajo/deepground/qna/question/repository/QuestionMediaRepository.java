@@ -12,4 +12,6 @@ public interface QuestionMediaRepository extends JpaRepository<QuestionMedia, Lo
     List<QuestionMedia> findAllByQuestionId(Long questionId);
 
     void deleteAllByQuestionId(Long questionId);
+
+    List<QuestionMedia> findByQuestion_Id(Long questionId);
 }

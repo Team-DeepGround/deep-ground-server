@@ -14,11 +14,11 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class AnswerMediaService {
 
     private final AnswerMediaRepository answerMediaRepository;
 
+    @Transactional
     public void createAnswerMedia(Answer answer, List<MultipartFile> mediaFiles) {
 
         answerMediaRepository.saveAll(
@@ -31,7 +31,7 @@ public class AnswerMediaService {
         );
     }
 
-
+    @Transactional
     public void deleteAnswerMedia(Long answerId) {
         List<AnswerMedia> answerMedia = answerMediaRepository.findAllByAnswerId(answerId);
         answerMedia.forEach(content -> MediaUtils.deleteMedia(content.getAnswerCommentUrl()));

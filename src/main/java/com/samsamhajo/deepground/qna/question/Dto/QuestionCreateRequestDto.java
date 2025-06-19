@@ -1,7 +1,6 @@
 package com.samsamhajo.deepground.qna.question.Dto;
 
 
-import com.samsamhajo.deepground.qna.question.entity.QuestionTag;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -21,5 +21,5 @@ public class QuestionCreateRequestDto {
     private String title;
     private String content;
     private List<String> techStacks;
-    private List<MultipartFile> images;
+    private List<MultipartFile> images = new ArrayList<>();
 }

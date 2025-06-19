@@ -71,6 +71,10 @@ public class Question extends BaseEntity {
         this.content = content;
     }
     public void updateStatus(QuestionStatus questionStatus){
-        this.questionStatus = questionStatus;
+        if(questionStatus != null) {
+            this.questionStatus = questionStatus;
+        } else {
+            this.questionStatus = QuestionStatus.OPEN;
+        }
     }
 }

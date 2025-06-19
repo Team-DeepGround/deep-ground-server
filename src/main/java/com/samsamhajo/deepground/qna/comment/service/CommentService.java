@@ -72,6 +72,10 @@ public class CommentService {
         Comment comment = commentRepository.findById(updateCommentRequestDto.getCommentId()).orElseThrow(() ->
                 new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
 
+        if(!comment.getMember().getId().equals(memberId)) {
+            throw new CommentException(CommentErrorCode.COMMENT_MEMBER_MISMATCH);
+        }
+
         if(!StringUtils.hasText(updateCommentRequestDto.getCommentContent())) {
             throw new CommentException(CommentErrorCode.COMMENT_REQUIRED);
         }
@@ -80,9 +84,9 @@ public class CommentService {
             throw new CommentException(CommentErrorCode.COMMENT_ANSWER_MISMATCH);
         }
 
-        if(!comment.getMember().getId().equals(memberId)) {
-            throw new CommentException(CommentErrorCode.COMMENT_MEMBER_MISMATCH);
-        }
+        System.out.println("comment.getMember().getId(): " + comment.getMember().getId());
+        System.out.println("memberId: " + memberId);
+
         comment.updateCommentContent(updateCommentRequestDto.getCommentContent());
 
 

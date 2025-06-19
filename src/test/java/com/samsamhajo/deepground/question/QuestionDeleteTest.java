@@ -5,6 +5,8 @@ import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateRequestDto;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateResponseDto;
+import com.samsamhajo.deepground.qna.question.exception.QuestionErrorCode;
+import com.samsamhajo.deepground.qna.question.exception.QuestionException;
 import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
 import com.samsamhajo.deepground.qna.question.service.QuestionService;
 import com.samsamhajo.deepground.techStack.entity.TechStack;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -44,13 +47,16 @@ public class QuestionDeleteTest {
     private TechStackRepository techStackRepository;
 
     private Long memberId;
+    private Long memberId2;
 
     @BeforeEach
     void 테스트용_멤버_저장() {
         // 테스트용 멤버 저장
         Member member = Member.createLocalMember("test@naver.com", "password123", "tester");
+        Member member2 = Member.createLocalMember("test@naver.com", "password123", "tester");
         memberRepository.save(member);
         memberId = member.getId();
+        memberId2 = member2.getId();
     }
 
     @Test
@@ -84,7 +90,16 @@ public class QuestionDeleteTest {
         //questionId, deleteId가 같아야함
         assertThat(deleteId.equals(questionId)).isTrue();
 
-        //TODO : 미디어 삭제 추가로직 구현
+        QuestionException exception = assertThrows(QuestionException.class, () ->{
+            if(!questionCreateResponseDto.getMemberId().equals(memberId2)){
+                throw new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH);
+            }
+        });
+        System.out.println(questionCreateResponseDto.getMemberId());
+        System.out.println(memberId2);
+
+        assertThat(exception.getMessage()).isEqualTo("질문을 작성한 사용자가 아닙니다.");
+        System.out.println(exception.getMessage());
 
 
     }

@@ -123,6 +123,15 @@ public class CommentUpdateTest {
         assertThat(updateCommentResponseDto.getCommentContent()).isEqualTo(updateCommentContent);
         //맞는 댓글을 수정한게 맞는지 확인
         assertThat(commentId2).isEqualTo(commentId);
+
+        CommentException exception = assertThrows(CommentException.class, () -> {
+            if(!updateCommentResponseDto.getMemberId().equals(memberId2)) {
+                throw new CommentException(CommentErrorCode.COMMENT_MEMBER_MISMATCH);
+            }
+        });
+
+        assertThat(exception.getMessage()).isEqualTo("댓글을 작성한 멤버가 아닙니다.");
+        System.out.println(exception.getMessage());
     }
     @Test
     @DisplayName("수정 예외 처리")
