@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.IntStream;
 import org.springframework.test.context.TestPropertySource;
@@ -54,7 +55,8 @@ class StudyGroupServiceMyListTest extends IntegrationTestSupport {
           LocalDate.now().plusDays(30),
           LocalDate.now(),
           LocalDate.now().plusDays(5),
-          5, creator, true, "강남"
+          5, creator, true, "강남",
+          new HashSet<>()
       );
       if (i > 5) {
         group.changeGroupStatus(GroupStatus.COMPLETED);
@@ -70,7 +72,8 @@ class StudyGroupServiceMyListTest extends IntegrationTestSupport {
           LocalDate.now().plusDays(30),
           LocalDate.now(),
           LocalDate.now().plusDays(5),
-          5, otherUser, true, "신촌"
+          5, otherUser, true, "신촌",
+          new HashSet<>()
       );
       studyGroupRepository.save(group);
     });

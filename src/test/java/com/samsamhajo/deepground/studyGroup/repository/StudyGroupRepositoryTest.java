@@ -20,6 +20,7 @@
 //
 //
 //import java.time.LocalDate;
+//import java.util.HashSet;
 //import java.util.Optional;
 //
 //import static org.assertj.core.api.Assertions.*;
@@ -56,7 +57,8 @@
 //        10,
 //        writer,
 //        true,
-//        "강남"
+//        "강남",
+//        new HashSet<>()
 //    );
 //    savedGroup = studyGroupRepository.save(group);
 //    em.flush();
@@ -109,7 +111,8 @@
 //          5,
 //          creator,
 //          true,
-//          "강남"
+//          "강남",
+//          new HashSet<>()
 //      );
 //      group.changeGroupStatus(status);
 //      studyGroupRepository.save(group);

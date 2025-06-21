@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -39,7 +40,8 @@ class StudyGroupDeleteServiceTest extends IntegrationTestSupport {
         null, "삭제 테스트 스터디", "설명",
         LocalDate.now(), LocalDate.now().plusDays(10),
         LocalDate.now(), LocalDate.now().plusDays(3),
-        5, owner, true, "강남"
+        5, owner, true, "강남",
+        new HashSet<>()
     );
     studyGroupRepository.save(group);
   }

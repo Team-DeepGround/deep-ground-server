@@ -13,6 +13,7 @@ import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import java.time.LocalDate;
+import java.util.HashSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,8 @@ class StudyGroupKickServiceTest extends IntegrationTestSupport {
         null, "스터디", "소개",
         LocalDate.now(), LocalDate.now().plusDays(10),
         LocalDate.now(), LocalDate.now().plusDays(3),
-        5, owner, true, "강남"
+        5, owner, true, "강남",
+        new HashSet<>()
     );
     studyGroupRepository.save(group);
 
