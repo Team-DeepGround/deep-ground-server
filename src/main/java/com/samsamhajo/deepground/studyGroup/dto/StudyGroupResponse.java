@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.studyGroup.dto;
 
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.TechTag;
 import lombok.Builder;
@@ -18,6 +19,7 @@ public class StudyGroupResponse {
   private String description;
   private String period;
   private String recruitmentPeriod;
+  private GroupStatus groupStatus;
   private Set<TechTag> tags;
   private Integer maxMembers;
   private Integer currentMembers;
@@ -46,6 +48,7 @@ public class StudyGroupResponse {
         .tags(group.getTechTags())
         .maxMembers(group.getGroupMemberCount())
         .currentMembers(group.getMembers().size())
+        .groupStatus(group.getGroupStatus())
         .organizer(
             OrganizerDto.builder()
                 .name(creator.getNickname())

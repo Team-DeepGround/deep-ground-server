@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -51,7 +52,8 @@ class StudyGroupParticipationServiceTest extends IntegrationTestSupport {
           null, "참가 스터디 " + i, "설명",
           LocalDate.now(), LocalDate.now().plusDays(30),
           LocalDate.now(), LocalDate.now().plusDays(10),
-          5, creator, true, "서울"
+          5, creator, true, "서울",
+          new HashSet<>()
       );
       studyGroupRepository.save(group);
 
@@ -64,7 +66,8 @@ class StudyGroupParticipationServiceTest extends IntegrationTestSupport {
           null, "대기 스터디 " + i, "설명",
           LocalDate.now(), LocalDate.now().plusDays(30),
           LocalDate.now(), LocalDate.now().plusDays(10),
-          5, creator, true, "서울"
+          5, creator, true, "서울",
+          new HashSet<>()
       );
       studyGroupRepository.save(group);
 
