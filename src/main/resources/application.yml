@@ -135,3 +135,18 @@ swagger:
 app:
   oauth2:
     authorized-redirect-uri: ${OAUTH2_AUTHORIZED_REDIRECT_URI}
+
+#AWS S3 관련 설정
+cloud:
+  aws:
+    s3:
+      bucketName: ${BUCKET_NAME}
+    credentials:
+      access-key: ${ACCESS_KEY}
+      secret-key: ${SECRET_KEY}
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+
+
