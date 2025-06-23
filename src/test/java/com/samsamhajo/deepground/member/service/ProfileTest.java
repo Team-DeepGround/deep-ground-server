@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -90,8 +91,9 @@ public class ProfileTest {
                 .websiteUrl("https://new.dev")
                 .twitterUrl("https://twitter.com/new")
                 .build();
+
         //when
-        MemberProfileDto update = memberService.editMemberProfile(member.getId(), edit);
+        MemberProfileDto update = memberService.editMemberProfile(member.getId(), edit, null);
 
         //then
         assertEquals("https://example.com/new.jpg", update.getProfileImage());
@@ -118,7 +120,7 @@ public class ProfileTest {
 
         // when & then
         assertThrows(MemberException.class, () ->
-                memberService.editMemberProfile(invalidMemberId, dto));
+                memberService.editMemberProfile(invalidMemberId, dto,null));
     }
 
 }
