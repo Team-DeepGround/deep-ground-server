@@ -3,7 +3,6 @@ package com.samsamhajo.deepground.calendar.controller;
 
 import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.calendar.dto.MemberScheduleCalendarResponseDto;
-import com.samsamhajo.deepground.calendar.dto.MemberScheduleDetailResponseDto;
 import com.samsamhajo.deepground.calendar.dto.MemberStudyScheduleRequestDto;
 import com.samsamhajo.deepground.calendar.dto.MemberStudyScheduleResponseDto;
 import com.samsamhajo.deepground.calendar.exception.ScheduleSuccessCode;
@@ -34,19 +33,6 @@ public class MemberStudyScheduleController {
 
         return ResponseEntity.status(ScheduleSuccessCode.SCHEDULE_FOUND.getStatus())
                 .body(SuccessResponse.of(ScheduleSuccessCode.SCHEDULE_FOUND, memberStudySchedules));
-    }
-
-    @GetMapping("/{memberStudyScheduleId}")
-    public ResponseEntity<SuccessResponse<MemberScheduleDetailResponseDto>> getScheduleByMemberScheduleId(
-            @PathVariable Long memberStudyScheduleId,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
-        Long userId = userDetails.getMember().getId();
-
-        MemberScheduleDetailResponseDto responseDto = memberStudyScheduleService.getScheduleByMemberScheduleId(memberStudyScheduleId, userId);
-
-        return ResponseEntity.status(ScheduleSuccessCode.SCHEDULE_FOUND.getStatus())
-                .body(SuccessResponse.of(ScheduleSuccessCode.SCHEDULE_FOUND, responseDto));
     }
 
     @PatchMapping("/{memberStudyScheduleId}")
