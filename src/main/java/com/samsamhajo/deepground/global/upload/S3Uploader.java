@@ -43,7 +43,6 @@ public class S3Uploader {
     private String putS3(File uploadFile, String fileName) {
         amazonS3Client.putObject(
                 new PutObjectRequest(bucket, fileName,uploadFile)
-                        .withCannedAcl(CannedAccessControlList.PublicRead)
                 );
         return amazonS3Client.getUrl(bucket,fileName).toString();
     }
@@ -82,4 +81,6 @@ public class S3Uploader {
         String random = UUID.randomUUID().toString();
         return random + originName;
     }
+
+
 }
