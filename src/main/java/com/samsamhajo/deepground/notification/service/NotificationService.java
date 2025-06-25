@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.notification.service;
 
 import com.samsamhajo.deepground.notification.dto.NotificationListResponse;
 import com.samsamhajo.deepground.notification.dto.NotificationResponse;
+import com.samsamhajo.deepground.notification.dto.NotificationUnreadResponse;
 import com.samsamhajo.deepground.notification.entity.Notification;
 import com.samsamhajo.deepground.notification.entity.NotificationData;
 import com.samsamhajo.deepground.notification.exception.NotificationErrorCode;
@@ -72,5 +73,11 @@ public class NotificationService {
 
     public void readAllNotifications(Long receiverId) {
         notificationRepository.updateAllByReceiverId(receiverId);
+    }
+
+    public NotificationUnreadResponse getUnreadCount(Long memberId) {
+        Long unreadCount = notificationRepository.countByReceiverIdAndReadFalse(memberId);
+
+        return NotificationUnreadResponse.of(unreadCount);
     }
 }
