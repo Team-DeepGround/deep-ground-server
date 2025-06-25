@@ -33,7 +33,7 @@ public class SseEmitterService {
         sseEmitter.onError(sseEmitter::completeWithError);
 
         eventPublisher.publishEvent(new SseSubscribeEvent(this, memberId));
-        broadcast(memberId, CONNECTED_EVENT);
+        send(List.of(sseEmitter), CONNECTED_EVENT);
         return sseEmitter;
     }
 
@@ -55,7 +55,7 @@ public class SseEmitterService {
                         .name(event.getName())
                         .data(event.getData()));
             } catch (IOException e) {
-                sseEmitter.completeWithError(e);
+                sseEmitter.complete();
             }
         });
     }
