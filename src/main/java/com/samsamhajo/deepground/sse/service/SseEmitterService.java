@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Service
@@ -37,8 +38,11 @@ public class SseEmitterService {
         return sseEmitter;
     }
 
-    public void broadcast(Long memberId, SseEvent event) {
-        List<SseEmitter> emitters = sseEmitterRepository.findAllById(memberId);
+    public void broadcast(SseEvent event) {
+        if (ObjectUtils.isEmpty(event.getMemberId())) {
+            return;
+        }
+        List<SseEmitter> emitters = sseEmitterRepository.findAllById(event.getMemberId());
         send(emitters, event);
     }
 

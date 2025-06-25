@@ -69,10 +69,7 @@ class NotificationServiceTest {
         List<Notification> savedNotifications = captor.getValue();
         assertThat(savedNotifications).hasSize(1);
 
-        verify(sseEmitterService).broadcast(
-                eq(receiverId),
-                any(SseEvent.class)
-        );
+        verify(sseEmitterService).broadcast(any(SseEvent.class));
     }
 
     @Nested

@@ -19,11 +19,11 @@ import com.samsamhajo.deepground.chat.repository.ChatRoomMemberRepository;
 import com.samsamhajo.deepground.global.message.MessagePublisher;
 import com.samsamhajo.deepground.sse.dto.SseEvent;
 import com.samsamhajo.deepground.sse.dto.SseEventType;
-import com.samsamhajo.deepground.sse.service.SseEmitterService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -37,7 +37,7 @@ public class ChatMessageService {
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatMediaRepository chatMediaRepository;
-    private final SseEmitterService sseEmitterService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public ChatMessageListResponse getMessages(Long chatRoomId, Long memberId, LocalDateTime cursor, int limit) {
@@ -131,8 +131,8 @@ public class ChatMessageService {
             );
 
             UnreadCountResponse response = UnreadCountResponse.of(chatRoomId, unreadCount, latestMessageTime);
-            SseEvent event = SseEvent.of(SseEventType.UNREAD_COUNT, response);
-            sseEmitterService.broadcast(member.getMember().getId(), event);
+            SseEvent event = SseEvent.of(member.getMember().getId(), SseEventType.UNREAD_COUNT, response);
+            eventPublisher.publishEvent(event);
         });
     }
 }

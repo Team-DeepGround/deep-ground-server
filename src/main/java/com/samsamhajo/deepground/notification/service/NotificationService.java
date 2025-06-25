@@ -11,10 +11,10 @@ import com.samsamhajo.deepground.notification.repository.NotificationDataReposit
 import com.samsamhajo.deepground.notification.repository.NotificationRepository;
 import com.samsamhajo.deepground.sse.dto.SseEvent;
 import com.samsamhajo.deepground.sse.dto.SseEventType;
-import com.samsamhajo.deepground.sse.service.SseEmitterService;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,7 +23,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final NotificationDataRepository notificationDataRepository;
-    private final SseEmitterService sseEmitterService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public void sendNotification(Long receiverId, NotificationData data) {
         sendNotification(List.of(receiverId), data);
@@ -40,8 +40,8 @@ public class NotificationService {
 
         notifications.forEach(notification -> {
             NotificationResponse response = NotificationResponse.from(notification);
-            SseEvent event = SseEvent.of(SseEventType.NOTIFICATION, response);
-            sseEmitterService.broadcast(notification.getReceiverId(), event);
+            SseEvent event = SseEvent.of(notification.getReceiverId(), SseEventType.NOTIFICATION, response);
+            eventPublisher.publishEvent(event);
         });
     }
 
