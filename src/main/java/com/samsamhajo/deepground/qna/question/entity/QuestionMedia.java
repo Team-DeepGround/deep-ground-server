@@ -19,7 +19,7 @@ public class QuestionMedia extends BaseEntity {
     private Long id;
 
     @Column(name="question_content_url", nullable = false)
-    private String questionContentUrl;
+    private String mediaUrl;
 
     @Column(name = "extension", nullable = false)
     private String extension;
@@ -28,8 +28,12 @@ public class QuestionMedia extends BaseEntity {
     @JoinColumn(name = "question_id")
     private Question question;
 
+    public String getMediaUrl() {
+        return mediaUrl;
+    }
+
     private QuestionMedia(String QuestionContentUrl, String extension, Question question) {
-        this.questionContentUrl = QuestionContentUrl;
+        this.mediaUrl = QuestionContentUrl;
         this.extension = extension;
         this.question = question;
     }

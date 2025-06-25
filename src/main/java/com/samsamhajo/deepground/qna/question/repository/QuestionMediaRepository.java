@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface QuestionMediaRepository extends JpaRepository<QuestionMedia, Long> {
@@ -13,5 +14,7 @@ public interface QuestionMediaRepository extends JpaRepository<QuestionMedia, Lo
 
     void deleteAllByQuestionId(Long questionId);
 
-    List<QuestionMedia> findByQuestion_Id(Long questionId);
+    List<QuestionMedia> findByQuestionId(Long questionId);
+
+    Optional<QuestionMedia> findFirstByQuestionId(Long questionId);
 }

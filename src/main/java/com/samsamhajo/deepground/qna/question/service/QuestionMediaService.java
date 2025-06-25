@@ -35,7 +35,7 @@ public class QuestionMediaService {
 
     public void deleteQuestionMedia(Long questionId) {
         List<QuestionMedia> questionMedia = questionMediaRepository.findAllByQuestionId(questionId);
-        questionMedia.forEach(content -> MediaUtils.deleteMedia(content.getQuestionContentUrl()));
+        questionMedia.forEach(content -> MediaUtils.deleteMedia(content.getMediaUrl()));
         questionMediaRepository.deleteAllByQuestionId(questionId);
     }
 
