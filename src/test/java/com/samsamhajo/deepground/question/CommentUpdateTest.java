@@ -114,7 +114,7 @@ public class CommentUpdateTest {
         String updateCommentContent = "테스트 댓글 수정";
         UpdateCommentRequestDto updateCommentRequestDto = new UpdateCommentRequestDto(updateCommentContent, answerId, commentId);
         System.out.println(updateCommentRequestDto.getCommentId());
-        UpdateCommentResponseDto updateCommentResponseDto = commentService.updateComment(updateCommentRequestDto, memberId);
+        UpdateCommentResponseDto updateCommentResponseDto = commentService.updateComment(commentId,updateCommentRequestDto, memberId);
         commentId2 = updateCommentResponseDto.getCommentId();
         System.out.println(commentId2);
         System.out.println(updateCommentResponseDto.getCommentContent());
@@ -179,9 +179,9 @@ public class CommentUpdateTest {
         UpdateCommentRequestDto updateCommentRequestDto2 = new UpdateCommentRequestDto(updateCommentContent, answerId, commentId);
         UpdateCommentRequestDto updateCommentRequestDto3 = new UpdateCommentRequestDto(commentContent, answerId2, commentId);
 
-        CommentException commentException = assertThrows(CommentException.class, () -> commentService.updateComment(updateCommentRequestDto, memberId2));
-        CommentException commentException2 = assertThrows(CommentException.class, () -> commentService.updateComment(updateCommentRequestDto2, memberId));
-        CommentException commentException3 = assertThrows(CommentException.class, () -> commentService.updateComment(updateCommentRequestDto3, memberId));
+        CommentException commentException = assertThrows(CommentException.class, () -> commentService.updateComment(commentId,updateCommentRequestDto, memberId2));
+        CommentException commentException2 = assertThrows(CommentException.class, () -> commentService.updateComment(commentId,updateCommentRequestDto2, memberId));
+        CommentException commentException3 = assertThrows(CommentException.class, () -> commentService.updateComment(commentId,updateCommentRequestDto3, memberId));
 
         assertThat(commentException.getMessage()).isEqualTo(CommentErrorCode.COMMENT_MEMBER_MISMATCH.getMessage());
         assertThat(commentException2.getMessage()).isEqualTo(CommentErrorCode.COMMENT_REQUIRED.getMessage());

@@ -18,6 +18,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/questions")
@@ -29,9 +32,12 @@ public class QuestionController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse> createQuestion(
             @Valid @ModelAttribute QuestionCreateRequestDto questionRequestDto,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
+        questionRequestDto.setImages(images);
         QuestionCreateResponseDto questionCreateResponseDto = questionService.createQuestion(questionRequestDto, customUserDetails.getMember().getId());
+
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

@@ -1,13 +1,12 @@
 package com.samsamhajo.deepground.qna.question.service;
 
-import com.samsamhajo.deepground.feed.feed.model.FetchFeedResponse;
-import com.samsamhajo.deepground.feed.feed.model.FetchFeedsResponse;
-import com.samsamhajo.deepground.feed.feedshared.model.FetchSharedFeedResponse;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
-import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateRequestDto;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
 import com.samsamhajo.deepground.qna.answer.service.AnswerService;
+import com.samsamhajo.deepground.qna.comment.dto.CommentDTO;
+import com.samsamhajo.deepground.qna.comment.entity.Comment;
+import com.samsamhajo.deepground.qna.comment.repository.CommentRepository;
 import com.samsamhajo.deepground.qna.question.Dto.*;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.entity.QuestionMedia;
@@ -42,6 +41,7 @@ public class QuestionService{
     private final AnswerService answerService;
     private final QuestionTagService tagService;
     private final QuestionMediaRepository questionMediaRepository;
+    private final CommentRepository commentRepository;
 
     //질문 생성
     @Transactional
@@ -64,7 +64,7 @@ public class QuestionService{
         );
 
         Question saved = questionRepository.save(question);
-        createQuestionMedia(questionCreateRequestDto, question);
+        List<String> mediaUrl = createQuestionMedia(questionCreateRequestDto, question);
         questionTagService.createQuestionTag(question, questionCreateRequestDto.getTechStacks());
 
 
@@ -75,6 +75,7 @@ public class QuestionService{
                 saved.getContent(),
                 memberId,
                 questionCreateRequestDto.getTechStacks()
+                ,mediaUrl
         );
     }
 
@@ -140,16 +141,17 @@ public class QuestionService{
         );
 
         question.updateQuesiton(questionUpdateRequestDto.getTitle(), questionUpdateRequestDto.getContent());
-        updateQuestionMedia(questionUpdateRequestDto, question);
         questionMediaService.deleteQuestionMedia(question.getId());
+        updateQuestionMedia(questionUpdateRequestDto, question);
 
 
 
         return questionUpdateResponseDto;
 
     }
-    private void createQuestionMedia(QuestionCreateRequestDto questionCreateRequestDto, Question question) {
-        questionMediaService.createQuestionMedia(question, questionCreateRequestDto.getImages());
+    private List<String> createQuestionMedia(QuestionCreateRequestDto questionCreateRequestDto, Question question) {
+        return questionMediaService.createQuestionMedia(question, questionCreateRequestDto.getImages());
+
     }
 
     private void updateQuestionMedia(QuestionUpdateRequestDto questionUpdateRequestDto, Question question) {
@@ -187,7 +189,12 @@ public class QuestionService{
                     List<String> teckStacks = tagService.getStackNamesByQuestionId(question.getId());
                     int answerCount = answerService.countAnswersByQuestionId(question.getId());
 
-                    return QuestionSummaryDto.of(question, teckStacks, answerCount);
+                    List<String> mediaUrl = questionMediaRepository.findAllByQuestionId(question.getId()).stream()
+                            .map(QuestionMedia::getMediaUrl)
+                            .toList();
+
+
+                    return QuestionSummaryDto.of(question, teckStacks, answerCount, mediaUrl);
                 }).toList();
 
         return QuestionListResponseDto.of(summaries, questionPage.getTotalPages());
@@ -200,12 +207,11 @@ public class QuestionService{
         List<QuestionMedia> questionMedia = questionMediaRepository.findAllByQuestionId(questionId);
         int answerCount = answerService.countAnswersByQuestionId(questionId);
         List<String> techStacks = tagService.getStackNamesByQuestionId(questionId);
-        List<String> imageUrls = questionMedia.stream()
-                .map(QuestionMedia::getQuestionContentUrl)
+        List<String> mediaUrl = questionMedia.stream()
+                .map(QuestionMedia::getMediaUrl)
                 .collect(Collectors.toList());
 
         List<AnswerCreateResponseDto> answers = answerService.getAnswersByQuestionId(questionId);
-
 
         return QuestionDetailResponseDto.of(
                 question.getId(),
@@ -216,7 +222,7 @@ public class QuestionService{
                 techStacks,
                 answerCount,
                 question.getQuestionStatus(),
-                imageUrls,
+                mediaUrl,
                 answers
         );
     }

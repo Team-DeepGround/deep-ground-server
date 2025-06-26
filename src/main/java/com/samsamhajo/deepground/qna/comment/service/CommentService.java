@@ -61,15 +61,13 @@ public class CommentService {
     }
   
     @Transactional
-    public UpdateCommentResponseDto updateComment(UpdateCommentRequestDto updateCommentRequestDto, Long memberId) {
+    public UpdateCommentResponseDto updateComment(Long commentId,UpdateCommentRequestDto updateCommentRequestDto, Long memberId) {
 
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        Answer answer = answerRepository.findById(updateCommentRequestDto.getAnswerId()).orElseThrow(() ->
-                new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND));
 
-        Comment comment = commentRepository.findById(updateCommentRequestDto.getCommentId()).orElseThrow(() ->
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
                 new CommentException(CommentErrorCode.COMMENT_NOT_FOUND));
 
         if(!comment.getMember().getId().equals(memberId)) {

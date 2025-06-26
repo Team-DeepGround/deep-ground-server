@@ -12,15 +12,17 @@ public class QuestionCreateResponseDto {
     private String content;
     private Long memberId;
     private List<String> techStacks;
+    private List<String> mediaUrls;
 
-    public QuestionCreateResponseDto(Long questionId, String title, String content, Long memberId, List<String> techStacks) {
+    public QuestionCreateResponseDto(Long questionId, String title, String content, Long memberId, List<String> techStacks, List<String> mediaUrls) {
         this.questionId = questionId;
         this.title = title;
         this.content = content;
         this.memberId = memberId;
         this.techStacks = techStacks;
+        this.mediaUrls = mediaUrls;
     }
-    public static QuestionCreateResponseDto of(Long questionId, String title, String content, Long memberId, List<String> techStacks) {
-        return new QuestionCreateResponseDto(questionId, title, content, memberId, techStacks);
+    public static QuestionCreateResponseDto of(Long questionId, String title, String content, Long memberId, List<String> techStacks, List<String> mediaUrls) {
+        return new QuestionCreateResponseDto(questionId, title, content, memberId, techStacks, mediaUrls);
     }
 }
