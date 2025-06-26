@@ -28,18 +28,24 @@ public class ChatMessage extends BaseDocument {
     @Field("media")
     private List<ChatMessageMedia> media;
 
-    private ChatMessage(Long chatRoomId, Long senderId, String message, List<ChatMessageMedia> media) {
+    @Field("media_id")
+    private List<String> mediaIds;
+
+    private ChatMessage(Long chatRoomId, Long senderId, String message, List<ChatMessageMedia> media,
+                        List<String> mediaIds) {
         this.chatRoomId = chatRoomId;
         this.senderId = senderId;
         this.message = message;
         this.media = media;
+        this.mediaIds = mediaIds;
     }
 
     public static ChatMessage of(Long chatRoomId, Long senderId, String message) {
-        return new ChatMessage(chatRoomId, senderId, message, null);
+        return new ChatMessage(chatRoomId, senderId, message, null, null);
     }
 
-    public static ChatMessage of(Long chatRoomId, Long senderId, String message, List<ChatMessageMedia> media) {
-        return new ChatMessage(chatRoomId, senderId, message, media);
+    public static ChatMessage of(Long chatRoomId, Long senderId, String message,
+                                 List<ChatMessageMedia> media, List<String> mediaIds) {
+        return new ChatMessage(chatRoomId, senderId, message, media, mediaIds);
     }
 }

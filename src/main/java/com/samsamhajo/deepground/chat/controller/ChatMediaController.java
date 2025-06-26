@@ -2,14 +2,18 @@ package com.samsamhajo.deepground.chat.controller;
 
 import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.chat.dto.ChatMediaResponse;
+import com.samsamhajo.deepground.chat.dto.ChatMediaUploadResponse;
 import com.samsamhajo.deepground.chat.service.ChatMediaService;
 import com.samsamhajo.deepground.chat.success.ChatSuccessCode;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
+import com.samsamhajo.deepground.media.MediaUtils;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,15 +29,29 @@ public class ChatMediaController {
     private final ChatMediaService chatMediaService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<SuccessResponse<ChatMediaResponse>> uploadChatMedia(
+    public ResponseEntity<SuccessResponse<ChatMediaUploadResponse>> uploadChatMedia(
             @PathVariable Long chatRoomId,
             @RequestParam List<MultipartFile> files,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         Long memberId = userDetails.getMember().getId();
 
-        ChatMediaResponse response = chatMediaService.uploadChatMedia(chatRoomId, memberId, files);
+        ChatMediaUploadResponse response = chatMediaService.uploadChatMedia(chatRoomId, memberId, files);
         return ResponseEntity
                 .ok(SuccessResponse.of(ChatSuccessCode.CHAT_MEDIA_UPLOADED, response));
+    }
+
+    @GetMapping("/{mediaId}")
+    public ResponseEntity<InputStreamResource> getMedia(
+            @PathVariable Long chatRoomId,
+            @PathVariable String mediaId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long memberId = userDetails.getMember().getId();
+
+        ChatMediaResponse response = chatMediaService.fetchMedia(chatRoomId, memberId, mediaId);
+        return ResponseEntity.ok()
+                .contentType(MediaUtils.getMediaType(response.getExtension()))
+                .body(response.getResource());
     }
 }

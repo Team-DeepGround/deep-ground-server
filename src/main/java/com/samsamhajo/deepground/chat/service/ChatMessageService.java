@@ -99,7 +99,10 @@ public class ChatMessageService {
         chatMedia.forEach(ChatMedia::send);
         chatMediaRepository.saveAll(chatMedia);
 
-        return ChatMessage.of(chatRoomId, memberId, request.getMessage(), media);
+        List<String> mediaIds = chatMedia.stream()
+                .map(ChatMedia::getId)
+                .toList();
+        return ChatMessage.of(chatRoomId, memberId, request.getMessage(), media, mediaIds);
     }
 
     @Transactional
@@ -109,7 +112,7 @@ public class ChatMessageService {
 
         boolean isUpdated = member.updateLastReadMessageTime(latestMessageTime);
         if (!isUpdated) {
-            throw new ChatMessageException(ChatMessageErrorCode.INVALID_MESSAGE_TIME);
+            return;
         }
 
         String destination = "/chatrooms/" + chatRoomId + "/read-receipt";

@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
-import com.samsamhajo.deepground.chat.dto.ChatMediaResponse;
+import com.samsamhajo.deepground.chat.dto.ChatMediaUploadResponse;
 import com.samsamhajo.deepground.chat.entity.ChatMedia;
 import com.samsamhajo.deepground.chat.entity.ChatMessageMedia;
 import com.samsamhajo.deepground.chat.exception.ChatErrorCode;
@@ -60,7 +60,7 @@ public class ChatMediaServiceTest {
         when(chatMediaRepository.saveAll(anyList())).thenReturn(List.of(media));
 
         // when
-        ChatMediaResponse response = chatMediaService.uploadChatMedia(chatRoomId, memberId, files);
+        ChatMediaUploadResponse response = chatMediaService.uploadChatMedia(chatRoomId, memberId, files);
 
         // then
         assertThat(response).isNotNull();
