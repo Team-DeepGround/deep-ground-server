@@ -16,6 +16,10 @@ public class MemberScheduleCalendarResponseDto {
     private String title;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private String description;
+    private Boolean isAvailable;
+    private Boolean isImportant;
+    private String memo;
 
 
     public static MemberScheduleCalendarResponseDto from(MemberStudySchedule schedule) {
@@ -26,8 +30,12 @@ public class MemberScheduleCalendarResponseDto {
                 .studyScheduleId(ss.getId())
                 .studyGroupId(sg.getId())
                 .title(ss.getTitle())
+                .description(ss.getDescription())
                 .startTime(ss.getStartTime())
                 .endTime(ss.getEndTime())
+                .isAvailable(schedule.getIsAvailable())
+                .isImportant(schedule.getIsImportant())
+                .memo(schedule.getMemo())
                 .build();
     }
 }
