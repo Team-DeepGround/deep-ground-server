@@ -1,20 +1,26 @@
 package com.samsamhajo.deepground.chat.dto;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public class ChatRoomResponse {
 
-    List<ChatRoomMemberInfo> memberInfos;
-    ChatMessageListResponse chatMessage;
+    private Long chatRoomId;
+    private String name;
+    private LocalDateTime lastReadMessageTime;
+    private long memberCount;
+    private Long unreadCount;
 
-    private ChatRoomResponse(List<ChatRoomMemberInfo> memberInfos, ChatMessageListResponse chatMessage) {
-        this.memberInfos = memberInfos;
-        this.chatMessage = chatMessage;
-    }
-
-    public static ChatRoomResponse of(List<ChatRoomMemberInfo> memberInfos, ChatMessageListResponse chatMessage) {
-        return new ChatRoomResponse(memberInfos, chatMessage);
+    public static ChatRoomResponse of(ChatRoomInfo info, Long unreadCount) {
+        return ChatRoomResponse.builder()
+                .chatRoomId(info.getChatRoomId())
+                .name(info.getName())
+                .lastReadMessageTime(info.getLastReadMessageTime())
+                .memberCount(info.getMemberCount())
+                .unreadCount(unreadCount)
+                .build();
     }
 }

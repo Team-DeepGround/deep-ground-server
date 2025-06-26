@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.studyGroup.controller;
 
+import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
@@ -7,6 +8,7 @@ import com.samsamhajo.deepground.studyGroup.service.StudyGroupAdminViewService;
 import com.samsamhajo.deepground.studyGroup.success.StudyGroupSuccessCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -19,16 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class StudyGroupAdminController {
 
   private final StudyGroupAdminViewService adminViewService;
-  private final MemberRepository memberRepository;
 
-  // TODO: 스프링 시큐리티 구현 완료시, memberId 제외하고 RequestAttribute 도입 고려
-  @GetMapping("/{studyGroupId}/admin/{memberId}")
+  @GetMapping("/{studyGroupId}/admin")
   public ResponseEntity<SuccessResponse<?>> getAdminInfo(
       @PathVariable Long studyGroupId,
-      @PathVariable Long memberId
+      @AuthenticationPrincipal CustomUserDetails customUserDetails
   ) {
-    Member member = memberRepository.findById(memberId)
-        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다"));
+    Member member = customUserDetails.getMember();
 
     var response = adminViewService.getAdminView(member, studyGroupId);
     return ResponseEntity

@@ -24,7 +24,7 @@ public class StudyGroupAdminViewService {
     StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
         .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
 
-    if (!studyGroup.getMember().getId().equals(requester.getId())) {
+    if (!studyGroup.getCreator().getId().equals(requester.getId())) {
       throw new AccessDeniedException("해당 스터디 그룹의 생성자가 아닙니다.");
     }
 

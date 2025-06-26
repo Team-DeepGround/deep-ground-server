@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -41,7 +42,8 @@ class StudyGroupInviteServiceTest extends IntegrationTestSupport {
         null, "스터디", "소개",
         LocalDate.now(), LocalDate.now().plusDays(10),
         LocalDate.now(), LocalDate.now().plusDays(3),
-        5, owner, true, "강남"
+        5, owner, true, "강남",
+        new HashSet<>()
     );
     studyGroupRepository.save(group);
   }

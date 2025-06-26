@@ -10,7 +10,6 @@ import com.samsamhajo.deepground.feed.feedcomment.repository.FeedCommentReposito
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
 import com.samsamhajo.deepground.member.exception.MemberException;
-import com.samsamhajo.deepground.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,8 +32,6 @@ class FeedCommentLikeServiceTest {
 
     @Mock
     private FeedCommentRepository feedCommentRepository;
-    @Mock
-    private MemberRepository memberRepository;
     @Mock
     private FeedCommentLikeRepository feedCommentLikeRepository;
 
@@ -69,12 +66,11 @@ class FeedCommentLikeServiceTest {
     void feedLikeIncreaseSuccess() {
         // given
         when(feedCommentRepository.getById(1L)).thenReturn(testFeedComment);
-        when(memberRepository.findById(1L)).thenReturn(Optional.of(testMember));
         when(feedCommentLikeRepository.existsByFeedCommentIdAndMemberId(1L, 1L)).thenReturn(false);
         when(feedCommentLikeRepository.save(any(FeedCommentLike.class))).thenReturn(testFeedCommentLike);
 
         // when
-        feedCommentLikeService.feedLikeIncrease(1L, 1L);
+        feedCommentLikeService.feedLikeIncrease(1L, testMember);
 
         // then
         verify(feedCommentLikeRepository).save(any(FeedCommentLike.class));
@@ -87,7 +83,7 @@ class FeedCommentLikeServiceTest {
         when(feedCommentLikeRepository.existsByFeedCommentIdAndMemberId(1L, 1L)).thenReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> feedCommentLikeService.feedLikeIncrease(1L, 1L))
+        assertThatThrownBy(() -> feedCommentLikeService.feedLikeIncrease(1L, testMember))
                 .isInstanceOf(FeedCommentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.FEED_COMMENT_LIKE_ALREADY_EXISTS);
     }
@@ -95,11 +91,8 @@ class FeedCommentLikeServiceTest {
     @Test
     @DisplayName("피드 댓글 좋아요 증가 실패 - 존재하지 않는 회원")
     void feedLikeIncreaseFailWithInvalidMember() {
-        // given
-        when(memberRepository.findById(1L)).thenReturn(Optional.empty());
-
         // when & then
-        assertThatThrownBy(() -> feedCommentLikeService.feedLikeIncrease(1L, 1L))
+        assertThatThrownBy(() -> feedCommentLikeService.feedLikeIncrease(1L, testMember))
                 .isInstanceOf(MemberException.class)
                 .hasFieldOrPropertyWithValue("errorCode", MemberErrorCode.INVALID_MEMBER_ID);
     }

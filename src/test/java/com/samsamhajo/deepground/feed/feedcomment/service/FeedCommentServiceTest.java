@@ -7,7 +7,6 @@ import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentErrorCode
 import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentException;
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentCreateRequest;
 import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentUpdateRequest;
-import com.samsamhajo.deepground.feed.feedcomment.model.FetchFeedCommentsResponse;
 import com.samsamhajo.deepground.feed.feedcomment.repository.FeedCommentRepository;
 import com.samsamhajo.deepground.feed.feedreply.service.FeedReplyService;
 import com.samsamhajo.deepground.member.entity.Member;
@@ -41,8 +40,6 @@ class FeedCommentServiceTest {
     private FeedCommentMediaService feedCommentMediaService;
     @Mock
     private FeedRepository feedRepository;
-    @Mock
-    private MemberRepository memberRepository;
     @Mock
     private FeedReplyService feedReplyService;
     @Mock
@@ -84,12 +81,11 @@ class FeedCommentServiceTest {
         // given
         FeedCommentCreateRequest request = new FeedCommentCreateRequest(1L, TEST_CONTENT, List.of(testImage));
 
-        when(memberRepository.findById(1L)).thenReturn(java.util.Optional.of(testMember));
         when(feedRepository.getById(1L)).thenReturn(testFeed);
         when(feedCommentRepository.save(any(FeedComment.class))).thenReturn(testFeedComment);
 
         // when
-        FeedComment createdComment = feedCommentService.createFeedComment(request, 1L);
+        FeedComment createdComment = feedCommentService.createFeedComment(request, testMember);
 
         // then
         assertThat(createdComment).isNotNull();
@@ -104,7 +100,7 @@ class FeedCommentServiceTest {
         FeedCommentCreateRequest request = new FeedCommentCreateRequest(1L, "", List.of());
 
         // when & then
-        assertThatThrownBy(() -> feedCommentService.createFeedComment(request, 1L))
+        assertThatThrownBy(() -> feedCommentService.createFeedComment(request, testMember))
                 .isInstanceOf(FeedCommentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.INVALID_FEED_COMMENT_CONTENT);
     }
@@ -114,10 +110,9 @@ class FeedCommentServiceTest {
     void createFeedCommentFailWithInvalidMember() {
         // given
         FeedCommentCreateRequest request = new FeedCommentCreateRequest(1L, TEST_CONTENT, List.of());
-        when(memberRepository.findById(1L)).thenReturn(java.util.Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> feedCommentService.createFeedComment(request, 1L))
+        assertThatThrownBy(() -> feedCommentService.createFeedComment(request, testMember))
                 .isInstanceOf(MemberException.class)
                 .hasFieldOrPropertyWithValue("errorCode", MemberErrorCode.INVALID_MEMBER_ID);
     }

@@ -5,6 +5,7 @@ import com.samsamhajo.deepground.feed.feed.entity.FeedMedia;
 import com.samsamhajo.deepground.feed.feed.model.FeedMediaResponse;
 import com.samsamhajo.deepground.feed.feed.model.FeedUpdateRequest;
 import com.samsamhajo.deepground.feed.feed.repository.FeedMediaRepository;
+import com.samsamhajo.deepground.global.upload.S3Uploader;
 import com.samsamhajo.deepground.media.MediaUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
@@ -15,25 +16,28 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+import static com.samsamhajo.deepground.media.MediaUtils.getExtension;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class FeedMediaService {
 
     private final FeedMediaRepository feedMediaRepository;
+    private final S3Uploader s3Uploader;
 
-    @Transactional
-    public void createFeedMedia(Feed feed, List<MultipartFile> images){
-        if(CollectionUtils.isEmpty(images)) return;
+    public void createFeedMedia(Feed feed, List<MultipartFile> images) {
+        if (CollectionUtils.isEmpty(images)) return;
 
-        feedMediaRepository.saveAll(
-                images.stream()
-                        .map(image -> FeedMedia.of(
-                                MediaUtils.generateMediaUrl(image),
-                                MediaUtils.getExtension(image),
-                                feed))
-                        .toList()
-        );
+        List<FeedMedia> mediaEntities = images.stream()
+                .map(image -> {
+                    String url = s3Uploader.upload(image, "feed-media");                  // ✅ S3Uploader 재사용
+                    String extension = getExtension(image.getOriginalFilename());        // ✅ 확장자 추출
+                    return FeedMedia.of(url, extension, feed);                           // ✅ 도메인 생성
+                })
+                .toList();
+
+        feedMediaRepository.saveAll(mediaEntities);
     }
 
     public FeedMediaResponse fetchFeedMedia(Long feedMediaId) {

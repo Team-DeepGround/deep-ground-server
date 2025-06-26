@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,10 +30,14 @@ public class StudyScheduleService {
     private final StudyGroupMemberRepository studyGroupMemberRepository;
 
     @Transactional
-    public StudyScheduleResponseDto createStudySchedule(Long studyGroupId, StudyScheduleRequestDto requestDto) {
+    public StudyScheduleResponseDto createStudySchedule(Long studyGroupId,
+                                                        Long userId,
+                                                        StudyScheduleRequestDto requestDto) {
 
         StudyGroup studyGroup = validateStudyGroup(studyGroupId);
         validateSchedule(studyGroupId, requestDto);
+
+        validateStudyLeader(userId, studyGroup);
 
         StudySchedule studySchedule = StudySchedule.of(
                 studyGroup,
@@ -45,11 +50,16 @@ public class StudyScheduleService {
 
         StudySchedule savedSchedule = studyScheduleRepository.save(studySchedule);
 
-        List<Member> members = studyGroupMemberRepository
+        List<Member> members = new ArrayList<>(studyGroupMemberRepository
                 .findAllByStudyGroupIdAndIsAllowedTrue(studyGroupId)
                 .stream()
                 .map(StudyGroupMember::getMember)
-                .toList();
+                .toList());
+
+        Member creator = studyGroup.getCreator();
+        if (members.stream().noneMatch(m -> m.getId().equals(creator.getId()))) {
+            members.add(creator);
+        }
 
         List<MemberStudySchedule> memberStudySchedules = members.stream()
                 .map(member -> MemberStudySchedule.of(member, studySchedule, null, false, null))
@@ -73,9 +83,13 @@ public class StudyScheduleService {
     }
 
     @Transactional
-    public StudyScheduleResponseDto updateStudySchedule(Long studyGroupId, Long scheduleId, StudyScheduleRequestDto requestDto) {
+    public StudyScheduleResponseDto updateStudySchedule(Long studyGroupId,
+                                                        Long userId,
+                                                        Long scheduleId,
+                                                        StudyScheduleRequestDto requestDto) {
 
-        validateStudyGroup(studyGroupId);
+        StudyGroup studyGroup = validateStudyGroup(studyGroupId);
+        validateStudyLeader(userId, studyGroup);
 
         StudySchedule studySchedule = studyScheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.SCHEDULE_NOT_FOUND));
@@ -103,13 +117,18 @@ public class StudyScheduleService {
     }
 
     @Transactional
-    public void deleteStudySchedule(Long studyGroupId, Long scheduleId) {
+    public void deleteStudySchedule(Long studyGroupId,
+                                    Long userId,
+                                    Long scheduleId) {
         StudySchedule schedule = studyScheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new ScheduleException(ScheduleErrorCode.SCHEDULE_NOT_FOUND));
 
-        if (!schedule.getStudyGroup().getId().equals(studyGroupId)) {
+        StudyGroup studyGroup = schedule.getStudyGroup();
+        if (!studyGroup.getId().equals(studyGroupId)) {
             throw new ScheduleException(ScheduleErrorCode.MISMATCHED_GROUP);
         }
+
+        validateStudyLeader(userId, studyGroup);
 
         memberStudyScheduleRepository.deleteAllByStudyScheduleId(schedule.getId());
 
@@ -134,6 +153,11 @@ public class StudyScheduleService {
         if (isDuplicated) {
             throw new ScheduleException(ScheduleErrorCode.DUPLICATE_SCHEDULE);
 
+        }
+    }
+    private void validateStudyLeader(Long userId, StudyGroup studyGroup) {
+        if (!studyGroup.getCreator().getId().equals(userId)) {
+            throw new ScheduleException(ScheduleErrorCode.UNAUTHORIZED_USER);
         }
     }
 }

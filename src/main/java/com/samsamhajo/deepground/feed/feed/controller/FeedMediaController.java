@@ -18,8 +18,6 @@ public class FeedMediaController {
 
     private final FeedMediaService feedMediaService;
 
-
-    // 피드 이미지 아이디로 이미지 불러오기
     @GetMapping("/{mediaId}")
     public ResponseEntity<InputStreamResource> viewImage(@PathVariable("mediaId") Long mediaId) {
         FeedMediaResponse feedMediaResponse =

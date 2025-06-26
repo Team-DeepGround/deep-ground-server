@@ -82,12 +82,11 @@ class FeedReplyServiceTest {
         // given
         FeedReplyCreateRequest request = new FeedReplyCreateRequest(1L, TEST_CONTENT, List.of(testImage));
 
-        when(memberRepository.findById(1L)).thenReturn(java.util.Optional.of(testMember));
         when(feedCommentRepository.getById(1L)).thenReturn(testFeedComment);
         when(feedReplyRepository.save(any(FeedReply.class))).thenReturn(testFeedReply);
 
         // when
-        FeedComment result = feedReplyService.createFeedReply(request, 1L);
+        FeedComment result = feedReplyService.createFeedReply(request, testMember);
 
         // then
         assertThat(result).isNotNull();
@@ -102,7 +101,7 @@ class FeedReplyServiceTest {
         FeedReplyCreateRequest request = new FeedReplyCreateRequest(1L, "", List.of());
 
         // when & then
-        assertThatThrownBy(() -> feedReplyService.createFeedReply(request, 1L))
+        assertThatThrownBy(() -> feedReplyService.createFeedReply(request, testMember))
                 .isInstanceOf(FeedCommentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.INVALID_FEED_COMMENT_CONTENT);
     }
@@ -115,7 +114,7 @@ class FeedReplyServiceTest {
         when(memberRepository.findById(1L)).thenReturn(java.util.Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> feedReplyService.createFeedReply(request, 1L))
+        assertThatThrownBy(() -> feedReplyService.createFeedReply(request, testMember))
                 .isInstanceOf(MemberException.class)
                 .hasFieldOrPropertyWithValue("errorCode", MemberErrorCode.INVALID_MEMBER_ID);
     }

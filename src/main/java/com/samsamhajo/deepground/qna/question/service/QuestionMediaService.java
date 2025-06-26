@@ -1,7 +1,8 @@
 package com.samsamhajo.deepground.qna.question.service;
 
-import com.samsamhajo.deepground.feed.feed.entity.FeedMedia;
-import com.samsamhajo.deepground.feed.feed.model.FeedMediaResponse;
+
+import com.nimbusds.oauth2.sdk.util.CollectionUtils;
+import com.samsamhajo.deepground.global.upload.S3Uploader;
 import com.samsamhajo.deepground.media.MediaUtils;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionMediaResponse;
 import com.samsamhajo.deepground.qna.question.entity.Question;
@@ -19,6 +20,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.samsamhajo.deepground.media.MediaUtils.getExtension;
+
 
 @Service
 @RequiredArgsConstructor
@@ -26,25 +29,22 @@ import java.util.stream.Collectors;
 public class QuestionMediaService {
 
     private final QuestionMediaRepository questionMediaRepository;
+    private final S3Uploader s3Uploader;
 
-    public List<String> createQuestionMedia(Question question, List<MultipartFile> images) {
-        if (images == null || images.isEmpty()) {
-            return Collections.emptyList();
-        }
 
-        List<QuestionMedia> medias = images.stream()
-                .map(image -> QuestionMedia.of(
-                        MediaUtils.generateMediaUrl(image),
-                        MediaUtils.getExtension(image),
-                        question))
-                .toList();
+    public void createQuestionMedia(Question question, List<MultipartFile> images) {
+        if (CollectionUtils.isEmpty(images)) return;
 
-        questionMediaRepository.saveAll(medias);
-
-        // 저장한 QuestionMedia에서 URL만 추출해서 반환
-        return medias.stream()
-                .map(QuestionMedia::getMediaUrl)
+        List<QuestionMedia> mediaEntities = images.stream()
+                .map(image -> {
+                    String url = s3Uploader.upload(image, "question-media");
+                    String extension = getExtension(image.getOriginalFilename());
+                    return QuestionMedia.of(url, extension, question);
+                })
                 .collect(Collectors.toList());
+
+        questionMediaRepository.saveAll(mediaEntities);
+
     }
 
 

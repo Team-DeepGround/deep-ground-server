@@ -12,9 +12,6 @@ import com.samsamhajo.deepground.feed.feedcomment.model.FetchFeedCommentsRespons
 import com.samsamhajo.deepground.feed.feedcomment.repository.FeedCommentRepository;
 import com.samsamhajo.deepground.feed.feedreply.service.FeedReplyService;
 import com.samsamhajo.deepground.member.entity.Member;
-import com.samsamhajo.deepground.member.exception.MemberErrorCode;
-import com.samsamhajo.deepground.member.exception.MemberException;
-import com.samsamhajo.deepground.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,18 +27,14 @@ public class FeedCommentService {
     private final FeedCommentRepository feedCommentRepository;
     private final FeedCommentMediaService feedCommentMediaService;
     private final FeedRepository feedRepository;
-    private final MemberRepository memberRepository;
     private final FeedReplyService feedReplyService;
     private final FeedCommentLikeService feedCommentLikeService;
 
     @Transactional
-    public FeedComment createFeedComment(FeedCommentCreateRequest request, Long memberId) {
+    public FeedComment createFeedComment(FeedCommentCreateRequest request, Member member) {
         if (!StringUtils.hasText(request.getContent())) {
             throw new FeedCommentException(FeedCommentErrorCode.INVALID_FEED_COMMENT_CONTENT);
         }
-
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.INVALID_MEMBER_ID));
 
         Feed feed = feedRepository.getById(request.getFeedId());
 

@@ -7,9 +7,6 @@ import com.samsamhajo.deepground.feed.feedreply.exception.FeedReplyException;
 import com.samsamhajo.deepground.feed.feedreply.repository.FeedReplyLikeRepository;
 import com.samsamhajo.deepground.feed.feedreply.repository.FeedReplyRepository;
 import com.samsamhajo.deepground.member.entity.Member;
-import com.samsamhajo.deepground.member.exception.MemberErrorCode;
-import com.samsamhajo.deepground.member.exception.MemberException;
-import com.samsamhajo.deepground.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,16 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class FeedReplyLikeService {
 
     private final FeedReplyRepository feedReplyRepository;
-    private final MemberRepository memberRepository;
     private final FeedReplyLikeRepository feedReplyLikeRepository;
 
     @Transactional
-    public void feedReplyLikeIncrease(Long feedReplyId, Long memberId) {
-        increaseValidate(feedReplyId, memberId);
+    public void feedReplyLikeIncrease(Long feedReplyId, Member member) {
+        increaseValidate(feedReplyId, member.getId());
 
         FeedReply feedReply = feedReplyRepository.getById(feedReplyId);
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.INVALID_MEMBER_ID));
 
         FeedReplyLike feedReplyLike = FeedReplyLike.of(feedReply, member);
 

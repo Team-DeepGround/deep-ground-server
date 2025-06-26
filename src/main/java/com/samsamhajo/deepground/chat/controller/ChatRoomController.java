@@ -3,30 +3,50 @@ package com.samsamhajo.deepground.chat.controller;
 import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.chat.dto.ChatMessageListRequest;
 import com.samsamhajo.deepground.chat.dto.ChatMessageListResponse;
+import com.samsamhajo.deepground.chat.dto.ChatRoomListResponse;
 import com.samsamhajo.deepground.chat.dto.ChatRoomMemberInfo;
+import com.samsamhajo.deepground.chat.entity.ChatRoomType;
 import com.samsamhajo.deepground.chat.service.ChatMessageService;
 import com.samsamhajo.deepground.chat.service.ChatRoomMemberService;
 import com.samsamhajo.deepground.chat.success.ChatSuccessCode;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/chatrooms/{chatRoomId}")
+@RequestMapping("/chatrooms")
 @RequiredArgsConstructor
 public class ChatRoomController {
 
     private final ChatRoomMemberService chatRoomMemberService;
     private final ChatMessageService chatMessageService;
 
-    @GetMapping("/members/{otherMemberId}")
+    @GetMapping
+    public ResponseEntity<SuccessResponse<ChatRoomListResponse>> getChatRooms(
+            @RequestParam(defaultValue = "FRIEND") ChatRoomType type,
+            Pageable pageable,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long memberId = userDetails.getMember().getId();
+
+        ChatRoomListResponse response = chatRoomMemberService.getChatrooms(memberId, type, pageable);
+        return ResponseEntity
+                .ok(SuccessResponse.of(ChatSuccessCode.CHATROOM_RETRIEVED, response));
+    }
+
+    @GetMapping("/{chatRoomId}/members/{otherMemberId}")
     public ResponseEntity<SuccessResponse<ChatRoomMemberInfo>> getChatRoomMemberInfo(
             @PathVariable Long chatRoomId,
             @PathVariable Long otherMemberId,
@@ -39,7 +59,7 @@ public class ChatRoomController {
                 .ok(SuccessResponse.of(ChatSuccessCode.CHATROOM_MEMBER_INFO_RETRIEVED, info));
     }
 
-    @GetMapping("/messages")
+    @GetMapping("/{chatRoomId}/messages")
     public ResponseEntity<SuccessResponse<ChatMessageListResponse>> getMessages(
             @PathVariable Long chatRoomId,
             @Valid @ModelAttribute ChatMessageListRequest request,

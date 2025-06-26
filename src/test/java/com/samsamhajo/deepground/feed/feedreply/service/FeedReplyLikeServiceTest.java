@@ -10,7 +10,6 @@ import com.samsamhajo.deepground.feed.feedreply.repository.FeedReplyRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
 import com.samsamhajo.deepground.member.exception.MemberException;
-import com.samsamhajo.deepground.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,9 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -41,8 +37,6 @@ class FeedReplyLikeServiceTest {
     @InjectMocks
     private FeedReplyLikeService feedReplyLikeService;
 
-    @Mock
-    private MemberRepository memberRepository;
 
     private static final String TEST_CONTENT = "테스트 답글 내용입니다.";
     private static final String TEST_EMAIL = "test@example.com";
@@ -74,10 +68,9 @@ class FeedReplyLikeServiceTest {
         when(feedReplyRepository.getById(1L)).thenReturn(testFeedReply);
         when(feedReplyLikeRepository.existsByFeedReplyIdAndMemberId(1L, 1L)).thenReturn(false);
         when(feedReplyLikeRepository.save(any(FeedReplyLike.class))).thenReturn(testFeedReplyLike);
-        when(memberRepository.findById(1L)).thenReturn(Optional.of(testMember));
 
         // when
-        feedReplyLikeService.feedReplyLikeIncrease(1L, 1L);
+        feedReplyLikeService.feedReplyLikeIncrease(1L, testMember);
 
         // then
         verify(feedReplyLikeRepository).save(any(FeedReplyLike.class));
@@ -90,7 +83,7 @@ class FeedReplyLikeServiceTest {
         when(feedReplyLikeRepository.existsByFeedReplyIdAndMemberId(1L, 1L)).thenReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> feedReplyLikeService.feedReplyLikeIncrease(1L, 1L))
+        assertThatThrownBy(() -> feedReplyLikeService.feedReplyLikeIncrease(1L, testMember))
                 .isInstanceOf(FeedReplyException.class)
                 .hasMessage(FeedReplyErrorCode.FEED_REPLY_LIKE_ALREADY_EXISTS.getMessage());
     }
@@ -103,7 +96,7 @@ class FeedReplyLikeServiceTest {
                 .thenThrow(new MemberException(MemberErrorCode.INVALID_MEMBER_ID));
 
         // when & then
-        assertThatThrownBy(() -> feedReplyLikeService.feedReplyLikeIncrease(1L, 1L))
+        assertThatThrownBy(() -> feedReplyLikeService.feedReplyLikeIncrease(1L, testMember))
                 .isInstanceOf(MemberException.class)
                 .hasFieldOrPropertyWithValue("errorCode", MemberErrorCode.INVALID_MEMBER_ID);
     }

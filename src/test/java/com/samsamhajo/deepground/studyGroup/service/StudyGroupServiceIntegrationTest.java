@@ -68,7 +68,7 @@ class StudyGroupServiceIntegrationTest extends IntegrationTestSupport {
 
     StudyGroup group = savedGroup.get();
     assertThat(group.getTitle()).isEqualTo(request.getTitle());
-    assertThat(group.getMember().getId()).isEqualTo(creator.getId());
+    assertThat(group.getCreator().getId()).isEqualTo(creator.getId());
 
     Optional<StudyGroupMember> membership = studyGroupMemberRepository.findAll().stream()
         .filter(m -> m.getMember().getId().equals(creator.getId()) &&

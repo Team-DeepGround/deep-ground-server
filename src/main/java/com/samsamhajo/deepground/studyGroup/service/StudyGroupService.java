@@ -1,14 +1,15 @@
 package com.samsamhajo.deepground.studyGroup.service;
 
-import static java.util.stream.Collectors.toList;
-
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupDetailResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupParticipationResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupMyListResponse;
+import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupComment;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupReply;
 import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupSearchRequest;
-import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
@@ -23,8 +24,9 @@ import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepositor
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
+import java.util.*;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,41 +36,39 @@ public class StudyGroupService {
   private final StudyGroupRepository studyGroupRepository;
   private final StudyGroupMemberRepository studyGroupMemberRepository;
   private final ChatRoomRepository chatRoomRepository;
-  
-  
+
+
+  @Transactional
   public StudyGroupDetailResponse getStudyGroupDetail(Long studyGroupId) {
-    StudyGroup group = studyGroupRepository.findWithMemberAndCommentsById(studyGroupId)
+    StudyGroup group = studyGroupRepository.findWithCreatorAndCommentsById(studyGroupId)
         .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
 
-    return StudyGroupDetailResponse.from(group);
+    List<Long> commentIds = group.getComments().stream()
+        .map(StudyGroupComment::getId)
+        .toList();
+
+    List<StudyGroupReply> replies = studyGroupRepository.findRepliesByCommentIds(commentIds);
+
+    Map<Long, List<StudyGroupReply>> replyMap = replies.stream()
+        .collect(Collectors.groupingBy(r -> r.getComment().getId()));
+
+    return StudyGroupDetailResponse.from(group, replyMap);
   }
 
 
   public Page<StudyGroupResponse> searchStudyGroups(StudyGroupSearchRequest request) {
     String keyword = request.getKeyword();
-    var status = request.getGroupStatus();
-    var pageable = request.toPageable();
+    GroupStatus status = request.getGroupStatus();
+    Pageable pageable = request.toPageable();
 
-    Page<StudyGroup> pageResult;
-
-    if (keyword != null && !keyword.isBlank()) {
-      if (status != null) {
-        pageResult = studyGroupRepository
-            .findByGroupStatusAndTitleContainingIgnoreCaseOrGroupStatusAndExplanationContainingIgnoreCase(
-                status, keyword, status, keyword, pageable
-            );
-      } else {
-        pageResult = studyGroupRepository
-            .findByTitleContainingIgnoreCaseOrExplanationContainingIgnoreCase(keyword, keyword, pageable);
-      }
-    } else {
-      if (status != null) {
-        pageResult = studyGroupRepository.findByGroupStatus(status, pageable);
-      } else {
-        pageResult = studyGroupRepository.findAll(pageable);
-      }
+    List<String> tagNames = null;
+    if (request.getTechTags() != null && !request.getTechTags().isEmpty()) {
+      tagNames = request.getTechTags().stream()
+          .map(Enum::name) // enum -> String
+          .toList();
     }
 
+    Page<StudyGroup> pageResult = studyGroupRepository.searchWithFilters(status, keyword, tagNames, pageable);
     return pageResult.map(StudyGroupResponse::from);
   }
 
@@ -103,7 +103,7 @@ public class StudyGroupService {
 
   public List<StudyGroupParticipationResponse> getStudyGroupsByMember(Long memberId) {
     List<StudyGroupMember> studyGroupMembers =
-        studyGroupMemberRepository.findAllByMemberIdAndIsAllowedTrueOrderByStudyGroupCreatedAtDesc(
+        studyGroupMemberRepository.findAllByMemberIdAndIsAllowedTrueAndNotCreator(
             memberId);
 
     return studyGroupMembers.stream()
@@ -114,7 +114,7 @@ public class StudyGroupService {
   }
       
   public List<StudyGroupMyListResponse> findMyStudyGroups(Long memberId) {
-    List<StudyGroup> groups = studyGroupRepository.findAllByMember_IdOrderByCreatedAtDesc(memberId);
+    List<StudyGroup> groups = studyGroupRepository.findAllByCreator_IdOrderByCreatedAtDesc(memberId);
 
     return groups.stream()
         .map(StudyGroupMyListResponse::from)

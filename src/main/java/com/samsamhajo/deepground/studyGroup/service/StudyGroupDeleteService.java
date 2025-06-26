@@ -18,7 +18,7 @@ public class StudyGroupDeleteService {
     var studyGroup = studyGroupRepository.findById(studyGroupId)
         .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
 
-    if (!studyGroup.getMember().getId().equals(requester.getId())) {
+    if (!studyGroup.getCreator().getId().equals(requester.getId())) {
       throw new IllegalArgumentException("스터디 생성자만 삭제할 수 있습니다.");
     }
 

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,7 +41,8 @@ class StudyGroupMemberQueryServiceTest extends IntegrationTestSupport {
         null, "테스트 스터디", "설명",
         LocalDate.now(), LocalDate.now().plusDays(5),
         LocalDate.now(), LocalDate.now().plusDays(1),
-        3, owner, true, "신촌"
+        3, owner, true, "신촌",
+        new HashSet<>()
     );
     studyGroupRepository.save(group);
 
