@@ -9,7 +9,8 @@ public enum SseEventType {
     CONNECTED("connected"),
     HEARTBEAT("heartbeat"),
     NOTIFICATION("notification"),
-    UNREAD_COUNT("unreadCount");
+    UNREAD_COUNT("unreadCount"),
+    PRESENCE("presence");
 
     private final String name;
 }

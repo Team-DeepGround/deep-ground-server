@@ -33,7 +33,7 @@ public class SseEmitterService {
         sseEmitter.onTimeout(sseEmitter::complete);
         sseEmitter.onError(sseEmitter::completeWithError);
 
-        eventPublisher.publishEvent(new SseSubscribeEvent(this, memberId));
+        eventPublisher.publishEvent(new SseSubscribeEvent(memberId));
         send(List.of(sseEmitter), CONNECTED_EVENT);
         return sseEmitter;
     }
@@ -65,7 +65,7 @@ public class SseEmitterService {
     }
 
     private void unsubscribe(Long memberId, SseEmitter sseEmitter) {
-        eventPublisher.publishEvent(new SseUnsubscribeEvent(this, memberId));
+        eventPublisher.publishEvent(new SseUnsubscribeEvent(memberId));
         sseEmitterRepository.delete(memberId, sseEmitter);
     }
 }

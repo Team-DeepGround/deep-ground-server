@@ -8,6 +8,7 @@ import lombok.Getter;
 @Builder
 public class ChatRoomResponse {
 
+    private Long id;
     private Long chatRoomId;
     private String name;
     private LocalDateTime lastReadMessageTime;
@@ -16,6 +17,7 @@ public class ChatRoomResponse {
 
     public static ChatRoomResponse of(ChatRoomInfo info, Long unreadCount) {
         return ChatRoomResponse.builder()
+                .id(info.getId())
                 .chatRoomId(info.getChatRoomId())
                 .name(info.getName())
                 .lastReadMessageTime(info.getLastReadMessageTime())

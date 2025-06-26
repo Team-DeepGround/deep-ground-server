@@ -52,7 +52,8 @@ public class FriendService {
         if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver, FriendStatus.ACCEPT)) {
             throw new FriendException(FriendErrorCode.ALREADY_FRIEND);
         }
-        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver, FriendStatus.REQUEST)) {
+        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver,
+                FriendStatus.REQUEST)) {
             throw new FriendException(FriendErrorCode.ALREADY_REQUESTED);
         }
     }
@@ -161,10 +162,12 @@ public class FriendService {
         if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver, FriendStatus.ACCEPT)) {
             throw new FriendException(FriendErrorCode.ALREADY_FRIEND);
         }
-        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver, FriendStatus.REQUEST)) {
+        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver,
+                FriendStatus.REQUEST)) {
             throw new FriendException(FriendErrorCode.ALREADY_REQUESTED);
         }
-        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(receiver, requester, FriendStatus.REQUEST)) {
+        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(receiver, requester,
+                FriendStatus.REQUEST)) {
             throw new FriendException(FriendErrorCode.REQUEST_ALREADY_RECEIVED);
         }
     }
@@ -188,8 +191,8 @@ public class FriendService {
     }
 
     public List<FriendDto> getFriendByMemberId(Long memberId) {
-
-            List<Friend> friends = friendRepository. findAllByMemberIdAndFriendStatusAndDeletedIs(memberId, FriendStatus.ACCEPT);
+        List<Friend> friends = friendRepository.findAllByMemberIdAndFriendStatusAndDeletedIs(memberId,
+                FriendStatus.ACCEPT);
 
         return friends.stream()
                 .map(friend -> {
@@ -201,5 +204,17 @@ public class FriendService {
                 .toList();
     }
 
+    public List<Long> getFriendMemberIdByMemberId(Long memberId) {
+        List<Friend> friends = friendRepository.findAllByMemberIdAndFriendStatusAndDeletedIs(memberId,
+                FriendStatus.ACCEPT);
 
+        return friends.stream()
+                .map(friend -> {
+                    if (friend.getReceiveMember().getId().equals(memberId)) {
+                        return friend.getRequestMember().getId();
+                    }
+                    return friend.getReceiveMember().getId();
+                })
+                .toList();
+    }
 }

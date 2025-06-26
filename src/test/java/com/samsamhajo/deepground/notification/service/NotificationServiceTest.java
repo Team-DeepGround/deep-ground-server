@@ -18,7 +18,6 @@ import com.samsamhajo.deepground.notification.exception.NotificationException;
 import com.samsamhajo.deepground.notification.repository.NotificationDataRepository;
 import com.samsamhajo.deepground.notification.repository.NotificationRepository;
 import com.samsamhajo.deepground.sse.dto.SseEvent;
-import com.samsamhajo.deepground.sse.service.SseEmitterService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -32,6 +31,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 @SuppressWarnings("unchecked")
 @ExtendWith(MockitoExtension.class)
@@ -47,7 +47,7 @@ class NotificationServiceTest {
     private NotificationDataRepository notificationDataRepository;
 
     @Mock
-    private SseEmitterService sseEmitterService;
+    private ApplicationEventPublisher eventPublisher;
 
     @Test
     @DisplayName("수신자에게 알림을 전송한다")
@@ -69,7 +69,7 @@ class NotificationServiceTest {
         List<Notification> savedNotifications = captor.getValue();
         assertThat(savedNotifications).hasSize(1);
 
-        verify(sseEmitterService).broadcast(any(SseEvent.class));
+        verify(eventPublisher).publishEvent(any(SseEvent.class));
     }
 
     @Nested
