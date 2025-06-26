@@ -54,11 +54,13 @@ public class StudyGroupController {
 
   @GetMapping("/{studyGroupId}")
   public ResponseEntity<SuccessResponse<?>> getStudyGroupDetail(
-      @PathVariable Long studyGroupId
+      @PathVariable Long studyGroupId,
+      @AuthenticationPrincipal CustomUserDetails customUserDetails
   ) {
     GlobalLogger.info("스터디 그룹 상세 조회 요청", studyGroupId);
+    Member member = customUserDetails.getMember();
 
-    var response = studyGroupService.getStudyGroupDetail(studyGroupId);
+    var response = studyGroupService.getStudyGroupDetail(studyGroupId, member.getId());
 
     return ResponseEntity
         .status(StudyGroupSuccessCode.READ_SUCCESS.getStatus())
