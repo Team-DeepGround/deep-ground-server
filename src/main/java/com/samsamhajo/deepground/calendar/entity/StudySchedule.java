@@ -52,11 +52,17 @@ public class StudySchedule extends BaseEntity {
 
     // location이 있는 경우
     public static StudySchedule of(StudyGroup studyGroup, String title, LocalDateTime startTime, LocalDateTime endTime, String description, String location) {
+        if (description == null || description.trim().isEmpty()) {
+            throw new ScheduleException(ScheduleErrorCode.MISSING_REQUIRED_FIELDS);
+        }
         return new StudySchedule(studyGroup, title, startTime, endTime, description, location);
     }
 
     // location이 없는 경우
     public static StudySchedule of(StudyGroup studyGroup, String title, LocalDateTime startTime, LocalDateTime endTime, String description) {
+        if (description == null || description.trim().isEmpty()) {
+            throw new ScheduleException(ScheduleErrorCode.MISSING_REQUIRED_FIELDS);
+        }
         return new StudySchedule(studyGroup, title, startTime, endTime, description, null);
     }
 
