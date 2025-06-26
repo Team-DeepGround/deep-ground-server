@@ -52,31 +52,32 @@ public class OAuthAttributes {
     }
 
     public static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
-
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
 
+        // 이메일이 없을 수 있으니 null 체크
+        String email = kakaoAccount.get("email") != null ? (String) kakaoAccount.get("email") : null;
+
         return OAuthAttributes.builder()
                 .name((String) kakaoProfile.get("nickname"))
-                .email((String) kakaoAccount.get("email"))
+                .email(email) // null일 수 있음
                 .provider(Provider.KAKAO)
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
                 .build();
     }
 
+
+
     public static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
-
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-
         return OAuthAttributes.builder()
                 .name((String) response.get("name"))
                 .email((String) response.get("email"))
                 .provider(Provider.NAVER)
-                .attributes(attributes)
-                .nameAttributeKey(userNameAttributeName)
+                .attributes(response) // ★ response만 넘김
+                .nameAttributeKey("id") // ★ 네이버의 고유키는 id
                 .build();
-
     }
 
     public Member toEntity() {

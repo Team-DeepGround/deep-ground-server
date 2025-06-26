@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
@@ -37,11 +39,14 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         refreshTokenRepository.save(userDetails.getMember().getId(), refreshToken, 1209600L);
 
+        String nickname = URLEncoder.encode(userDetails.getMember().getNickname(), StandardCharsets.UTF_8);
+        String email = URLEncoder.encode(userDetails.getMember().getEmail(), StandardCharsets.UTF_8);
+
         String targetUrl = UriComponentsBuilder.fromUriString(oauth2RedirectUri)
                 .queryParam("accessToken", accessToken)
                 .queryParam("refreshToken", refreshToken)
-                .queryParam("email", userDetails.getMember().getEmail())
-                .queryParam("nickname", userDetails.getMember().getNickname())
+                .queryParam("email", email)
+                .queryParam("nickname", nickname)
                 .build()
                 .toUriString();
 
