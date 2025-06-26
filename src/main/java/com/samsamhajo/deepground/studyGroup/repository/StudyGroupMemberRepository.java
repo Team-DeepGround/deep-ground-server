@@ -40,8 +40,6 @@ public interface StudyGroupMemberRepository extends JpaRepository<StudyGroupMemb
 
   Optional<StudyGroupMember> findByStudyGroupIdAndMemberId(Long studyGroupId, Long memberId);
 
-  void deleteByStudyGroupIdAndMemberId(Long studyGroupId, Long memberId);
-
   @Query("""
   SELECT m FROM StudyGroupMember m
   JOIN FETCH m.member

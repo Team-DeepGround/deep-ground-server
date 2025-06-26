@@ -8,5 +8,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StudyGroupReplyRepository extends JpaRepository<StudyGroupReply, Long> {
-  List<StudyGroupReply> findAllByComment_IdOrderByCreatedAtAsc(Long commentId);
 }
