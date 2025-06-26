@@ -32,8 +32,10 @@ public class QuestionMediaService {
     private final S3Uploader s3Uploader;
 
 
-    public void createQuestionMedia(Question question, List<MultipartFile> images) {
-        if (CollectionUtils.isEmpty(images)) return;
+    public List<String> createQuestionMedia(Question question, List<MultipartFile> images) {
+        if (CollectionUtils.isEmpty(images)){
+            throw new IllegalArgumentException("image is blank");
+        }
 
         List<QuestionMedia> mediaEntities = images.stream()
                 .map(image -> {
@@ -44,7 +46,7 @@ public class QuestionMediaService {
                 .collect(Collectors.toList());
 
         questionMediaRepository.saveAll(mediaEntities);
-
+        return mediaEntities.stream().map(QuestionMedia::getMediaUrl).toList();
     }
 
 
