@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.qna.question.Dto;
 
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
+import com.samsamhajo.deepground.qna.comment.dto.CommentDTO;
 import com.samsamhajo.deepground.qna.question.entity.QuestionStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,7 @@ public class QuestionDetailResponseDto {
     private List<String> techStacks;
     private int answerCount;
     private QuestionStatus questionStatus;
-    private List<String> mediaUrls;
+    private List<String> mediaUrl;
 
     private List<AnswerCreateResponseDto> answers;
 
@@ -32,8 +33,8 @@ public class QuestionDetailResponseDto {
             List<String> techStacks,
             int answerCount,
             QuestionStatus questionStatus,
-            List<String> mediaUrls,
-            List<AnswerCreateResponseDto> answers  // 추가
+            List<String> mediaUrl,
+            List<AnswerCreateResponseDto> answers// 추가
     ) {
         this.questionId = questionId;
         this.title = title;
@@ -43,8 +44,8 @@ public class QuestionDetailResponseDto {
         this.techStacks = techStacks;
         this.answerCount = answerCount;
         this.questionStatus = questionStatus;
-        this.mediaUrls = mediaUrls;
-        this.answers = answers;  // 추가
+        this.mediaUrl = mediaUrl;
+        this.answers = answers;// 추가
     }
 
     public static QuestionDetailResponseDto of(
@@ -56,7 +57,7 @@ public class QuestionDetailResponseDto {
             List<String> techStacks,
             int answerCount,
             QuestionStatus questionStatus,
-            List<String> mediaUrls,
+            List<String> mediaUrl,
             List<AnswerCreateResponseDto> answers
     ) {
         return new QuestionDetailResponseDto(
@@ -68,7 +69,7 @@ public class QuestionDetailResponseDto {
                 techStacks,
                 answerCount,
                 questionStatus,
-                mediaUrls,
+                mediaUrl,
                 answers
         );
     }

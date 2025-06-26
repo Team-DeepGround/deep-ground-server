@@ -21,19 +21,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/comment")
+@RequestMapping("/comments")
 @RequiredArgsConstructor
 public class CommentController {
 
     private final CommentService commentService;
 
 
-    @PutMapping
+    @PutMapping({"/{commentId}"})
     public ResponseEntity<SuccessResponse> updateComment(
             @Valid @RequestBody UpdateCommentRequestDto updateCommentRequestDto,
+            @PathVariable Long commentId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
             ) {
-        UpdateCommentResponseDto updateCommentResponseDto = commentService.updateComment(updateCommentRequestDto,
+        UpdateCommentResponseDto updateCommentResponseDto = commentService.updateComment(commentId,updateCommentRequestDto,
                 customUserDetails.getMember().getId());
 
         return ResponseEntity

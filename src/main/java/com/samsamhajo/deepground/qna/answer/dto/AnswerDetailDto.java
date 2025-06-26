@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.qna.answer.dto;
 
+import com.samsamhajo.deepground.qna.comment.dto.CommentDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -9,6 +9,7 @@ import com.samsamhajo.deepground.qna.answer.repository.AnswerMediaRepository;
 import com.samsamhajo.deepground.qna.answer.repository.AnswerRepository;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerErrorCode;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerException;
+import com.samsamhajo.deepground.qna.comment.dto.CommentDTO;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.entity.QuestionMedia;
 import com.samsamhajo.deepground.qna.question.exception.QuestionErrorCode;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,11 +60,15 @@ public class AnswerService {
         question.incrementAnswerCount();
         createAnswerMedia(answerCreateRequestDto, saved);
 
+        List<CommentDTO> comments = new ArrayList<>();
+
         return AnswerCreateResponseDto.of(
                 saved.getAnswerContent(),
                 saved.getQuestion().getId(),
                 saved.getMember().getId(),
                 saved.getId()
+                , comments,
+                saved.getAnswerLikeCount()
         );
     }
 
@@ -140,14 +146,24 @@ public class AnswerService {
     public List<AnswerCreateResponseDto> getAnswersByQuestionId(Long questionId) {
         List<Answer> answers = answerRepository.findAllByQuestionId(questionId);
         return answers.stream()
-                .map(answer -> new AnswerCreateResponseDto(
-                        answer.getAnswerContent(),
-                        answer.getQuestion().getId(),
-                        answer.getMember().getId(),
-                        answer.getId()
+                .map(answer -> {
+                    List<CommentDTO> commentDTOs = answer.getComments().stream()
+                            .map(comment -> CommentDTO.of(
+                                    comment.getId(),
+                                    comment.getCommentContent(),
+                                    comment.getMember().getId(),
+                                    comment.getMember().getNickname()
+                            )).collect(Collectors.toList());
 
-                ))
-                .collect(Collectors.toList());
+                    return new AnswerCreateResponseDto(
+                            answer.getAnswerContent(),
+                            answer.getQuestion().getId(),
+                            answer.getMember().getId(),
+                            answer.getId(),
+                            commentDTOs,
+                            answer.getAnswerLikeCount()
+                    );
+                        }).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -159,6 +175,7 @@ public class AnswerService {
         List<String> imageUrls = answerMedia.stream()
                 .map(AnswerMedia::getAnswerCommentUrl)
                 .collect(Collectors.toList());
+
 
         return AnswerDetailDto.of(
                 answer.getAnswerContent(),

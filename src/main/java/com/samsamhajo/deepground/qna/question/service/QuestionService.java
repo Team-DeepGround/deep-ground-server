@@ -4,6 +4,9 @@ import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
 import com.samsamhajo.deepground.qna.answer.service.AnswerService;
+import com.samsamhajo.deepground.qna.comment.dto.CommentDTO;
+import com.samsamhajo.deepground.qna.comment.entity.Comment;
+import com.samsamhajo.deepground.qna.comment.repository.CommentRepository;
 import com.samsamhajo.deepground.qna.question.Dto.*;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.entity.QuestionMedia;
@@ -38,6 +41,7 @@ public class QuestionService{
     private final AnswerService answerService;
     private final QuestionTagService tagService;
     private final QuestionMediaRepository questionMediaRepository;
+    private final CommentRepository commentRepository;
 
     //질문 생성
     @Transactional
@@ -60,7 +64,7 @@ public class QuestionService{
         );
 
         Question saved = questionRepository.save(question);
-        List<String> mediaUrls = createQuestionMedia(questionCreateRequestDto, question);
+        List<String> mediaUrl = createQuestionMedia(questionCreateRequestDto, question);
         questionTagService.createQuestionTag(question, questionCreateRequestDto.getTechStacks());
 
 
@@ -71,7 +75,7 @@ public class QuestionService{
                 saved.getContent(),
                 memberId,
                 questionCreateRequestDto.getTechStacks()
-                ,mediaUrls
+                ,mediaUrl
         );
     }
 
@@ -146,8 +150,8 @@ public class QuestionService{
 
     }
     private List<String> createQuestionMedia(QuestionCreateRequestDto questionCreateRequestDto, Question question) {
-        questionMediaService.createQuestionMedia(question, questionCreateRequestDto.getImages());
-        return null;
+        return questionMediaService.createQuestionMedia(question, questionCreateRequestDto.getImages());
+
     }
 
     private void updateQuestionMedia(QuestionUpdateRequestDto questionUpdateRequestDto, Question question) {
@@ -185,12 +189,12 @@ public class QuestionService{
                     List<String> teckStacks = tagService.getStackNamesByQuestionId(question.getId());
                     int answerCount = answerService.countAnswersByQuestionId(question.getId());
 
-                    List<String> mediaUrls = questionMediaRepository.findAllByQuestionId(question.getId()).stream()
+                    List<String> mediaUrl = questionMediaRepository.findAllByQuestionId(question.getId()).stream()
                             .map(QuestionMedia::getMediaUrl)
                             .toList();
 
 
-                    return QuestionSummaryDto.of(question, teckStacks, answerCount, mediaUrls);
+                    return QuestionSummaryDto.of(question, teckStacks, answerCount, mediaUrl);
                 }).toList();
 
         return QuestionListResponseDto.of(summaries, questionPage.getTotalPages());
@@ -203,12 +207,11 @@ public class QuestionService{
         List<QuestionMedia> questionMedia = questionMediaRepository.findAllByQuestionId(questionId);
         int answerCount = answerService.countAnswersByQuestionId(questionId);
         List<String> techStacks = tagService.getStackNamesByQuestionId(questionId);
-        List<String> imageUrls = questionMedia.stream()
+        List<String> mediaUrl = questionMedia.stream()
                 .map(QuestionMedia::getMediaUrl)
                 .collect(Collectors.toList());
 
         List<AnswerCreateResponseDto> answers = answerService.getAnswersByQuestionId(questionId);
-
 
         return QuestionDetailResponseDto.of(
                 question.getId(),
@@ -219,7 +222,7 @@ public class QuestionService{
                 techStacks,
                 answerCount,
                 question.getQuestionStatus(),
-                imageUrls,
+                mediaUrl,
                 answers
         );
     }
