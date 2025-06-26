@@ -68,14 +68,14 @@ public class ChatMediaServiceTest {
     }
 
     @Test
-    @DisplayName("채팅방 멤버를 찾을 수 없다면 예외가 발생한다")
-    void uploadChatMedia_notFound_throwsException() {
+    @DisplayName("채팅방 접근 권한이 없다면 예외가 발생한다")
+    void uploadChatMedia_accessDenied_throwsException() {
         // given
         when(chatRoomMemberService.isChatRoomMember(chatRoomId, memberId)).thenReturn(false);
 
         // when & then
         assertThatThrownBy(() -> chatMediaService.uploadChatMedia(chatRoomId, memberId, files))
                 .isInstanceOf(ChatException.class)
-                .hasMessage(ChatErrorCode.CHATROOM_MEMBER_NOT_FOUND.getMessage());
+                .hasMessage(ChatErrorCode.CHATROOM_ACCESS_DENIED.getMessage());
     }
 }
