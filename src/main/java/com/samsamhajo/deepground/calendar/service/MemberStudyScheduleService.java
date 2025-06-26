@@ -2,7 +2,6 @@ package com.samsamhajo.deepground.calendar.service;
 
 
 import com.samsamhajo.deepground.calendar.dto.MemberScheduleCalendarResponseDto;
-import com.samsamhajo.deepground.calendar.dto.MemberScheduleDetailResponseDto;
 import com.samsamhajo.deepground.calendar.dto.MemberStudyScheduleRequestDto;
 import com.samsamhajo.deepground.calendar.dto.MemberStudyScheduleResponseDto;
 
@@ -32,14 +31,6 @@ public class MemberStudyScheduleService {
     }
 
     @Transactional
-    public MemberScheduleDetailResponseDto getScheduleByMemberScheduleId(Long memberScheduleId, Long userId) {
-
-        MemberStudySchedule memberStudySchedule = validateScheduleOwner(memberScheduleId, userId);
-
-        return MemberScheduleDetailResponseDto.from(memberStudySchedule);
-    }
-
-    @Transactional
     public MemberStudyScheduleResponseDto updateMemberStudySchedule (Long memberScheduleId, Long userId, MemberStudyScheduleRequestDto requestDto){
 
         MemberStudySchedule memberStudySchedule = validateScheduleOwner(memberScheduleId, userId);
@@ -50,15 +41,15 @@ public class MemberStudyScheduleService {
             if (Boolean.FALSE.equals(memberStudySchedule.getIsAvailable())) {
                 memberStudySchedule.updateImportant(false);
                 memberStudySchedule.updateMemo(null);
-            } else {
-                // 참석 중일 때만 개별 필드 업데이트
-                if (requestDto.getIsImportant() != null) {
-                    memberStudySchedule.updateImportant(requestDto.getIsImportant());
-                }
-                if (requestDto.getMemo() != null) {
-                    memberStudySchedule.updateMemo(requestDto.getMemo());
-                }
             }
+        }
+
+        if (requestDto.getIsImportant() != null) {
+            memberStudySchedule.updateImportant(requestDto.getIsImportant());
+        }
+
+        if (requestDto.getMemo() != null) {
+            memberStudySchedule.updateMemo(requestDto.getMemo());
         }
 
         return MemberStudyScheduleResponseDto.from(memberStudySchedule);

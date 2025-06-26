@@ -2,21 +2,19 @@ package com.samsamhajo.deepground.member.Dto;
 
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.entity.MemberProfile;
-import com.samsamhajo.deepground.techStack.entity.MemberTechStack;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.URL;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ch.qos.logback.classic.spi.ThrowableProxyVO.build;
 
 @Setter
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class MemberProfileDto {
 

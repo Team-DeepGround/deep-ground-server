@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.studyGroup.dto;
 
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupReply;
 import java.time.LocalDate;
 import java.util.Map;
@@ -28,8 +29,9 @@ public class StudyGroupDetailResponse {
   private int commentCount;
   private List<String> participants;
   private List<CommentWithRepliesResponse> comments;
+  private StudyGroupMemberStatus memberStatus;
 
-  public static StudyGroupDetailResponse from(StudyGroup group, Map<Long, List<StudyGroupReply>> replyMap) {
+  public static StudyGroupDetailResponse from(StudyGroup group, Map<Long, List<StudyGroupReply>> replyMap, StudyGroupMemberStatus memberStatus) {
     return StudyGroupDetailResponse.builder()
         .id(group.getId())
         .title(group.getTitle())
@@ -44,6 +46,7 @@ public class StudyGroupDetailResponse {
         .studyStartDate(group.getStudyStartDate())
         .studyEndDate(group.getStudyEndDate())
         .commentCount(group.getComments().size())
+        .memberStatus(memberStatus)
         .participants(
             group.getMembers().stream()
                 .map(m -> m.getMember().getNickname())

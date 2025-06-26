@@ -12,9 +12,11 @@ import com.samsamhajo.deepground.member.service.MemberService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,16 +26,16 @@ public class MemberController {
     private final MemberService memberService;
     private final PresenceService presenceService;
 
-    @PutMapping("/profile")
+    @PutMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse<MemberProfileDto>> editMemberProfile(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody @Valid MemberProfileDto memberprofile) {
+            @RequestPart("profile") @Valid MemberProfileDto memberProfileDto,
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
 
         Long memberId = userDetails.getMember().getId();
-        MemberProfileDto profile = memberService.editMemberProfile(memberId, memberprofile);
-        return ResponseEntity
-                .ok(SuccessResponse.of(ProfileSuccessCode.PROFILE_SUCCESS_CODE, profile));
+        MemberProfileDto profile = memberService.editMemberProfile(memberId, memberProfileDto, profileImage);
 
+        return ResponseEntity.ok(SuccessResponse.of(ProfileSuccessCode.PROFILE_SUCCESS_CODE, profile));
     }
 
     @GetMapping("/online")
@@ -47,3 +49,4 @@ public class MemberController {
                 .ok(SuccessResponse.of(MemberSuccessCode.ONLINE_SUCCESS_CODE, response));
     }
 }
+

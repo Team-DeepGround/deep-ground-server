@@ -1,7 +1,6 @@
 package com.samsamhajo.deepground.calendar.service;
 
 import com.samsamhajo.deepground.calendar.dto.MemberScheduleCalendarResponseDto;
-import com.samsamhajo.deepground.calendar.dto.MemberScheduleDetailResponseDto;
 import com.samsamhajo.deepground.calendar.dto.MemberStudyScheduleRequestDto;
 import com.samsamhajo.deepground.calendar.dto.MemberStudyScheduleResponseDto;
 import com.samsamhajo.deepground.calendar.entity.MemberStudySchedule;
@@ -64,59 +63,6 @@ public class MemberStudyScheduleServiceTest {
         assertThat(dto.getTitle()).isEqualTo("스터디 일정 제목");
         assertThat(dto.getStartTime()).isEqualTo(LocalDateTime.of(2025, 5, 30, 14, 0));
         assertThat(dto.getEndTime()).isEqualTo(LocalDateTime.of(2025, 5, 30, 16, 0));
-    }
-
-    @Test
-    @DisplayName("멤버 스터디 일정 상세 정보 조회 성공")
-    void getMemberStudySchedule_success() {
-        // given
-        Long memberStudyScheduleId = 1L;
-        Member member = mock(Member.class);
-        when(member.getId()).thenReturn(userId);
-
-        // studySchedule mock 설정
-        StudySchedule studySchedule = mock(StudySchedule.class);
-        when(studySchedule.getTitle()).thenReturn("자바 스터디");
-        when(studySchedule.getStartTime()).thenReturn(LocalDateTime.of(2025, 6, 4, 14, 0));
-        when(studySchedule.getEndTime()).thenReturn(LocalDateTime.of(2025, 6, 4, 16, 0));
-        when(studySchedule.getDescription()).thenReturn("자바 공부");
-        when(studySchedule.getLocation()).thenReturn("온라인");
-
-        // memberStudySchedule mock 설정
-        MemberStudySchedule memberStudySchedule = mock(MemberStudySchedule.class);
-        when(memberStudySchedule.getId()).thenReturn(memberStudyScheduleId);
-        when(memberStudySchedule.getIsAvailable()).thenReturn(true);
-        when(memberStudySchedule.getIsImportant()).thenReturn(true);
-        when(memberStudySchedule.getMemo()).thenReturn("메모");
-        when(memberStudySchedule.getStudySchedule()).thenReturn(studySchedule);
-        when(memberStudySchedule.getMember()).thenReturn(member);
-
-        when(memberStudyScheduleRepository.findById(memberStudyScheduleId))
-                .thenReturn(Optional.of(memberStudySchedule));
-
-
-        // when
-        MemberScheduleDetailResponseDto responseDto = memberStudyScheduleService.getScheduleByMemberScheduleId(memberStudyScheduleId, member.getId());
-
-        // then
-        assertThat(responseDto.getIsAvailable()).isTrue();
-        assertThat(responseDto.getIsImportant()).isTrue();
-        assertThat(responseDto.getMemo()).isEqualTo("메모");
-        assertThat(responseDto.getTitle()).isEqualTo("자바 스터디");
-        assertThat(responseDto.getStartTime()).isEqualTo(LocalDateTime.of(2025, 6, 4, 14, 0));
-    }
-
-    @Test
-    @DisplayName("멤버 스터디 일정 상세 정보 조회 실패 - 존재하지 않는 일정")
-    void getMemberStudySchedule_fail_scheduleNotFound() {
-        // given
-        Long memberStudyScheduleId = 1L;
-        when(memberStudyScheduleRepository.findById(memberStudyScheduleId)).thenReturn(Optional.empty());
-
-        // when & then
-        assertThatThrownBy(() -> memberStudyScheduleService.getScheduleByMemberScheduleId(memberStudyScheduleId, userId))
-                .isInstanceOf(ScheduleException.class)
-                .hasMessageContaining(ScheduleErrorCode.SCHEDULE_NOT_FOUND.getMessage());
     }
 
     @Test

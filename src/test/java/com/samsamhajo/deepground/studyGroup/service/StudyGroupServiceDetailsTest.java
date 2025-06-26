@@ -76,7 +76,7 @@ class StudyGroupServiceDetailsTest extends IntegrationTestSupport {
   @DisplayName("스터디 그룹 ID로 상세 조회하면 작성자, 멤버, 댓글이 모두 포함된다")
   void getStudyGroupDetail_success() {
     // when
-    StudyGroupDetailResponse result = studyGroupService.getStudyGroupDetail(studyGroupId);
+    StudyGroupDetailResponse result = studyGroupService.getStudyGroupDetail(studyGroupId, 0L);
 
     // then
     assertThat(result.getTitle()).isEqualTo("통합테스트 스터디");
@@ -90,7 +90,7 @@ class StudyGroupServiceDetailsTest extends IntegrationTestSupport {
   @DisplayName("스터디 그룹 ID가 존재하지 않으면 예외가 발생한다")
   void getStudyGroupDetail_notFound() {
     // when & then
-    assertThatThrownBy(() -> studyGroupService.getStudyGroupDetail(-1L))
+    assertThatThrownBy(() -> studyGroupService.getStudyGroupDetail(-1L, 0L))
         .isInstanceOf(StudyGroupNotFoundException.class);
   }
 }

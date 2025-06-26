@@ -1,9 +1,7 @@
 package com.samsamhajo.deepground.studyGroup.repository;
 
-import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
-import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupReply;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -35,22 +33,6 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
       Pageable pageable
   );
 
-  Page<StudyGroup> findByGroupStatusAndTitleContainingIgnoreCaseOrGroupStatusAndExplanationContainingIgnoreCase(
-      GroupStatus status1, String titleKeyword,
-      GroupStatus status2, String explanationKeyword,
-      Pageable pageable
-  );
-
-  Page<StudyGroup> findByTitleContainingIgnoreCaseOrExplanationContainingIgnoreCase(
-      String titleKeyword, String explanationKeyword,
-      Pageable pageable
-  );
-
-  Page<StudyGroup> findByGroupStatus(
-      GroupStatus groupStatus,
-      Pageable pageable
-  );
-
   @Query("""
   SELECT DISTINCT sg FROM StudyGroup sg
   LEFT JOIN FETCH sg.creator
@@ -69,7 +51,5 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
   List<StudyGroupReply> findRepliesByCommentIds(@Param("commentIds") List<Long> commentIds);
 
   List<StudyGroup> findAllByCreator_IdOrderByCreatedAtDesc(Long memberId);
-
-
 
 }

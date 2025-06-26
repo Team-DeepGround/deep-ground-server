@@ -6,6 +6,7 @@ import com.samsamhajo.deepground.studyGroup.dto.StudyGroupParticipationResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupMyListResponse;
 import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupComment;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupReply;
 import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupResponse;
@@ -38,7 +39,7 @@ public class StudyGroupService {
 
 
   @Transactional
-  public StudyGroupDetailResponse getStudyGroupDetail(Long studyGroupId) {
+  public StudyGroupDetailResponse getStudyGroupDetail(Long studyGroupId, Long memberId) {
     StudyGroup group = studyGroupRepository.findWithCreatorAndCommentsById(studyGroupId)
         .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
 
@@ -50,8 +51,19 @@ public class StudyGroupService {
 
     Map<Long, List<StudyGroupReply>> replyMap = replies.stream()
         .collect(Collectors.groupingBy(r -> r.getComment().getId()));
+    StudyGroupMemberStatus memberStatus = getMemberStatus(studyGroupId, memberId);
 
-    return StudyGroupDetailResponse.from(group, replyMap);
+    return StudyGroupDetailResponse.from(group, replyMap, memberStatus);
+  }
+
+  public StudyGroupMemberStatus getMemberStatus(Long studyGroupId, Long memberId) {
+    Optional<StudyGroupMember> memberOpt =
+        studyGroupMemberRepository.findByStudyGroupIdAndMemberId(studyGroupId, memberId);
+
+    return memberOpt.map(studyGroupMember -> studyGroupMember.getIsAllowed()
+        ? StudyGroupMemberStatus.APPROVED
+        : StudyGroupMemberStatus.PENDING).orElse(StudyGroupMemberStatus.NOT_APPLIED);
+
   }
 
 

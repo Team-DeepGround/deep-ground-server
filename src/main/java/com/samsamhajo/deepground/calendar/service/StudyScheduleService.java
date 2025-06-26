@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -49,11 +50,16 @@ public class StudyScheduleService {
 
         StudySchedule savedSchedule = studyScheduleRepository.save(studySchedule);
 
-        List<Member> members = studyGroupMemberRepository
+        List<Member> members = new ArrayList<>(studyGroupMemberRepository
                 .findAllByStudyGroupIdAndIsAllowedTrue(studyGroupId)
                 .stream()
                 .map(StudyGroupMember::getMember)
-                .toList();
+                .toList());
+
+        Member creator = studyGroup.getCreator();
+        if (members.stream().noneMatch(m -> m.getId().equals(creator.getId()))) {
+            members.add(creator);
+        }
 
         List<MemberStudySchedule> memberStudySchedules = members.stream()
                 .map(member -> MemberStudySchedule.of(member, studySchedule, null, false, null))
