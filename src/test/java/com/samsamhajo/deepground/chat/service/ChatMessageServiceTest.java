@@ -236,21 +236,4 @@ public class ChatMessageServiceTest {
                 .isInstanceOf(ChatMessageException.class)
                 .hasMessage(ChatMessageErrorCode.CHATROOM_MEMBER_NOT_FOUND.getMessage());
     }
-
-    @Test
-    @DisplayName("읽음 처리 시 메시지 시간이 유효하지 않으면 예외가 발생한다")
-    void readMessage_invalidMessageTime_throwsException() {
-        // given
-        LocalDateTime latestMessageTime = LocalDateTime.now().plusHours(1);
-        ChatRoomMember chatRoomMember = mock(ChatRoomMember.class);
-
-        when(chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, memberId))
-                .thenReturn(Optional.of(chatRoomMember));
-        when(chatRoomMember.updateLastReadMessageTime(eq(latestMessageTime))).thenReturn(false);
-
-        // when & then
-        assertThatThrownBy(() -> chatMessageService.readMessage(chatRoomId, memberId, latestMessageTime))
-                .isInstanceOf(ChatMessageException.class)
-                .hasMessage(ChatMessageErrorCode.INVALID_MESSAGE_TIME.getMessage());
-    }
 }

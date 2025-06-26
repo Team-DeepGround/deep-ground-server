@@ -1,18 +1,19 @@
 package com.samsamhajo.deepground.chat.dto;
 
-import java.util.List;
 import lombok.Getter;
+import org.springframework.core.io.InputStreamResource;
 
 @Getter
 public class ChatMediaResponse {
+    private final InputStreamResource resource;
+    private final String extension;
 
-    private final List<String> mediaIds;
-
-    private ChatMediaResponse(List<String> mediaIds) {
-        this.mediaIds = mediaIds;
+    private ChatMediaResponse(InputStreamResource resource, String extension) {
+        this.resource = resource;
+        this.extension = extension;
     }
 
-    public static ChatMediaResponse of(List<String> mediaIds) {
-        return new ChatMediaResponse(mediaIds);
+    public static ChatMediaResponse of(InputStreamResource resource, String extension) {
+        return new ChatMediaResponse(resource, extension);
     }
 }

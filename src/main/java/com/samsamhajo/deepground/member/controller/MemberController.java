@@ -1,13 +1,16 @@
 package com.samsamhajo.deepground.member.controller;
 
 
-
 import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.member.Dto.MemberProfileDto;
+import com.samsamhajo.deepground.member.Dto.PresenceDto;
+import com.samsamhajo.deepground.member.exception.MemberSuccessCode;
 import com.samsamhajo.deepground.member.exception.ProfileSuccessCode;
+import com.samsamhajo.deepground.member.service.PresenceService;
 import com.samsamhajo.deepground.member.service.MemberService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class MemberController {
 
     private final MemberService memberService;
+    private final PresenceService presenceService;
 
     @PutMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse<MemberProfileDto>> editMemberProfile(
@@ -33,4 +37,16 @@ public class MemberController {
 
         return ResponseEntity.ok(SuccessResponse.of(ProfileSuccessCode.PROFILE_SUCCESS_CODE, profile));
     }
+
+    @GetMapping("/online")
+    public ResponseEntity<SuccessResponse<List<PresenceDto>>> getOnlineMembers(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long memberId = userDetails.getMember().getId();
+
+        List<PresenceDto> response = presenceService.isOnlineMembers(memberId);
+        return ResponseEntity
+                .ok(SuccessResponse.of(MemberSuccessCode.ONLINE_SUCCESS_CODE, response));
+    }
 }
+

@@ -56,4 +56,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
+
+    @Override
+    protected boolean shouldNotFilterAsyncDispatch() {
+        return false; // 비동기 요청(SSE)에 필터 적용
+    }
 }

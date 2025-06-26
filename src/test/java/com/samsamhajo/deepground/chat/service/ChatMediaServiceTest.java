@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
-import com.samsamhajo.deepground.chat.dto.ChatMediaResponse;
+import com.samsamhajo.deepground.chat.dto.ChatMediaUploadResponse;
 import com.samsamhajo.deepground.chat.entity.ChatMedia;
 import com.samsamhajo.deepground.chat.entity.ChatMessageMedia;
 import com.samsamhajo.deepground.chat.exception.ChatErrorCode;
@@ -60,7 +60,7 @@ public class ChatMediaServiceTest {
         when(chatMediaRepository.saveAll(anyList())).thenReturn(List.of(media));
 
         // when
-        ChatMediaResponse response = chatMediaService.uploadChatMedia(chatRoomId, memberId, files);
+        ChatMediaUploadResponse response = chatMediaService.uploadChatMedia(chatRoomId, memberId, files);
 
         // then
         assertThat(response).isNotNull();
@@ -68,14 +68,14 @@ public class ChatMediaServiceTest {
     }
 
     @Test
-    @DisplayName("채팅방 멤버를 찾을 수 없다면 예외가 발생한다")
-    void uploadChatMedia_notFound_throwsException() {
+    @DisplayName("채팅방 접근 권한이 없다면 예외가 발생한다")
+    void uploadChatMedia_accessDenied_throwsException() {
         // given
         when(chatRoomMemberService.isChatRoomMember(chatRoomId, memberId)).thenReturn(false);
 
         // when & then
         assertThatThrownBy(() -> chatMediaService.uploadChatMedia(chatRoomId, memberId, files))
                 .isInstanceOf(ChatException.class)
-                .hasMessage(ChatErrorCode.CHATROOM_MEMBER_NOT_FOUND.getMessage());
+                .hasMessage(ChatErrorCode.CHATROOM_ACCESS_DENIED.getMessage());
     }
 }

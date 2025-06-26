@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.friend.service;
 
+import com.samsamhajo.deepground.chat.service.ChatRoomService;
 import com.samsamhajo.deepground.friend.Dto.FriendDto;
 import com.samsamhajo.deepground.friend.Exception.FriendException;
 import com.samsamhajo.deepground.friend.entity.Friend;
@@ -10,7 +11,10 @@ import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
 import com.samsamhajo.deepground.member.exception.MemberException;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
+import com.samsamhajo.deepground.notification.entity.data.FriendNotificationData;
+import com.samsamhajo.deepground.notification.event.NotificationEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +27,8 @@ public class FriendService {
 
     private final FriendRepository friendRepository;
     private final MemberRepository memberRepository;
+    private final ChatRoomService chatRoomService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Long sendFriendRequest(Long requesterId, String receiverEmail) {
@@ -38,6 +44,12 @@ public class FriendService {
         Friend friend = Friend.request(requester, receiver);
         friendRepository.save(friend);
 
+        // 친구 요청 알림
+        eventPublisher.publishEvent(NotificationEvent.of(
+                receiver.getId(),
+                FriendNotificationData.request(requester)
+        ));
+
         return friend.getId();
     }
 
@@ -52,7 +64,8 @@ public class FriendService {
         if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver, FriendStatus.ACCEPT)) {
             throw new FriendException(FriendErrorCode.ALREADY_FRIEND);
         }
-        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver, FriendStatus.REQUEST)) {
+        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver,
+                FriendStatus.REQUEST)) {
             throw new FriendException(FriendErrorCode.ALREADY_REQUESTED);
         }
     }
@@ -90,6 +103,18 @@ public class FriendService {
         Friend friendRequest = validateAccept(friendId, receiver);
 
         friendRequest.accept();
+
+        // 친구 수락 알림
+        eventPublisher.publishEvent(NotificationEvent.of(
+                friendRequest.getRequestMember().getId(),
+                FriendNotificationData.accept(receiver)
+        ));
+
+        // 친구 채팅방 생성
+        chatRoomService.createFriendChatRoom(
+                friendRequest.getRequestMember(),
+                friendRequest.getReceiveMember()
+        );
 
         return friendRequest.getId();
     }
@@ -161,10 +186,12 @@ public class FriendService {
         if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver, FriendStatus.ACCEPT)) {
             throw new FriendException(FriendErrorCode.ALREADY_FRIEND);
         }
-        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver, FriendStatus.REQUEST)) {
+        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver,
+                FriendStatus.REQUEST)) {
             throw new FriendException(FriendErrorCode.ALREADY_REQUESTED);
         }
-        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(receiver, requester, FriendStatus.REQUEST)) {
+        if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(receiver, requester,
+                FriendStatus.REQUEST)) {
             throw new FriendException(FriendErrorCode.REQUEST_ALREADY_RECEIVED);
         }
     }
@@ -184,12 +211,14 @@ public class FriendService {
         }
         friend.softDelete();
 
-
+        // 친구 채팅방 삭제
+        chatRoomService.deleteFriendChatRoom(
+                friend.getRequestMember().getId(), friend.getReceiveMember().getId());
     }
 
     public List<FriendDto> getFriendByMemberId(Long memberId) {
-
-            List<Friend> friends = friendRepository. findAllByMemberIdAndFriendStatusAndDeletedIs(memberId, FriendStatus.ACCEPT);
+        List<Friend> friends = friendRepository.findAllByMemberIdAndFriendStatusAndDeletedIs(memberId,
+                FriendStatus.ACCEPT);
 
         return friends.stream()
                 .map(friend -> {
@@ -201,5 +230,17 @@ public class FriendService {
                 .toList();
     }
 
+    public List<Long> getFriendMemberIdByMemberId(Long memberId) {
+        List<Friend> friends = friendRepository.findAllByMemberIdAndFriendStatusAndDeletedIs(memberId,
+                FriendStatus.ACCEPT);
 
+        return friends.stream()
+                .map(friend -> {
+                    if (friend.getReceiveMember().getId().equals(memberId)) {
+                        return friend.getRequestMember().getId();
+                    }
+                    return friend.getReceiveMember().getId();
+                })
+                .toList();
+    }
 }

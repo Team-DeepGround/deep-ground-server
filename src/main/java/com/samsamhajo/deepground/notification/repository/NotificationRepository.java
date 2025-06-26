@@ -15,4 +15,6 @@ public interface NotificationRepository extends MongoRepository<Notification, St
     @Query("{ 'receiver_id': ?0, 'is_read': false }")
     @Update("{ '$set': { 'is_read': true }, '$currentDate': { 'modified_at': true } }")
     void updateAllByReceiverId(Long receiverId);
+
+    Long countByReceiverIdAndReadFalse(Long receiverId);
 }

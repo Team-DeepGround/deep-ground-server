@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.notification.service;
 
 import com.samsamhajo.deepground.notification.dto.NotificationListResponse;
 import com.samsamhajo.deepground.notification.dto.NotificationResponse;
+import com.samsamhajo.deepground.notification.dto.NotificationUnreadResponse;
 import com.samsamhajo.deepground.notification.entity.Notification;
 import com.samsamhajo.deepground.notification.entity.NotificationData;
 import com.samsamhajo.deepground.notification.exception.NotificationErrorCode;
@@ -10,10 +11,10 @@ import com.samsamhajo.deepground.notification.repository.NotificationDataReposit
 import com.samsamhajo.deepground.notification.repository.NotificationRepository;
 import com.samsamhajo.deepground.sse.dto.SseEvent;
 import com.samsamhajo.deepground.sse.dto.SseEventType;
-import com.samsamhajo.deepground.sse.service.SseEmitterService;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,7 +23,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final NotificationDataRepository notificationDataRepository;
-    private final SseEmitterService sseEmitterService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public void sendNotification(Long receiverId, NotificationData data) {
         sendNotification(List.of(receiverId), data);
@@ -39,8 +40,8 @@ public class NotificationService {
 
         notifications.forEach(notification -> {
             NotificationResponse response = NotificationResponse.from(notification);
-            SseEvent event = SseEvent.of(SseEventType.NOTIFICATION, response);
-            sseEmitterService.broadcast(notification.getReceiverId(), event);
+            SseEvent event = SseEvent.of(notification.getReceiverId(), SseEventType.NOTIFICATION, response);
+            eventPublisher.publishEvent(event);
         });
     }
 
@@ -72,5 +73,11 @@ public class NotificationService {
 
     public void readAllNotifications(Long receiverId) {
         notificationRepository.updateAllByReceiverId(receiverId);
+    }
+
+    public NotificationUnreadResponse getUnreadCount(Long memberId) {
+        Long unreadCount = notificationRepository.countByReceiverIdAndReadFalse(memberId);
+
+        return NotificationUnreadResponse.of(unreadCount);
     }
 }

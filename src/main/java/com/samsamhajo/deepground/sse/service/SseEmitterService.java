@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Service
@@ -32,13 +33,16 @@ public class SseEmitterService {
         sseEmitter.onTimeout(sseEmitter::complete);
         sseEmitter.onError(sseEmitter::completeWithError);
 
-        eventPublisher.publishEvent(new SseSubscribeEvent(this, memberId));
-        broadcast(memberId, CONNECTED_EVENT);
+        eventPublisher.publishEvent(new SseSubscribeEvent(memberId));
+        send(List.of(sseEmitter), CONNECTED_EVENT);
         return sseEmitter;
     }
 
-    public void broadcast(Long memberId, SseEvent event) {
-        List<SseEmitter> emitters = sseEmitterRepository.findAllById(memberId);
+    public void broadcast(SseEvent event) {
+        if (ObjectUtils.isEmpty(event.getMemberId())) {
+            return;
+        }
+        List<SseEmitter> emitters = sseEmitterRepository.findAllById(event.getMemberId());
         send(emitters, event);
     }
 
@@ -55,13 +59,13 @@ public class SseEmitterService {
                         .name(event.getName())
                         .data(event.getData()));
             } catch (IOException e) {
-                sseEmitter.completeWithError(e);
+                sseEmitter.complete();
             }
         });
     }
 
     private void unsubscribe(Long memberId, SseEmitter sseEmitter) {
-        eventPublisher.publishEvent(new SseUnsubscribeEvent(this, memberId));
+        eventPublisher.publishEvent(new SseUnsubscribeEvent(memberId));
         sseEmitterRepository.delete(memberId, sseEmitter);
     }
 }

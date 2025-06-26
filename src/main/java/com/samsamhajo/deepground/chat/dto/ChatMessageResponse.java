@@ -16,6 +16,7 @@ public class ChatMessageResponse {
     private Long senderId;
     private String message;
     private List<ChatMessageMedia> media;
+    private List<String> mediaIds;
     private LocalDateTime createdAt;
 
     public static ChatMessageResponse from(ChatMessage chatMessage) {
@@ -24,6 +25,7 @@ public class ChatMessageResponse {
                 .senderId(chatMessage.getSenderId())
                 .message(chatMessage.getMessage())
                 .media(Optional.ofNullable(chatMessage.getMedia()).orElse(List.of()))
+                .mediaIds(Optional.ofNullable(chatMessage.getMediaIds()).orElse(List.of()))
                 .createdAt(chatMessage.getCreatedAt())
                 .build();
     }

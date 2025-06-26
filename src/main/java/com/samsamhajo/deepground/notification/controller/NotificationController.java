@@ -4,6 +4,7 @@ import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.notification.dto.NotificationListRequest;
 import com.samsamhajo.deepground.notification.dto.NotificationListResponse;
+import com.samsamhajo.deepground.notification.dto.NotificationUnreadResponse;
 import com.samsamhajo.deepground.notification.service.NotificationService;
 import com.samsamhajo.deepground.notification.success.NotificationSuccessCode;
 import jakarta.validation.Valid;
@@ -61,5 +62,16 @@ public class NotificationController {
         notificationService.readAllNotifications(memberId);
         return ResponseEntity
                 .ok(SuccessResponse.of(NotificationSuccessCode.NOTIFICATION_READ));
+    }
+
+    @GetMapping("/unread-count")
+    public ResponseEntity<SuccessResponse<?>> getUnreadCount(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long memberId = userDetails.getMember().getId();
+
+        NotificationUnreadResponse response = notificationService.getUnreadCount(memberId);
+        return ResponseEntity
+                .ok(SuccessResponse.of(NotificationSuccessCode.NOTIFICATION_UNREAD_COUNT_RETRIEVED, response));
     }
 }

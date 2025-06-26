@@ -51,6 +51,15 @@ public class ChatRoomService {
     }
 
     @Transactional
+    public void deleteFriendChatRoom(Long member1, Long member2) {
+        ChatRoom chatRoom = chatRoomMemberRepository.findFriendChatRoom(member1, member2)
+                .orElseThrow(() -> new ChatException(ChatErrorCode.CHATROOM_NOT_FOUND));
+
+       chatRoomMemberRepository.softDeleteByChatRoomId(chatRoom.getId());
+       chatRoom.softDelete();
+    }
+
+    @Transactional
     public void deleteChatRoom(Long chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new ChatException(ChatErrorCode.CHATROOM_NOT_FOUND));

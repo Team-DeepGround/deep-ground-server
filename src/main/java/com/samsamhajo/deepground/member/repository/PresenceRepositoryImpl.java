@@ -11,7 +11,7 @@ import org.springframework.util.CollectionUtils;
 
 @Repository
 @RequiredArgsConstructor
-public class MemberPresenceRepositoryImpl implements MemberPresenceRepository {
+public class PresenceRepositoryImpl implements PresenceRepository {
 
     private final StringRedisTemplate redisTemplate;
     private static final String KEY_PREFIX = "PRESENCE:";
@@ -30,7 +30,7 @@ public class MemberPresenceRepositoryImpl implements MemberPresenceRepository {
     }
 
     @Override
-    public List<Boolean> findPresentMembers(List<Long> memberIds) {
+    public List<Boolean> findOnlineMembers(List<Long> memberIds) {
         if (CollectionUtils.isEmpty(memberIds)) {
             return Collections.emptyList();
         }

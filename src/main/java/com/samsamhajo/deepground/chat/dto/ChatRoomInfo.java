@@ -8,6 +8,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ChatRoomInfo {
 
+    private Long id;
     private Long chatRoomId;
     private String name;
     private LocalDateTime lastReadMessageTime;

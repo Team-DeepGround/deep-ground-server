@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.studyGroup.service;
 
+import com.samsamhajo.deepground.chat.service.ChatRoomMemberService;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
@@ -16,6 +17,7 @@ public class StudyGroupAcceptService {
 
   private final StudyGroupRepository studyGroupRepository;
   private final StudyGroupMemberRepository studyGroupMemberRepository;
+  private final ChatRoomMemberService chatRoomMemberService;
 
   @Transactional
   public void acceptMember(Long studyGroupId, Long targetMemberId, Member requester) {
@@ -40,5 +42,8 @@ public class StudyGroupAcceptService {
 
     // 상태 수락으로 변경
     member.allowMember();
+
+    // 채팅방 참가
+    chatRoomMemberService.joinChatRoom(member.getMember(), group.getChatRoom());
   }
 }

@@ -65,11 +65,11 @@ class SseEmitterServiceTest {
     void broadcast_success() throws IOException {
         // given
         List<SseEmitter> emitters = Collections.singletonList(sseEmitter);
-        SseEvent event = SseEvent.of(SseEventType.NOTIFICATION, "message");
+        SseEvent event = SseEvent.of(memberId, SseEventType.NOTIFICATION, "message");
         when(sseEmitterRepository.findAllById(memberId)).thenReturn(emitters);
 
         // when
-        sseEmitterService.broadcast(memberId, event);
+        sseEmitterService.broadcast(event);
 
         // then
         verify(sseEmitterRepository).findAllById(memberId);
