@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.friend.service;
 
+import com.samsamhajo.deepground.chat.service.ChatRoomService;
 import com.samsamhajo.deepground.friend.Dto.FriendDto;
 import com.samsamhajo.deepground.friend.Exception.FriendException;
 import com.samsamhajo.deepground.friend.entity.Friend;
@@ -26,6 +27,7 @@ public class FriendService {
 
     private final FriendRepository friendRepository;
     private final MemberRepository memberRepository;
+    private final ChatRoomService chatRoomService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -107,6 +109,12 @@ public class FriendService {
                 friendRequest.getRequestMember().getId(),
                 FriendNotificationData.accept(receiver)
         ));
+
+        // 친구 채팅방 생성
+        chatRoomService.createFriendChatRoom(
+                friendRequest.getRequestMember(),
+                friendRequest.getReceiveMember()
+        );
 
         return friendRequest.getId();
     }
@@ -203,7 +211,9 @@ public class FriendService {
         }
         friend.softDelete();
 
-
+        // 친구 채팅방 삭제
+        chatRoomService.deleteFriendChatRoom(
+                friend.getRequestMember().getId(), friend.getReceiveMember().getId());
     }
 
     public List<FriendDto> getFriendByMemberId(Long memberId) {

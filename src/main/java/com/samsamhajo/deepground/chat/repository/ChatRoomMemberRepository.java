@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.chat.repository;
 
 import com.samsamhajo.deepground.chat.dto.ChatRoomInfo;
+import com.samsamhajo.deepground.chat.entity.ChatRoom;
 import com.samsamhajo.deepground.chat.entity.ChatRoomMember;
 
 import io.lettuce.core.dynamic.annotation.Param;
@@ -47,4 +48,12 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
     @Modifying
     @Query("UPDATE ChatRoomMember SET deleted = true WHERE chatRoom.id = :chatRoomId")
     void softDeleteByChatRoomId(@Param("chatRoomId") Long chatRoomId);
+
+    @Query("SELECT crm.chatRoom "
+           + "FROM ChatRoomMember crm "
+           + "WHERE crm.member.id IN (:memberId1, :memberId2) "
+           + "AND crm.chatRoom.type = 'FRIEND' "
+           + "GROUP BY crm.chatRoom.id "
+           + "HAVING COUNT(crm.member.id) = 2")
+    Optional<ChatRoom> findFriendChatRoom(Long memberId1, Long memberId2);
 }

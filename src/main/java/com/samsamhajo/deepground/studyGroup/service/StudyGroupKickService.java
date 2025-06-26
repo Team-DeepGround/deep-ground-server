@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.studyGroup.service;
 
+import com.samsamhajo.deepground.chat.service.ChatRoomMemberService;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupKickRequest;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
@@ -17,6 +18,7 @@ public class StudyGroupKickService {
 
   private final StudyGroupRepository studyGroupRepository;
   private final StudyGroupMemberRepository studyGroupMemberRepository;
+  private final ChatRoomMemberService chatRoomMemberService;
 
   @Transactional
   public void kickMember(StudyGroupKickRequest request, Member requester) {
@@ -34,6 +36,9 @@ public class StudyGroupKickService {
     StudyGroupMember target = studyGroupMemberRepository.findByStudyGroupIdAndMemberId(
             request.getStudyGroupId(), request.getTargetMemberId())
         .orElseThrow(() -> new IllegalArgumentException("대상 멤버가 스터디에 존재하지 않습니다."));
+
+    // 채팅방 멤버 삭제
+    chatRoomMemberService.leaveChatRoom(group.getChatRoom().getId(), target.getMember().getId());
 
     target.softDelete();
   }

@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.studyGroup.service;
 
+import com.samsamhajo.deepground.chat.service.ChatRoomService;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupDetailResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupParticipationResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupMyListResponse;
@@ -13,8 +14,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
-import com.samsamhajo.deepground.chat.entity.ChatRoomType;
-import com.samsamhajo.deepground.chat.repository.ChatRoomRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCreateRequest;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCreateResponse;
@@ -35,7 +34,7 @@ public class StudyGroupService {
 
   private final StudyGroupRepository studyGroupRepository;
   private final StudyGroupMemberRepository studyGroupMemberRepository;
-  private final ChatRoomRepository chatRoomRepository;
+  private final ChatRoomService chatRoomService;
 
 
   @Transactional
@@ -76,7 +75,7 @@ public class StudyGroupService {
   public StudyGroupCreateResponse createStudyGroup(StudyGroupCreateRequest request, Member creator) {
     validateRequest(request);
 
-    ChatRoom chatRoom = chatRoomRepository.save(ChatRoom.of(ChatRoomType.STUDY_GROUP));
+    ChatRoom chatRoom = chatRoomService.createStudyGroupChatRoom(creator);
 
     StudyGroup studyGroup = StudyGroup.of(
         chatRoom,
