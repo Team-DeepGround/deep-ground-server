@@ -10,7 +10,10 @@ import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
 import com.samsamhajo.deepground.member.exception.MemberException;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
+import com.samsamhajo.deepground.notification.entity.data.FriendNotificationData;
+import com.samsamhajo.deepground.notification.event.NotificationEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,7 @@ public class FriendService {
 
     private final FriendRepository friendRepository;
     private final MemberRepository memberRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Long sendFriendRequest(Long requesterId, String receiverEmail) {
@@ -37,6 +41,12 @@ public class FriendService {
 
         Friend friend = Friend.request(requester, receiver);
         friendRepository.save(friend);
+
+        // 친구 요청 알림
+        eventPublisher.publishEvent(NotificationEvent.of(
+                receiver.getId(),
+                FriendNotificationData.request(requester)
+        ));
 
         return friend.getId();
     }
@@ -91,6 +101,12 @@ public class FriendService {
         Friend friendRequest = validateAccept(friendId, receiver);
 
         friendRequest.accept();
+
+        // 친구 수락 알림
+        eventPublisher.publishEvent(NotificationEvent.of(
+                friendRequest.getRequestMember().getId(),
+                FriendNotificationData.accept(receiver)
+        ));
 
         return friendRequest.getId();
     }
