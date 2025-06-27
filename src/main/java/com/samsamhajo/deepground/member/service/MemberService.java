@@ -45,4 +45,14 @@ public class MemberService {
 
         return memberProfileDto.from(saved, member);
     }
+
+
+    // TODO: 비공개 프로필 설정 도입 시, memberId와 profileId를 비교하여 접근 제한 예외 처리 추가 예정
+    public MemberProfileDto getUserProfile(Long memberId, Long profileId) {
+
+        MemberProfile profile = profileRepository.findById(profileId)
+                .orElseThrow(()-> new ProfileException(ProfileErrorCode.INVALID_PROFILE_ID));
+
+        return MemberProfileDto.of(profile);
+    }
 }
