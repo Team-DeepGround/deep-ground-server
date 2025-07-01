@@ -3,9 +3,7 @@ package com.samsamhajo.deepground.feed.feed.controller;
 import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.feed.feed.entity.Feed;
 import com.samsamhajo.deepground.feed.feed.exception.FeedSuccessCode;
-import com.samsamhajo.deepground.feed.feed.model.FeedCreateRequest;
-import com.samsamhajo.deepground.feed.feed.model.FeedUpdateRequest;
-import com.samsamhajo.deepground.feed.feed.model.FetchFeedsResponse;
+import com.samsamhajo.deepground.feed.feed.model.*;
 import com.samsamhajo.deepground.feed.feed.service.FeedService;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +44,32 @@ public class FeedController {
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedSuccessCode.FEED_LIST_FETCHED, response));
     }
-    
+
+    @GetMapping("/summaries")
+    public ResponseEntity<SuccessResponse<FetchFeedSummariesResponse>> getFeedsSummariesByMemberId(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        Long memberId = userDetails.getMember().getId();
+        FetchFeedSummariesResponse response = feedService.getFeedSummariesByMemberId(pageable, memberId);
+
+        return ResponseEntity
+                .ok(SuccessResponse.of(FeedSuccessCode.FEED_LIST_FETCHED, response));
+    }
+
+    @GetMapping(value = "/{feedId}")
+    public ResponseEntity<SuccessResponse<FetchFeedResponse>> getFeed(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable("feedId") Long feedId) {
+
+        Long memberId = userDetails.getMember().getId();
+        FetchFeedResponse response = feedService.getFeed(feedId, memberId);
+
+        return ResponseEntity
+                .ok(SuccessResponse.of(FeedSuccessCode.FEED_FETCHED, response));
+    }
+
+
     @PutMapping(value = "/{feedId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse<Feed>> updateFeed(
             @AuthenticationPrincipal CustomUserDetails userDetails,
