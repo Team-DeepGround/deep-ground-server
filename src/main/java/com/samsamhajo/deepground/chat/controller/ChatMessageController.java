@@ -27,9 +27,12 @@ public class ChatMessageController {
 
     @SubscribeMapping("/init")
     public ChatRoomInitResponse init(
-            @DestinationVariable Long chatRoomId
+            @DestinationVariable Long chatRoomId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        List<ChatRoomMemberInfo> memberInfos = chatRoomMemberService.getChatRoomMemberInfos(chatRoomId);
+        Long memberId = userDetails.getMember().getId();
+
+        List<ChatRoomMemberInfo> memberInfos = chatRoomMemberService.getChatRoomMemberInfos(chatRoomId, memberId);
         ChatMessageListResponse chatMessage = chatMessageService.getMessages(chatRoomId, null, 20);
         return ChatRoomInitResponse.of(memberInfos, chatMessage);
     }

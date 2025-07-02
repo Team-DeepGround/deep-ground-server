@@ -166,9 +166,9 @@ class ChatRoomMemberServiceTest {
         // given
         ChatRoom chatRoom = mock(ChatRoom.class);
         LocalDateTime lastReadMessageTime = LocalDateTime.now();
-        Member member1 = Member.createLocalMember("a@test.com", "password", "test1");
-        Member member2 = Member.createLocalMember("b@test.com", "password", "test2");
-        Member member3 = Member.createLocalMember("c@test.com", "password", "test3");
+        Member member1 = mock(Member.class);
+        Member member2 = mock(Member.class);
+        Member member3 = mock(Member.class);
         List<ChatRoomMember> members = List.of(
                 ChatRoomMember.of(member1, chatRoom, lastReadMessageTime),
                 ChatRoomMember.of(member2, chatRoom, lastReadMessageTime),
@@ -178,7 +178,7 @@ class ChatRoomMemberServiceTest {
         when(chatRoomMemberRepository.findByChatRoomId(chatRoomId)).thenReturn(members);
 
         // when
-        List<ChatRoomMemberInfo> infos = chatRoomMemberService.getChatRoomMemberInfos(chatRoomId);
+        List<ChatRoomMemberInfo> infos = chatRoomMemberService.getChatRoomMemberInfos(chatRoomId, memberId);
 
         // then
         verify(chatRoomMemberRepository).findByChatRoomId(eq(chatRoomId));
