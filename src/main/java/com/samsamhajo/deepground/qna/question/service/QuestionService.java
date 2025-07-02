@@ -227,5 +227,24 @@ public class QuestionService{
         );
     }
 
+    @Transactional(readOnly = true)
+    public QuestionListResponseDto getQuestionsByMemberId(Long memberId, Pageable pageable) {
+        Page<Question> questionPage = questionRepository.findByMemberId(memberId, pageable);
+
+        List<QuestionSummaryDto> summaries = questionPage.stream()
+                .map(question -> {
+                    List<String> techStacks = questionTagService.getStackNamesByQuestionId(question.getId());
+                    int answerCount = answerService.countAnswersByQuestionId(question.getId());
+                    List<String> mediaUrls = questionMediaRepository.findAllByQuestionId(question.getId())
+                            .stream()
+                            .map(qm -> qm.getMediaUrl())
+                            .toList();
+
+                    return QuestionSummaryDto.of(question, techStacks, answerCount, mediaUrls);
+                }).toList();
+
+        return QuestionListResponseDto.of(summaries, questionPage.getTotalPages());
+    }
+
 
 }

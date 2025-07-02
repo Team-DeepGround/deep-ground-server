@@ -23,4 +23,5 @@ public class AnswerUpdateRequestDto {
     private List<MultipartFile> mediaFiles = new ArrayList<>();
     private Long questionId;
     private Long answerId;
+    private List<MultipartFile> images = new ArrayList<>();
 }

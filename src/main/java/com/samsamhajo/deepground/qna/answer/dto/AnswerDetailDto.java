@@ -15,24 +15,24 @@ public class AnswerDetailDto {
     private Long questionId;
     private Long memberId;
     private Long answerId;
-    private List<String> mediaUrls;
+    private List<String> mediaUrl;
 
     public AnswerDetailDto(
             String answerContent,
             Long questionId,
             Long memberId,
             Long answerId,
-            List<String> mediaUrls
+            List<String> mediaUrl
 
     ) {
         this.answerContent = answerContent;
         this.questionId = questionId;
         this.memberId = memberId;
         this.answerId = answerId;
-        this.mediaUrls = mediaUrls;
+        this.mediaUrl = mediaUrl;
     }
 
-    public static AnswerDetailDto of(String answerContent, Long questionId, Long memberId, Long answerId, List<String> mediaUrls) {
-        return new AnswerDetailDto(answerContent, questionId, memberId, answerId, mediaUrls);
+    public static AnswerDetailDto of(String answerContent, Long questionId, Long memberId, Long answerId, List<String> mediaUrl) {
+        return new AnswerDetailDto(answerContent, questionId, memberId, answerId, mediaUrl);
     }
 }

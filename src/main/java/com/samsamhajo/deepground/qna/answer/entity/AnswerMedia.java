@@ -17,7 +17,7 @@ public class AnswerMedia extends BaseEntity {
     private Long id;
 
     @Column(name = "answer_comment_url",nullable = false)
-    private String answerCommentUrl;
+    private String mediaUrl;
 
     @Column(name = "extension",nullable = false)
     private String extension;
@@ -26,13 +26,18 @@ public class AnswerMedia extends BaseEntity {
     @JoinColumn(name = "answer_id")
     private Answer answer;
 
-    private AnswerMedia(String answerCommentUrl, String extension, Answer answer) {
-        this.answerCommentUrl = answerCommentUrl;
+    private AnswerMedia(String mediaUrl, String extension, Answer answer) {
+        this.mediaUrl = mediaUrl;
         this.extension = extension;
         this.answer = answer;
     }
 
-    public static AnswerMedia of(String answerCommentUrl, String extension, Answer answer) {
-        return new AnswerMedia(answerCommentUrl, extension, answer);
+    public static AnswerMedia of(String mediaUrl, String extension, Answer answer) {
+        return new AnswerMedia(mediaUrl, extension, answer);
     }
+
+    public String getMediaUrl() {
+        return mediaUrl;
+    }
+
 }
