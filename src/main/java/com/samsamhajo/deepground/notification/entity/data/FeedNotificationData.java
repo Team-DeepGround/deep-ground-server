@@ -9,8 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Getter
 public class FeedNotificationData extends NotificationData {
 
-    private static final int CONTENT_LENGTH = 8;
-
     @Field("feedId")
     private Long feedId;
 
@@ -29,11 +27,5 @@ public class FeedNotificationData extends NotificationData {
                 feedComment.getFeed().getId(),
                 truncated(feedComment.getContent())
         );
-    }
-
-    private static String truncated(String content) {
-        return content.length() > CONTENT_LENGTH
-                ? content.substring(0, CONTENT_LENGTH) + "..."
-                : content;
     }
 }

@@ -10,6 +10,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "notification_data")
 public abstract class NotificationData {
 
+    private static final int CONTENT_LENGTH = 8;
+
     @Id
     @JsonIgnore
     private String id;
@@ -19,5 +21,11 @@ public abstract class NotificationData {
 
     protected NotificationData(NotificationType type) {
         this.type = type;
+    }
+
+    protected static String truncated(String content) {
+        return content.length() > CONTENT_LENGTH
+                ? content.substring(0, CONTENT_LENGTH) + "..."
+                : content;
     }
 }

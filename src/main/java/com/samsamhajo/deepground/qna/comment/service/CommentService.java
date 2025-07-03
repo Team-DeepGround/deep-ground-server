@@ -2,6 +2,8 @@ package com.samsamhajo.deepground.qna.comment.service;
 
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
+import com.samsamhajo.deepground.notification.entity.data.QNANotificationData;
+import com.samsamhajo.deepground.notification.event.NotificationEvent;
 import com.samsamhajo.deepground.qna.answer.entity.Answer;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerErrorCode;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerException;
@@ -15,6 +17,7 @@ import com.samsamhajo.deepground.qna.comment.exception.CommentErrorCode;
 import com.samsamhajo.deepground.qna.comment.exception.CommentException;
 import com.samsamhajo.deepground.qna.comment.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -26,6 +29,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
     private final AnswerRepository answerRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public CommentCreateResponseDto createComment(CommentCreateRequestDto commentCreateRequestDto, Long memberId) {
@@ -50,6 +54,15 @@ public class CommentService {
         );
 
         Comment saved = commentRepository.save(comment);
+
+        // 댓글 알림
+        Long answerMemberId = answer.getMember().getId();
+        if (!answerMemberId.equals(memberId)) {
+            eventPublisher.publishEvent(NotificationEvent.of(
+                    answerMemberId,
+                    QNANotificationData.comment(answer.getQuestion().getId(), comment.getCommentContent())
+            ));
+        }
 
         return CommentCreateResponseDto.of(
                 saved.getCommentContent(),

@@ -22,6 +22,12 @@ public enum NotificationType {
     SCHEDULE_REMINDER,      // 스터디 일정 알림
 
     /**
+     * Q&A 알림
+     */
+    QNA_ANSWER,             // 답변 알림
+    QNA_COMMENT,            // 댓글 알림
+
+    /**
      * 피드 알림
      */
     FEED_COMMENT,           // 피드 댓글 알림
