@@ -48,5 +48,27 @@ public class MemberController {
         return ResponseEntity
                 .ok(SuccessResponse.of(MemberSuccessCode.ONLINE_SUCCESS_CODE, response));
     }
+
+    @PostMapping(value = "/profile/new", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<SuccessResponse<MemberProfileDto>> createProfile(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestPart("profile") @Valid MemberProfileDto memberProfileDto,
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+
+        Long memberId = userDetails.getMember().getId();
+        MemberProfileDto profile = memberService.createProfile(memberId, memberProfileDto, profileImage);
+
+        return ResponseEntity.ok(SuccessResponse.of(ProfileSuccessCode.PROFILE_CREATE_SUCCESS, profile));
+    }
+
+    @GetMapping("/profile/me")
+    public ResponseEntity<SuccessResponse<MemberProfileDto>> getMyProfile(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        Long memberId = userDetails.getMember().getId();
+        MemberProfileDto profile = memberService.getMyProfile(memberId);
+
+        return ResponseEntity.ok(SuccessResponse.of(ProfileSuccessCode.GET_MY_PROFILE_SUCCESS, profile));
+    }
 }
 
