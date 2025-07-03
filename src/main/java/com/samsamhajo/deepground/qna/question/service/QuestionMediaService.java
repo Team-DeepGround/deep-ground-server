@@ -33,8 +33,8 @@ public class QuestionMediaService {
 
 
     public List<String> createQuestionMedia(Question question, List<MultipartFile> images) {
-        if (CollectionUtils.isEmpty(images)){
-            throw new IllegalArgumentException("image is blank");
+        if (images == null || images.isEmpty()) {
+            return Collections.emptyList();
         }
 
         List<QuestionMedia> mediaEntities = images.stream()
@@ -51,10 +51,22 @@ public class QuestionMediaService {
 
 
     public void deleteQuestionMedia(Long questionId) {
-        List<QuestionMedia> questionMedia = questionMediaRepository.findAllByQuestionId(questionId);
-        questionMedia.forEach(content -> MediaUtils.deleteMedia(content.getMediaUrl()));
+        List<QuestionMedia> questionMediaList = questionMediaRepository.findAllByQuestionId(questionId);
+
+        if (questionMediaList.isEmpty()) {
+            return;
+        }
+
+        questionMediaList.forEach(media -> {
+            try {
+                MediaUtils.deleteMedia(media.getMediaUrl());
+            } catch (Exception e) {
+            }
+        });
+
         questionMediaRepository.deleteAllByQuestionId(questionId);
     }
+
 
     public QuestionMediaResponse questionFetchMedia(String mediaUrl) {
         QuestionMedia questionMedia = questionMediaRepository.findByMediaUrl(mediaUrl)
