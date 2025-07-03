@@ -21,5 +21,8 @@ public enum NotificationType {
     SCHEDULE_CREATE,        // 스터디 일정 생성
     SCHEDULE_REMINDER,      // 스터디 일정 알림
 
-    // TODO: QNA, FEED 알림
+    /**
+     * 피드 알림
+     */
+    FEED_COMMENT,           // 피드 댓글 알림
 }

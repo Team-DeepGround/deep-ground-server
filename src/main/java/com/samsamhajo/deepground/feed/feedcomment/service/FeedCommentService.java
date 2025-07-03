@@ -12,7 +12,10 @@ import com.samsamhajo.deepground.feed.feedcomment.model.FetchFeedCommentsRespons
 import com.samsamhajo.deepground.feed.feedcomment.repository.FeedCommentRepository;
 import com.samsamhajo.deepground.feed.feedreply.service.FeedReplyService;
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.notification.entity.data.FeedNotificationData;
+import com.samsamhajo.deepground.notification.event.NotificationEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -29,6 +32,7 @@ public class FeedCommentService {
     private final FeedRepository feedRepository;
     private final FeedReplyService feedReplyService;
     private final FeedCommentLikeService feedCommentLikeService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public FeedComment createFeedComment(FeedCommentCreateRequest request, Member member) {
@@ -42,6 +46,12 @@ public class FeedCommentService {
         feedCommentRepository.save(feedComment);
 
         saveFeedCommentMedia(request, feedComment);
+
+        // 피드 댓글 알림
+        eventPublisher.publishEvent(NotificationEvent.of(
+                feed.getMember().getId(),
+                FeedNotificationData.comment(feedComment)
+        ));
 
         return feedComment;
     }
