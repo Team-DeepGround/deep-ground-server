@@ -26,18 +26,18 @@ public class FeedMediaService {
     private final FeedMediaRepository feedMediaRepository;
     private final S3Uploader s3Uploader;
 
-    public void createFeedMedia(Feed feed, List<MultipartFile> images) {
-        if (CollectionUtils.isEmpty(images)) return;
+    @Transactional
+    public void createFeedMedia(Feed feed, List<MultipartFile> images){
+        if(CollectionUtils.isEmpty(images)) return;
 
-        List<FeedMedia> mediaEntities = images.stream()
-                .map(image -> {
-                    String url = s3Uploader.upload(image, "feed-media");                  // ✅ S3Uploader 재사용
-                    String extension = getExtension(image.getOriginalFilename());        // ✅ 확장자 추출
-                    return FeedMedia.of(url, extension, feed);                           // ✅ 도메인 생성
-                })
-                .toList();
-
-        feedMediaRepository.saveAll(mediaEntities);
+        feedMediaRepository.saveAll(
+                images.stream()
+                        .map(image -> FeedMedia.of(
+                                MediaUtils.generateMediaUrl(image),
+                                MediaUtils.getExtension(image),
+                                feed))
+                        .toList()
+        );
     }
 
     public FeedMediaResponse fetchFeedMedia(Long feedMediaId) {

@@ -3,10 +3,7 @@ package com.samsamhajo.deepground.feed.feed.service;
 import com.samsamhajo.deepground.feed.feed.entity.Feed;
 import com.samsamhajo.deepground.feed.feed.exception.FeedErrorCode;
 import com.samsamhajo.deepground.feed.feed.exception.FeedException;
-import com.samsamhajo.deepground.feed.feed.model.FeedCreateRequest;
-import com.samsamhajo.deepground.feed.feed.model.FeedUpdateRequest;
-import com.samsamhajo.deepground.feed.feed.model.FetchFeedResponse;
-import com.samsamhajo.deepground.feed.feed.model.FetchFeedsResponse;
+import com.samsamhajo.deepground.feed.feed.model.*;
 import com.samsamhajo.deepground.feed.feed.repository.FeedRepository;
 import com.samsamhajo.deepground.feed.feedcomment.service.FeedCommentService;
 import com.samsamhajo.deepground.feed.feedshared.model.FetchSharedFeedResponse;
@@ -62,6 +59,27 @@ public class FeedService {
         return feed;
     }
 
+    public FetchFeedResponse getFeed(Long feedId, Long memberId) {
+        Feed feed = feedRepository.getById(feedId);
+
+        FetchSharedFeedResponse sharedFeedResponse =
+                sharedFeedService.getSharedFeedResponse(feed.getId());
+
+        return FetchFeedResponse.builder()
+                .feedId(feed.getId())
+                .content(feed.getContent())
+                .createdAt(feed.getCreatedAt().toLocalDate())
+                .memberId(feed.getMember().getId())
+                .memberName(feed.getMember().getNickname())
+                .mediaIds(feedMediaService.findAllMediaIdsByFeedId(feed.getId()))
+                .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId()))
+                .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))
+                .likeCount(feedLikeService.countFeedLikeByFeedId(feed.getId()))
+                .isLiked(feedLikeService.isLiked(feed.getId(), memberId))
+                .isShared(sharedFeedResponse != null)
+                .sharedFeed(sharedFeedResponse)
+                .build();
+    }
 
     public FetchFeedsResponse getFeeds(Pageable pageable, Long memberId) {
 
@@ -70,24 +88,24 @@ public class FeedService {
         return FetchFeedsResponse.of(
                 feeds.getContent().stream()
                         .map(feed -> {
-                            FetchSharedFeedResponse sharedFeedResponse =
-                                    sharedFeedService.getSharedFeedResponse(feed.getId());
+                                    FetchSharedFeedResponse sharedFeedResponse =
+                                            sharedFeedService.getSharedFeedResponse(feed.getId());
 
-                            return FetchFeedResponse.builder()
-                                    .feedId(feed.getId())
-                                    .content(feed.getContent())
-                                    .createdAt(feed.getCreatedAt().toLocalDate())
-                                    .memberId(feed.getMember().getId())
-                                    .memberName(feed.getMember().getNickname())
-                                    .mediaIds(feedMediaService.findAllMediaIdsByFeedId(feed.getId()))
-                                    .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId()))
-                                    .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))
-                                    .likeCount(feedLikeService.countFeedLikeByFeedId(feed.getId()))
-                                    .isLiked(feedLikeService.isLiked(feed.getId(), memberId))
-                                    .isShared(sharedFeedResponse != null)
-                                    .sharedFeed(sharedFeedResponse)
-                                    .build();
-                        }
+                                    return FetchFeedResponse.builder()
+                                            .feedId(feed.getId())
+                                            .content(feed.getContent())
+                                            .createdAt(feed.getCreatedAt().toLocalDate())
+                                            .memberId(feed.getMember().getId())
+                                            .memberName(feed.getMember().getNickname())
+                                            .mediaIds(feedMediaService.findAllMediaIdsByFeedId(feed.getId()))
+                                            .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId()))
+                                            .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))
+                                            .likeCount(feedLikeService.countFeedLikeByFeedId(feed.getId()))
+                                            .isLiked(feedLikeService.isLiked(feed.getId(), memberId))
+                                            .isShared(sharedFeedResponse != null)
+                                            .sharedFeed(sharedFeedResponse)
+                                            .build();
+                                }
                         ).toList(),
                 feeds.getTotalElements(),
                 feeds.getNumber(),        // 현재 페이지 번호 (0부터 시작)
@@ -95,6 +113,26 @@ public class FeedService {
                 feeds.getTotalPages()
         );
     }
+
+    public FetchFeedSummariesResponse getFeedSummariesByMemberId(Pageable pageable, Long memberId) {
+
+        Page<Feed> feeds = feedRepository.findAllByMemberId(pageable, memberId);
+
+        return FetchFeedSummariesResponse.of(
+                feeds.getContent().stream()
+                        .map(feed -> FetchFeedSummaryResponse.builder()
+                                .feedId(feed.getId())
+                                .content(feed.getContent())
+                                .createdAt(feed.getCreatedAt().toLocalDate())
+                                .build())
+                        .toList(),
+                feeds.getTotalElements(),
+                feeds.getNumber(),        // 현재 페이지 번호 (0부터 시작)
+                feeds.getSize(),          // 요청된 페이지 크기
+                feeds.getTotalPages()
+        );
+    }
+
 
     private void saveFeedMedia(FeedCreateRequest request, Feed feed) {
         feedMediaService.createFeedMedia(feed, request.getImages());
