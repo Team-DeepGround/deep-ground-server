@@ -13,6 +13,7 @@ public class MemberScheduleCalendarResponseDto {
     private Long memberStudyScheduleId;
     private Long studyScheduleId;
     private Long studyGroupId;
+    private String studyGroupName;
     private String title;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
@@ -20,6 +21,7 @@ public class MemberScheduleCalendarResponseDto {
     private Boolean isAvailable;
     private Boolean isImportant;
     private String memo;
+    private String location;
 
 
     public static MemberScheduleCalendarResponseDto from(MemberStudySchedule schedule) {
@@ -29,6 +31,7 @@ public class MemberScheduleCalendarResponseDto {
                 .memberStudyScheduleId(schedule.getId())
                 .studyScheduleId(ss.getId())
                 .studyGroupId(sg.getId())
+                .studyGroupName(sg.getTitle())
                 .title(ss.getTitle())
                 .description(ss.getDescription())
                 .startTime(ss.getStartTime())
@@ -36,6 +39,7 @@ public class MemberScheduleCalendarResponseDto {
                 .isAvailable(schedule.getIsAvailable())
                 .isImportant(schedule.getIsImportant())
                 .memo(schedule.getMemo())
+                .location(ss.getLocation())
                 .build();
     }
 }
