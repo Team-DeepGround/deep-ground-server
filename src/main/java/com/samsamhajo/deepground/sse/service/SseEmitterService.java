@@ -5,7 +5,6 @@ import com.samsamhajo.deepground.sse.dto.SseEventType;
 import com.samsamhajo.deepground.sse.event.SseSubscribeEvent;
 import com.samsamhajo.deepground.sse.event.SseUnsubscribeEvent;
 import com.samsamhajo.deepground.sse.repository.SseEmitterRepository;
-import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -58,7 +57,7 @@ public class SseEmitterService {
                 sseEmitter.send(SseEmitter.event()
                         .name(event.getName())
                         .data(event.getData()));
-            } catch (IOException e) {
+            } catch (Exception e) {
                 sseEmitter.complete();
             }
         });
