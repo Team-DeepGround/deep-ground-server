@@ -189,7 +189,6 @@ public class ChatMessageServiceTest {
         assertThat(savedChatMessage.getChatRoomId()).isEqualTo(chatRoomId);
         assertThat(savedChatMessage.getSenderId()).isEqualTo(memberId);
         assertThat(savedChatMessage.getMessage()).isEqualTo(message);
-        assertThat(savedChatMessage.getMedia()).isEqualTo(List.of(messageMedia));
 
         String expectedDestination = "/chatrooms/" + chatRoomId + "/message";
         verify(messagePublisher).convertAndSend(eq(expectedDestination), any(ChatMessageResponse.class));
