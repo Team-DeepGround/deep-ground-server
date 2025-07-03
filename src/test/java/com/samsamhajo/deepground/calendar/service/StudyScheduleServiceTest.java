@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.calendar.service;
 
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleRequestDto;
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleResponseDto;
+import com.samsamhajo.deepground.calendar.entity.MemberStudySchedule;
 import com.samsamhajo.deepground.calendar.entity.StudySchedule;
 import com.samsamhajo.deepground.calendar.exception.ScheduleErrorCode;
 import com.samsamhajo.deepground.calendar.exception.ScheduleException;
@@ -9,6 +10,7 @@ import com.samsamhajo.deepground.calendar.repository.MemberStudyScheduleReposito
 import com.samsamhajo.deepground.calendar.repository.StudyScheduleRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
+import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,6 +40,9 @@ class StudyScheduleServiceTest {
     private StudyGroupRepository studyGroupRepository;
 
     @Mock
+    private StudyGroupMemberRepository studyGroupMemberRepository;
+
+    @Mock
     private MemberStudyScheduleRepository memberStudyScheduleRepository;
 
     @InjectMocks
@@ -57,10 +62,6 @@ class StudyScheduleServiceTest {
                 .description("스터디 설명")
                 .location("온라인")
                 .build();
-
-        Member leader = mock(Member.class);
-        when(leader.getId()).thenReturn(userId);
-        when(studyGroup.getCreator()).thenReturn(leader);
     }
 
     @Test
@@ -73,6 +74,10 @@ class StudyScheduleServiceTest {
                 eq(requestDto.getStartTime()),
                 eq(requestDto.getEndTime())
         )).thenReturn(false);
+
+        Member leader = mock(Member.class);
+        when(leader.getId()).thenReturn(userId);
+        when(studyGroup.getCreator()).thenReturn(leader);
 
         when(studyScheduleRepository.save(any(StudySchedule.class)))
                 .thenAnswer(invocation -> {
@@ -224,6 +229,10 @@ class StudyScheduleServiceTest {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
 
+        Member leader = mock(Member.class);
+        when(leader.getId()).thenReturn(userId);
+        when(studyGroup.getCreator()).thenReturn(leader);
+
         StudySchedule existingSchedule = StudySchedule.of(
                 studyGroup,
                 "기존 제목",
@@ -239,6 +248,9 @@ class StudyScheduleServiceTest {
 
         when(studyScheduleRepository.findById(anyLong())).thenReturn(Optional.of(existingSchedule));
 
+        MemberStudySchedule memberSchedule = mock(MemberStudySchedule.class);
+        when(memberStudyScheduleRepository.findByStudyScheduleId(anyLong())).thenReturn(List.of(memberSchedule));
+
         StudyScheduleRequestDto updateRequestDto = StudyScheduleRequestDto.builder()
                 .title("수정된 일정 제목")
                 .startTime(LocalDateTime.now())
@@ -253,6 +265,7 @@ class StudyScheduleServiceTest {
         assertThat(responseDto).isNotNull();
         assertThat(responseDto.getId()).isEqualTo(existingSchedule.getId());
         assertThat(responseDto.getTitle()).isEqualTo(updateRequestDto.getTitle());
+        verify(memberSchedule, times(1)).updateAvailable(null);
     }
 
     @Test
@@ -274,6 +287,10 @@ class StudyScheduleServiceTest {
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
         when(studyScheduleRepository.findById(anyLong())).thenReturn(Optional.empty());
 
+        Member leader = mock(Member.class);
+        when(leader.getId()).thenReturn(userId);
+        when(studyGroup.getCreator()).thenReturn(leader);
+
         // when & then
         assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, userId, 1L, requestDto))
                 .isInstanceOf(ScheduleException.class)
@@ -291,6 +308,10 @@ class StudyScheduleServiceTest {
                 .startTime(startTime)
                 .endTime(endTime)
                 .build();
+
+        Member leader = mock(Member.class);
+        when(leader.getId()).thenReturn(userId);
+        when(studyGroup.getCreator()).thenReturn(leader);
 
         StudySchedule schedule = StudySchedule.of(
                 studyGroup,
@@ -325,6 +346,10 @@ class StudyScheduleServiceTest {
         StudySchedule schedule = mock(StudySchedule.class);
         when(schedule.getId()).thenReturn(2L);
 
+        Member leader = mock(Member.class);
+        when(leader.getId()).thenReturn(userId);
+        when(studyGroup.getCreator()).thenReturn(leader);
+
         when(studyScheduleRepository.findById(anyLong())).thenReturn(Optional.of(schedule));
         when(studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
                 anyLong(),
@@ -347,9 +372,6 @@ class StudyScheduleServiceTest {
         when(studyGroup.getCreator()).thenReturn(notLeader);
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
 
-        StudySchedule schedule = mock(StudySchedule.class);
-        when(studyScheduleRepository.findById(anyLong())).thenReturn(Optional.of(schedule));
-
         // when & then
         assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, userId, 1L, requestDto))
                 .isInstanceOf(ScheduleException.class)
@@ -364,6 +386,10 @@ class StudyScheduleServiceTest {
         Long scheduleId = 1L;
 
         when(studyGroup.getId()).thenReturn(studyGroupId);
+
+        Member leader = mock(Member.class);
+        when(leader.getId()).thenReturn(userId);
+        when(studyGroup.getCreator()).thenReturn(leader);
 
         StudySchedule schedule = mock(StudySchedule.class);
         when(schedule.getStudyGroup()).thenReturn(studyGroup);
