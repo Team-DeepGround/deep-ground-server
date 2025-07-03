@@ -20,6 +20,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -53,7 +58,9 @@ public class SecurityConfig {
             JwtProvider jwtProvider,
             CustomUserDetailsService userDetailsService,
             MemberRepository memberRepository) throws Exception {
-        http.authorizeHttpRequests(authorize -> authorize
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(PERMIT_URL_ARRAY).permitAll()
                         .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())
@@ -84,4 +91,20 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // 허용할 Origin을 명시적으로 지정 (여러 개 가능)
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
 }
