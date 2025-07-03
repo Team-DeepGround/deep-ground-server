@@ -59,5 +59,4 @@ public class MemberStudySchedule extends BaseEntity {
     public void updateMemo(String memo) {
         this.memo = memo;
     }
-
 }

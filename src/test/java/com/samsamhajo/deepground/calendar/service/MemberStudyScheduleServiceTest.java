@@ -9,6 +9,7 @@ import com.samsamhajo.deepground.calendar.exception.ScheduleErrorCode;
 import com.samsamhajo.deepground.calendar.exception.ScheduleException;
 import com.samsamhajo.deepground.calendar.repository.MemberStudyScheduleRepository;
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,12 +42,17 @@ public class MemberStudyScheduleServiceTest {
     void findMemberSchedulesByMemberId_Success() {
         // given
         Long studyScheduleId = 10L;
+        Long studyGroupId = 100L;
+        StudyGroup studyGroup = mock(StudyGroup.class);
+        when(studyGroup.getId()).thenReturn(studyGroupId);
 
         StudySchedule studySchedule = mock(StudySchedule.class);
         when(studySchedule.getId()).thenReturn(studyScheduleId);
         when(studySchedule.getTitle()).thenReturn("스터디 일정 제목");
         when(studySchedule.getStartTime()).thenReturn(LocalDateTime.of(2025, 5, 30, 14, 0));
         when(studySchedule.getEndTime()).thenReturn(LocalDateTime.of(2025, 5, 30, 16, 0));
+        when(studySchedule.getStudyGroup()).thenReturn(studyGroup);
+
 
         Member member = mock(Member.class);
         MemberStudySchedule memberStudySchedule = MemberStudySchedule.of(member, studySchedule, true, true, "memo");

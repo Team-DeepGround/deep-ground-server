@@ -11,7 +11,6 @@ import com.samsamhajo.deepground.qna.answer.exception.AnswerErrorCode;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerException;
 import com.samsamhajo.deepground.qna.comment.dto.CommentDTO;
 import com.samsamhajo.deepground.qna.question.entity.Question;
-import com.samsamhajo.deepground.qna.question.entity.QuestionMedia;
 import com.samsamhajo.deepground.qna.question.exception.QuestionErrorCode;
 import com.samsamhajo.deepground.qna.question.exception.QuestionException;
 import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
@@ -56,9 +55,8 @@ public class AnswerService {
         );
 
         Answer saved = answerRepository.save(answer);
-
         question.incrementAnswerCount();
-        createAnswerMedia(answerCreateRequestDto, saved);
+        List<String> mediaUrl = createAnswerMedia(answerCreateRequestDto, answer);
 
         List<CommentDTO> comments = new ArrayList<>();
 
@@ -68,7 +66,8 @@ public class AnswerService {
                 saved.getMember().getId(),
                 saved.getId()
                 , comments,
-                saved.getAnswerLikeCount()
+                saved.getAnswerLikeCount(),
+                mediaUrl
         );
     }
 
@@ -128,12 +127,12 @@ public class AnswerService {
         );
 
     }
-    private void createAnswerMedia(AnswerCreateRequestDto answerCreateRequestDto, Answer answer) {
-        answerMediaService.createAnswerMedia(answer, answerCreateRequestDto.getMediaFiles());
+    private List<String> createAnswerMedia(AnswerCreateRequestDto answerCreateRequestDto, Answer answer) {
+       return answerMediaService.createAnswerMedia(answer, answerCreateRequestDto.getImages());
     }
 
     private void updateAnswerMedia(AnswerUpdateRequestDto answerUpdateRequestDto, Answer answer) {
-        answerMediaService.createAnswerMedia(answer, answerUpdateRequestDto.getMediaFiles());
+        answerMediaService.createAnswerMedia(answer, answerUpdateRequestDto.getImages());
     }
 
     public int countAnswersByQuestionId(Long questionId) {
@@ -143,10 +142,16 @@ public class AnswerService {
         return question.getAnswerCount();
     }
 
+    @Transactional(readOnly = true)
     public List<AnswerCreateResponseDto> getAnswersByQuestionId(Long questionId) {
         List<Answer> answers = answerRepository.findAllByQuestionId(questionId);
+
         return answers.stream()
                 .map(answer -> {
+                    List<String> mediaUrl = answerMediaRepository.findAllByAnswerId(answer.getId()).stream()
+                            .map(AnswerMedia::getMediaUrl)
+                            .collect(Collectors.toList());
+
                     List<CommentDTO> commentDTOs = answer.getComments().stream()
                             .map(comment -> CommentDTO.of(
                                     comment.getId(),
@@ -161,29 +166,42 @@ public class AnswerService {
                             answer.getMember().getId(),
                             answer.getId(),
                             commentDTOs,
-                            answer.getAnswerLikeCount()
+                            answer.getAnswerLikeCount(),
+                            mediaUrl
                     );
                         }).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public AnswerDetailDto getAnswer(Long answerId, Long memberId) {
+    public List<AnswerCreateResponseDto> getAnswersByQuestionId1(Long questionId) {
+        // 특정 질문에 대한 답변들 조회
+        List<Answer> answers = answerRepository.findAllByQuestionId(questionId);
 
-        Answer answer = answerRepository.findById(answerId).orElseThrow(
-                () -> new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND));
-        List<AnswerMedia> answerMedia = answerMediaRepository.findAllByAnswerId(answerId);
-        List<String> imageUrls = answerMedia.stream()
-                .map(AnswerMedia::getAnswerCommentUrl)
-                .collect(Collectors.toList());
+        return answers.stream()
+                .map(answer -> {
+                    // 각 답변에 대한 미디어 URL 조회 (중요!)
+                    List<String> mediaUrl = answerMediaRepository.findAllByAnswerId(answer.getId()).stream()
+                            .map(AnswerMedia::getMediaUrl)
+                            .collect(Collectors.toList());
 
+                    List<CommentDTO> commentDTOs = answer.getComments().stream()
+                            .map(comment -> CommentDTO.of(
+                                    comment.getId(),
+                                    comment.getCommentContent(),
+                                    comment.getMember().getId(),
+                                    comment.getMember().getNickname()
+                            )).collect(Collectors.toList());
 
-        return AnswerDetailDto.of(
-                answer.getAnswerContent(),
-                answer.getQuestion().getId(),
-                answer.getMember().getId(),
-                answerId,
-                imageUrls
-        );
-
+                    return new AnswerCreateResponseDto(
+                            answer.getAnswerContent(),
+                            answer.getQuestion().getId(),
+                            answer.getMember().getId(),
+                            answer.getId(),
+                            commentDTOs,
+                            answer.getAnswerLikeCount(),
+                            mediaUrl
+                    );
+                }).collect(Collectors.toList());
     }
+
 }

@@ -109,4 +109,14 @@ public class QuestionController {
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.of(QuestionSuccessCode.QUESTION_SUCCESS_CODE, response));
     }
+
+    @GetMapping("/questionList")
+    public ResponseEntity<QuestionListResponseDto> getMyQuestions(
+            @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        QuestionListResponseDto questions = questionService.getQuestionsByMemberId(customUserDetails.getMember().getId(), pageable);
+        return ResponseEntity.ok(questions);
+    }
+
+
 }

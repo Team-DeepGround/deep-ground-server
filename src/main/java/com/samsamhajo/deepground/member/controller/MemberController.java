@@ -70,5 +70,15 @@ public class MemberController {
 
         return ResponseEntity.ok(SuccessResponse.of(ProfileSuccessCode.GET_MY_PROFILE_SUCCESS, profile));
     }
+  
+    @GetMapping("/profile/{profileId}")
+    public ResponseEntity<SuccessResponse<MemberProfileDto>> getUserProfile(
+            @AuthenticationPrincipal(expression = "memberId") Long memberId,
+            @PathVariable Long profileId){
+
+        MemberProfileDto profile = memberService.getUserProfile(memberId,profileId);
+        return ResponseEntity
+                .ok(SuccessResponse.of(ProfileSuccessCode.GET_SUCCESS_PROFILE, profile));
+    }
 }
 

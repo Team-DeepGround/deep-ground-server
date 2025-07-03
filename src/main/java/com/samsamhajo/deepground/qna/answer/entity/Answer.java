@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.qna.answer.entity;
 
+import com.samsamhajo.deepground.global.BaseEntity;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerUpdateRequestDto;
 import com.samsamhajo.deepground.qna.comment.entity.Comment;
@@ -16,7 +17,7 @@ import java.util.List;
 @Getter
 @Table(name = "answers")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Answer {
+public class Answer extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

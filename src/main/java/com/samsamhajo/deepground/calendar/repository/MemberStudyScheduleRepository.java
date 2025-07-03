@@ -21,4 +21,6 @@ public interface MemberStudyScheduleRepository extends JpaRepository<MemberStudy
     WHERE mss.member.id = :memberId
     """)
     List<MemberStudySchedule> findAllByMemberId(@Param("memberId") Long memberId);
+
+    List<MemberStudySchedule> findByStudyScheduleId(Long studyScheduleId);
 }
