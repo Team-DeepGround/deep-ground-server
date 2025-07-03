@@ -123,4 +123,87 @@ public class ProfileTest {
                 memberService.editMemberProfile(invalidMemberId, dto,null));
     }
 
+    @Test
+    void 내_프로필_조회_성공() {
+        // given
+        // setup()에서 이미 member, profile이 저장되어 있음
+
+        // when
+        MemberProfileDto result = memberService.getMyProfile(member.getId());
+
+        // then
+        assertEquals(profile.getProfileImage(), result.getProfileImage());
+        assertEquals(member.getNickname(), result.getNickname());
+        assertEquals(profile.getIntroduction(), result.getIntroduction());
+        assertEquals(profile.getJob(), result.getJob());
+        assertEquals(profile.getCompany(), result.getCompany());
+        assertEquals(profile.getLiveIn(), result.getLiveIn());
+        assertEquals(profile.getEducation(), result.getEducation());
+        assertEquals(profile.getGithubUrl(), result.getGithubUrl());
+        assertEquals(profile.getLinkedInUrl(), result.getLinkedInUrl());
+        assertEquals(profile.getWebsiteUrl(), result.getWebsiteUrl());
+        assertEquals(profile.getTwitterUrl(), result.getTwitterUrl());
+    }
+
+    @Test
+    void 존재하지_않는_멤버ID_프로필_조회시_예외() {
+        // given
+        Long invalidMemberId = 9999L;
+
+        // when & then
+        assertThrows(Exception.class, () ->
+                memberService.getMyProfile(invalidMemberId));
+    }
+
+    @Test
+    void 프로필_생성_성공() throws Exception {
+        // given
+        Member newMember = Member.createLocalMember(
+                "new@email.com", "pw123", "새유저");
+        memberRepository.save(newMember);
+
+        MemberProfileDto create = MemberProfileDto.builder()
+                .profileImage("https://example.com/newprofile.jpg")
+                .nickname("새유저")
+                .introduction("신규 소개")
+                .job("프론트엔드 개발자")
+                .company("삼삼하조")
+                .liveIn("부산")
+                .education("정보보호학과")
+                .techStack(List.of("JavaScript"))
+                .githubUrl("https://github.com/newuser")
+                .linkedInUrl("https://linkedin.com/newuser")
+                .websiteUrl("https://newuser.dev")
+                .twitterUrl("https://twitter.com/newuser")
+                .build();
+
+        // when
+        MemberProfileDto created = memberService.createProfile(newMember.getId(), create, null);
+
+        // then
+        assertEquals("https://example.com/newprofile.jpg", created.getProfileImage());
+        assertEquals("새유저", created.getNickname());
+        assertEquals("프론트엔드 개발자", created.getJob());
+        assertEquals("삼삼하조", created.getCompany());
+        assertEquals("부산", created.getLiveIn());
+        assertEquals("정보보호학과", created.getEducation());
+        assertEquals("https://github.com/newuser", created.getGithubUrl());
+        assertEquals("https://linkedin.com/newuser", created.getLinkedInUrl());
+        assertEquals("https://newuser.dev", created.getWebsiteUrl());
+        assertEquals("https://twitter.com/newuser", created.getTwitterUrl());
+    }
+
+    @Test
+    void 이미_존재하는_프로필_생성시_예외() {
+        // given
+        // setup()에서 이미 member와 profile이 저장되어 있음
+        MemberProfileDto create = MemberProfileDto.builder()
+                .nickname("중복유저")
+                .build();
+
+        // when & then
+        assertThrows(Exception.class, () ->
+                memberService.createProfile(member.getId(), create, null));
+    }
+
 }
