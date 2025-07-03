@@ -42,6 +42,8 @@ public class MemberStudyScheduleService {
                 memberStudySchedule.updateImportant(false);
                 memberStudySchedule.updateMemo(null);
             }
+        } else {
+            memberStudySchedule.updateAvailable(null);
         }
 
         if (requestDto.getIsImportant() != null) {

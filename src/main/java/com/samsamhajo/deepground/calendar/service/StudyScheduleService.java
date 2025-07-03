@@ -113,6 +113,11 @@ public class StudyScheduleService {
                 requestDto.getLocation()
         );
 
+        List<MemberStudySchedule> memberSchedules = memberStudyScheduleRepository.findByStudyScheduleId(scheduleId);
+        for (MemberStudySchedule memberSchedule : memberSchedules) {
+            memberSchedule.updateAvailable(null);
+        }
+
         return StudyScheduleResponseDto.from(studySchedule);
     }
 
