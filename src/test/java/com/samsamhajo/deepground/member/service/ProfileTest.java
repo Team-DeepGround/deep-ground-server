@@ -43,6 +43,12 @@ public class ProfileTest {
 
     @BeforeEach
     void setup() {
+
+        profileRepository.deleteAll();
+        techStackRepository.deleteAll();
+        memberRepository.deleteAll();
+
+
         member = Member.createLocalMember(
                 "paka@email.com","pa123","알파카");
         memberRepository.save(member);
@@ -123,4 +129,22 @@ public class ProfileTest {
                 memberService.editMemberProfile(invalidMemberId, dto,null));
     }
 
+    @Test
+    public void 다른_사용자_프로필_조회() throws Exception {
+        //given
+        Member member2 = Member.createLocalMember(
+                "wjd@gmail.com", "wjd123","정");
+        memberRepository.save(member2);
+
+        //when
+        MemberProfileDto userProfile = memberService.getUserProfile(member2.getId(), profile.getProfileId());
+
+        //then
+        assertEquals("알파카", userProfile.getNickname());
+        assertEquals("백엔드 개발자", userProfile.getJob());
+        assertEquals("삼삼하조", userProfile.getCompany());
+        assertEquals("서울", userProfile.getLiveIn());
+        assertEquals("https://github.com/paka", userProfile.getGithubUrl());
+
+        }
 }
