@@ -1,7 +1,6 @@
 package com.samsamhajo.deepground.chat.dto;
 
 import com.samsamhajo.deepground.chat.entity.ChatMessage;
-import com.samsamhajo.deepground.chat.entity.ChatMessageMedia;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +14,6 @@ public class ChatMessageResponse {
     private String id;
     private Long senderId;
     private String message;
-    private List<ChatMessageMedia> media;
     private List<String> mediaIds;
     private LocalDateTime createdAt;
 
@@ -24,7 +22,6 @@ public class ChatMessageResponse {
                 .id(chatMessage.getId())
                 .senderId(chatMessage.getSenderId())
                 .message(chatMessage.getMessage())
-                .media(Optional.ofNullable(chatMessage.getMedia()).orElse(List.of()))
                 .mediaIds(Optional.ofNullable(chatMessage.getMediaIds()).orElse(List.of()))
                 .createdAt(chatMessage.getCreatedAt())
                 .build();
