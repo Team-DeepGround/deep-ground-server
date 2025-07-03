@@ -58,4 +58,23 @@ public class MemberProfileDto {
                 .build();
     }
 
+    public static MemberProfileDto of(MemberProfile profile) {
+
+        return MemberProfileDto.builder()
+                .profileImage(profile.getProfileImage())
+                .nickname(profile.getMember().getNickname())
+                .introduction(profile.getIntroduction())
+                .job(profile.getJob())
+                .company(profile.getCompany())
+                .liveIn(profile.getLiveIn())
+                .education(profile.getEducation())
+                .techStack(profile.getMemberTechStacks().stream()
+                        .map(stack -> stack.getTechStack().getName())
+                        .collect(Collectors.toList()))
+                .githubUrl(profile.getGithubUrl())
+                .linkedInUrl(profile.getLinkedInUrl())
+                .websiteUrl(profile.getWebsiteUrl())
+                .twitterUrl(profile.getTwitterUrl())
+                .build();
+    }
 }
