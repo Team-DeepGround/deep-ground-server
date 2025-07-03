@@ -9,11 +9,14 @@ import com.samsamhajo.deepground.calendar.exception.ScheduleException;
 import com.samsamhajo.deepground.calendar.repository.MemberStudyScheduleRepository;
 import com.samsamhajo.deepground.calendar.repository.StudyScheduleRepository;
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.notification.entity.data.ScheduleNotificationData;
+import com.samsamhajo.deepground.notification.event.NotificationEvent;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,7 @@ public class StudyScheduleService {
     private final StudyGroupRepository studyGroupRepository;
     private final MemberStudyScheduleRepository memberStudyScheduleRepository;
     private final StudyGroupMemberRepository studyGroupMemberRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public StudyScheduleResponseDto createStudySchedule(Long studyGroupId,
@@ -66,6 +70,12 @@ public class StudyScheduleService {
                 .toList();
 
         memberStudyScheduleRepository.saveAll(memberStudySchedules);
+
+        // 스케줄 생성 알림
+        eventPublisher.publishEvent(NotificationEvent.of(
+                members.stream().map(Member::getId).toList(),
+                ScheduleNotificationData.create(studySchedule)
+        ));
 
         return StudyScheduleResponseDto.from(savedSchedule);
     }

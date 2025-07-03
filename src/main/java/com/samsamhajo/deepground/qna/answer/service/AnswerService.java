@@ -2,6 +2,8 @@ package com.samsamhajo.deepground.qna.answer.service;
 
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
+import com.samsamhajo.deepground.notification.entity.data.QNANotificationData;
+import com.samsamhajo.deepground.notification.event.NotificationEvent;
 import com.samsamhajo.deepground.qna.answer.dto.*;
 import com.samsamhajo.deepground.qna.answer.entity.Answer;
 import com.samsamhajo.deepground.qna.answer.entity.AnswerMedia;
@@ -15,6 +17,7 @@ import com.samsamhajo.deepground.qna.question.exception.QuestionErrorCode;
 import com.samsamhajo.deepground.qna.question.exception.QuestionException;
 import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -33,6 +36,7 @@ public class AnswerService {
     private final AnswerMediaService answerMediaService;
     private final AnswerLikeService answerLikeService;
     private final AnswerMediaRepository answerMediaRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     @Transactional
@@ -59,6 +63,12 @@ public class AnswerService {
         List<String> mediaUrl = createAnswerMedia(answerCreateRequestDto, answer);
 
         List<CommentDTO> comments = new ArrayList<>();
+
+        // 답변 알림
+        eventPublisher.publishEvent(NotificationEvent.of(
+                question.getMember().getId(),
+                QNANotificationData.answer(answer)
+        ));
 
         return AnswerCreateResponseDto.of(
                 saved.getAnswerContent(),

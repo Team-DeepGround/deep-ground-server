@@ -2,6 +2,8 @@ package com.samsamhajo.deepground.studyGroup.service;
 
 import com.samsamhajo.deepground.chat.service.ChatRoomMemberService;
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.notification.entity.data.StudyGroupNotificationData;
+import com.samsamhajo.deepground.notification.event.NotificationEvent;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
@@ -9,6 +11,7 @@ import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepositor
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,6 +21,7 @@ public class StudyGroupAcceptService {
   private final StudyGroupRepository studyGroupRepository;
   private final StudyGroupMemberRepository studyGroupMemberRepository;
   private final ChatRoomMemberService chatRoomMemberService;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Transactional
   public void acceptMember(Long studyGroupId, Long targetMemberId, Member requester) {
@@ -45,5 +49,12 @@ public class StudyGroupAcceptService {
 
     // 채팅방 참가
     chatRoomMemberService.joinChatRoom(member.getMember(), group.getChatRoom());
+
+    // 스터디 그룹 가입 알림
+    eventPublisher.publishEvent(NotificationEvent.of(
+            targetMemberId,
+            StudyGroupNotificationData.accept(group)
+    ));
+
   }
 }
