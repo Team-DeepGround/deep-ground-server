@@ -1,14 +1,13 @@
-package com.samsamhajo.deepground.member.exception;
+package com.samsamhajo.deepground.techStack.exception;
 
 import com.samsamhajo.deepground.global.error.core.ErrorCode;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @AllArgsConstructor
-public enum ProfileErrorCode implements ErrorCode {
+public enum TechStackErrorCode implements ErrorCode {
 
-    INVALID_PROFILE_ID(HttpStatus.BAD_REQUEST, "회원의 프로필이 존재하지 않습니다."),
-    ALREADY_EXISTS_PROFILE(HttpStatus.CONFLICT, "이미 프로필이 존재합니다."),
+    TECH_STACK_NOT_FOUND(HttpStatus.NOT_FOUND, "기술스택이 존재하지 않습니다."),
     ;
 
 
@@ -22,6 +21,6 @@ public enum ProfileErrorCode implements ErrorCode {
 
     @Override
     public String getMessage() {
-        return "[PROFILE ERROR]" + message;
+        return "[TECHSTACK ERROR]" + message;
     }
 }
