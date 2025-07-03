@@ -56,6 +56,11 @@ public class ChatMediaService {
                 .orElseThrow(() -> new ChatException(ChatErrorCode.MEDIA_NOT_FOUND));
 
         InputStreamResource resource = MediaUtils.getMedia(chatMedia.getMedia().getMediaUrl());
-        return ChatMediaResponse.of(resource, chatMedia.getMedia().getExtension());
+        return ChatMediaResponse.of(
+                resource,
+                chatMedia.getMedia().getFileName(),
+                chatMedia.getMedia().getFileSize(),
+                chatMedia.getMedia().getExtension()
+        );
     }
 }

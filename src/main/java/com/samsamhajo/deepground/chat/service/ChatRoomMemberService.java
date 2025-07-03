@@ -64,13 +64,13 @@ public class ChatRoomMemberService {
         ChatRoomMember chatRoomMember = chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, otherMemberId)
                 .orElseThrow(() -> new ChatException(ChatErrorCode.CHATROOM_MEMBER_NOT_FOUND));
 
-        return ChatRoomMemberInfo.from(chatRoomMember);
+        return ChatRoomMemberInfo.of(chatRoomMember, otherMemberId.equals(memberId));
     }
 
     @Transactional(readOnly = true)
-    public List<ChatRoomMemberInfo> getChatRoomMemberInfos(Long chatRoomId) {
+    public List<ChatRoomMemberInfo> getChatRoomMemberInfos(Long chatRoomId, Long memberId) {
         return chatRoomMemberRepository.findByChatRoomId(chatRoomId).stream()
-                .map(ChatRoomMemberInfo::from)
+                .map(member -> ChatRoomMemberInfo.of(member, member.getMember().getId().equals(memberId)))
                 .toList();
     }
 

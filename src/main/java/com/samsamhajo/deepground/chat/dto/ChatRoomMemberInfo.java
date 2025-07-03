@@ -12,12 +12,14 @@ public class ChatRoomMemberInfo {
     private Long memberId;
     private String nickname;
     private LocalDateTime lastReadMessageTime;
+    private boolean isMe;
 
-    public static ChatRoomMemberInfo from(ChatRoomMember member) {
+    public static ChatRoomMemberInfo of(ChatRoomMember member, boolean isMe) {
         return ChatRoomMemberInfo.builder()
                 .memberId(member.getMember().getId())
                 .nickname(member.getMember().getNickname())
                 .lastReadMessageTime(member.getLastReadMessageTime())
+                .isMe(isMe)
                 .build();
     }
 }

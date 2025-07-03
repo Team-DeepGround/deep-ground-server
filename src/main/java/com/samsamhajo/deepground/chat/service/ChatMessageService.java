@@ -102,7 +102,7 @@ public class ChatMessageService {
         List<String> mediaIds = chatMedia.stream()
                 .map(ChatMedia::getId)
                 .toList();
-        return ChatMessage.of(chatRoomId, memberId, request.getMessage(), media, mediaIds);
+        return ChatMessage.of(chatRoomId, memberId, request.getMessage(), mediaIds);
     }
 
     @Transactional

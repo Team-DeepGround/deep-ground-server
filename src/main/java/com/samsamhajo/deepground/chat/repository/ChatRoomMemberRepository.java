@@ -18,8 +18,11 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, Long> {
+
+    @Query("SELECT crm FROM ChatRoomMember crm JOIN FETCH crm.member WHERE crm.chatRoom.id = :chatRoomId")
     List<ChatRoomMember> findByChatRoomId(Long chatRoomId);
 
+    @Query("SELECT crm FROM ChatRoomMember crm JOIN FETCH crm.member WHERE crm.chatRoom.id = :chatRoomId AND crm.member.id = :memberId")
     Optional<ChatRoomMember> findByChatRoomIdAndMemberId(Long chatRoomId, Long memberId);
 
     @Query("SELECT NEW com.samsamhajo.deepground.chat.dto.ChatRoomInfo("
@@ -50,10 +53,10 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
     void softDeleteByChatRoomId(@Param("chatRoomId") Long chatRoomId);
 
     @Query("SELECT crm.chatRoom "
-           + "FROM ChatRoomMember crm "
-           + "WHERE crm.member.id IN (:memberId1, :memberId2) "
-           + "AND crm.chatRoom.type = 'FRIEND' "
-           + "GROUP BY crm.chatRoom.id "
-           + "HAVING COUNT(crm.member.id) = 2")
+            + "FROM ChatRoomMember crm "
+            + "WHERE crm.member.id IN (:memberId1, :memberId2) "
+            + "AND crm.chatRoom.type = 'FRIEND' "
+            + "GROUP BY crm.chatRoom.id "
+            + "HAVING COUNT(crm.member.id) = 2")
     Optional<ChatRoom> findFriendChatRoom(Long memberId1, Long memberId2);
 }

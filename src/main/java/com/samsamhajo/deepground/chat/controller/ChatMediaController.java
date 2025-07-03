@@ -7,9 +7,12 @@ import com.samsamhajo.deepground.chat.service.ChatMediaService;
 import com.samsamhajo.deepground.chat.success.ChatSuccessCode;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.media.MediaUtils;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -50,8 +53,14 @@ public class ChatMediaController {
         Long memberId = userDetails.getMember().getId();
 
         ChatMediaResponse response = chatMediaService.fetchMedia(chatRoomId, memberId, mediaId);
+        String fileName = URLEncoder.encode(response.getFileName(), StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20");
+
         return ResponseEntity.ok()
+                .contentLength(response.getFileSize())
                 .contentType(MediaUtils.getMediaType(response.getExtension()))
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + fileName + "\"; filename*=UTF-8''" + fileName)
                 .body(response.getResource());
     }
 }
