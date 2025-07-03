@@ -8,7 +8,6 @@ public enum NotificationType {
     STUDY_GROUP_ACCEPT,     // 스터디 그룹 가입 성공
     SCHEDULE_CREATE,        // 스터디 일정 생성
     SCHEDULE_REMINDER,      // 스터디 일정 알림
-    NEW_MESSAGE,            // 새 메시지
 
     // TODO: QNA, FEED 알림
 }
