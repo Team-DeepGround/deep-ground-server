@@ -1,11 +1,14 @@
 package com.samsamhajo.deepground.studyGroup.service;
 
+import com.samsamhajo.deepground.notification.entity.data.StudyGroupNotificationData;
+import com.samsamhajo.deepground.notification.event.NotificationEvent;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +18,7 @@ public class StudyGroupJoinService {
 
   private final StudyGroupRepository studyGroupRepository;
   private final StudyGroupMemberRepository studyGroupMemberRepository;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Transactional
   public void requestToJoin(Member member, Long studyGroupId) {
@@ -28,5 +32,12 @@ public class StudyGroupJoinService {
 
     StudyGroupMember pendingRequest = StudyGroupMember.of(member, studyGroup, false);
     studyGroupMemberRepository.save(pendingRequest);
+
+    // 스터디 그룹 가입 알림
+    eventPublisher.publishEvent(NotificationEvent.of(
+            studyGroup.getCreator().getId(),
+            StudyGroupNotificationData.join(studyGroup)
+    ));
+
   }
 }

@@ -21,9 +21,17 @@ public class StudyGroupNotificationData extends NotificationData {
         this.title = title;
     }
 
-    public static StudyGroupNotificationData invite(StudyGroup studyGroup) {
+    public static StudyGroupNotificationData kick(StudyGroup studyGroup) {
         return new StudyGroupNotificationData(
-                NotificationType.STUDY_GROUP_INVITE,
+                NotificationType.STUDY_GROUP_KICK,
+                studyGroup.getId(),
+                studyGroup.getTitle()
+        );
+    }
+
+    public static StudyGroupNotificationData accept(StudyGroup studyGroup) {
+        return new StudyGroupNotificationData(
+                NotificationType.STUDY_GROUP_ACCEPT,
                 studyGroup.getId(),
                 studyGroup.getTitle()
         );
