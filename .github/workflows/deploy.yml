@@ -31,7 +31,7 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-    
+             ${{ runner.os }}-gradle-
         # Gradle로 프로젝트 빌드
       - name: Build with Gradle
         run: ./gradlew build
@@ -41,7 +41,7 @@ jobs:
             touch ./application.yml
             echo "${{ secrets.STAGING_YML }}" > ./application.yml
             cat ./application.yml
-          working-directory: ${{ env.working-directory }}
+            working-directory: ${{ env.working-directory }}
         # Docker 빌드를 위한 설정
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -70,7 +70,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           script: |
-            cd /home/ubuntu/deploy
+            cd /home/ubuntu/deepground
 
             echo "${{ secrets.ENV }}" | base64 -d > .env
             chmod 600 .env # .env 
