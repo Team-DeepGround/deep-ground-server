@@ -56,14 +56,12 @@ public class StudyGroup extends BaseEntity {
     @Column(name = "study_location")
     private String studyLocation;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING)
-    private Set<TechTag> techTags = new HashSet<>();
+    @OneToMany(mappedBy = "studyGroup", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<StudyGroupTechTag> studyGroupTechTags = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "member_id", nullable = false)
     private Member creator;
-
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id", nullable = false)
@@ -79,7 +77,7 @@ public class StudyGroup extends BaseEntity {
         ChatRoom chatRoom, String title, String explanation,
         LocalDate studyStartDate, LocalDate studyEndDate,
         LocalDate recruitStartDate, LocalDate recruitEndDate,
-        Integer groupMemberCount, Member member, Boolean isOffline, String studyLocation, Set<TechTag> techTags
+        Integer groupMemberCount, Member member, Boolean isOffline, String studyLocation
     ) {
         this.chatRoom = chatRoom;
         this.title = title;
@@ -92,24 +90,27 @@ public class StudyGroup extends BaseEntity {
         this.creator = member;
         this.isOffline = isOffline;
         this.studyLocation = studyLocation;
-        this.techTags = techTags;
     }
 
-  public static StudyGroup of(
+    public static StudyGroup of(
         ChatRoom chatRoom, String title, String explanation,
         LocalDate studyStartDate, LocalDate studyEndDate,
         LocalDate recruitStartDate, LocalDate recruitEndDate,
-        Integer groupMemberCount, Member member, Boolean isOffline, String studyLocation, Set<TechTag> techTags
+        Integer groupMemberCount, Member member, Boolean isOffline, String studyLocation
     ) {
         return new StudyGroup(
             chatRoom, title, explanation,
             studyStartDate, studyEndDate,
             recruitStartDate, recruitEndDate,
-            groupMemberCount, member, isOffline, studyLocation, techTags
+            groupMemberCount, member, isOffline, studyLocation
         );
     }
 
     public void changeGroupStatus(GroupStatus newStatus) {
         this.groupStatus = newStatus;
+    }
+
+    public void addTechTag(StudyGroupTechTag techTag) {
+        this.studyGroupTechTags.add(techTag);
     }
 }

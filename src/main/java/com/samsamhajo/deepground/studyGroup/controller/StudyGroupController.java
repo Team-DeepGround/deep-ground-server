@@ -71,7 +71,7 @@ public class StudyGroupController {
   public ResponseEntity<SuccessResponse<?>> searchStudyGroups(
       @ModelAttribute StudyGroupSearchRequest request
   ) {
-    GlobalLogger.info("스터디 목록 검색 요청", request.getKeyword(), request.getGroupStatus(), request.getTechTags());
+    GlobalLogger.info("스터디 목록 검색 요청", request.getKeyword(), request.getGroupStatus(), request.getTechStackNames());
 
     var response = studyGroupService.searchStudyGroups(request);
     return ResponseEntity

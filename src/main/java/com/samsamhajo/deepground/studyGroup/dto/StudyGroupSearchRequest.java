@@ -1,13 +1,13 @@
 package com.samsamhajo.deepground.studyGroup.dto;
 
 import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
-import com.samsamhajo.deepground.studyGroup.entity.TechTag;
-import java.util.Set;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
+import java.util.List;
 
 @Getter
 public class StudyGroupSearchRequest {
@@ -16,15 +16,21 @@ public class StudyGroupSearchRequest {
   private final GroupStatus groupStatus;
   private final int page;
   private final int size;
-  private final Set<TechTag> techTags; // 추가됨
+  private final List<String> techStackNames;
 
   @Builder
-  public StudyGroupSearchRequest(String keyword, GroupStatus groupStatus, int page, int size, Set<TechTag> techTags) {
+  public StudyGroupSearchRequest(
+      String keyword,
+      GroupStatus groupStatus,
+      int page,
+      int size,
+      List<String> techStackNames
+  ) {
     this.keyword = keyword;
     this.groupStatus = groupStatus;
     this.page = page;
     this.size = size;
-    this.techTags = techTags;
+    this.techStackNames = techStackNames;
   }
 
   public Pageable toPageable() {

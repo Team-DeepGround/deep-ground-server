@@ -8,9 +8,12 @@ import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupComment;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupReply;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupTechTag;
 import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupSearchRequest;
+import com.samsamhajo.deepground.techStack.entity.TechStack;
+import com.samsamhajo.deepground.techStack.repository.TechStackRepository;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,6 +39,7 @@ public class StudyGroupService {
   private final StudyGroupRepository studyGroupRepository;
   private final StudyGroupMemberRepository studyGroupMemberRepository;
   private final ChatRoomService chatRoomService;
+  private final TechStackRepository techStackRepository;
 
 
   @Transactional
@@ -71,15 +75,9 @@ public class StudyGroupService {
     String keyword = request.getKeyword();
     GroupStatus status = request.getGroupStatus();
     Pageable pageable = request.toPageable();
+    List<String> stackNames = request.getTechStackNames();
 
-    List<String> tagNames = null;
-    if (request.getTechTags() != null && !request.getTechTags().isEmpty()) {
-      tagNames = request.getTechTags().stream()
-          .map(Enum::name) // enum -> String
-          .toList();
-    }
-
-    Page<StudyGroup> pageResult = studyGroupRepository.searchWithFilters(status, keyword, tagNames, pageable);
+    Page<StudyGroup> pageResult = studyGroupRepository.searchWithFilters(status, keyword, stackNames, pageable);
     return pageResult.map(StudyGroupResponse::from);
   }
 
@@ -100,11 +98,20 @@ public class StudyGroupService {
         request.getGroupMemberCount(),
         creator,
         request.getIsOffline(),
-        request.getStudyLocation(),
-        request.getTechTags()
+        request.getStudyLocation()
     );
 
+
     StudyGroup savedGroup = studyGroupRepository.save(studyGroup);
+
+    List<String> stackNames = request.getTechStackNames();
+    if (stackNames != null && !stackNames.isEmpty()) {
+      List<TechStack> techStacks = techStackRepository.findAllByNameIn(stackNames);
+      for (TechStack techStack : techStacks) {
+        StudyGroupTechTag link = StudyGroupTechTag.of(savedGroup, techStack);
+        savedGroup.addTechTag(link);
+      }
+    }
 
     StudyGroupMember groupMember = StudyGroupMember.of(creator, savedGroup, true);
     studyGroupMemberRepository.save(groupMember);

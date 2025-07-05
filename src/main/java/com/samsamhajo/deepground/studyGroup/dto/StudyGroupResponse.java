@@ -3,6 +3,7 @@ package com.samsamhajo.deepground.studyGroup.dto;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupTechTag;
 import com.samsamhajo.deepground.studyGroup.entity.TechTag;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,7 +21,7 @@ public class StudyGroupResponse {
   private String period;
   private String recruitmentPeriod;
   private GroupStatus groupStatus;
-  private Set<TechTag> tags;
+  private Set<StudyGroupTechTag> tags;
   private Integer maxMembers;
   private Integer currentMembers;
   private OrganizerDto organizer;
@@ -45,7 +46,7 @@ public class StudyGroupResponse {
         .description(group.getExplanation())
         .period(group.getStudyStartDate().format(formatter) + " ~ " + group.getStudyEndDate().format(formatter))
         .recruitmentPeriod(group.getRecruitStartDate().format(formatter) + " ~ " + group.getRecruitEndDate().format(formatter))
-        .tags(group.getTechTags())
+        .tags(group.getStudyGroupTechTags())
         .maxMembers(group.getGroupMemberCount())
         .currentMembers(group.getMembers().size())
         .groupStatus(group.getGroupStatus())
