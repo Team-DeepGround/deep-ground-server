@@ -9,6 +9,7 @@ import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCreateRequest;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCreateResponse;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
+import com.samsamhajo.deepground.studyGroup.repository.StudyGroupTechTagRepository;
 import com.samsamhajo.deepground.techStack.repository.TechStackRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ public class StudyGroupServiceTest {
     private ChatRoomService chatRoomService;
     private StudyGroupService studyGroupService;
     private TechStackRepository techStackRepository;
+    private StudyGroupTechTagRepository studyGroupTechTagRepository;
 
     @BeforeEach
     void setUp() {
@@ -35,7 +37,8 @@ public class StudyGroupServiceTest {
                 studyGroupRepository,
                 studyGroupMemberRepository,
                 chatRoomService,
-                techStackRepository
+                techStackRepository,
+                studyGroupTechTagRepository
         );
     }
 

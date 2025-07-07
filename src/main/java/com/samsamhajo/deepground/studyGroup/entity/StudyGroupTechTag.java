@@ -32,6 +32,8 @@ public class StudyGroupTechTag {
   }
 
   public static StudyGroupTechTag of(StudyGroup studyGroup, TechStack techStack) {
-    return new StudyGroupTechTag(studyGroup, techStack);
+    StudyGroupTechTag link = new StudyGroupTechTag(studyGroup, techStack);
+    studyGroup.addTechTag(link);
+    return link;
   }
 }

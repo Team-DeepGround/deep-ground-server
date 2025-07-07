@@ -18,8 +18,8 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
   @Query("""
   SELECT DISTINCT sg FROM StudyGroup sg
   LEFT JOIN FETCH sg.creator
-  LEFT JOIN sg.studyGroupTechTags sgt
-  LEFT JOIN sgt.techStack ts
+  LEFT JOIN FETCH sg.studyGroupTechTags sgt
+  LEFT JOIN FETCH sgt.techStack ts
   WHERE (:status IS NULL OR sg.groupStatus = :status)
     AND (
         (:keyword IS NULL OR LOWER(sg.title) LIKE LOWER(CONCAT('%', :keyword, '%')))

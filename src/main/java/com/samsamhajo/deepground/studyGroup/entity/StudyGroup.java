@@ -56,7 +56,7 @@ public class StudyGroup extends BaseEntity {
     @Column(name = "study_location")
     private String studyLocation;
 
-    @OneToMany(mappedBy = "studyGroup", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "studyGroup", orphanRemoval = true)
     private Set<StudyGroupTechTag> studyGroupTechTags = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)

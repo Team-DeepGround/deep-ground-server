@@ -4,6 +4,7 @@ import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupTechTag;
 import com.samsamhajo.deepground.studyGroup.entity.TechTag;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -16,7 +17,7 @@ public class StudyGroupCreateResponse {
   private String explanation;
   private Boolean isOffline;
   private String studyLocation;
-  private Set<StudyGroupTechTag> techTags;
+  private Set<TechTagDto> techTags;
 
   public static StudyGroupCreateResponse from(StudyGroup group) {
     return StudyGroupCreateResponse.builder()
@@ -25,7 +26,12 @@ public class StudyGroupCreateResponse {
         .explanation(group.getExplanation())
         .isOffline(group.getIsOffline())
         .studyLocation(group.getStudyLocation())
-        .techTags(group.getStudyGroupTechTags())
+        .techTags(
+            group.getStudyGroupTechTags().stream()
+                .map(StudyGroupTechTag::getTechStack)
+                .map(TechTagDto::from)
+                .collect(Collectors.toSet())
+        )
         .build();
   }
 }

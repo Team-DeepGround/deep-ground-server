@@ -12,6 +12,7 @@ import com.samsamhajo.deepground.studyGroup.entity.StudyGroupTechTag;
 import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupSearchRequest;
+import com.samsamhajo.deepground.studyGroup.repository.StudyGroupTechTagRepository;
 import com.samsamhajo.deepground.techStack.entity.TechStack;
 import com.samsamhajo.deepground.techStack.repository.TechStackRepository;
 import java.util.stream.Collectors;
@@ -40,6 +41,7 @@ public class StudyGroupService {
   private final StudyGroupMemberRepository studyGroupMemberRepository;
   private final ChatRoomService chatRoomService;
   private final TechStackRepository techStackRepository;
+  private final StudyGroupTechTagRepository studyGroupTechTagRepository;
 
 
   @Transactional
@@ -101,15 +103,15 @@ public class StudyGroupService {
         request.getStudyLocation()
     );
 
-
     StudyGroup savedGroup = studyGroupRepository.save(studyGroup);
 
     List<String> stackNames = request.getTechStackNames();
+
     if (stackNames != null && !stackNames.isEmpty()) {
-      List<TechStack> techStacks = techStackRepository.findAllByNameIn(stackNames);
+      List<TechStack> techStacks = techStackRepository.findByNames(stackNames);
       for (TechStack techStack : techStacks) {
         StudyGroupTechTag link = StudyGroupTechTag.of(savedGroup, techStack);
-        savedGroup.addTechTag(link);
+        studyGroupTechTagRepository.save(link);
       }
     }
 
