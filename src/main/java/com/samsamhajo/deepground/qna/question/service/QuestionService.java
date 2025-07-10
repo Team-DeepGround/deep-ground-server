@@ -3,6 +3,7 @@ package com.samsamhajo.deepground.qna.question.service;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
+import com.samsamhajo.deepground.qna.answer.dto.AnswerUpdateResponseDto;
 import com.samsamhajo.deepground.qna.answer.service.AnswerService;
 import com.samsamhajo.deepground.qna.comment.dto.CommentDTO;
 import com.samsamhajo.deepground.qna.comment.entity.Comment;
@@ -132,21 +133,18 @@ public class QuestionService{
         }
 
 
-        QuestionUpdateResponseDto questionUpdateResponseDto = QuestionUpdateResponseDto.of(
-                questionUpdateRequestDto.getQuestionId(),
-                questionUpdateRequestDto.getTitle(),
-                questionUpdateRequestDto.getContent(),
-                memberId,
-                techStacks
-        );
-
         question.updateQuesiton(questionUpdateRequestDto.getTitle(), questionUpdateRequestDto.getContent());
         questionMediaService.deleteQuestionMedia(question.getId());
-        updateQuestionMedia(questionUpdateRequestDto, question);
+        List<String> mediaUrl = updateQuestionMedia(questionUpdateRequestDto, question);
 
-
-
-        return questionUpdateResponseDto;
+        return QuestionUpdateResponseDto.of(
+                question.getId(),
+                question.getTitle(),
+                question.getContent(),
+                member.getId(),
+                techStacks,
+                mediaUrl
+        );
 
     }
     private List<String> createQuestionMedia(QuestionCreateRequestDto questionCreateRequestDto, Question question) {
@@ -154,8 +152,8 @@ public class QuestionService{
 
     }
 
-    private void updateQuestionMedia(QuestionUpdateRequestDto questionUpdateRequestDto, Question question) {
-        questionMediaService.createQuestionMedia(question, questionUpdateRequestDto.getImages());
+    private List<String> updateQuestionMedia(QuestionUpdateRequestDto questionUpdateRequestDto, Question question) {
+        return questionMediaService.createQuestionMedia(question, questionUpdateRequestDto.getImages());
     }
 
     @Transactional

@@ -5,6 +5,8 @@ import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.qna.answer.dto.*;
 import com.samsamhajo.deepground.qna.answer.service.AnswerService;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerSuccessCode;
+import com.samsamhajo.deepground.qna.question.Dto.QuestionDetailResponseDto;
+import com.samsamhajo.deepground.qna.question.exception.QuestionSuccessCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -61,6 +63,15 @@ public class AnswerController {
                 .body(SuccessResponse.of(AnswerSuccessCode.ANSWER_UPDATED, answerUpdateResponseDto));
 
     }
+
+    @GetMapping("/{answerId}")
+    public ResponseEntity<AnswerEditResponseDto> getAnswer(@PathVariable Long answerId,
+                                                           @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        AnswerEditResponseDto response = answerService.getAnswerEditInfo(answerId, customUserDetails.getMember().getId());
+        return ResponseEntity.ok(response);
+    }
+
+
 
 
 }
