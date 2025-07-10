@@ -113,4 +113,32 @@ public class StudyGroup extends BaseEntity {
     public void addTechTag(StudyGroupTechTag techTag) {
         this.studyGroupTechTags.add(techTag);
     }
+
+    public void update(com.samsamhajo.deepground.studyGroup.dto.StudyGroupUpdateRequest req, java.util.List<com.samsamhajo.deepground.techStack.entity.TechStack> techStacks) {
+        this.title = req.getTitle();
+        this.explanation = req.getExplanation();
+        this.studyStartDate = req.getStudyStartDate();
+        this.studyEndDate = req.getStudyEndDate();
+        this.recruitStartDate = req.getRecruitStartDate();
+        this.recruitEndDate = req.getRecruitEndDate();
+        this.groupMemberCount = req.getGroupMemberCount();
+        this.isOffline = req.getIsOffline();
+        this.studyLocation = req.getStudyLocation();
+        // 기술스택 연관관계 관리
+        this.studyGroupTechTags.clear();
+        for (com.samsamhajo.deepground.techStack.entity.TechStack techStack : techStacks) {
+            this.addTechTag(com.samsamhajo.deepground.studyGroup.entity.StudyGroupTechTag.of(this, techStack));
+        }
+    }
+
+    public void changeTitle(String title) { this.title = title; }
+    public void changeExplanation(String explanation) { this.explanation = explanation; }
+    public void changeStudyStartDate(LocalDate date) { this.studyStartDate = date; }
+    public void changeStudyEndDate(LocalDate date) { this.studyEndDate = date; }
+    public void changeRecruitStartDate(LocalDate date) { this.recruitStartDate = date; }
+    public void changeRecruitEndDate(LocalDate date) { this.recruitEndDate = date; }
+    public void changeGroupMemberCount(Integer count) { this.groupMemberCount = count; }
+    public void changeIsOffline(Boolean isOffline) { this.isOffline = isOffline; }
+    public void changeStudyLocation(String location) { this.studyLocation = location; }
+    public void clearTechTags() { this.studyGroupTechTags.clear(); }
 }

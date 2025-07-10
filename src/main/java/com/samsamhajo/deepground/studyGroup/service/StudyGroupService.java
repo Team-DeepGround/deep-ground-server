@@ -32,6 +32,7 @@ import java.util.*;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import com.samsamhajo.deepground.studyGroup.dto.StudyGroupUpdateRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -83,12 +84,48 @@ public class StudyGroupService {
     return pageResult.map(StudyGroupResponse::from);
   }
 
+  private List<TechStack> getTechStacksByNames(List<String> names) {
+    if (names == null || names.isEmpty()) return List.of();
+    return techStackRepository.findByNames(names);
+  }
+
+  private void validatePeriod(LocalDate start, LocalDate end, String msg) {
+    if (start.isAfter(end)) {
+      throw new IllegalArgumentException(msg);
+    }
+  }
+
+  @Transactional
+  public StudyGroupDetailResponse updateStudyGroup(Long studyGroupId, StudyGroupUpdateRequest request, Member updater) {
+    StudyGroup group = studyGroupRepository.findWithCreatorAndCommentsById(studyGroupId)
+        .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
+
+    if (!group.getCreator().getId().equals(updater.getId())) {
+      throw new IllegalArgumentException("스터디 생성자만 수정할 수 있습니다.");
+    }
+
+    validatePeriod(request.getStudyStartDate(), request.getStudyEndDate(), "스터디 시작일은 종료일보다 이전이어야 합니다.");
+    validatePeriod(request.getRecruitStartDate(), request.getRecruitEndDate(), "모집 시작일은 종료일보다 이전이어야 합니다.");
+
+    if (request.getGroupMemberCount() <= 0) {
+      throw new IllegalArgumentException("정원은 1명 이상이어야 합니다.");
+    }
+
+    List<TechStack> techStacks = getTechStacksByNames(request.getTechStackNames());
+    group.update(request, techStacks);
+
+    List<Long> commentIds = group.getComments().stream().map(c -> c.getId()).toList();
+    List<StudyGroupReply> replies = studyGroupRepository.findRepliesByCommentIds(commentIds);
+    Map<Long, List<StudyGroupReply>> replyMap = replies.stream().collect(Collectors.groupingBy(r -> r.getComment().getId()));
+    StudyGroupMemberStatus memberStatus = getMemberStatus(group.getId(), updater.getId());
+
+    return StudyGroupDetailResponse.from(group, replyMap, memberStatus);
+  }
+
   @Transactional
   public StudyGroupCreateResponse createStudyGroup(StudyGroupCreateRequest request, Member creator) {
     validateRequest(request);
-
     ChatRoom chatRoom = chatRoomService.createStudyGroupChatRoom(creator);
-
     StudyGroup studyGroup = StudyGroup.of(
         chatRoom,
         request.getTitle(),
@@ -102,22 +139,14 @@ public class StudyGroupService {
         request.getIsOffline(),
         request.getStudyLocation()
     );
-
     StudyGroup savedGroup = studyGroupRepository.save(studyGroup);
-
-    List<String> stackNames = request.getTechStackNames();
-
-    if (stackNames != null && !stackNames.isEmpty()) {
-      List<TechStack> techStacks = techStackRepository.findByNames(stackNames);
-      for (TechStack techStack : techStacks) {
-        StudyGroupTechTag link = StudyGroupTechTag.of(savedGroup, techStack);
-        studyGroupTechTagRepository.save(link);
-      }
+    List<TechStack> techStacks = getTechStacksByNames(request.getTechStackNames());
+    for (TechStack techStack : techStacks) {
+      StudyGroupTechTag link = StudyGroupTechTag.of(savedGroup, techStack);
+      studyGroupTechTagRepository.save(link);
     }
-
     StudyGroupMember groupMember = StudyGroupMember.of(creator, savedGroup, true);
     studyGroupMemberRepository.save(groupMember);
-
     return StudyGroupCreateResponse.from(savedGroup);
   }
 

@@ -40,6 +40,8 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
   LEFT JOIN FETCH sg.members
   LEFT JOIN FETCH sg.comments c
   LEFT JOIN FETCH c.member
+  LEFT JOIN FETCH sg.studyGroupTechTags sgt
+  LEFT JOIN FETCH sgt.techStack ts
   WHERE sg.id = :id
 """)
   Optional<StudyGroup> findWithCreatorAndCommentsById(@Param("id") Long id);

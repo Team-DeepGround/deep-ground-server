@@ -10,6 +10,7 @@ import lombok.Getter;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Set;
 
 @Getter
 @Builder
@@ -30,6 +31,7 @@ public class StudyGroupDetailResponse {
   private List<String> participants;
   private List<CommentWithRepliesResponse> comments;
   private StudyGroupMemberStatus memberStatus;
+  private Set<TechTagDto> techStacks;
 
   public static StudyGroupDetailResponse from(StudyGroup group, Map<Long, List<StudyGroupReply>> replyMap, StudyGroupMemberStatus memberStatus) {
     return StudyGroupDetailResponse.builder()
@@ -57,6 +59,11 @@ public class StudyGroupDetailResponse {
                 .distinct()
                 .map(comment -> CommentWithRepliesResponse.from(comment, replyMap.getOrDefault(comment.getId(), List.of())))
                 .toList()
+        )
+        .techStacks(
+            group.getStudyGroupTechTags().stream()
+                .map(studyGroupTechTag -> TechTagDto.from(studyGroupTechTag.getTechStack()))
+                .collect(Collectors.toSet())
         )
         .build();
   }
