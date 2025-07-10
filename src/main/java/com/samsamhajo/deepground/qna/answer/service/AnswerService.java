@@ -127,22 +127,23 @@ public class AnswerService {
         answer.updateAnswer(answerUpdateRequestDto.getAnswerContent());
 
         answerMediaService.deleteAnswerMedia(answer.getId());
-        updateAnswerMedia(answerUpdateRequestDto, answer);
+        List<String> mediaUrl = updateAnswerMedia(answerUpdateRequestDto, answer);
+
 
         return AnswerUpdateResponseDto.of(
                 answer.getAnswerContent(),
                 answer.getQuestion().getId(),
                 answer.getId(),
-                member.getId()
+                member.getId(),
+                mediaUrl
         );
-
     }
     private List<String> createAnswerMedia(AnswerCreateRequestDto answerCreateRequestDto, Answer answer) {
        return answerMediaService.createAnswerMedia(answer, answerCreateRequestDto.getImages());
     }
 
-    private void updateAnswerMedia(AnswerUpdateRequestDto answerUpdateRequestDto, Answer answer) {
-        answerMediaService.createAnswerMedia(answer, answerUpdateRequestDto.getImages());
+    private List<String> updateAnswerMedia(AnswerUpdateRequestDto answerUpdateRequestDto, Answer answer) {
+        return answerMediaService.createAnswerMedia(answer, answerUpdateRequestDto.getImages());
     }
 
     public int countAnswersByQuestionId(Long questionId) {
@@ -181,6 +182,27 @@ public class AnswerService {
                     );
                         }).collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public AnswerEditResponseDto getAnswerEditInfo(Long answerId, Long memberId) {
+        Answer answer = answerRepository.findById(answerId)
+                .orElseThrow(() -> new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND));
+
+        List<String> mediaUrls = answerMediaRepository.findAllByAnswerId(answerId)
+                .stream()
+                .map(AnswerMedia::getMediaUrl)
+                .collect(Collectors.toList());
+
+        return new AnswerEditResponseDto(
+                answer.getId(),
+                answer.getQuestion().getId(),
+                answer.getAnswerContent(),
+                mediaUrls
+        );
+    }
+
+
+
 
     @Transactional(readOnly = true)
     public List<AnswerCreateResponseDto> getAnswersByQuestionId1(Long questionId) {

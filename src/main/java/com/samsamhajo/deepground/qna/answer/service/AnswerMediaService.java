@@ -45,6 +45,7 @@ public class AnswerMediaService {
         return mediaEntities.stream().map(AnswerMedia::getMediaUrl).toList();
     }
 
+
     public void deleteAnswerMedia(Long answerId) {
         List<AnswerMedia> answerMediaList = answerMediaRepository.findAllByAnswerId(answerId);
 
