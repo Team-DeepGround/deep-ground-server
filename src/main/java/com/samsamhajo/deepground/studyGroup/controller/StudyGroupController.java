@@ -13,6 +13,7 @@ import com.samsamhajo.deepground.studyGroup.dto.StudyGroupParticipationResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupReplyRequest;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupReplyResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupSearchRequest;
+import com.samsamhajo.deepground.studyGroup.dto.StudyGroupUpdateRequest;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.service.StudyGroupAcceptService;
 import com.samsamhajo.deepground.studyGroup.service.StudyGroupCommentService;
@@ -71,7 +72,7 @@ public class StudyGroupController {
   public ResponseEntity<SuccessResponse<?>> searchStudyGroups(
       @ModelAttribute StudyGroupSearchRequest request
   ) {
-    GlobalLogger.info("스터디 목록 검색 요청", request.getKeyword(), request.getGroupStatus(), request.getTechTags());
+    GlobalLogger.info("스터디 목록 검색 요청", request.getKeyword(), request.getGroupStatus(), request.getTechStackNames());
 
     var response = studyGroupService.searchStudyGroups(request);
     return ResponseEntity
@@ -261,4 +262,18 @@ public class StudyGroupController {
         .status(StudyGroupSuccessCode.CREATE_SUCCESS.getStatus())
         .body(SuccessResponse.of(StudyGroupSuccessCode.CREATE_SUCCESS, response));
   }
+
+    @PatchMapping("/{studyGroupId}")
+    public ResponseEntity<SuccessResponse<?>> updateStudyGroup(
+            @PathVariable Long studyGroupId,
+            @RequestBody @Valid StudyGroupUpdateRequest request,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
+        Member member = customUserDetails.getMember();
+        GlobalLogger.info("스터디 수정 요청", member.getEmail(), studyGroupId);
+        var response = studyGroupService.updateStudyGroup(studyGroupId, request, member);
+        return ResponseEntity
+                .status(StudyGroupSuccessCode.UPDATE_SUCCESS.getStatus())
+                .body(SuccessResponse.of(StudyGroupSuccessCode.UPDATE_SUCCESS, response));
+    }
 }

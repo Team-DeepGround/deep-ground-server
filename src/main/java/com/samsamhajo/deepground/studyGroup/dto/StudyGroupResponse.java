@@ -3,7 +3,9 @@ package com.samsamhajo.deepground.studyGroup.dto;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupTechTag;
 import com.samsamhajo.deepground.studyGroup.entity.TechTag;
+import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -20,7 +22,7 @@ public class StudyGroupResponse {
   private String period;
   private String recruitmentPeriod;
   private GroupStatus groupStatus;
-  private Set<TechTag> tags;
+  private Set<TechTagDto> tags;
   private Integer maxMembers;
   private Integer currentMembers;
   private OrganizerDto organizer;
@@ -39,13 +41,18 @@ public class StudyGroupResponse {
 
     Member creator = group.getCreator();
 
+    Set<TechTagDto> techTags = group.getStudyGroupTechTags().stream()
+        .map(StudyGroupTechTag::getTechStack)
+        .map(techStack -> new TechTagDto(techStack.getId(), techStack.getName()))
+        .collect(Collectors.toSet());
+
     return StudyGroupResponse.builder()
         .id(group.getId())
         .title(group.getTitle())
         .description(group.getExplanation())
         .period(group.getStudyStartDate().format(formatter) + " ~ " + group.getStudyEndDate().format(formatter))
         .recruitmentPeriod(group.getRecruitStartDate().format(formatter) + " ~ " + group.getRecruitEndDate().format(formatter))
-        .tags(group.getTechTags())
+        .tags(techTags)
         .maxMembers(group.getGroupMemberCount())
         .currentMembers(group.getMembers().size())
         .groupStatus(group.getGroupStatus())

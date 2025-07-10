@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.studyGroup.dto;
 
 import com.samsamhajo.deepground.studyGroup.entity.TechTag;
 import jakarta.validation.constraints.*;
+import java.util.List;
 import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -44,5 +45,7 @@ public class StudyGroupCreateRequest {
 
   private String studyLocation; // isOffline이 true일 때만 필요
 
-  private Set<TechTag> techTags;
+  @NotNull(message = "기술 스택은 필수입니다.")
+  @Size(min = 1, message = "최소 1개 이상의 기술 스택을 선택해주세요.")
+  private List<String> techStackNames;
 }

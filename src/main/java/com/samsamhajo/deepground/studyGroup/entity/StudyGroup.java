@@ -56,14 +56,12 @@ public class StudyGroup extends BaseEntity {
     @Column(name = "study_location")
     private String studyLocation;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING)
-    private Set<TechTag> techTags = new HashSet<>();
+    @OneToMany(mappedBy = "studyGroup", orphanRemoval = true)
+    private Set<StudyGroupTechTag> studyGroupTechTags = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "member_id", nullable = false)
     private Member creator;
-
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id", nullable = false)
@@ -79,7 +77,7 @@ public class StudyGroup extends BaseEntity {
         ChatRoom chatRoom, String title, String explanation,
         LocalDate studyStartDate, LocalDate studyEndDate,
         LocalDate recruitStartDate, LocalDate recruitEndDate,
-        Integer groupMemberCount, Member member, Boolean isOffline, String studyLocation, Set<TechTag> techTags
+        Integer groupMemberCount, Member member, Boolean isOffline, String studyLocation
     ) {
         this.chatRoom = chatRoom;
         this.title = title;
@@ -92,24 +90,55 @@ public class StudyGroup extends BaseEntity {
         this.creator = member;
         this.isOffline = isOffline;
         this.studyLocation = studyLocation;
-        this.techTags = techTags;
     }
 
-  public static StudyGroup of(
+    public static StudyGroup of(
         ChatRoom chatRoom, String title, String explanation,
         LocalDate studyStartDate, LocalDate studyEndDate,
         LocalDate recruitStartDate, LocalDate recruitEndDate,
-        Integer groupMemberCount, Member member, Boolean isOffline, String studyLocation, Set<TechTag> techTags
+        Integer groupMemberCount, Member member, Boolean isOffline, String studyLocation
     ) {
         return new StudyGroup(
             chatRoom, title, explanation,
             studyStartDate, studyEndDate,
             recruitStartDate, recruitEndDate,
-            groupMemberCount, member, isOffline, studyLocation, techTags
+            groupMemberCount, member, isOffline, studyLocation
         );
     }
 
     public void changeGroupStatus(GroupStatus newStatus) {
         this.groupStatus = newStatus;
     }
+
+    public void addTechTag(StudyGroupTechTag techTag) {
+        this.studyGroupTechTags.add(techTag);
+    }
+
+    public void update(com.samsamhajo.deepground.studyGroup.dto.StudyGroupUpdateRequest req, java.util.List<com.samsamhajo.deepground.techStack.entity.TechStack> techStacks) {
+        this.title = req.getTitle();
+        this.explanation = req.getExplanation();
+        this.studyStartDate = req.getStudyStartDate();
+        this.studyEndDate = req.getStudyEndDate();
+        this.recruitStartDate = req.getRecruitStartDate();
+        this.recruitEndDate = req.getRecruitEndDate();
+        this.groupMemberCount = req.getGroupMemberCount();
+        this.isOffline = req.getIsOffline();
+        this.studyLocation = req.getStudyLocation();
+        // 기술스택 연관관계 관리
+        this.studyGroupTechTags.clear();
+        for (com.samsamhajo.deepground.techStack.entity.TechStack techStack : techStacks) {
+            this.addTechTag(com.samsamhajo.deepground.studyGroup.entity.StudyGroupTechTag.of(this, techStack));
+        }
+    }
+
+    public void changeTitle(String title) { this.title = title; }
+    public void changeExplanation(String explanation) { this.explanation = explanation; }
+    public void changeStudyStartDate(LocalDate date) { this.studyStartDate = date; }
+    public void changeStudyEndDate(LocalDate date) { this.studyEndDate = date; }
+    public void changeRecruitStartDate(LocalDate date) { this.recruitStartDate = date; }
+    public void changeRecruitEndDate(LocalDate date) { this.recruitEndDate = date; }
+    public void changeGroupMemberCount(Integer count) { this.groupMemberCount = count; }
+    public void changeIsOffline(Boolean isOffline) { this.isOffline = isOffline; }
+    public void changeStudyLocation(String location) { this.studyLocation = location; }
+    public void clearTechTags() { this.studyGroupTechTags.clear(); }
 }

@@ -16,20 +16,21 @@ import org.springframework.data.repository.query.Param;
 public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
 
   @Query("""
-    SELECT DISTINCT sg FROM StudyGroup sg
-    LEFT JOIN FETCH sg.creator
-    LEFT JOIN sg.techTags tag
-    WHERE (:status IS NULL OR sg.groupStatus = :status)
-      AND (
-          (:keyword IS NULL OR LOWER(sg.title) LIKE LOWER(CONCAT('%', :keyword, '%')))
-          OR (:keyword IS NULL OR LOWER(sg.explanation) LIKE LOWER(CONCAT('%', :keyword, '%')))
-      )
-      AND (:tags IS NULL OR tag IN :tags)
+  SELECT DISTINCT sg FROM StudyGroup sg
+  LEFT JOIN FETCH sg.creator
+  LEFT JOIN FETCH sg.studyGroupTechTags sgt
+  LEFT JOIN FETCH sgt.techStack ts
+  WHERE (:status IS NULL OR sg.groupStatus = :status)
+    AND (
+        (:keyword IS NULL OR LOWER(sg.title) LIKE LOWER(CONCAT('%', :keyword, '%')))
+        OR (:keyword IS NULL OR LOWER(sg.explanation) LIKE LOWER(CONCAT('%', :keyword, '%')))
+    )
+    AND (:stackNames IS NULL OR ts.name IN :stackNames)
 """)
   Page<StudyGroup> searchWithFilters(
       @Param("status") GroupStatus status,
       @Param("keyword") String keyword,
-      @Param("tags") List<String> tags,
+      @Param("stackNames") List<String> stackNames,
       Pageable pageable
   );
 
@@ -39,6 +40,8 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
   LEFT JOIN FETCH sg.members
   LEFT JOIN FETCH sg.comments c
   LEFT JOIN FETCH c.member
+  LEFT JOIN FETCH sg.studyGroupTechTags sgt
+  LEFT JOIN FETCH sgt.techStack ts
   WHERE sg.id = :id
 """)
   Optional<StudyGroup> findWithCreatorAndCommentsById(@Param("id") Long id);
