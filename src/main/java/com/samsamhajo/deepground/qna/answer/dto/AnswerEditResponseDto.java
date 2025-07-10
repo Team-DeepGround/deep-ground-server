@@ -8,4 +8,3 @@ public record AnswerEditResponseDto(
         String content,
         List<String> imageUrls
 ) {}
-g
