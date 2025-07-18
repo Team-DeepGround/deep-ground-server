@@ -8,6 +8,8 @@ import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
+import com.samsamhajo.deepground.chat.entity.ChatRoom;
+import com.samsamhajo.deepground.chat.entity.ChatRoomType;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,11 +51,10 @@ class StudyGroupParticipationServiceTest extends IntegrationTestSupport {
 
     IntStream.rangeClosed(1, 5).forEach(i -> {
       StudyGroup group = StudyGroup.of(
-          null, "참가 스터디 " + i, "설명",
+          ChatRoom.of(ChatRoomType.STUDY_GROUP), "참가 스터디 " + i, "설명",
           LocalDate.now(), LocalDate.now().plusDays(30),
           LocalDate.now(), LocalDate.now().plusDays(10),
-          5, creator, true, "서울",
-          new HashSet<>()
+          5, creator, true, "서울"
       );
       studyGroupRepository.save(group);
 
@@ -63,11 +64,10 @@ class StudyGroupParticipationServiceTest extends IntegrationTestSupport {
 
     IntStream.rangeClosed(1, 2).forEach(i -> {
       StudyGroup group = StudyGroup.of(
-          null, "대기 스터디 " + i, "설명",
+          ChatRoom.of(ChatRoomType.STUDY_GROUP), "대기 스터디 " + i, "설명",
           LocalDate.now(), LocalDate.now().plusDays(30),
           LocalDate.now(), LocalDate.now().plusDays(10),
-          5, creator, true, "서울",
-          new HashSet<>()
+          5, creator, true, "서울"
       );
       studyGroupRepository.save(group);
 

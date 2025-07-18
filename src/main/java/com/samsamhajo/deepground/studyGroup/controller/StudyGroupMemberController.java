@@ -61,23 +61,6 @@ public class StudyGroupMemberController {
         .body(SuccessResponse.of(StudyGroupSuccessCode.READ_SUCCESS, response));
   }
 
-  @DeleteMapping("/{studyGroupId}/kick/{targetMemberId}")
-  public ResponseEntity<SuccessResponse<?>> kickMember(
-      @PathVariable Long studyGroupId,
-      @PathVariable Long targetMemberId,
-      @AuthenticationPrincipal CustomUserDetails customUserDetails
-  ) {
-    Member requester = customUserDetails.getMember();
-    GlobalLogger.info("스터디 강퇴 요청", requester.getEmail(), studyGroupId, targetMemberId);
-
-    StudyGroupKickRequest request = new StudyGroupKickRequest(studyGroupId, targetMemberId);
-    studyGroupMemberService.kickMember(request, requester);
-
-    return ResponseEntity
-        .status(StudyGroupSuccessCode.UPDATE_SUCCESS.getStatus())
-        .body(SuccessResponse.of(StudyGroupSuccessCode.UPDATE_SUCCESS));
-  }
-
   @GetMapping("/{studyGroupId}/members")
   public ResponseEntity<SuccessResponse<List<StudyGroupMemberSummary>>> getStudyGroupMembers(
       @PathVariable Long studyGroupId

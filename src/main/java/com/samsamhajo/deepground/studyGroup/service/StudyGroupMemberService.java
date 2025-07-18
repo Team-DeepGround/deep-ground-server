@@ -23,8 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class StudyGroupMemberService {
   private final StudyGroupRepository studyGroupRepository;
   private final StudyGroupMemberRepository studyGroupMemberRepository;
-  private final ChatRoomMemberService chatRoomMemberService;
-  private final StudyGroupInviteTokenRepository inviteTokenRepository;
   private final ApplicationEventPublisher eventPublisher;
 
   @Transactional
@@ -79,37 +77,6 @@ public class StudyGroupMemberService {
         StudyGroupNotificationData.join(studyGroup)
     ));
 
-  }
-
-  @Transactional
-  public void kickMember(StudyGroupKickRequest request, Member requester) {
-    StudyGroup group = studyGroupRepository.findById(request.getStudyGroupId())
-        .orElseThrow(() -> new StudyGroupNotFoundException(request.getStudyGroupId()));
-
-    if (!group.getCreator().getId().equals(requester.getId())) {
-      throw new IllegalArgumentException("스터디장만 강퇴할 수 있습니다.");
-    }
-
-    if (request.getTargetMemberId().equals(requester.getId())) {
-      throw new IllegalArgumentException("자기 자신은 강퇴할 수 없습니다.");
-    }
-
-    StudyGroupMember target = studyGroupMemberRepository.findByStudyGroupIdAndMemberId(
-            request.getStudyGroupId(), request.getTargetMemberId())
-        .orElseThrow(() -> new IllegalArgumentException("대상 멤버가 스터디에 존재하지 않습니다."));
-
-    // 채팅방 멤버 삭제
-    if (target.getIsAllowed()) {
-      chatRoomMemberService.leaveChatRoom(group.getChatRoom().getId(), target.getMember().getId());
-
-      // 스터디 그룹 강퇴 알림
-      eventPublisher.publishEvent(NotificationEvent.of(
-          request.getTargetMemberId(),
-          StudyGroupNotificationData.kick(group)
-      ));
-    }
-
-    target.softDelete();
   }
 
 }
