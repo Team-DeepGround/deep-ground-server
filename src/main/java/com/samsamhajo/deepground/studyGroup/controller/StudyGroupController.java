@@ -14,14 +14,10 @@ import com.samsamhajo.deepground.studyGroup.dto.StudyGroupReplyRequest;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupReplyResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupSearchRequest;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupUpdateRequest;
-import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.service.StudyGroupAcceptService;
 import com.samsamhajo.deepground.studyGroup.service.StudyGroupCommentService;
 import com.samsamhajo.deepground.studyGroup.service.StudyGroupDeleteService;
 import com.samsamhajo.deepground.studyGroup.service.StudyGroupInviteService;
-import com.samsamhajo.deepground.studyGroup.service.StudyGroupJoinService;
-import com.samsamhajo.deepground.studyGroup.service.StudyGroupKickService;
-import com.samsamhajo.deepground.studyGroup.service.StudyGroupMemberQueryService;
 import com.samsamhajo.deepground.studyGroup.service.StudyGroupReplyService;
 import com.samsamhajo.deepground.studyGroup.service.StudyGroupService;
 import com.samsamhajo.deepground.studyGroup.success.StudyGroupSuccessCode;
@@ -43,12 +39,9 @@ import org.springframework.web.bind.annotation.*;
 public class StudyGroupController {
 
   private final StudyGroupService studyGroupService;
-  private final StudyGroupJoinService studyGroupJoinService;
   private final StudyGroupDeleteService deleteService;
   private final StudyGroupInviteService inviteService;
   private final MemberRepository memberRepository;
-  private final StudyGroupKickService studyGroupKickService;
-  private final StudyGroupMemberQueryService queryService;
   private final StudyGroupReplyService replyService;
   private final StudyGroupCommentService commentService;
   private final StudyGroupAcceptService acceptService;
@@ -96,25 +89,7 @@ public class StudyGroupController {
   }
 
 
-  /**
-   * 스터디 그룹 참가 요청 API
-   *
-   * @param studyGroupId 요청 대상 스터디 그룹 ID
-   */
-  @PostMapping("/{studyGroupId}/join")
-  public ResponseEntity<SuccessResponse<?>> requestJoin(
-      @PathVariable Long studyGroupId,
-      @AuthenticationPrincipal CustomUserDetails customUserDetails
-  ) {
-    Member member = customUserDetails.getMember();
-    GlobalLogger.info("스터디 참가 요청", member.getEmail(), "스터디 ID:", studyGroupId);
 
-    studyGroupJoinService.requestToJoin(member, studyGroupId);
-
-    return ResponseEntity
-        .status(StudyGroupSuccessCode.REQUEST_JOIN_SUCCESS.getStatus())
-        .body(SuccessResponse.of(StudyGroupSuccessCode.REQUEST_JOIN_SUCCESS));
-  }
 
   @PostMapping("/{studyGroupId}/accept/{targetMemberId}")
   public ResponseEntity<SuccessResponse<?>> acceptMember(
@@ -131,21 +106,7 @@ public class StudyGroupController {
         .body(SuccessResponse.of(StudyGroupSuccessCode.UPDATE_SUCCESS));
   }
 
-  @GetMapping("/{studyGroupId}/applicants")
-  public ResponseEntity<SuccessResponse<List<StudyGroupMemberSummary>>> getPendingApplicants(
-      @PathVariable Long studyGroupId,
-      @AuthenticationPrincipal CustomUserDetails customUserDetails
-  ) {
-    Member requester = customUserDetails.getMember();
-    GlobalLogger.info("스터디 신청자 목록 조회 요청", requester.getId(), studyGroupId);
 
-    List<StudyGroupMemberSummary> response =
-        queryService.getPendingApplicantsAsCreator(studyGroupId, requester);
-
-    return ResponseEntity
-        .status(StudyGroupSuccessCode.READ_SUCCESS.getStatus())
-        .body(SuccessResponse.of(StudyGroupSuccessCode.READ_SUCCESS, response));
-  }
 
   @GetMapping("/joined")
   public ResponseEntity<SuccessResponse<List<StudyGroupParticipationResponse>>> getMyParticipatedGroups(
@@ -205,35 +166,9 @@ public class StudyGroupController {
         .body(SuccessResponse.of(StudyGroupSuccessCode.CREATE_SUCCESS));
   }
 
-  @DeleteMapping("/{studyGroupId}/kick/{targetMemberId}")
-  public ResponseEntity<SuccessResponse<?>> kickMember(
-      @PathVariable Long studyGroupId,
-      @PathVariable Long targetMemberId,
-      @AuthenticationPrincipal CustomUserDetails customUserDetails
-  ) {
-    Member requester = customUserDetails.getMember();
-    GlobalLogger.info("스터디 강퇴 요청", requester.getEmail(), studyGroupId, targetMemberId);
 
-    StudyGroupKickRequest request = new StudyGroupKickRequest(studyGroupId, targetMemberId);
-    studyGroupKickService.kickMember(request, requester);
 
-    return ResponseEntity
-        .status(StudyGroupSuccessCode.UPDATE_SUCCESS.getStatus())
-        .body(SuccessResponse.of(StudyGroupSuccessCode.UPDATE_SUCCESS));
-  }
 
-  @GetMapping("/{studyGroupId}/members")
-  public ResponseEntity<SuccessResponse<List<StudyGroupMemberSummary>>> getStudyGroupMembers(
-      @PathVariable Long studyGroupId
-  ) {
-    GlobalLogger.info("스터디 참여자 목록 조회", studyGroupId);
-
-    List<StudyGroupMemberSummary> response = queryService.getAcceptedMembers(studyGroupId);
-
-    return ResponseEntity
-        .status(StudyGroupSuccessCode.READ_SUCCESS.getStatus())
-        .body(SuccessResponse.of(StudyGroupSuccessCode.READ_SUCCESS, response));
-  }
 
   @PostMapping("/comments")
   public ResponseEntity<SuccessResponse<StudyGroupCommentResponse>> writeComment(
