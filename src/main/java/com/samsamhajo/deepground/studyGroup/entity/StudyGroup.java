@@ -73,6 +73,10 @@ public class StudyGroup extends BaseEntity {
     @OneToMany(mappedBy = "studyGroup")
     private final List<StudyGroupComment> comments = new ArrayList<>();
 
+    @OneToMany
+    @JoinColumn(name = "studyGroup_id")
+    private List<StudyGroupAddress> studyGroupAddresses = new ArrayList<>();
+
     private StudyGroup(
         ChatRoom chatRoom, String title, String explanation,
         LocalDate studyStartDate, LocalDate studyEndDate,
