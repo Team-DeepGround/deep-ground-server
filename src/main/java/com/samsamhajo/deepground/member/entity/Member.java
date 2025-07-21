@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.member.entity;
 
+import com.samsamhajo.deepground.communityPlace.entity.CommunityPlaceReview;
 import com.samsamhajo.deepground.global.BaseEntity;
 import com.samsamhajo.deepground.interest.entity.MemberInterest;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
@@ -51,6 +52,10 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member")
     private List<StudyGroupMember> studyGroupMembers = new ArrayList<>();
+
+    @OneToMany
+    @JoinColumn(name = "member_id")
+    private List<CommunityPlaceReview> communityPlaceReviews = new ArrayList<>();
 
     private Member(String email, String password, String nickname, Provider provider, String providerId, Role role) {
         this.email = email;

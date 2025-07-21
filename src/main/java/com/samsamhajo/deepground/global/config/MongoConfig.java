@@ -10,8 +10,8 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 @EnableMongoAuditing
 public class MongoConfig {
 
-    @Bean
-    public MongoTransactionManager transactionManager(MongoDatabaseFactory factory) {
-        return new MongoTransactionManager(factory);
-    }
+//    @Bean
+//    public MongoTransactionManager transactionManager(MongoDatabaseFactory factory) {
+//        return new MongoTransactionManager(factory);
+//    }
 }
