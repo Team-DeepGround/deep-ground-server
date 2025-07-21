@@ -1,30 +1,24 @@
 // 1. 필요한 import
 import * as github from '@actions/github';
 import * as core from '@actions/core';
-import { getReviewerGroups } from './reviewerUtils'; // 그룹 로딩 함수
+import { getAllReviewers } from './reviewerUtils'; // 그룹 로딩 함수
 import { IReviewer } from './types'; // 타입 정의
 import { sendDiscordMessage } from './discord'; // ✅ 디스코드 알림용 함수
 
 const githubClient = github.getOctokit(process.env.GITHUB_TOKEN!);
 
 // 2. 그룹 기반 리뷰어 선택
-function selectReviewersFromSameGroup(prAuthor: string): IReviewer[] {
-    const groups = getReviewerGroups();
-    const groupA = groups.groupA;
-    const groupB = groups.groupB;
+function selectRandomReviewers(prAuthor: string, count: number = 2): IReviewer[] {
+    const allReviewers = getAllReviewers().filter(r => r.githubName !== prAuthor);
 
-    const isAuthorInA = groupA.some(r => r.githubName === prAuthor);
-    const targetGroup = isAuthorInA ? groupA : groupB;
-
-    // 자신 제외한 같은 그룹의 나머지 인원
-    const reviewers = targetGroup.filter(r => r.githubName !== prAuthor);
-
-    if (reviewers.length === 0) {
-        throw new Error(`같은 그룹 내에 PR 작성자를 제외한 리뷰어가 없습니다.`);
+    if (allReviewers.length < count) {
+        throw new Error(`리뷰어 수가 부족합니다. (${allReviewers.length}명)`);
     }
 
-    return reviewers;
+    const shuffled = allReviewers.sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count);
 }
+
 
 //3.main 함수
 async function main() {
@@ -35,7 +29,7 @@ async function main() {
     }
 
     const prCreator = pr.user.login;
-    const reviewers = selectReviewersFromSameGroup(prCreator);
+    const reviewers = selectRandomReviewers(prCreator);
 
     // GitHub 리뷰어 요청
     await githubClient.rest.pulls.requestReviewers({

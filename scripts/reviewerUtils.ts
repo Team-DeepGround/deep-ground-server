@@ -1,21 +1,16 @@
 import * as fs from 'fs';
 import * as yaml from 'yaml';
-import { IReviewer, ReviewerGroups } from './types';
+import { IReviewer } from './types';
 
-export function getReviewerGroups(): ReviewerGroups {
+export function getAllReviewers(): IReviewer[] {
     const file = fs.readFileSync('.github/reviewers.yml', 'utf8');
     const parsed = yaml.parse(file);
 
-    console.log('[DEBUG] Parsed YAML:', parsed);
-
-    const groups = parsed.groups; // ✅ 이 객체에서 groupA, groupB 추출
-
-    console.log('[DEBUG] groupA:', groups?.groupA);
-    console.log('[DEBUG] groupB:', groups?.groupB);
+    const groups = parsed.groups;
 
     const resolveMention = (key: string): string => {
         const envVar = process.env[`DISCORD_MENTION_${key.toUpperCase()}`];
-        if (!envVar) throw new Error(`Missing DISCORD_MENTION_${key.toUpperCase()} in environment variables`);
+        if (!envVar) throw new Error(`Missing DISCORD_MENTION_${key.toUpperCase()}`);
         return envVar;
     };
 
@@ -25,9 +20,10 @@ export function getReviewerGroups(): ReviewerGroups {
             discordMention: resolveMention(r.discordKey),
         }));
 
-    return {
-        groupA: mapGroup(groups.groupA),
-        groupB: mapGroup(groups.groupB),
-    };
-}
+    const all = [
+        ...mapGroup(groups.groupA || []),
+        ...mapGroup(groups.groupB || []),
+    ];
 
+    return all;
+}
