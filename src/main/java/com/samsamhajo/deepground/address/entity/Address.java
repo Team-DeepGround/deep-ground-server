@@ -32,7 +32,7 @@ public class Address {
 
     @OneToMany
     @JoinColumn(name = "address_id")
-    private List<StudyGroupAddress> studyGroupAddress = new ArrayList<>();
+    private List<StudyGroupAddress> studyGroupAddresses = new ArrayList<>();
 
     private Address (String city, String gu, String dong){
         this.city =city;

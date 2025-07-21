@@ -31,7 +31,7 @@ public class SpecificAddress {
     private List<StudySchedule> studySchedules = new ArrayList<>();
 
     @OneToMany
-    @JoinColumn(name = "speicfic_address_id")
+    @JoinColumn(name = "specific_address_id")
     private List<CommunityPlaceReview> communityPlaceReviews = new ArrayList<>();
 
     private SpecificAddress(String location,Point locationPoint){

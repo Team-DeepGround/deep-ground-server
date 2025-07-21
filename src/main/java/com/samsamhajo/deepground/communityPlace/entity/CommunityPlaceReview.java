@@ -13,10 +13,10 @@ public class CommunityPlaceReview {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "communtiy_place_reviews")
+    @Column(name = "communtiy_place_reviews_id")
     private Long id;
 
-    @Column(name = "community_palce_scope")
+    @Column(name = "community_place_scope")
     private double scope;
 
     @Column(name = "community_place_content")
