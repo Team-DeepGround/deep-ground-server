@@ -152,4 +152,7 @@ cloud:
     stack:
       auto: false
 
+kakao-api:
+  rest-client: ${NEXT_PUBLIC_KAKAO_REST_API_KEY}
+  host: ${KAKAO_REST_API_HOST}
 
