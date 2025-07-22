@@ -43,7 +43,7 @@ public class StudyGroupCreateRequest {
   @NotNull(message = "오프라인 여부는 필수입니다.")
   private Boolean isOffline;
 
-  private String studyLocation; // isOffline이 true일 때만 필요
+  private List<Long> addressIds;
 
   @NotNull(message = "기술 스택은 필수입니다.")
   @Size(min = 1, message = "최소 1개 이상의 기술 스택을 선택해주세요.")
