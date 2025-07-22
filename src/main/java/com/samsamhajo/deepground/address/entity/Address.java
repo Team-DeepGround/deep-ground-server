@@ -30,8 +30,7 @@ public class Address {
     @Column(name = "dong")
     private String dong;
 
-    @OneToMany
-    @JoinColumn(name = "address_id")
+    @OneToMany(mappedBy = "address")
     private List<StudyGroupAddress> studyGroupAddresses = new ArrayList<>();
 
     private Address (String city, String gu, String dong){
