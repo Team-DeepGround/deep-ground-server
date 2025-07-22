@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "Community_place_reviews)")
+@Table(name = "community_place_reviews)")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CommunityPlaceReview {
 
