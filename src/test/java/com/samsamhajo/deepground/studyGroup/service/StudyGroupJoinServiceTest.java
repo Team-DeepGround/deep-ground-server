@@ -7,6 +7,8 @@ import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
+import com.samsamhajo.deepground.chat.entity.ChatRoom;
+import com.samsamhajo.deepground.chat.entity.ChatRoomType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -25,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class StudyGroupJoinServiceTest extends IntegrationTestSupport {
 
   @Autowired
-  private StudyGroupJoinService studyGroupJoinService;
+  private StudyGroupMemberService studyGroupMemberService;
 
   @Autowired
   private StudyGroupRepository studyGroupRepository;
@@ -52,7 +54,7 @@ class StudyGroupJoinServiceTest extends IntegrationTestSupport {
     memberRepository.save(requester);
 
     studyGroup = StudyGroup.of(
-        null, "스터디 제목", "스터디 설명",
+        ChatRoom.of(ChatRoomType.STUDY_GROUP), "스터디 제목", "스터디 설명",
         LocalDate.now().plusDays(1),
         LocalDate.now().plusDays(10),
         LocalDate.now(),
@@ -60,8 +62,7 @@ class StudyGroupJoinServiceTest extends IntegrationTestSupport {
         5,
         writer,
         true,
-        "강남",
-        new HashSet<>()
+        "강남"
     );
     studyGroupRepository.save(studyGroup);
     em.flush();
@@ -72,7 +73,7 @@ class StudyGroupJoinServiceTest extends IntegrationTestSupport {
   @DisplayName("스터디 그룹에 참가 요청을 성공적으로 보낼 수 있다")
   void requestJoin_success() {
     // when
-    studyGroupJoinService.requestToJoin(requester, studyGroup.getId());
+    studyGroupMemberService.requestToJoin(requester, studyGroup.getId());
 
     // then
     boolean exists = studyGroupMemberRepository.existsByMemberAndStudyGroup(requester, studyGroup);
@@ -92,7 +93,7 @@ class StudyGroupJoinServiceTest extends IntegrationTestSupport {
     em.clear();
 
     // when & then
-    assertThatThrownBy(() -> studyGroupJoinService.requestToJoin(requester, studyGroup.getId()))
+    assertThatThrownBy(() -> studyGroupMemberService.requestToJoin(requester, studyGroup.getId()))
         .isInstanceOf(IllegalStateException.class)
         .hasMessageContaining("이미 참가 요청");
   }
@@ -107,7 +108,7 @@ class StudyGroupJoinServiceTest extends IntegrationTestSupport {
     em.clear();
 
     // when & then
-    assertThatThrownBy(() -> studyGroupJoinService.requestToJoin(requester, studyGroup.getId()))
+    assertThatThrownBy(() -> studyGroupMemberService.requestToJoin(requester, studyGroup.getId()))
         .isInstanceOf(IllegalStateException.class)
         .hasMessageContaining("참여 중");
   }

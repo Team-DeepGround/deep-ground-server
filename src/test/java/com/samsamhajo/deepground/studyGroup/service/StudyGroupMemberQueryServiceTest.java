@@ -4,6 +4,8 @@ import com.samsamhajo.deepground.IntegrationTestSupport;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupMemberSummary;
+import com.samsamhajo.deepground.chat.entity.ChatRoom;
+import com.samsamhajo.deepground.chat.entity.ChatRoomType;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
@@ -21,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class StudyGroupMemberQueryServiceTest extends IntegrationTestSupport {
 
-  @Autowired private StudyGroupMemberQueryService queryService;
+  @Autowired private StudyGroupMemberService studyGroupMemberService;
   @Autowired private StudyGroupRepository studyGroupRepository;
   @Autowired private StudyGroupMemberRepository studyGroupMemberRepository;
   @Autowired private MemberRepository memberRepository;
@@ -38,11 +40,10 @@ class StudyGroupMemberQueryServiceTest extends IntegrationTestSupport {
     memberRepository.save(memberA);
 
     group = StudyGroup.of(
-        null, "테스트 스터디", "설명",
+        ChatRoom.of(ChatRoomType.STUDY_GROUP), "테스트 스터디", "설명",
         LocalDate.now(), LocalDate.now().plusDays(5),
         LocalDate.now(), LocalDate.now().plusDays(1),
-        3, owner, true, "신촌",
-        new HashSet<>()
+        3, owner, true, "신촌"
     );
     studyGroupRepository.save(group);
 
@@ -56,7 +57,7 @@ class StudyGroupMemberQueryServiceTest extends IntegrationTestSupport {
   @Test
   @DisplayName("스터디 수락된 멤버 목록을 조회한다")
   void getAcceptedMembers() {
-    List<StudyGroupMemberSummary> members = queryService.getAcceptedMembers(group.getId());
+    List<StudyGroupMemberSummary> members = studyGroupMemberService.getAcceptedMembers(group.getId());
 
     assertThat(members).hasSize(2);
     assertThat(members.get(0).getNickname()).isEqualTo("관리자");
