@@ -9,4 +9,6 @@ import org.springframework.stereotype.Service;
 public class CommunityPlaceService {
 
     private final CommunityPlaceRepository communityPlaceRepository;
+
+
 }
