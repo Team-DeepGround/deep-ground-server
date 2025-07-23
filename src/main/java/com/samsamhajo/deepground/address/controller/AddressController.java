@@ -4,6 +4,7 @@ import com.samsamhajo.deepground.address.dto.AddressDto;
 import com.samsamhajo.deepground.address.service.AddressService;
 import com.samsamhajo.deepground.address.success.AddressSuccessCode;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,7 @@ public class AddressController {
 
     @GetMapping("/gus")
     public ResponseEntity<SuccessResponse<List<AddressDto>>> getGusByCity(
-            @RequestParam String city)
+            @RequestParam @NotBlank(message = "도시 명은 필수입니다.") String city)
     {
         List<AddressDto> gus = addressService.getGusByCity(city);
         return ResponseEntity
@@ -40,8 +41,8 @@ public class AddressController {
 
     @GetMapping("/dongs")
     public ResponseEntity<SuccessResponse<List<AddressDto>>> getDongsByCityAndGu(
-            @RequestParam String city,
-            @RequestParam String gu
+            @RequestParam @NotBlank(message = "도시 명은 필수입니다.")String city,
+            @RequestParam @NotBlank(message = "구 명은 필수입니다.")String gu
     ) {
         List<AddressDto> dongs = addressService.getDongsByCityAndGu(city, gu);
         return ResponseEntity
