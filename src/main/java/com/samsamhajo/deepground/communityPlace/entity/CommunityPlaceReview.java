@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.communityPlace.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "community_place_reviews")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CommunityPlaceReview {
+public class CommunityPlaceReview extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

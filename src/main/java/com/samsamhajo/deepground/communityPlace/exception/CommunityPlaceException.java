@@ -5,4 +5,5 @@ import com.samsamhajo.deepground.global.error.core.ErrorCode;
 
 public class CommunityPlaceException extends BaseException {
     public CommunityPlaceException(ErrorCode errorCode) { super(errorCode); }
+
 }

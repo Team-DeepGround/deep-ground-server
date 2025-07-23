@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.communityPlace.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.samsamhajo.deepground.calendar.entity.StudySchedule;
+import com.samsamhajo.deepground.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import java.util.List;
 @Getter
 @Table(name = "specific_address")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SpecificAddress {
+public class SpecificAddress extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

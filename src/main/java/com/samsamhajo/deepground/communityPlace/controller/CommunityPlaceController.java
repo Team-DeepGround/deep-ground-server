@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.communityPlace.controller;
 
+
 import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.communityPlace.dto.request.CreateReviewDto;
 import com.samsamhajo.deepground.communityPlace.dto.response.ReviewResponseDto;
@@ -13,6 +14,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import com.samsamhajo.deepground.communityPlace.entity.CommunityPlaceReview;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/communityplace")
@@ -20,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class CommunityPlaceController {
 
     private final CommunityPlaceService communityPlaceService;
+
 
     /**
      *
@@ -37,6 +44,18 @@ public class CommunityPlaceController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(SuccessResponse.of(CommunityPlaceSuccessCode.REVIEW_CREATED, reviewResponseDto));
+    }
+
+    @GetMapping("/{specificAddressId}")
+    public ResponseEntity<SuccessResponse> selectCommunityPlaceReviewsAndScope(
+            @AuthenticationPrincipal(expression = "memberId") Long memberId,
+            @PathVariable Long specificAddressId) {
+
+        CommunityPlaceReview reviewData = communityPlaceService.selectCommunityPlaceReviewsAndScope(specificAddressId);
+        return ResponseEntity
+                .ok(SuccessResponse.of(CommunityPlaceSuccessCode.COMMUNITYPLACE_SUCCESS_SELECT,reviewData));
 
     }
 }
+
+

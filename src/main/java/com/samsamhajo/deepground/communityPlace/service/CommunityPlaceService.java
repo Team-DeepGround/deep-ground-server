@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.communityPlace.service;
 
+
 import com.samsamhajo.deepground.communityPlace.dto.request.AddressDto;
 import com.samsamhajo.deepground.communityPlace.dto.request.CreateReviewDto;
 import com.samsamhajo.deepground.communityPlace.dto.response.ReviewResponseDto;
@@ -11,6 +12,8 @@ import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
 import com.samsamhajo.deepground.member.exception.MemberException;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
+import com.samsamhajo.deepground.communityPlace.exception.CommunityPlaceErrorCode;
+import com.samsamhajo.deepground.communityPlace.exception.CommunityPlaceException;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -20,8 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CommunityPlaceService {
 
     private final CommunityPlaceRepository communityPlaceRepository;
@@ -29,6 +34,7 @@ public class CommunityPlaceService {
     private final CommunityPlaceMediaService communityPlaceMediaService;
     private final SpecificAddressRepository specificAddressRepository;
     private final MemberRepository memberRepository;
+    private final SpecificAddressRepository specificAddressRepository;
 
     @Transactional
     public ReviewResponseDto createReview(CreateReviewDto createReviewDto, Long memberId) {
@@ -94,4 +100,14 @@ public class CommunityPlaceService {
     }
 
 
+    public CommunityPlaceReview selectCommunityPlaceReviewsAndScope(Long specificAddressId) {
+
+        CommunityPlaceReview communityPlaceReview = specificAddressRepository.findByIdCountReviewsAndScopeAverage(specificAddressId)
+                .orElseThrow(() -> new CommunityPlaceException(CommunityPlaceErrorCode.COMMUNITYPLACE_NOT_FOUND));
+
+        return communityPlaceReview;
+    }
+    //TODO: 리뷰 작성 로직 구현 후 테스트 코드 작성 후 테스트 및 SWAGGER 통해 컨트롤러 테스트 진행 예정
+
 }
+

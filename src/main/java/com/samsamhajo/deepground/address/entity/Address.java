@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.address.entity;
 
 
+import com.samsamhajo.deepground.global.BaseEntity;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerDetailDto;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupAddress;
 import jakarta.persistence.*;
@@ -14,7 +15,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Address {
+public class Address extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +31,7 @@ public class Address {
     @Column(name = "dong")
     private String dong;
 
-    @OneToMany
-    @JoinColumn(name = "address_id")
+    @OneToMany(mappedBy = "address")
     private List<StudyGroupAddress> studyGroupAddresses = new ArrayList<>();
 
     private Address (String city, String gu, String dong){
@@ -40,4 +40,7 @@ public class Address {
         this.dong = dong;
     }
 
+    public static Address of(String city, String gu, String dong) {
+        return new Address(city, gu, dong);
+    }
 }

@@ -1,17 +1,18 @@
 package com.samsamhajo.deepground.studyGroup.service;
 
+import com.samsamhajo.deepground.address.entity.Address;
+import com.samsamhajo.deepground.address.exception.AddressErrorCode;
+import com.samsamhajo.deepground.address.exception.AddressException;
+import com.samsamhajo.deepground.address.repository.AddressRepository;
 import com.samsamhajo.deepground.chat.service.ChatRoomService;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupDetailResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupParticipationResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupMyListResponse;
-import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
-import com.samsamhajo.deepground.studyGroup.entity.StudyGroupComment;
-import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus;
-import com.samsamhajo.deepground.studyGroup.entity.StudyGroupReply;
-import com.samsamhajo.deepground.studyGroup.entity.StudyGroupTechTag;
+import com.samsamhajo.deepground.studyGroup.entity.*;
 import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupSearchRequest;
+import com.samsamhajo.deepground.studyGroup.repository.StudyGroupAddressRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupTechTagRepository;
 import com.samsamhajo.deepground.techStack.entity.TechStack;
 import com.samsamhajo.deepground.techStack.repository.TechStackRepository;
@@ -22,8 +23,6 @@ import com.samsamhajo.deepground.chat.entity.ChatRoom;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCreateRequest;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCreateResponse;
-import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
-import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import jakarta.transaction.Transactional;
@@ -43,6 +42,8 @@ public class StudyGroupService {
   private final ChatRoomService chatRoomService;
   private final TechStackRepository techStackRepository;
   private final StudyGroupTechTagRepository studyGroupTechTagRepository;
+  private final StudyGroupAddressRepository studyGroupAddressRepository;
+  private final AddressRepository addressRepository;
 
 
   @Transactional
@@ -126,18 +127,30 @@ public class StudyGroupService {
   public StudyGroupCreateResponse createStudyGroup(StudyGroupCreateRequest request, Member creator) {
     validateRequest(request);
     ChatRoom chatRoom = chatRoomService.createStudyGroupChatRoom(creator);
+
+    List<StudyGroupAddress> studyGroupAddresses = new ArrayList<>();
+    if (request.getIsOffline() && request.getAddressIds() != null) {
+      List<Address> addresses = addressRepository.findAllById(request.getAddressIds());
+      if (addresses.size() != request.getAddressIds().size()) {
+        throw new AddressException(AddressErrorCode.INVALID_ADDRESS_INCLUDED);
+      }
+      studyGroupAddresses = addresses.stream()
+              .map(address -> StudyGroupAddress.of(null, address))
+              .toList();
+    }
+
     StudyGroup studyGroup = StudyGroup.of(
-        chatRoom,
-        request.getTitle(),
-        request.getExplanation(),
-        request.getStudyStartDate(),
-        request.getStudyEndDate(),
-        request.getRecruitStartDate(),
-        request.getRecruitEndDate(),
-        request.getGroupMemberCount(),
-        creator,
-        request.getIsOffline(),
-        request.getStudyLocation()
+            chatRoom,
+            request.getTitle(),
+            request.getExplanation(),
+            request.getStudyStartDate(),
+            request.getStudyEndDate(),
+            request.getRecruitStartDate(),
+            request.getRecruitEndDate(),
+            request.getGroupMemberCount(),
+            creator,
+            request.getIsOffline(),
+            studyGroupAddresses
     );
     StudyGroup savedGroup = studyGroupRepository.save(studyGroup);
     List<TechStack> techStacks = getTechStacksByNames(request.getTechStackNames());
@@ -145,6 +158,12 @@ public class StudyGroupService {
       StudyGroupTechTag link = StudyGroupTechTag.of(savedGroup, techStack);
       studyGroupTechTagRepository.save(link);
     }
+
+    for (StudyGroupAddress sga : studyGroupAddresses) {
+      sga.assignStudyGroup(savedGroup);
+      studyGroupAddressRepository.save(sga);
+    }
+
     StudyGroupMember groupMember = StudyGroupMember.of(creator, savedGroup, true);
     studyGroupMemberRepository.save(groupMember);
     return StudyGroupCreateResponse.from(savedGroup);

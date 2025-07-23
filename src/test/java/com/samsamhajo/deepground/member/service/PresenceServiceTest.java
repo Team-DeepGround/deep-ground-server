@@ -8,7 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.samsamhajo.deepground.friend.service.FriendService;
-import com.samsamhajo.deepground.member.Dto.PresenceDto;
+import com.samsamhajo.deepground.member.dto.PresenceDto;
 import com.samsamhajo.deepground.member.repository.PresenceRepository;
 import com.samsamhajo.deepground.sse.event.SseSubscribeEvent;
 import com.samsamhajo.deepground.sse.event.SseUnsubscribeEvent;
