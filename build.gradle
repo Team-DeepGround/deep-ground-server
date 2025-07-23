@@ -60,6 +60,11 @@ dependencies {
 
 	implementation 'org.locationtech.jts:jts-core:1.19.0'
 
+	//Geometry
+	implementation 'org.hibernate:hibernate-spatial:6.2.7.Final'
+	implementation 'org.locationtech.jts:jts-core:1.19.0'
+
+
 }
 
 tasks.named('test') {

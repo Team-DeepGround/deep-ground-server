@@ -21,7 +21,6 @@ import static com.samsamhajo.deepground.media.MediaUtils.getExtension;
 @Transactional
 public class CommunityPlaceMediaService {
 
-    private final CommunityPlaceMediaService communityPlaceMediaService;
     private final S3Uploader s3Uploader;
     private final CommunityPlaceMediaRepository communityPlaceMediaRepository;
 

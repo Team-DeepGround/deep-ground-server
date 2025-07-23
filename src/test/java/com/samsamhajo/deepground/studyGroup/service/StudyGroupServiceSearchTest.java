@@ -47,7 +47,7 @@ class StudyGroupServiceSearchTest extends IntegrationTestSupport {
       String explanation = (i % 3 == 0) ? "알고리즘 풀이" : "웹 개발";
       GroupStatus status = (i <= 15) ? GroupStatus.RECRUITING : GroupStatus.COMPLETED;
 
-      StudyGroup group = StudyGroup.of(
+      StudyGroup group = StudyGroup .of(
           null, title, explanation,
           LocalDate.now().plusDays(1),
           LocalDate.now().plusDays(30),

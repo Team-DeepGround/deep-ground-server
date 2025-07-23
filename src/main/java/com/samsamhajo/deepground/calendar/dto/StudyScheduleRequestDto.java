@@ -25,5 +25,7 @@ public class StudyScheduleRequestDto {
     private String description;
 
     private String location;
+    private Double latitude;
+    private Double longitude;
 
 }

@@ -24,7 +24,7 @@ public class CommunityPlaceMedia extends BaseEntity {
     private String extension;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id")
+    @JoinColumn(name = "community_place_reviews_id")
     private CommunityPlaceReview communityPlaceReview;
 
     public String getMediaUrl() {
