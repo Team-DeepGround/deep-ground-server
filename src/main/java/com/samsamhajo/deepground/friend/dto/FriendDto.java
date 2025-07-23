@@ -1,8 +1,7 @@
-package com.samsamhajo.deepground.friend.Dto;
+package com.samsamhajo.deepground.friend.dto;
 
 import com.samsamhajo.deepground.friend.entity.Friend;
 import com.samsamhajo.deepground.friend.entity.FriendStatus;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter

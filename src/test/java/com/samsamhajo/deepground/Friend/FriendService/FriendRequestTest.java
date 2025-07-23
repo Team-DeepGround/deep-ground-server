@@ -1,8 +1,8 @@
 package com.samsamhajo.deepground.Friend.FriendService;
 
-import com.samsamhajo.deepground.friend.Dto.FriendDto;
-import com.samsamhajo.deepground.friend.Exception.FriendErrorCode;
-import com.samsamhajo.deepground.friend.Exception.FriendException;
+import com.samsamhajo.deepground.friend.dto.FriendDto;
+import com.samsamhajo.deepground.friend.exception.FriendErrorCode;
+import com.samsamhajo.deepground.friend.exception.FriendException;
 import com.samsamhajo.deepground.friend.entity.Friend;
 import com.samsamhajo.deepground.friend.entity.FriendStatus;
 import com.samsamhajo.deepground.friend.repository.FriendRepository;
