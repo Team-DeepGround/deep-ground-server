@@ -11,10 +11,11 @@ public class ReviewResponseDto {
     private String location;
     private double latitude;
     private double longitude;
+    private Long memberId;
     private List<String> mediaUrls;
 
     public ReviewResponseDto(Long id, double scope, String content,
-                             String location, double latitude, double longitude,
+                             String location, double latitude, double longitude, Long memberId,
                              List<String> mediaUrls) {
         this.id = id;
         this.scope = scope;
@@ -22,12 +23,13 @@ public class ReviewResponseDto {
         this.location = location;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.memberId = memberId;
         this.mediaUrls = mediaUrls;
     }
 
     public static ReviewResponseDto of(Long id, double scope, String content,
-                                       String location, double latitude, double longitude,
+                                       String location, double latitude, double longitude, Long memberId,
                                        List<String> mediaUrls) {
-        return new ReviewResponseDto(id, scope, content, location, latitude, longitude, mediaUrls);
+        return new ReviewResponseDto(id, scope, content, location, latitude, longitude, memberId, mediaUrls);
     }
 }

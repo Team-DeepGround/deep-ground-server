@@ -41,6 +41,10 @@ public class StudySchedule extends BaseEntity {
     @Column(name = "location")
     private String location;
 
+    /**
+     * 스터디 일정 생성 시, 장소를 지정하고 위도, 경도 값을 가지고 있어야 리뷰 생성 시 값을 가져올 수 있어 컬럼 추가
+     * 스터디 일정 생성, 수정 시 위도, 경도 값을 가지고 올 수 있도록 Service 로직도 수정
+     */
     @Column(name = "latitude")
     private Double latitude;
 

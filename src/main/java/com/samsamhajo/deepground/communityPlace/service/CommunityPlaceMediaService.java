@@ -41,6 +41,9 @@ public class CommunityPlaceMediaService {
         return mediaEntities.stream().map(CommunityPlaceMedia::getMediaUrl).toList();
     }
 
+    /**
+     * 후에 Review 수정, 삭제 기능이 추가된다면 사용 할 일이 있을 예정
+     */
     public void deleteCommunityPlaceMedia(Long communityPlaceReviewId) {
         List<CommunityPlaceMedia> communityPlaceMediaList = communityPlaceMediaRepository.findAllByCommunityPlaceReviewId(communityPlaceReviewId);
 

@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.communityPlace.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.samsamhajo.deepground.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -24,17 +25,22 @@ public class CommunityPlaceReview {
     private String content;
 
     @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    @ManyToOne
     @JoinColumn(name = "specific_address_id")
     @JsonBackReference //순환참조 방지 : (Depth 깊이 에러 발생)
     private SpecificAddress specificAddress;
 
-    private CommunityPlaceReview(double scope,String content){
+    private CommunityPlaceReview(double scope,String content, Member member){
         this.scope = scope;
         this.content = content;
+        this.member = member;
     }
 
-    public static CommunityPlaceReview of(double scope,String content, SpecificAddress specificAddress) {
-        CommunityPlaceReview review = new CommunityPlaceReview(scope, content);
+    public static CommunityPlaceReview of(double scope,String content, Member member, SpecificAddress specificAddress) {
+        CommunityPlaceReview review = new CommunityPlaceReview(scope, content, member);
         review.specificAddress = specificAddress;
         specificAddress.getCommunityPlaceReviews().add(review);
         return review;

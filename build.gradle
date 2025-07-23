@@ -64,6 +64,9 @@ dependencies {
 	implementation 'org.hibernate:hibernate-spatial:6.2.7.Final'
 	implementation 'org.locationtech.jts:jts-core:1.19.0'
 
+	// S3 업로드 관련
+	implementation 'javax.xml.bind:jaxb-api:2.3.1'
+
 
 }
 

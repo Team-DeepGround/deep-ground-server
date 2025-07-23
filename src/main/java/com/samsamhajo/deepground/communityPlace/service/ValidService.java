@@ -13,9 +13,13 @@ public class ValidService {
 
     private final MemberRepository memberRepository;
 
-    public Member findMemberById(Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(()-> new MemberException(MemberErrorCode.INVALID_MEMBER_ID));
+    /**
+     * 추후에 기능 개발이 더 들어가면 공통적으로 Validation관련 중복 코드가 증가할 것 같아 미리 만들어 두었습니다.
+     */
+    public Long findMemberById(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new MemberException(MemberErrorCode.INVALID_MEMBER_ID));
+        return member.getId();
     }
 
 

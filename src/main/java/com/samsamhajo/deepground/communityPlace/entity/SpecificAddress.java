@@ -27,6 +27,10 @@ public class SpecificAddress {
     @Column(name="specific_address_location")
     private String location;
 
+    /**
+     * POINT 클래스 명시를 해주고, SQLTypes.GEOMETRY라고 명시를 해준 후에
+     * MYSQL에서 해당 컬럼은 POINT라고 지정 해줘야 POINT 클래스 인식 후 사용 가능
+     */
     @Column(name = "specific_address_location_point", columnDefinition = "POINT")
     @JdbcTypeCode(SqlTypes.GEOMETRY)
     private Point locationPoint;

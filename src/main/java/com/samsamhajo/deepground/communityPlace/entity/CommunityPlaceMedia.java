@@ -1,7 +1,6 @@
 package com.samsamhajo.deepground.communityPlace.entity;
 
 import com.samsamhajo.deepground.global.BaseEntity;
-import com.samsamhajo.deepground.qna.question.entity.Question;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
