@@ -12,6 +12,19 @@ public class AddressDto {
     private String gu;
     private String dong;
 
+    public static AddressDto fromCity(String city) {
+        return AddressDto.builder()
+                .city(city)
+                .build();
+    }
+
+    public static AddressDto fromGu(String city, String gu) {
+        return AddressDto.builder()
+                .city(city)
+                .gu(gu)
+                .build();
+    }
+
     public static AddressDto from(Address address) {
         return AddressDto.builder()
                 .id(address.getId())

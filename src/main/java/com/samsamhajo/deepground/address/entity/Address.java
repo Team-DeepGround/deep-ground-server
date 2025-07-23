@@ -40,4 +40,7 @@ public class Address extends BaseEntity {
         this.dong = dong;
     }
 
+    public static Address of(String city, String gu, String dong) {
+        return new Address(city, gu, dong);
+    }
 }
