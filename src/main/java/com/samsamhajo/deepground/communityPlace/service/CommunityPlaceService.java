@@ -26,3 +26,4 @@ public class CommunityPlaceService {
     }
     //TODO: 리뷰 작성 로직 구현 후 테스트 코드 작성 후 테스트 및 SWAGGER 통해 컨트롤러 테스트 진행 예정
 }
+

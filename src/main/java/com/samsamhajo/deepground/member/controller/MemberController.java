@@ -3,8 +3,8 @@ package com.samsamhajo.deepground.member.controller;
 
 import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
-import com.samsamhajo.deepground.member.Dto.MemberProfileDto;
-import com.samsamhajo.deepground.member.Dto.PresenceDto;
+import com.samsamhajo.deepground.member.dto.MemberProfileDto;
+import com.samsamhajo.deepground.member.dto.PresenceDto;
 import com.samsamhajo.deepground.member.exception.MemberSuccessCode;
 import com.samsamhajo.deepground.member.exception.ProfileSuccessCode;
 import com.samsamhajo.deepground.member.service.PresenceService;

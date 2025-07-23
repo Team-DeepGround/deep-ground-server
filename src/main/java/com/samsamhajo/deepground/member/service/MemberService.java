@@ -1,7 +1,7 @@
 package com.samsamhajo.deepground.member.service;
 
 import com.samsamhajo.deepground.global.upload.S3Uploader;
-import com.samsamhajo.deepground.member.Dto.MemberProfileDto;
+import com.samsamhajo.deepground.member.dto.MemberProfileDto;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.entity.MemberProfile;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

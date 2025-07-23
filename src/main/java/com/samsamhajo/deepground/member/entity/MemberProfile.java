@@ -1,7 +1,7 @@
 package com.samsamhajo.deepground.member.entity;
 
 import com.samsamhajo.deepground.global.BaseEntity;
-import com.samsamhajo.deepground.member.Dto.MemberProfileDto;
+import com.samsamhajo.deepground.member.dto.MemberProfileDto;
 import com.samsamhajo.deepground.techStack.entity.MemberTechStack;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
