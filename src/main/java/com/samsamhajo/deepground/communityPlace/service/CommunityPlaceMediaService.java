@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +20,7 @@ import static com.samsamhajo.deepground.media.MediaUtils.getExtension;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class CommunityPlaceMediaService {
 
     private final S3Uploader s3Uploader;
@@ -55,6 +57,7 @@ public class CommunityPlaceMediaService {
             try {
                 MediaUtils.deleteMedia(media.getMediaUrl());
             } catch (Exception e) {
+                log.warn("미디어 파일 삭제 실패: {}", media.getMediaUrl(), e);
             }
         });
         communityPlaceMediaRepository.deleteAllByCommunityPlaceReviewId(communityPlaceReviewId);

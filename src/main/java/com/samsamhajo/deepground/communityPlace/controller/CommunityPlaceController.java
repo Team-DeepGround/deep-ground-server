@@ -27,7 +27,7 @@ public class CommunityPlaceController {
      * @param customUserDetails : Member 인증
      * @return : ReviewResponseDto를 통해 값이 잘 들어갔는지 확인
      */
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/reviews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse> createReview(
             @Valid @ModelAttribute CreateReviewDto createReviewDto,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {

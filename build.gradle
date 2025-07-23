@@ -58,10 +58,8 @@ dependencies {
 	// AWS S3
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
-	implementation 'org.locationtech.jts:jts-core:1.19.0'
-
 	//Geometry
-	implementation 'org.hibernate:hibernate-spatial:6.2.7.Final'
+	implementation 'org.hibernate:hibernate-spatial:6.5.3.Final'
 	implementation 'org.locationtech.jts:jts-core:1.19.0'
 
 	// S3 업로드 관련

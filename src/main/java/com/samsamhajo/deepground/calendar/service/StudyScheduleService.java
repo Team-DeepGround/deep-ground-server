@@ -54,9 +54,6 @@ public class StudyScheduleService {
                 requestDto.getLongitude()
         );
 
-        System.out.println(requestDto.getLatitude());
-        System.out.println(requestDto.getLongitude());
-
         StudySchedule savedSchedule = studyScheduleRepository.save(studySchedule);
 
         List<Member> members = new ArrayList<>(studyGroupMemberRepository

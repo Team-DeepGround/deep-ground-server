@@ -24,11 +24,11 @@ public class CommunityPlaceReview {
     @Column(name = "community_place_content")
     private String content;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "specific_address_id")
     @JsonBackReference //순환참조 방지 : (Depth 깊이 에러 발생)
     private SpecificAddress specificAddress;
