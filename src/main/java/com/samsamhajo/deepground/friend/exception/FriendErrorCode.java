@@ -1,4 +1,5 @@
-package com.samsamhajo.deepground.friend.exception;
+package com.samsamhajo.deepground.friend.Exception;
+
 
 import com.samsamhajo.deepground.global.error.core.ErrorCode;
 import lombok.AllArgsConstructor;

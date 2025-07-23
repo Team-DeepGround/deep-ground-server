@@ -1,4 +1,4 @@
-package com.samsamhajo.deepground.friend.exception;
+package com.samsamhajo.deepground.friend.Exception;
 
 import com.samsamhajo.deepground.global.success.SuccessCode;
 import lombok.Getter;
