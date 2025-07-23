@@ -73,8 +73,7 @@ public class StudyGroup extends BaseEntity {
     @OneToMany(mappedBy = "studyGroup")
     private final List<StudyGroupComment> comments = new ArrayList<>();
 
-    @OneToMany
-    @JoinColumn(name = "studyGroup_id")
+    @OneToMany(mappedBy = "studyGroup")
     private List<StudyGroupAddress> studyGroupAddresses = new ArrayList<>();
 
     private StudyGroup(
