@@ -22,6 +22,6 @@ public enum AddressErrorCode implements ErrorCode {
 
     @Override
     public String getMessage() {
-        return "[AUTH ERROR] " + message;
+        return "[ADDRESS ERROR] " + message;
     }
 }
