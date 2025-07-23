@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.communityPlace.controller;
 
+import com.samsamhajo.deepground.communityPlace.entity.CommunityPlaceReview;
 import com.samsamhajo.deepground.communityPlace.exception.CommunityPlaceSuccessCode;
 import com.samsamhajo.deepground.communityPlace.service.CommunityPlaceService;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
@@ -22,8 +23,8 @@ public class CommunityPlaceController {
     public ResponseEntity<SuccessResponse> selectCommunityPlaceReviewsAndScope(
             @AuthenticationPrincipal(expression = "memberId") Long memberId,
             @PathVariable Long specificAddressId) {
-        communityPlaceService.selectCommunityPlaceReviewsAndScope(specificAddressId);
+        CommunityPlaceReview reviewData = communityPlaceService.selectCommunityPlaceReviewsAndScope(specificAddressId);
         return ResponseEntity
-                .ok(SuccessResponse.of(CommunityPlaceSuccessCode.COMMUNITYPLACE_SUCCESS_SELECT));
+                .ok(SuccessResponse.of(CommunityPlaceSuccessCode.COMMUNITYPLACE_SUCCESS_SELECT,reviewData));
     }
 }
