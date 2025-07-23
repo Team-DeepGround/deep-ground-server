@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 
 @Entity
 @Getter
@@ -35,6 +37,12 @@ public class StudyGroupAddress {
     }
 
     public void assignStudyGroup(StudyGroup studyGroup) {
+        if (this.studyGroup != null) {
+            this.studyGroup.getStudyGroupAddresses().remove(this);
+        }
         this.studyGroup = studyGroup;
+        if (studyGroup != null) {
+            studyGroup.getStudyGroupAddresses().add(this);
+        }
     }
 }

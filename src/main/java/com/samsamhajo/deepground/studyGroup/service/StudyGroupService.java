@@ -1,6 +1,8 @@
 package com.samsamhajo.deepground.studyGroup.service;
 
 import com.samsamhajo.deepground.address.entity.Address;
+import com.samsamhajo.deepground.address.exception.AddressErrorCode;
+import com.samsamhajo.deepground.address.exception.AddressException;
 import com.samsamhajo.deepground.address.repository.AddressRepository;
 import com.samsamhajo.deepground.chat.service.ChatRoomService;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupDetailResponse;
@@ -129,6 +131,9 @@ public class StudyGroupService {
     List<StudyGroupAddress> studyGroupAddresses = new ArrayList<>();
     if (request.getIsOffline() && request.getAddressIds() != null) {
       List<Address> addresses = addressRepository.findAllById(request.getAddressIds());
+      if (addresses.size() != request.getAddressIds().size()) {
+        throw new AddressException(AddressErrorCode.INVALID_ADDRESS_INCLUDED);
+      }
       studyGroupAddresses = addresses.stream()
               .map(address -> StudyGroupAddress.of(null, address))
               .toList();
