@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.friend.Exception;
 
+
 import com.samsamhajo.deepground.global.error.core.ErrorCode;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

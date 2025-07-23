@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.address.entity;
 
 
+import com.samsamhajo.deepground.global.BaseEntity;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerDetailDto;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupAddress;
 import jakarta.persistence.*;
@@ -14,7 +15,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Address {
+public class Address extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

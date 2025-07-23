@@ -2,17 +2,15 @@ package com.samsamhajo.deepground.friend.controller;
 
 
 import com.samsamhajo.deepground.auth.security.CustomUserDetails;
-import com.samsamhajo.deepground.friend.Dto.FriendDto;
-import com.samsamhajo.deepground.friend.Dto.FriendRequestDto;
-import com.samsamhajo.deepground.friend.Exception.FriendSuccessCode;
+import com.samsamhajo.deepground.friend.dto.FriendDto;
+import com.samsamhajo.deepground.friend.dto.FriendRequestDto;
+import com.samsamhajo.deepground.friend.exception.FriendSuccessCode;
 import com.samsamhajo.deepground.friend.service.FriendService;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
-import com.samsamhajo.deepground.member.entity.Member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
