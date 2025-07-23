@@ -73,15 +73,15 @@ public class StudyGroup extends BaseEntity {
     @OneToMany(mappedBy = "studyGroup")
     private final List<StudyGroupComment> comments = new ArrayList<>();
 
-    @OneToMany
-    @JoinColumn(name = "studyGroup_id")
+    @OneToMany(mappedBy = "studyGroup")
     private List<StudyGroupAddress> studyGroupAddresses = new ArrayList<>();
 
     private StudyGroup(
         ChatRoom chatRoom, String title, String explanation,
         LocalDate studyStartDate, LocalDate studyEndDate,
         LocalDate recruitStartDate, LocalDate recruitEndDate,
-        Integer groupMemberCount, Member member, Boolean isOffline, String studyLocation
+        Integer groupMemberCount, Member member, Boolean isOffline,
+        List<StudyGroupAddress> studyGroupAddresses
     ) {
         this.chatRoom = chatRoom;
         this.title = title;
@@ -93,20 +93,21 @@ public class StudyGroup extends BaseEntity {
         this.groupMemberCount = groupMemberCount;
         this.creator = member;
         this.isOffline = isOffline;
-        this.studyLocation = studyLocation;
+        this.studyGroupAddresses = studyGroupAddresses != null ? studyGroupAddresses : new ArrayList<>();
     }
 
     public static StudyGroup of(
         ChatRoom chatRoom, String title, String explanation,
         LocalDate studyStartDate, LocalDate studyEndDate,
         LocalDate recruitStartDate, LocalDate recruitEndDate,
-        Integer groupMemberCount, Member member, Boolean isOffline, String studyLocation
+        Integer groupMemberCount, Member member, Boolean isOffline,
+        List<StudyGroupAddress> studyGroupAddresses
     ) {
         return new StudyGroup(
             chatRoom, title, explanation,
             studyStartDate, studyEndDate,
             recruitStartDate, recruitEndDate,
-            groupMemberCount, member, isOffline, studyLocation
+            groupMemberCount, member, isOffline, studyGroupAddresses
         );
     }
 
