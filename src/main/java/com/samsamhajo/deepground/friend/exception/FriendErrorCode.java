@@ -1,4 +1,4 @@
-package com.samsamhajo.deepground.friend.Exception;
+package com.samsamhajo.deepground.friend.exception;
 
 
 import com.samsamhajo.deepground.global.error.core.ErrorCode;

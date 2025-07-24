@@ -2,10 +2,10 @@ package com.samsamhajo.deepground.friend.service;
 
 import com.samsamhajo.deepground.chat.service.ChatRoomService;
 import com.samsamhajo.deepground.friend.dto.FriendDto;
-import com.samsamhajo.deepground.friend.exception.FriendException;
 import com.samsamhajo.deepground.friend.entity.Friend;
-import com.samsamhajo.deepground.friend.exception.FriendErrorCode;
 import com.samsamhajo.deepground.friend.entity.FriendStatus;
+import com.samsamhajo.deepground.friend.exception.FriendErrorCode;
+import com.samsamhajo.deepground.friend.exception.FriendException;
 import com.samsamhajo.deepground.friend.repository.FriendRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
