@@ -2,7 +2,6 @@ package com.samsamhajo.deepground.communityPlace.exception;
 
 import com.samsamhajo.deepground.global.success.SuccessCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
