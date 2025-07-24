@@ -17,8 +17,12 @@ public interface MemberStudyScheduleRepository extends JpaRepository<MemberStudy
     SELECT mss
     FROM MemberStudySchedule mss
     JOIN FETCH mss.studySchedule ss
-    JOIN FETCH ss.studyGroup
+    JOIN FETCH ss.studyGroup sg
+    JOIN StudyGroupMember sgm
+      ON sgm.member.id = mss.member.id AND sgm.studyGroup.id = sg.id
     WHERE mss.member.id = :memberId
+      AND sgm.isAllowed = true
+      AND sgm.deleted = false
     """)
     List<MemberStudySchedule> findAllByMemberId(@Param("memberId") Long memberId);
 
