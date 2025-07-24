@@ -41,21 +41,34 @@ public class StudySchedule extends BaseEntity {
     @Column(name = "location")
     private String location;
 
-    private StudySchedule(StudyGroup studyGroup, String title, LocalDateTime startTime, LocalDateTime endTime, String description, String location) {
+    /**
+     * 스터디 일정 생성 시, 장소를 지정하고 위도, 경도 값을 가지고 있어야 리뷰 생성 시 값을 가져올 수 있어 컬럼 추가
+     * 스터디 일정 생성, 수정 시 위도, 경도 값을 가지고 올 수 있도록 Service 로직도 수정
+     */
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
+
+
+    private StudySchedule(StudyGroup studyGroup, String title, LocalDateTime startTime, LocalDateTime endTime, String description, String location, Double latitude, Double longitude) {
         this.studyGroup = studyGroup;
         this.title = title;
         this.startTime = startTime;
         this.endTime = endTime;
         this.description = description;
         this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     // location이 있는 경우
-    public static StudySchedule of(StudyGroup studyGroup, String title, LocalDateTime startTime, LocalDateTime endTime, String description, String location) {
+    public static StudySchedule of(StudyGroup studyGroup, String title, LocalDateTime startTime, LocalDateTime endTime, String description, String location, Double latitude, Double longitude) {
         if (description == null || description.trim().isEmpty()) {
             throw new ScheduleException(ScheduleErrorCode.MISSING_REQUIRED_FIELDS);
         }
-        return new StudySchedule(studyGroup, title, startTime, endTime, description, location);
+        return new StudySchedule(studyGroup, title, startTime, endTime, description, location, latitude, longitude);
     }
 
     // location이 없는 경우
@@ -63,10 +76,10 @@ public class StudySchedule extends BaseEntity {
         if (description == null || description.trim().isEmpty()) {
             throw new ScheduleException(ScheduleErrorCode.MISSING_REQUIRED_FIELDS);
         }
-        return new StudySchedule(studyGroup, title, startTime, endTime, description, null);
+        return new StudySchedule(studyGroup, title, startTime, endTime, description, null, null, null);
     }
 
-    public void update(String title, LocalDateTime startTime, LocalDateTime endTime, String description, String location) {
+    public void update(String title, LocalDateTime startTime, LocalDateTime endTime, String description, String location, Double latitude, Double longitude) {
         if (startTime.isAfter(endTime)) {
             throw new ScheduleException(ScheduleErrorCode.INVALID_DATE_RANGE);
         }
@@ -76,5 +89,7 @@ public class StudySchedule extends BaseEntity {
         this.endTime = endTime;
         this.description = description;
         this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 }

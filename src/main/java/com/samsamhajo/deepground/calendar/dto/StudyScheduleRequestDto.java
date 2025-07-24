@@ -3,6 +3,8 @@ package com.samsamhajo.deepground.calendar.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 
 import java.time.LocalDateTime;
 
@@ -25,5 +27,13 @@ public class StudyScheduleRequestDto {
     private String description;
 
     private String location;
+
+    @DecimalMin(value = "-90.0", message = "위도는 -90도 이상이어야 합니다.")
+    @DecimalMax(value = "90.0", message = "위도는 90도 이하여야 합니다.")
+    private Double latitude;
+
+    @DecimalMin(value = "-180.0", message = "경도는 -180도 이상이어야 합니다.")
+    @DecimalMax(value = "180.0", message = "경도는 180도 이하여야 합니다.")
+    private Double longitude;
 
 }

@@ -16,6 +16,8 @@ public class StudyScheduleResponseDto {
     private LocalDateTime endTime;
     private String description;
     private String location;
+    private Double latitude;
+    private Double longitude;
 
     public static StudyScheduleResponseDto from(StudySchedule schedule) {
         return StudyScheduleResponseDto.builder()
@@ -25,6 +27,8 @@ public class StudyScheduleResponseDto {
                 .endTime(schedule.getEndTime())
                 .description(schedule.getDescription())
                 .location(schedule.getLocation())
+                .latitude(schedule.getLatitude())
+                .longitude(schedule.getLongitude())
                 .build();
     }
 

@@ -1,11 +1,14 @@
 package com.samsamhajo.deepground.communityPlace.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.samsamhajo.deepground.calendar.entity.StudySchedule;
 import com.samsamhajo.deepground.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.locationtech.jts.geom.Point;
 
 import java.util.ArrayList;
@@ -13,6 +16,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Table(name = "specific_address")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SpecificAddress extends BaseEntity {
 
@@ -24,7 +28,12 @@ public class SpecificAddress extends BaseEntity {
     @Column(name="specific_address_location")
     private String location;
 
-    @Column(name="specific_address_location_point")
+    /**
+     * POINT 클래스 명시를 해주고, SQLTypes.GEOMETRY라고 명시를 해준 후에
+     * MYSQL에서 해당 컬럼은 POINT라고 지정 해줘야 POINT 클래스 인식 후 사용 가능
+     */
+    @Column(name = "specific_address_location_point", columnDefinition = "POINT")
+    @JdbcTypeCode(SqlTypes.GEOMETRY)
     private Point locationPoint;
 
     @OneToMany
@@ -33,11 +42,16 @@ public class SpecificAddress extends BaseEntity {
 
     @OneToMany
     @JoinColumn(name = "specific_address_id")
+    @JsonManagedReference //순환참조 방지
     private List<CommunityPlaceReview> communityPlaceReviews = new ArrayList<>();
 
     private SpecificAddress(String location,Point locationPoint){
         this.location = location;
         this.locationPoint = locationPoint;
+    }
+
+    public static SpecificAddress of(String location,Point locationPoint){
+        return new SpecificAddress(location,locationPoint);
     }
 
 }

@@ -49,7 +49,9 @@ public class StudyScheduleService {
                 requestDto.getStartTime(),
                 requestDto.getEndTime(),
                 requestDto.getDescription(),
-                requestDto.getLocation()
+                requestDto.getLocation(),
+                requestDto.getLatitude(),
+                requestDto.getLongitude()
         );
 
         StudySchedule savedSchedule = studyScheduleRepository.save(studySchedule);
@@ -120,7 +122,9 @@ public class StudyScheduleService {
                 requestDto.getStartTime(),
                 requestDto.getEndTime(),
                 requestDto.getDescription(),
-                requestDto.getLocation()
+                requestDto.getLocation(),
+                requestDto.getLatitude(),
+                requestDto.getLongitude()
         );
 
         List<MemberStudySchedule> memberSchedules = memberStudyScheduleRepository.findByStudyScheduleId(scheduleId);

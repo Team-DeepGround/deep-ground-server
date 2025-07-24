@@ -16,4 +16,5 @@ public interface SpecificAddressRepository extends JpaRepository<SpecificAddress
             "JOIN sa.communityPlaceReviews cpr " +
             "WHERE sa.id = :specificAddressId")
     Optional<CommunityPlaceReview> findByIdCountReviewsAndScopeAverage(@Param("specificAddressId") Long specificAddressId);
+
 }
