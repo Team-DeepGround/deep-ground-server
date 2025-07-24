@@ -44,6 +44,7 @@ public class SecurityConfig {
             "/auth/**",
             "/ws/**",
             "/auth/**",
+            "/email/**",
 //            "/**"
     };
 

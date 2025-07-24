@@ -49,9 +49,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private Member saveOrUpdate(OAuthAttributes attributes) {
-        Member member = memberRepository.findByEmailAndProvider(attributes.getEmail(), attributes.getProvider())
-                .map(entity -> entity.update(attributes.getName()))
-                .orElse(attributes.toEntity());
+        Member member = memberRepository.findByEmail(attributes.getEmail())
+                .map(existing ->{
+                    existing.linkSocialAccount(attributes.getProvider(), attributes.getProviderId());
+                    existing.update(attributes.getName());
+                    return existing;
+                })
+                .orElseGet(()->{
+                    Member newMember = attributes.toEntity();
+                    newMember.linkSocialAccount(attributes.getProvider(), attributes.getProviderId());
+                    return newMember;
+                });
 
         return memberRepository.save(member);
     }
@@ -59,19 +67,24 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     // 테스트 용
     public CustomUserDetails createTestUserDetails(String registrationId, Map<String, Object> attributes) {
         String userNameAttributeName = switch (registrationId) {
-            case "google" -> "email";
-            case "kakao" -> "id";
+            case "google" -> "sub";
             case "naver" -> "id";
             default -> "email";
         };
+
         OAuthAttributes oauthAttributes = OAuthAttributes.of(registrationId, userNameAttributeName, attributes);
 
-        Member member = memberRepository.findByEmailAndProvider(oauthAttributes.getEmail(), oauthAttributes.getProvider())
+        Member member = memberRepository.findByEmail(oauthAttributes.getEmail())
                 .map(entity -> {
-                    entity.update(oauthAttributes.getName());
-                    return memberRepository.save(entity); // 반드시 save 호출!
+                    entity.linkSocialAccount(oauthAttributes.getProvider(), oauthAttributes.getProviderId());
+                    entity.updateNickname(oauthAttributes.getName());
+                    return memberRepository.save(entity);
                 })
-                .orElseGet(() -> memberRepository.save(oauthAttributes.toEntity()));
+                .orElseGet(() -> {
+                    Member newMember = oauthAttributes.toEntity();
+                    newMember.linkSocialAccount(oauthAttributes.getProvider(), oauthAttributes.getProviderId());
+                    return memberRepository.save(newMember);
+                });
 
         return new CustomUserDetails(member, attributes);
     }
