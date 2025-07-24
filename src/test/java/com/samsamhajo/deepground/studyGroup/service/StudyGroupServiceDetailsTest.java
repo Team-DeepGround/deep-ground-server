@@ -9,6 +9,8 @@ import com.samsamhajo.deepground.studyGroup.entity.StudyGroupComment;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
+import com.samsamhajo.deepground.chat.entity.ChatRoom;
+import com.samsamhajo.deepground.chat.entity.ChatRoomType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -48,7 +50,7 @@ class StudyGroupServiceDetailsTest extends IntegrationTestSupport {
     memberRepository.save(participant);
 
     StudyGroup group = StudyGroup.of(
-        null, "통합테스트 스터디", "설명입니다",
+        ChatRoom.of(ChatRoomType.STUDY_GROUP), "통합테스트 스터디", "설명입니다",
         LocalDate.now().plusDays(1),
         LocalDate.now().plusDays(10),
         LocalDate.now(),
@@ -56,8 +58,7 @@ class StudyGroupServiceDetailsTest extends IntegrationTestSupport {
         10,
         writer,
         true,
-        "강남",
-        new HashSet<>()
+        "강남"
     );
     studyGroupRepository.save(group);
 

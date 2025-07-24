@@ -1,26 +1,29 @@
 package com.samsamhajo.deepground.studyGroup.service;
 
-
+import com.samsamhajo.deepground.chat.service.ChatRoomMemberService;
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.notification.entity.data.StudyGroupNotificationData;
+import com.samsamhajo.deepground.notification.event.NotificationEvent;
+import com.samsamhajo.deepground.studyGroup.dto.StudyGroupKickRequest;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupMemberSummary;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
+import com.samsamhajo.deepground.studyGroup.repository.StudyGroupInviteTokenRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class StudyGroupMemberQueryService {
-
+public class StudyGroupMemberService {
   private final StudyGroupRepository studyGroupRepository;
   private final StudyGroupMemberRepository studyGroupMemberRepository;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Transactional
   public List<StudyGroupMemberSummary> getAcceptedMembers(Long studyGroupId) {
@@ -54,4 +57,26 @@ public class StudyGroupMemberQueryService {
             .build())
         .toList();
   }
+
+  @Transactional
+  public void requestToJoin(Member member, Long studyGroupId) {
+    StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
+        .orElseThrow(() -> new IllegalArgumentException("스터디 그룹이 존재하지 않습니다."));
+
+    // 중복 요청 방지
+    if (studyGroupMemberRepository.existsByMemberAndStudyGroup(member, studyGroup)) {
+      throw new IllegalStateException("이미 참가 요청을 했거나 참여 중입니다.");
+    }
+
+    StudyGroupMember pendingRequest = StudyGroupMember.of(member, studyGroup, false);
+    studyGroupMemberRepository.save(pendingRequest);
+
+    // 스터디 그룹 가입 알림
+    eventPublisher.publishEvent(NotificationEvent.of(
+        studyGroup.getCreator().getId(),
+        StudyGroupNotificationData.join(studyGroup)
+    ));
+
+  }
+
 }

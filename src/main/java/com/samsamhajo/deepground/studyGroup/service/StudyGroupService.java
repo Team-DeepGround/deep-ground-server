@@ -170,6 +170,21 @@ public class StudyGroupService {
         .toList();
   }
 
+  @Transactional
+  public void softDeleteStudyGroup(Long studyGroupId, Member requester) {
+    var studyGroup = studyGroupRepository.findById(studyGroupId)
+        .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
+
+    if (!studyGroup.getCreator().getId().equals(requester.getId())) {
+      throw new IllegalArgumentException("스터디 생성자만 삭제할 수 있습니다.");
+    }
+
+    // 채팅방 삭제
+    chatRoomService.deleteChatRoom(studyGroup.getChatRoom().getId());
+
+    studyGroup.softDelete();
+  }
+
 
   private void validateRequest(StudyGroupCreateRequest request) {
     LocalDate now = LocalDate.now();

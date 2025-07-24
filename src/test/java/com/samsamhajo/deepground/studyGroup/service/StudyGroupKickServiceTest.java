@@ -8,6 +8,8 @@ import com.samsamhajo.deepground.IntegrationTestSupport;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupKickRequest;
+import com.samsamhajo.deepground.chat.entity.ChatRoom;
+import com.samsamhajo.deepground.chat.entity.ChatRoomType;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
@@ -24,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 class StudyGroupKickServiceTest extends IntegrationTestSupport {
 
   @Autowired
-  private StudyGroupKickService kickService;
+  private StudyGroupMemberService studyGroupMemberService;
   @Autowired private MemberRepository memberRepository;
   @Autowired private StudyGroupRepository studyGroupRepository;
   @Autowired private StudyGroupMemberRepository studyGroupMemberRepository;
@@ -44,11 +46,10 @@ class StudyGroupKickServiceTest extends IntegrationTestSupport {
     memberRepository.save(outsider);
 
     group = StudyGroup.of(
-        null, "스터디", "소개",
+        ChatRoom.of(ChatRoomType.STUDY_GROUP), "스터디", "소개",
         LocalDate.now(), LocalDate.now().plusDays(10),
         LocalDate.now(), LocalDate.now().plusDays(3),
-        5, owner, true, "강남",
-        new HashSet<>()
+        5, owner, true, "강남"
     );
     studyGroupRepository.save(group);
 
@@ -66,7 +67,7 @@ class StudyGroupKickServiceTest extends IntegrationTestSupport {
         .build();
 
     // when
-    kickService.kickMember(request, owner);
+    studyGroupMemberService.kickMember(request, owner);
 
     // then
     assertThat(studyGroupMemberRepository.findByStudyGroupIdAndMemberId(group.getId(), target.getId())).isEmpty();
@@ -80,7 +81,7 @@ class StudyGroupKickServiceTest extends IntegrationTestSupport {
         .targetMemberId(target.getId())
         .build();
 
-    assertThatThrownBy(() -> kickService.kickMember(request, outsider))
+    assertThatThrownBy(() -> studyGroupMemberService.kickMember(request, outsider))
         .isInstanceOf(RuntimeException.class);
   }
 
@@ -92,7 +93,7 @@ class StudyGroupKickServiceTest extends IntegrationTestSupport {
         .targetMemberId(owner.getId())
         .build();
 
-    assertThatThrownBy(() -> kickService.kickMember(request, owner))
+    assertThatThrownBy(() -> studyGroupMemberService.kickMember(request, owner))
         .isInstanceOf(IllegalArgumentException.class);
   }
 }
