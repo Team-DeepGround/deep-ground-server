@@ -80,7 +80,7 @@ public class StudyGroupService {
     Pageable pageable = request.toPageable();
     List<String> stackNames = request.getTechStackNames();
 
-    Page<StudyGroup> pageResult = studyGroupRepository.searchWithFilters(status, keyword, stackNames, pageable);
+    Page<StudyGroup> pageResult = studyGroupRepository.searchWithFilters(status, keyword, stackNames, request.getOnOffline().name(), pageable);
     return pageResult.map(StudyGroupResponse::from);
   }
 
