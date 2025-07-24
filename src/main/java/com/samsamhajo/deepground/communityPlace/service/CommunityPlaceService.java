@@ -34,7 +34,6 @@ public class CommunityPlaceService {
     private final CommunityPlaceMediaService communityPlaceMediaService;
     private final SpecificAddressRepository specificAddressRepository;
     private final MemberRepository memberRepository;
-    private final SpecificAddressRepository specificAddressRepository;
 
     @Transactional
     public ReviewResponseDto createReview(CreateReviewDto createReviewDto, Long memberId) {
