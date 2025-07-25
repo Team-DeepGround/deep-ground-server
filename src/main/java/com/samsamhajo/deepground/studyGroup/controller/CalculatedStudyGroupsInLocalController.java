@@ -23,8 +23,7 @@ public class CalculatedStudyGroupsInLocalController {
   @GetMapping
   public ResponseEntity<SuccessResponse<?>> getStudyGroupDetail(
       @RequestParam String city,
-      @RequestParam String gu,
-      @AuthenticationPrincipal CustomUserDetails customUserDetails
+      @RequestParam String gu
   ) {
     GlobalLogger.info("스터디 그룹 집계 조회", city, gu);
 
