@@ -135,6 +135,6 @@ public class CommunityPlaceService {
         return ReviewListResponseDto.of(reviews, reviewPage.getTotalPages());
     }
 
-    //TODO : 후에 스터디 일정 생성 시 가게정보 저장 로직 완료되면 테스트 예정
+    //TODO : 후에 스터디 일정 생성 시 가게정보 저장 로직 완료되면 테스트 예정 + N개의 리뷰마다 N번의 미디어 조회가 발생하기 때문에, 추후에 리팩토링 예정
 }
 
