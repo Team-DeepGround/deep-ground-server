@@ -22,6 +22,7 @@ public class CreateReviewDto {
     @NotNull(message = "주소 정보는 필수입니다.")
     @Valid
     private AddressDto address;
+    private Long placeId;
     private List<MultipartFile> images = new ArrayList<>();
 
 

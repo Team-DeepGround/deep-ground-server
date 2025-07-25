@@ -68,6 +68,7 @@ public class CommunityPlaceService {
         CommunityPlaceReview review = CommunityPlaceReview.of(
                 createReviewDto.getScope(),
                 createReviewDto.getContent(),
+                createReviewDto.getPlaceId(),
                 member,
                 address
 
@@ -88,6 +89,7 @@ public class CommunityPlaceService {
                 point.getY(), // latitude(위도)
                 point.getX(),// longitude(경도)
                 member.getId(),
+                review.getPlaceId(),
                 mediaUrl
         );
 
