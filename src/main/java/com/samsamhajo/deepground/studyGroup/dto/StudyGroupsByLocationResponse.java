@@ -7,7 +7,7 @@ import java.util.List;
 @Getter
 public class StudyGroupsByLocationResponse {
 
-    List<StudyGroupResponse> studyGroups;
+    private final List<StudyGroupResponse> studyGroups;
 
     private StudyGroupsByLocationResponse(List<StudyGroupResponse> studyGroups) {
         this.studyGroups = studyGroups;
