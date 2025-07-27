@@ -51,6 +51,16 @@ public class MemberService {
 
         profile.update(memberProfileDto);
 
+        profile.getMemberTechStacks().clear();
+        List<MemberTechStack> updatedStacks = memberProfileDto.getTechStack().stream()
+                .map(name -> {
+                    TechStack techStack = techStackRepository.findByName(name)
+                            .orElseThrow(() -> new TechStackException(TechStackErrorCode.TECH_STACK_NOT_FOUND));
+                    return MemberTechStack.of(member, profile, techStack);
+                })
+                .toList();
+        updatedStacks.forEach(profile.getMemberTechStacks()::add);
+
         MemberProfile saved = profileRepository.save(profile);
 
         return memberProfileDto.from(saved, member);

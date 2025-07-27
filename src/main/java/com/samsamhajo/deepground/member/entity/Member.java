@@ -61,7 +61,7 @@ public class Member extends BaseEntity {
 
     //일반 회원가입 정적 메소드
     public static Member createLocalMember(String email, String password, String nickname) {
-        return new Member(email, password, nickname, Role.ROLE_USER);
+        return new Member(email, password, nickname, Role.ROLE_GUEST);
     }
 
     //소셜 로그인 용 정적 메소드
@@ -79,6 +79,10 @@ public class Member extends BaseEntity {
 
     public void updateNickname(String nickname){
         this.nickname = nickname;
+    }
+
+    public void updateRole(Role role) {
+        this.role = role;
     }
 
     // 소셜 로그인 시 닉네임 동기화
