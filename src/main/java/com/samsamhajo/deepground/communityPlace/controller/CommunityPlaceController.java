@@ -51,7 +51,7 @@ public class CommunityPlaceController {
 
     }
 
-    @GetMapping("/ByReview")
+    @GetMapping("/ByReviewCount")
     public ResponseEntity<SuccessResponse<List<CommunityPlaceReviewDto>>> selectCommunityPlaceByReviewCount() {
 
         List<CommunityPlaceReviewDto> communityPlaceReview = communityPlaceService.selectCommunityPlaceByReviewCount();
@@ -60,7 +60,7 @@ public class CommunityPlaceController {
                 .ok(SuccessResponse.of(CommunityPlaceSuccessCode.COMMUNITYPLACE_SUCCESS_SELECT_BY_REVIEW_COUNT,communityPlaceReview));
     }
 
-    @GetMapping("/ByReview")
+    @GetMapping("/ByReviewScope")
     public ResponseEntity<SuccessResponse<List<CommunityPlaceReviewDto>>> selectCommunityPlaceByReviewScope() {
 
         List<CommunityPlaceReviewDto> communityPlaceReview = communityPlaceService.selectCommunityPlaceByReviewScope();
