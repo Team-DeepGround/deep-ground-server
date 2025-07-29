@@ -10,7 +10,7 @@ public class CommunityPlaceReviewDto {
     private String name;
     private Long number;
 
-    private CommunityPlaceReviewDto(String name, Long number) {
+    public CommunityPlaceReviewDto(String name, Long number) {
         this.name = name;
         this.number = number;
     }
