@@ -1,17 +1,14 @@
 package com.samsamhajo.deepground.studyGroup.service;
 
 import com.samsamhajo.deepground.chat.service.ChatRoomService;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupDetailResponse;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupParticipationResponse;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupMyListResponse;
+import com.samsamhajo.deepground.member.entity.MemberProfile;
+import com.samsamhajo.deepground.studyGroup.dto.*;
 import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupComment;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupReply;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupTechTag;
 import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupResponse;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupSearchRequest;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupTechTagRepository;
 import com.samsamhajo.deepground.techStack.entity.TechStack;
 import com.samsamhajo.deepground.techStack.repository.TechStackRepository;
@@ -20,19 +17,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import com.samsamhajo.deepground.chat.entity.ChatRoom;
 import com.samsamhajo.deepground.member.entity.Member;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCreateRequest;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCreateResponse;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
-import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.*;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupUpdateRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -73,6 +67,23 @@ public class StudyGroupService {
 
   }
 
+  @Transactional(readOnly = true)
+  public List<ParticipantSummaryDto> getParticipantSummaries(Long studyGroupId) {
+    StudyGroup group = studyGroupRepository.findById(studyGroupId)
+            .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
+
+    return group.getMembers().stream()
+            .map(m -> {
+              Member member = m.getMember();
+              MemberProfile profile = member.getMemberProfile();
+              return ParticipantSummaryDto.builder()
+                      .memberId(member.getId())
+                      .profileId(profile.getProfileId())
+                      .nickname(member.getNickname())
+                      .profileImage(profile.getProfileImage())
+                      .build();
+            }).toList();
+  }
 
   public Page<StudyGroupResponse> searchStudyGroups(StudyGroupSearchRequest request) {
     String keyword = request.getKeyword();

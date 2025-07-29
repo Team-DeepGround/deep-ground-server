@@ -51,6 +51,9 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
     private List<StudyGroupMember> studyGroupMembers = new ArrayList<>();
 
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private MemberProfile memberProfile;
+
     private Member(String email, String password, String nickname, Role role) {
         this.email = email;
         this.password = password;
@@ -97,6 +100,11 @@ public class Member extends BaseEntity {
             case NAVER -> this.naverId = socialId;
         }
         this.isVerified = true;
+    }
+
+    // 프로필 등록
+    public void linkProfile(MemberProfile profile) {
+        this.memberProfile = profile;
     }
 }
 

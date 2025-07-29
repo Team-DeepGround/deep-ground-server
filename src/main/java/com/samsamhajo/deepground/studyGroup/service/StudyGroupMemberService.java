@@ -18,6 +18,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.samsamhajo.deepground.member.utils.MemberUtils.extractProfileId;
+
+
 @Service
 @RequiredArgsConstructor
 public class StudyGroupMemberService {
@@ -32,12 +35,13 @@ public class StudyGroupMemberService {
 
     return studyGroupMemberRepository.findAcceptedMembersWithInfo(studyGroupId).stream()
         .map(member -> StudyGroupMemberSummary.builder()
-            .memberId(member.getMember().getId())
-            .nickname(member.getMember().getNickname())
-            .isOwner(group.getCreator().getId().equals(member.getMember().getId()))
-            .joinedAt(member.getCreatedAt())
-            .build())
-        .toList();
+                .memberId(member.getMember().getId())
+                .profileId(extractProfileId(member.getMember()))
+                .nickname(member.getMember().getNickname())
+                .isOwner(group.getCreator().getId().equals(member.getMember().getId()))
+                .joinedAt(member.getCreatedAt())
+                .build())
+            .toList();
   }
 
   public List<StudyGroupMemberSummary> getPendingApplicantsAsCreator(Long studyGroupId, Member requester) {
@@ -52,9 +56,10 @@ public class StudyGroupMemberService {
 
     return pending.stream()
         .map(m -> StudyGroupMemberSummary.builder()
-            .memberId(m.getMember().getId())
-            .nickname(m.getMember().getNickname())
-            .build())
+                .memberId(m.getMember().getId())
+                .profileId(extractProfileId(m.getMember()))
+                .nickname(m.getMember().getNickname())
+                .build())
         .toList();
   }
 

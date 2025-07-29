@@ -32,7 +32,6 @@ public class MemberProfileDto {
     private String company;
 
     @NotBlank (message = "사는 지역을 입력해주세요")
-    @JsonProperty("location")
     private String liveIn;
 
     private String education;

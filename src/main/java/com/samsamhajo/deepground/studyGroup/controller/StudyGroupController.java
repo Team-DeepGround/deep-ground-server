@@ -4,21 +4,12 @@ import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.global.utils.GlobalLogger;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCommentRequest;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCommentResponse;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupInviteRequest;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupParticipationResponse;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupReplyRequest;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupReplyResponse;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupSearchRequest;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupUpdateRequest;
+import com.samsamhajo.deepground.studyGroup.dto.*;
 import com.samsamhajo.deepground.studyGroup.service.StudyGroupCommentService;
 import com.samsamhajo.deepground.studyGroup.service.StudyGroupInviteService;
 import com.samsamhajo.deepground.studyGroup.service.StudyGroupService;
 import com.samsamhajo.deepground.studyGroup.success.StudyGroupSuccessCode;
 import com.samsamhajo.deepground.member.entity.Member;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCreateRequest;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCreateResponse;
 
 import jakarta.validation.Valid;
 
@@ -47,6 +38,20 @@ public class StudyGroupController {
     return ResponseEntity
         .status(StudyGroupSuccessCode.READ_SUCCESS.getStatus())
         .body(SuccessResponse.of(StudyGroupSuccessCode.READ_SUCCESS, response));
+  }
+
+  @GetMapping("/{studyGroupId}/participants")
+  public ResponseEntity<SuccessResponse<List<ParticipantSummaryDto>>> getParticipantSummaries(
+          @PathVariable Long studyGroupId
+  ) {
+    GlobalLogger.info("스터디 참여자 요약 정보 조회", studyGroupId);
+
+    List<ParticipantSummaryDto> response =
+            studyGroupService.getParticipantSummaries(studyGroupId);
+
+    return ResponseEntity
+            .status(StudyGroupSuccessCode.READ_SUCCESS.getStatus())
+            .body(SuccessResponse.of(StudyGroupSuccessCode.READ_SUCCESS, response));
   }
 
   @GetMapping("/search")
