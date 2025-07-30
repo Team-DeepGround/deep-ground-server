@@ -51,6 +51,9 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
     private List<StudyGroupMember> studyGroupMembers = new ArrayList<>();
 
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private MemberProfile memberProfile;
+
     private Member(String email, String password, String nickname, Role role) {
         this.email = email;
         this.password = password;
@@ -61,7 +64,7 @@ public class Member extends BaseEntity {
 
     //일반 회원가입 정적 메소드
     public static Member createLocalMember(String email, String password, String nickname) {
-        return new Member(email, password, nickname, Role.ROLE_USER);
+        return new Member(email, password, nickname, Role.ROLE_GUEST);
     }
 
     //소셜 로그인 용 정적 메소드
@@ -81,6 +84,10 @@ public class Member extends BaseEntity {
         this.nickname = nickname;
     }
 
+    public void updateRole(Role role) {
+        this.role = role;
+    }
+
     // 소셜 로그인 시 닉네임 동기화
     public Member update(String nickname) {
         this.nickname = nickname;
@@ -93,6 +100,11 @@ public class Member extends BaseEntity {
             case NAVER -> this.naverId = socialId;
         }
         this.isVerified = true;
+    }
+
+    // 프로필 등록
+    public void linkProfile(MemberProfile profile) {
+        this.memberProfile = profile;
     }
 }
 

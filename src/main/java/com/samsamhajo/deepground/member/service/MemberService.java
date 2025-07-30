@@ -51,6 +51,16 @@ public class MemberService {
 
         profile.update(memberProfileDto);
 
+        profile.getMemberTechStacks().clear();
+        List<MemberTechStack> updatedStacks = memberProfileDto.getTechStack().stream()
+                .map(name -> {
+                    TechStack techStack = techStackRepository.findByName(name)
+                            .orElseThrow(() -> new TechStackException(TechStackErrorCode.TECH_STACK_NOT_FOUND));
+                    return MemberTechStack.of(member, profile, techStack);
+                })
+                .toList();
+        updatedStacks.forEach(profile.getMemberTechStacks()::add);
+
         MemberProfile saved = profileRepository.save(profile);
 
         return memberProfileDto.from(saved, member);
@@ -106,6 +116,7 @@ public class MemberService {
     }
 
     // TODO: 비공개 프로필 설정 도입 시, memberId와 profileId를 비교하여 접근 제한 예외 처리 추가 예정
+    @Transactional(readOnly = true)
     public MemberProfileDto getUserProfile(Long memberId, Long profileId) {
 
         MemberProfile profile = profileRepository.findById(profileId)
