@@ -91,7 +91,7 @@ public class AnswerUpdateTest {
         String UpdateBeforeContent = answerRepository.findById(test2).get().getAnswerContent();
 
         //수정
-        AnswerUpdateRequestDto answerUpdateRequestDto = new AnswerUpdateRequestDto(UpdateContent, mediaFiles, test1, test2);
+        AnswerUpdateRequestDto answerUpdateRequestDto = new AnswerUpdateRequestDto(UpdateContent, mediaFiles, test1, test2, null);
         AnswerUpdateResponseDto answerUpdateResponseDto = answerService.updateAnswer(answerUpdateRequestDto, memberId);
         System.out.println(answerUpdateResponseDto.getAnswerContent());
         String UpdateAfterContent = answerRepository.findById(test2).get().getAnswerContent();
@@ -140,7 +140,7 @@ public class AnswerUpdateTest {
         System.out.println(answerCreateResponseDto.getAnswerContent());
 
         //답변 빈칸일시 예외발생
-        AnswerUpdateRequestDto answerUpdateRequestDto = new AnswerUpdateRequestDto(UpdateContent, mediaFiles, test1, test2);
+        AnswerUpdateRequestDto answerUpdateRequestDto = new AnswerUpdateRequestDto(UpdateContent, mediaFiles, test1, test2, null);
         AnswerException answerException = assertThrows(AnswerException.class, () -> answerService.updateAnswer(answerUpdateRequestDto, memberId));
         assertThat(answerException.getMessage()).isEqualTo(AnswerErrorCode.ANSWER_CONTENT_REQUIRED.getMessage());
     }
@@ -175,7 +175,7 @@ public class AnswerUpdateTest {
         AnswerCreateResponseDto answerCreateResponseDto = answerService.createAnswer(answerCreateRequestDto, memberId);
         Long test2 = 2L;
 
-        AnswerUpdateRequestDto answerUpdateRequestDto = new AnswerUpdateRequestDto(UpdateContent, mediaFiles, test1, test2);
+        AnswerUpdateRequestDto answerUpdateRequestDto = new AnswerUpdateRequestDto(UpdateContent, mediaFiles, test1, test2, null);
 
         AnswerException answerException = assertThrows(AnswerException.class, () -> answerService.updateAnswer(answerUpdateRequestDto, memberId));
 

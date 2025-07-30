@@ -33,6 +33,8 @@ public class StudyGroupServiceTest {
         studyGroupRepository = mock(StudyGroupRepository.class);
         studyGroupMemberRepository = mock(StudyGroupMemberRepository.class);
         chatRoomService = mock(ChatRoomService.class);
+        techStackRepository = mock(TechStackRepository.class);
+        studyGroupTechTagRepository = mock(StudyGroupTechTagRepository.class);
         studyGroupService = new StudyGroupService(
                 studyGroupRepository,
                 studyGroupMemberRepository,

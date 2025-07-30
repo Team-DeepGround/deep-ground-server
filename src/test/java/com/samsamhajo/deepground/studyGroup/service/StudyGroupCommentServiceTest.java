@@ -57,8 +57,7 @@ class StudyGroupCommentServiceTest extends IntegrationTestSupport {
         10,
         member,
         true,
-        "신촌",
-        new HashSet<>()
+        "신촌"
     );
     studyGroupRepository.save(group);
     this.studyGroupId = group.getId();
