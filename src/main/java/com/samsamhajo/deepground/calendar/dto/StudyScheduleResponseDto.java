@@ -18,6 +18,7 @@ public class StudyScheduleResponseDto {
     private String location;
     private Double latitude;
     private Double longitude;
+    private SpecificAddressResponseDto place;
 
     public static StudyScheduleResponseDto from(StudySchedule schedule) {
         return StudyScheduleResponseDto.builder()
@@ -29,6 +30,9 @@ public class StudyScheduleResponseDto {
                 .location(schedule.getLocation())
                 .latitude(schedule.getLatitude())
                 .longitude(schedule.getLongitude())
+                .place(schedule.getSpecificAddress() != null
+                        ? SpecificAddressResponseDto.from(schedule.getSpecificAddress())
+                        : null)
                 .build();
     }
 

@@ -36,4 +36,5 @@ public class StudyScheduleRequestDto {
     @DecimalMax(value = "180.0", message = "경도는 180도 이하여야 합니다.")
     private Double longitude;
 
+    private PlaceRequestDto place;
 }
