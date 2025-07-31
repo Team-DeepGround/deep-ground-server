@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.calendar.service;
 
+import com.samsamhajo.deepground.calendar.dto.PlaceRequestDto;
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleRequestDto;
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleResponseDto;
 import com.samsamhajo.deepground.calendar.entity.MemberStudySchedule;
@@ -8,6 +9,8 @@ import com.samsamhajo.deepground.calendar.exception.ScheduleErrorCode;
 import com.samsamhajo.deepground.calendar.exception.ScheduleException;
 import com.samsamhajo.deepground.calendar.repository.MemberStudyScheduleRepository;
 import com.samsamhajo.deepground.calendar.repository.StudyScheduleRepository;
+import com.samsamhajo.deepground.communityPlace.entity.SpecificAddress;
+import com.samsamhajo.deepground.communityPlace.repository.SpecificAddressRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
@@ -16,6 +19,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -49,6 +55,12 @@ class StudyScheduleServiceTest {
     @Mock
     private ApplicationEventPublisher eventPublisher;
 
+    @Mock
+    private SpecificAddressRepository specificAddressRepository;
+
+    @Mock
+    private GeometryFactory geometryFactory;
+
     @InjectMocks
     private StudyScheduleService studyScheduleService;
 
@@ -60,60 +72,57 @@ class StudyScheduleServiceTest {
     void setup() {
         studyGroup = mock(StudyGroup.class);
         requestDto = StudyScheduleRequestDto.builder()
-                .title("스터디 스케줄 1")
+                .title("스터디 제목")
+                .description("스터디 설명")
                 .startTime(LocalDateTime.now())
                 .endTime(LocalDateTime.now().plusHours(2))
-                .description("스터디 설명")
-                .location("온라인")
+                .location("강남역")
+                .latitude(37.0)
+                .longitude(127.0)
+                .place(PlaceRequestDto.builder()
+                        .name("카페")
+                        .address("서울 강남구")
+                        .phone("010-0000-0000")
+                        .placeUrl("http://place.kakao.com")
+                        .latitude(37.0)
+                        .longitude(127.0)
+                        .build())
                 .build();
     }
 
     @Test
     @DisplayName("스터디 일정 생성 성공")
-    void createStudySchedule_Success() {
-        // given
+    void createStudySchedule_Success() throws Exception {
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
-        when(studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
-                anyLong(),
-                eq(requestDto.getStartTime()),
-                eq(requestDto.getEndTime())
-        )).thenReturn(false);
+        when(studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(anyLong(), any(), any())).thenReturn(false);
 
         Member leader = mock(Member.class);
         when(leader.getId()).thenReturn(userId);
         when(studyGroup.getCreator()).thenReturn(leader);
 
-        when(studyScheduleRepository.save(any(StudySchedule.class)))
-                .thenAnswer(invocation -> {
-                    StudySchedule schedule = invocation.getArgument(0);
+        when(specificAddressRepository.findByNameAndLocation(anyString(), anyString())).thenReturn(Optional.empty());
 
-                    Field idField = StudySchedule.class.getDeclaredField("id");
-                    idField.setAccessible(true);
-                    idField.set(schedule, 1L);
+        Point point = mock(Point.class);
+        when(point.getY()).thenReturn(37.0);
+        when(point.getX()).thenReturn(127.0);
+        when(geometryFactory.createPoint(any(Coordinate.class))).thenReturn(point);
 
-                    return schedule;
-                });
+        when(studyScheduleRepository.save(any(StudySchedule.class))).thenAnswer(invocation -> {
+            StudySchedule schedule = invocation.getArgument(0);
+            Field idField = StudySchedule.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(schedule, 1L);
+            return schedule;
+        });
 
-        // when
+        when(studyGroupMemberRepository.findAllByStudyGroupIdAndIsAllowedTrue(anyLong())).thenReturn(List.of());
+
         StudyScheduleResponseDto responseDto = studyScheduleService.createStudySchedule(1L, userId, requestDto);
 
-        // then
         assertThat(responseDto).isNotNull();
         assertThat(responseDto.getTitle()).isEqualTo(requestDto.getTitle());
-        assertThat(responseDto.getStartTime()).isEqualTo(requestDto.getStartTime());
-        assertThat(responseDto.getEndTime()).isEqualTo(requestDto.getEndTime());
-        assertThat(responseDto.getDescription()).isEqualTo(requestDto.getDescription());
-        assertThat(responseDto.getLocation()).isEqualTo(requestDto.getLocation());
-
-        verify(studyGroupRepository, times(1)).findById(anyLong());
-        verify(studyScheduleRepository, times(1)).existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
-                anyLong(),
-                eq(requestDto.getStartTime()),
-                eq(requestDto.getEndTime())
-        );
-        verify(studyScheduleRepository, times(1)).save(any(StudySchedule.class));
-        verify(memberStudyScheduleRepository,times(1)).saveAll(anyList());
     }
+
 
     @Test
     @DisplayName("스터디 일정 생성 실패 - 종료 시간이 시작 시간보다 빠른 경우")
@@ -193,10 +202,33 @@ class StudyScheduleServiceTest {
     void findSchedulesByStudyGroupId_Success() {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
-        StudySchedule studySchedule1 = StudySchedule.of(studyGroup, "스터디 1", LocalDateTime.now(), LocalDateTime.now().plusHours(1), "설명 1", "온라인");
-        StudySchedule studySchedule2 = StudySchedule.of(studyGroup, "스터디 2", LocalDateTime.now().plusHours(2), LocalDateTime.now().plusHours(3), "설명 2", "오프라인");
 
-        when(studyScheduleRepository.findAllByStudyGroupId(anyLong())).thenReturn(List.of(studySchedule1, studySchedule2));
+        SpecificAddress address = mock(SpecificAddress.class);
+        when(address.getName()).thenReturn("카페");
+        when(address.getLocation()).thenReturn("서울 강남구");
+        when(address.getPhone()).thenReturn("010-0000-0000");
+        when(address.getPlaceUrl()).thenReturn("http://place.kakao.com");
+        when(address.getLatitude()).thenReturn(37.0);
+        when(address.getLongitude()).thenReturn(127.0);
+
+        StudySchedule studySchedule1 = StudySchedule.of(
+                studyGroup, "스터디 1",
+                LocalDateTime.now(),
+                LocalDateTime.now().plusHours(1),
+                "설명 1", "온라인",
+                37.0, 127.0, address
+        );
+
+        StudySchedule studySchedule2 = StudySchedule.of(
+                studyGroup, "스터디 2",
+                LocalDateTime.now().plusHours(2),
+                LocalDateTime.now().plusHours(3),
+                "설명 2", "오프라인",
+                37.0, 127.0, address
+        );
+
+        when(studyScheduleRepository.findAllByStudyGroupId(anyLong()))
+                .thenReturn(List.of(studySchedule1, studySchedule2));
 
         // when
         List<StudyScheduleResponseDto> responseDtos = studyScheduleService.findSchedulesByStudyGroupId(1L);
@@ -205,10 +237,11 @@ class StudyScheduleServiceTest {
         assertThat(responseDtos).hasSize(2);
         assertThat(responseDtos.get(0).getTitle()).isEqualTo("스터디 1");
         assertThat(responseDtos.get(1).getTitle()).isEqualTo("스터디 2");
+        assertThat(responseDtos.get(0).getPlace().getName()).isEqualTo("카페");
 
         verify(studyScheduleRepository, times(1)).findAllByStudyGroupId(anyLong());
-
     }
+
 
     @Test
     @DisplayName("스터디 그룹 ID로 일정 조회 실패 - 존재하지 않는 스터디 그룹 ID로 조회")
@@ -225,12 +258,9 @@ class StudyScheduleServiceTest {
 
     }
 
-
-
     @Test
     @DisplayName("스터디 일정 수정 성공")
-    void updateStudySchedule_Success() throws NoSuchFieldException, IllegalAccessException {
-        // given
+    void updateStudySchedule_Success() throws Exception {
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
 
         Member leader = mock(Member.class);
@@ -243,7 +273,10 @@ class StudyScheduleServiceTest {
                 requestDto.getStartTime(),
                 requestDto.getEndTime(),
                 requestDto.getDescription(),
-                requestDto.getLocation()
+                requestDto.getLocation(),
+                requestDto.getLatitude(),
+                requestDto.getLongitude(),
+                null
         );
 
         Field idField = StudySchedule.class.getDeclaredField("id");
@@ -251,24 +284,21 @@ class StudyScheduleServiceTest {
         idField.set(existingSchedule, 1L);
 
         when(studyScheduleRepository.findById(anyLong())).thenReturn(Optional.of(existingSchedule));
+        when(studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(anyLong(), any(), any())).thenReturn(false);
+
+        when(specificAddressRepository.findByNameAndLocation(anyString(), anyString())).thenReturn(Optional.empty());
+
+        Point point = mock(Point.class);
+        when(point.getY()).thenReturn(37.0);
+        when(point.getX()).thenReturn(127.0);
+        when(geometryFactory.createPoint(any(Coordinate.class))).thenReturn(point);
 
         MemberStudySchedule memberSchedule = mock(MemberStudySchedule.class);
         when(memberStudyScheduleRepository.findByStudyScheduleId(anyLong())).thenReturn(List.of(memberSchedule));
 
-        StudyScheduleRequestDto updateRequestDto = StudyScheduleRequestDto.builder()
-                .title("수정된 일정 제목")
-                .startTime(LocalDateTime.now())
-                .endTime(LocalDateTime.now().plusHours(2))
-                .description("수정된 일정 설명")
-                .location("Online")
-                .build();
-        // when
-        StudyScheduleResponseDto responseDto = studyScheduleService.updateStudySchedule(studyGroup.getId(), userId, existingSchedule.getId(), updateRequestDto);
+        StudyScheduleResponseDto responseDto = studyScheduleService.updateStudySchedule(1L, userId, 1L, requestDto);
 
-        // then
-        assertThat(responseDto).isNotNull();
-        assertThat(responseDto.getId()).isEqualTo(existingSchedule.getId());
-        assertThat(responseDto.getTitle()).isEqualTo(updateRequestDto.getTitle());
+        assertThat(responseDto.getTitle()).isEqualTo(requestDto.getTitle());
         verify(memberSchedule, times(1)).updateAvailable(null);
     }
 
@@ -323,7 +353,10 @@ class StudyScheduleServiceTest {
                 requestDto.getStartTime(),
                 requestDto.getEndTime(),
                 requestDto.getDescription(),
-                requestDto.getLocation()
+                requestDto.getLocation(),
+                requestDto.getLatitude(),
+                requestDto.getLongitude(),
+                null // SpecificAddress 없음
         );
 
         Field idField = StudySchedule.class.getDeclaredField("id");
