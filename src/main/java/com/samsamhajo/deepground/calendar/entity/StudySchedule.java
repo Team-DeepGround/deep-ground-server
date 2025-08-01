@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.calendar.entity;
 
 import com.samsamhajo.deepground.calendar.exception.ScheduleErrorCode;
 import com.samsamhajo.deepground.calendar.exception.ScheduleException;
+import com.samsamhajo.deepground.communityPlace.entity.SpecificAddress;
 import com.samsamhajo.deepground.global.BaseEntity;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import jakarta.persistence.*;
@@ -51,8 +52,16 @@ public class StudySchedule extends BaseEntity {
     @Column(name = "longitude")
     private Double longitude;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "specific_address_id")
+    private SpecificAddress specificAddress;
 
-    private StudySchedule(StudyGroup studyGroup, String title, LocalDateTime startTime, LocalDateTime endTime, String description, String location, Double latitude, Double longitude) {
+
+
+    private StudySchedule(StudyGroup studyGroup, String title,
+                          LocalDateTime startTime, LocalDateTime endTime,
+                          String description, String location,
+                          Double latitude, Double longitude, SpecificAddress specificAddress) {
         this.studyGroup = studyGroup;
         this.title = title;
         this.startTime = startTime;
@@ -61,14 +70,15 @@ public class StudySchedule extends BaseEntity {
         this.location = location;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.specificAddress = specificAddress;
     }
 
     // location이 있는 경우
-    public static StudySchedule of(StudyGroup studyGroup, String title, LocalDateTime startTime, LocalDateTime endTime, String description, String location, Double latitude, Double longitude) {
+    public static StudySchedule of(StudyGroup studyGroup, String title, LocalDateTime startTime, LocalDateTime endTime, String description, String location, Double latitude, Double longitude, SpecificAddress specificAddress) {
         if (description == null || description.trim().isEmpty()) {
             throw new ScheduleException(ScheduleErrorCode.MISSING_REQUIRED_FIELDS);
         }
-        return new StudySchedule(studyGroup, title, startTime, endTime, description, location, latitude, longitude);
+        return new StudySchedule(studyGroup, title, startTime, endTime, description, location, latitude, longitude, specificAddress);
     }
 
     // location이 없는 경우
@@ -76,10 +86,10 @@ public class StudySchedule extends BaseEntity {
         if (description == null || description.trim().isEmpty()) {
             throw new ScheduleException(ScheduleErrorCode.MISSING_REQUIRED_FIELDS);
         }
-        return new StudySchedule(studyGroup, title, startTime, endTime, description, null, null, null);
+        return new StudySchedule(studyGroup, title, startTime, endTime, description, null, null, null, null);
     }
 
-    public void update(String title, LocalDateTime startTime, LocalDateTime endTime, String description, String location, Double latitude, Double longitude) {
+    public void update(String title, LocalDateTime startTime, LocalDateTime endTime, String description, String location, Double latitude, Double longitude, SpecificAddress specificAddress) {
         if (startTime.isAfter(endTime)) {
             throw new ScheduleException(ScheduleErrorCode.INVALID_DATE_RANGE);
         }
@@ -91,5 +101,6 @@ public class StudySchedule extends BaseEntity {
         this.location = location;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.specificAddress = specificAddress;
     }
 }

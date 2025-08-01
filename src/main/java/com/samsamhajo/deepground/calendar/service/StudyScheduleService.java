@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.calendar.service;
 
+import com.samsamhajo.deepground.calendar.dto.PlaceRequestDto;
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleRequestDto;
 import com.samsamhajo.deepground.calendar.dto.StudyScheduleResponseDto;
 import com.samsamhajo.deepground.calendar.entity.MemberStudySchedule;
@@ -8,6 +9,8 @@ import com.samsamhajo.deepground.calendar.exception.ScheduleErrorCode;
 import com.samsamhajo.deepground.calendar.exception.ScheduleException;
 import com.samsamhajo.deepground.calendar.repository.MemberStudyScheduleRepository;
 import com.samsamhajo.deepground.calendar.repository.StudyScheduleRepository;
+import com.samsamhajo.deepground.communityPlace.entity.SpecificAddress;
+import com.samsamhajo.deepground.communityPlace.repository.SpecificAddressRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.notification.entity.data.ScheduleNotificationData;
 import com.samsamhajo.deepground.notification.event.NotificationEvent;
@@ -16,6 +19,9 @@ import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +38,8 @@ public class StudyScheduleService {
     private final MemberStudyScheduleRepository memberStudyScheduleRepository;
     private final StudyGroupMemberRepository studyGroupMemberRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final SpecificAddressRepository specificAddressRepository;
+    private final GeometryFactory geometryFactory;
 
     @Transactional
     public StudyScheduleResponseDto createStudySchedule(Long studyGroupId,
@@ -40,8 +48,23 @@ public class StudyScheduleService {
 
         StudyGroup studyGroup = validateStudyGroup(studyGroupId);
         validateSchedule(studyGroupId, requestDto);
-
         validateStudyLeader(userId, studyGroup);
+
+        PlaceRequestDto placeDto = requestDto.getPlace();
+        SpecificAddress specificAddress = null;
+        if (placeDto != null) {
+            specificAddress = specificAddressRepository.findByNameAndLocation(placeDto.getName(), placeDto.getAddress())
+                    .orElseGet(() -> {
+                        Point point = geometryFactory.createPoint(
+                                new Coordinate(placeDto.getLongitude(), placeDto.getLatitude()));
+                        SpecificAddress newAddress = SpecificAddress.of(
+                                placeDto.getAddress(), point,
+                                placeDto.getName(), placeDto.getPhone(), placeDto.getPlaceUrl());
+                        return specificAddressRepository.save(newAddress);
+                    });
+
+
+        }
 
         StudySchedule studySchedule = StudySchedule.of(
                 studyGroup,
@@ -51,7 +74,8 @@ public class StudyScheduleService {
                 requestDto.getDescription(),
                 requestDto.getLocation(),
                 requestDto.getLatitude(),
-                requestDto.getLongitude()
+                requestDto.getLongitude(),
+                specificAddress
         );
 
         StudySchedule savedSchedule = studyScheduleRepository.save(studySchedule);
@@ -117,6 +141,19 @@ public class StudyScheduleService {
             throw new ScheduleException(ScheduleErrorCode.DUPLICATE_SCHEDULE);
         }
 
+        PlaceRequestDto placeDto = requestDto.getPlace();
+        SpecificAddress specificAddress = null;
+        if (placeDto != null) {
+            specificAddress = specificAddressRepository.findByNameAndLocation(placeDto.getName(), placeDto.getAddress())
+                    .orElseGet(() -> {
+                        Point point = geometryFactory.createPoint(
+                                new Coordinate(placeDto.getLongitude(), placeDto.getLatitude()));
+                        return specificAddressRepository.save(
+                                SpecificAddress.of(placeDto.getAddress(), point,
+                                        placeDto.getName(), placeDto.getPhone(), placeDto.getPlaceUrl()));
+                    });
+        }
+
         studySchedule.update(
                 requestDto.getTitle(),
                 requestDto.getStartTime(),
@@ -124,7 +161,8 @@ public class StudyScheduleService {
                 requestDto.getDescription(),
                 requestDto.getLocation(),
                 requestDto.getLatitude(),
-                requestDto.getLongitude()
+                requestDto.getLongitude(),
+                specificAddress
         );
 
         List<MemberStudySchedule> memberSchedules = memberStudyScheduleRepository.findByStudyScheduleId(scheduleId);

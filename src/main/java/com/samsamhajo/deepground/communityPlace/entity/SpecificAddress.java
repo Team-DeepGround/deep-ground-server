@@ -42,22 +42,51 @@ public class SpecificAddress extends BaseEntity {
     @JdbcTypeCode(SqlTypes.GEOMETRY)
     private Point locationPoint;
 
-    @OneToMany
-    @JoinColumn(name = "specific_address_id")
+    @Column(name = "specific_address_name")
+    private String name;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "place_url")
+    private String placeUrl;
+
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
+
+    @OneToMany(mappedBy = "specificAddress", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudySchedule> studySchedules = new ArrayList<>();
 
-    @OneToMany
-    @JoinColumn(name = "specific_address_id")
-    @JsonManagedReference //순환참조 방지
+    @OneToMany(mappedBy = "specificAddress", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<CommunityPlaceReview> communityPlaceReviews = new ArrayList<>();
 
-    private SpecificAddress(String location,Point locationPoint){
+
+    private SpecificAddress(String location,Point locationPoint,
+                            String name, String phone, String placeUrl,
+                            Double latitude, Double longitude){
         this.location = location;
         this.locationPoint = locationPoint;
+        this.name = name;
+        this.phone = phone;
+        this.placeUrl = placeUrl;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
-    public static SpecificAddress of(String location,Point locationPoint){
-        return new SpecificAddress(location,locationPoint);
+    public static SpecificAddress of(String location, Point locationPoint,
+                                     String name, String phone, String placeUrl) {
+        return new SpecificAddress(
+                location,
+                locationPoint,
+                name,
+                phone,
+                placeUrl,
+                locationPoint.getY(), // 위도 = Y
+                locationPoint.getX()  // 경도 = X
+        );
     }
-
 }
