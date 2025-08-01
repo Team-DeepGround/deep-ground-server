@@ -4,12 +4,16 @@ package com.samsamhajo.deepground.communityPlace.controller;
 import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.communityPlace.dto.CommunityPlaceReviewDto;
 import com.samsamhajo.deepground.communityPlace.dto.request.CreateReviewDto;
+import com.samsamhajo.deepground.communityPlace.dto.response.ReviewListResponseDto;
 import com.samsamhajo.deepground.communityPlace.dto.response.ReviewResponseDto;
 import com.samsamhajo.deepground.communityPlace.exception.CommunityPlaceSuccessCode;
 import com.samsamhajo.deepground.communityPlace.service.CommunityPlaceService;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +55,17 @@ public class CommunityPlaceController {
 
     }
 
+    @GetMapping("/{placeId}")
+    public ResponseEntity<SuccessResponse> getCommunityPlaceReviews(
+            @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable Long placeId) {
+        ReviewListResponseDto reviewListResponseDto = communityPlaceService.SearchReviews(placeId, pageable);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.of(CommunityPlaceSuccessCode.COMMUNITY_PLACE_SUCCESS_SEARCH, reviewListResponseDto));
+    }
+  
     @GetMapping("/ByReviewCount")
     public ResponseEntity<SuccessResponse<List<CommunityPlaceReviewDto>>> selectCommunityPlaceByReviewCount() {
 

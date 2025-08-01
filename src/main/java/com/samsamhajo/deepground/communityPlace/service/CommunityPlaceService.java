@@ -4,9 +4,13 @@ package com.samsamhajo.deepground.communityPlace.service;
 import com.samsamhajo.deepground.communityPlace.dto.CommunityPlaceReviewDto;
 import com.samsamhajo.deepground.communityPlace.dto.request.AddressDto;
 import com.samsamhajo.deepground.communityPlace.dto.request.CreateReviewDto;
+import com.samsamhajo.deepground.communityPlace.dto.request.SearchReviewSummaryDto;
+import com.samsamhajo.deepground.communityPlace.dto.response.ReviewListResponseDto;
 import com.samsamhajo.deepground.communityPlace.dto.response.ReviewResponseDto;
+import com.samsamhajo.deepground.communityPlace.entity.CommunityPlaceMedia;
 import com.samsamhajo.deepground.communityPlace.entity.CommunityPlaceReview;
 import com.samsamhajo.deepground.communityPlace.entity.SpecificAddress;
+import com.samsamhajo.deepground.communityPlace.repository.CommunityPlaceMediaRepository;
 import com.samsamhajo.deepground.communityPlace.repository.CommunityPlaceRepository;
 import com.samsamhajo.deepground.communityPlace.repository.SpecificAddressRepository;
 import com.samsamhajo.deepground.member.entity.Member;
@@ -19,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +41,7 @@ public class CommunityPlaceService {
     private final CommunityPlaceMediaService communityPlaceMediaService;
     private final SpecificAddressRepository specificAddressRepository;
     private final MemberRepository memberRepository;
+    private final CommunityPlaceMediaRepository communityPlaceMediaRepository;
 
     @Transactional
     public ReviewResponseDto createReview(CreateReviewDto createReviewDto, Long memberId) {
@@ -68,6 +75,7 @@ public class CommunityPlaceService {
         CommunityPlaceReview review = CommunityPlaceReview.of(
                 createReviewDto.getScope(),
                 createReviewDto.getContent(),
+                createReviewDto.getPlaceId(),
                 member,
                 address
         );
@@ -87,6 +95,7 @@ public class CommunityPlaceService {
                 point.getY(), // latitude(위도)
                 point.getX(),// longitude(경도)
                 member.getId(),
+                review.getPlaceId(),
                 mediaUrl
         );
     }
@@ -103,8 +112,26 @@ public class CommunityPlaceService {
 
         return communityPlaceReview;
     }
+  
     //TODO: 리뷰 작성 로직 구현 후 테스트 코드 작성 후 테스트 및 SWAGGER 통해 컨트롤러 테스트 진행 예정
+    public ReviewListResponseDto SearchReviews(Long placeId, Pageable pageable) {
 
+        Page<CommunityPlaceReview> reviewPage = communityPlaceRepository.findByPlaceId(placeId, pageable);
+
+        List<SearchReviewSummaryDto> reviews = reviewPage.stream()
+                .map(communityPlaceReview -> {
+                    List<String> mediaUrl = communityPlaceMediaRepository.findAllByCommunityPlaceReviewId(communityPlaceReview.getId())
+                            .stream()
+                            .map((CommunityPlaceMedia:: getMediaUrl))
+                            .toList();
+
+                    return SearchReviewSummaryDto.of(communityPlaceReview, mediaUrl);
+                }).toList();
+
+        return ReviewListResponseDto.of(reviews, reviewPage.getTotalPages());
+    }
+
+    //TODO : 후에 스터디 일정 생성 시 가게정보 저장 로직 완료되면 테스트 예정 + N개의 리뷰마다 N번의 미디어 조회가 발생하기 때문에, 추후에 리팩토링 예정
     public List<CommunityPlaceReviewDto> selectCommunityPlaceByReviewCount() {
 
         return specificAddressRepository.findAllCommunityPlaceByReviewCountDesc();
