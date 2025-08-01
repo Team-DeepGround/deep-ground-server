@@ -12,21 +12,21 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<ErrorResponse> handleBaseException(BaseException e) {
-        return getErrorResponse(e,e.getErrorCode());
+        return getErrorResponse(e, e.getErrorCode());
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {
-        return getErrorResponse(e,GlobalErrorCode.INTERNAL_SERVER_ERROR);
+        return getErrorResponse(e, GlobalErrorCode.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
-        return getErrorResponse(e,GlobalErrorCode.INTERNAL_SERVER_ERROR);
+        return getErrorResponse(e, GlobalErrorCode.INTERNAL_SERVER_ERROR);
     }
 
     private static ResponseEntity<ErrorResponse> getErrorResponse(Exception e, GlobalErrorCode errorCode) {
-        GlobalLogger.error(e.toString());
+        GlobalLogger.error(e.toString(), e.getMessage());
 
         return ResponseEntity
                 .status(errorCode.getStatus())
@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
     }
 
     private static ResponseEntity<ErrorResponse> getErrorResponse(Exception e, ErrorCode errorCode) {
-        GlobalLogger.error(e.toString());
+        GlobalLogger.error(e.toString(), e.getMessage());
 
         return ResponseEntity
                 .status(errorCode.getStatus())
