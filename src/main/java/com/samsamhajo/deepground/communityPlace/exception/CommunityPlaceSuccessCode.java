@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 public enum CommunityPlaceSuccessCode implements SuccessCode {
 
     REVIEW_CREATED(HttpStatus.CREATED, "리뷰가 정상적으로 생성되었습니다."),
-    COMMUNITYPLACE_SUCCESS_SELECT(HttpStatus.OK, "스터디 장소가 성공적으로 조회됐습니다");
+    COMMUNITYPLACE_SUCCESS_SELECT(HttpStatus.OK, "스터디 장소가 성공적으로 조회됐습니다"),
+    COMMUNITYPLACE_SUCCESS_SELECT_BY_REVIEW_COUNT(HttpStatus.OK, "리뷰순으로 스터디 장소가 성공적으로 조회됐습니다" ),
+    COMMUNITYPLACE_SUCCESS_SELECT_BY_REVIEW_SCOPE(HttpStatus.OK, "별점순으로 스터디 장소가 성공적으로 조회됐습니다" );
 
     private final HttpStatus status;
     private final String message;

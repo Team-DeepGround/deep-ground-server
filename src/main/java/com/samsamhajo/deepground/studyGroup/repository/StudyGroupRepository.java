@@ -55,4 +55,5 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
 
   List<StudyGroup> findAllByCreator_IdOrderByCreatedAtDesc(Long memberId);
 
+    List<StudyGroup> findByIdIn(List<Long> studyGroupIds);
 }
