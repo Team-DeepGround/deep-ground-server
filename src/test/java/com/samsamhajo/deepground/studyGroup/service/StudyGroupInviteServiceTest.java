@@ -8,6 +8,8 @@ import com.samsamhajo.deepground.studyGroup.dto.StudyGroupInviteRequest;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupInviteTokenRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
+import com.samsamhajo.deepground.chat.entity.ChatRoom;
+import com.samsamhajo.deepground.chat.entity.ChatRoomType;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,11 +41,10 @@ class StudyGroupInviteServiceTest extends IntegrationTestSupport {
     memberRepository.save(outsider);
 
     group = StudyGroup.of(
-        null, "스터디", "소개",
+        ChatRoom.of(ChatRoomType.STUDY_GROUP), "스터디", "소개",
         LocalDate.now(), LocalDate.now().plusDays(10),
         LocalDate.now(), LocalDate.now().plusDays(3),
-        5, owner, true, "강남",
-        new HashSet<>()
+        5, owner, true, "강남"
     );
     studyGroupRepository.save(group);
   }

@@ -8,11 +8,14 @@ import com.samsamhajo.deepground.chat.service.ChatRoomService;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupDetailResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupParticipationResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupMyListResponse;
-import com.samsamhajo.deepground.studyGroup.entity.*;
+import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupComment;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupReply;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupTechTag;
 import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupSearchRequest;
-import com.samsamhajo.deepground.studyGroup.repository.StudyGroupAddressRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupTechTagRepository;
 import com.samsamhajo.deepground.techStack.entity.TechStack;
 import com.samsamhajo.deepground.techStack.repository.TechStackRepository;
@@ -23,15 +26,16 @@ import com.samsamhajo.deepground.chat.entity.ChatRoom;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCreateRequest;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCreateResponse;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
-import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.*;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import com.samsamhajo.deepground.studyGroup.dto.StudyGroupUpdateRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,8 +46,6 @@ public class StudyGroupService {
   private final ChatRoomService chatRoomService;
   private final TechStackRepository techStackRepository;
   private final StudyGroupTechTagRepository studyGroupTechTagRepository;
-  private final StudyGroupAddressRepository studyGroupAddressRepository;
-  private final AddressRepository addressRepository;
 
 
   @Transactional
@@ -74,6 +76,23 @@ public class StudyGroupService {
 
   }
 
+  @Transactional(readOnly = true)
+  public List<ParticipantSummaryDto> getParticipantSummaries(Long studyGroupId) {
+    StudyGroup group = studyGroupRepository.findById(studyGroupId)
+            .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
+
+    return group.getMembers().stream()
+            .map(m -> {
+              Member member = m.getMember();
+              MemberProfile profile = member.getMemberProfile();
+              return ParticipantSummaryDto.builder()
+                      .memberId(member.getId())
+                      .profileId(profile.getProfileId())
+                      .nickname(member.getNickname())
+                      .profileImage(profile.getProfileImage())
+                      .build();
+            }).toList();
+  }
 
   public Page<StudyGroupResponse> searchStudyGroups(StudyGroupSearchRequest request) {
     String keyword = request.getKeyword();
@@ -158,12 +177,6 @@ public class StudyGroupService {
       StudyGroupTechTag link = StudyGroupTechTag.of(savedGroup, techStack);
       studyGroupTechTagRepository.save(link);
     }
-
-    for (StudyGroupAddress sga : studyGroupAddresses) {
-      sga.assignStudyGroup(savedGroup);
-      studyGroupAddressRepository.save(sga);
-    }
-
     StudyGroupMember groupMember = StudyGroupMember.of(creator, savedGroup, true);
     studyGroupMemberRepository.save(groupMember);
     return StudyGroupCreateResponse.from(savedGroup);
@@ -187,6 +200,21 @@ public class StudyGroupService {
     return groups.stream()
         .map(StudyGroupMyListResponse::from)
         .toList();
+  }
+
+  @Transactional
+  public void softDeleteStudyGroup(Long studyGroupId, Member requester) {
+    var studyGroup = studyGroupRepository.findById(studyGroupId)
+        .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
+
+    if (!studyGroup.getCreator().getId().equals(requester.getId())) {
+      throw new IllegalArgumentException("스터디 생성자만 삭제할 수 있습니다.");
+    }
+
+    // 채팅방 삭제
+    chatRoomService.deleteChatRoom(studyGroup.getChatRoom().getId());
+
+    studyGroup.softDelete();
   }
 
 

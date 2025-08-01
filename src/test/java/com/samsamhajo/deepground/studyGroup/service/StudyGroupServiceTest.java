@@ -27,12 +27,10 @@ public class StudyGroupServiceTest {
 
     private StudyGroupRepository studyGroupRepository;
     private StudyGroupMemberRepository studyGroupMemberRepository;
-    private StudyGroupTechTagRepository studyGroupTechTagRepository;
-    private StudyGroupAddressRepository studyGroupAddressRepository;
-    private AddressRepository addressRepository;
     private ChatRoomService chatRoomService;
     private StudyGroupService studyGroupService;
     private TechStackRepository techStackRepository;
+    private StudyGroupTechTagRepository studyGroupTechTagRepository;
 
     @BeforeEach
     void setUp() {
@@ -42,16 +40,12 @@ public class StudyGroupServiceTest {
         studyGroupAddressRepository = mock(StudyGroupAddressRepository.class);
         addressRepository = mock(AddressRepository.class);
         chatRoomService = mock(ChatRoomService.class);
-        techStackRepository = mock(TechStackRepository.class);
-
         studyGroupService = new StudyGroupService(
                 studyGroupRepository,
                 studyGroupMemberRepository,
                 chatRoomService,
                 techStackRepository,
-                studyGroupTechTagRepository,
-                studyGroupAddressRepository,
-                addressRepository
+                studyGroupTechTagRepository
         );
     }
 
@@ -79,9 +73,6 @@ public class StudyGroupServiceTest {
 
         when(chatRoomService.createStudyGroupChatRoom(any())).thenReturn(chatRoom);
         when(studyGroupRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
-        when(addressRepository.findAllById(anyList())).thenReturn(
-                List.of(mock(Address.class), mock(Address.class))
-        );
 
         // when
         StudyGroupCreateResponse response = studyGroupService.createStudyGroup(request, creator);

@@ -79,6 +79,8 @@ public class MemberProfile extends BaseEntity {
         this.linkedInUrl = linkedInUrl;
         this.websiteUrl = websiteUrl;
         this.twitterUrl = twitterUrl;
+
+        member.linkProfile(this);
     }
 
     public static MemberProfile create(String profileImage, Member member, String introduction, String job, String company, String liveIn, String education,

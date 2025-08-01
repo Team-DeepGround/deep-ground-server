@@ -15,26 +15,26 @@ public class OAuthAttributes {
     private final String name;
     private final String email;
     private final Provider provider;
+    private final String providerId;
 
     @Builder
     public OAuthAttributes(Map<String, Object> attributes,
                            String nameAttributeKey,
                            String name,
                            String email,
-                           Provider provider) {
+                           Provider provider,
+                           String providerId) {
         this.attributes = attributes;
         this.nameAttributeKey = nameAttributeKey;
         this.name = name;
         this.email = email;
         this.provider = provider;
+        this.providerId = providerId;
     }
 
     public static OAuthAttributes of(String registrationId,
                                      String userNameAttributeName,
                                      Map<String, Object> attributes) {
-        if ("kakao".equals(registrationId)) {
-            return ofKakao(userNameAttributeName, attributes);
-        }
         if ("naver".equals(registrationId)) {
             return ofNaver(userNameAttributeName, attributes);
         }
@@ -46,28 +46,11 @@ public class OAuthAttributes {
                 .name((String) attributes.get("name"))
                 .email((String) attributes.get("email"))
                 .provider(Provider.GOOGLE)
+                .providerId((String) attributes.get("sub"))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
                 .build();
     }
-
-    public static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
-        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
-        Map<String, Object> kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
-
-        // 이메일이 없을 수 있으니 null 체크
-        String email = kakaoAccount.get("email") != null ? (String) kakaoAccount.get("email") : null;
-
-        return OAuthAttributes.builder()
-                .name((String) kakaoProfile.get("nickname"))
-                .email(email) // null일 수 있음
-                .provider(Provider.KAKAO)
-                .attributes(attributes)
-                .nameAttributeKey(userNameAttributeName)
-                .build();
-    }
-
-
 
     public static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
@@ -75,6 +58,7 @@ public class OAuthAttributes {
                 .name((String) response.get("name"))
                 .email((String) response.get("email"))
                 .provider(Provider.NAVER)
+                .providerId((String) response.get("id"))
                 .attributes(response) // ★ response만 넘김
                 .nameAttributeKey("id") // ★ 네이버의 고유키는 id
                 .build();
@@ -83,9 +67,7 @@ public class OAuthAttributes {
     public Member toEntity() {
         return Member.createSocialMember(
                 email,
-                name,
-                provider,
-                attributes.get(nameAttributeKey).toString()
+                name
         );
     }
 }

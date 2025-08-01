@@ -26,11 +26,16 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
         OR (:keyword IS NULL OR LOWER(sg.explanation) LIKE LOWER(CONCAT('%', :keyword, '%')))
     )
     AND (:stackNames IS NULL OR ts.name IN :stackNames)
+    AND (:onOffline IS NULL OR
+        (:onOffline = 'ONLINE' AND sg.isOffline = false) OR
+        (:onOffline = 'OFFLINE' AND sg.isOffline = true) OR
+        (:onOffline = 'ALL'))
 """)
   Page<StudyGroup> searchWithFilters(
       @Param("status") GroupStatus status,
       @Param("keyword") String keyword,
       @Param("stackNames") List<String> stackNames,
+      @Param("onOffline") String onOffline,
       Pageable pageable
   );
 

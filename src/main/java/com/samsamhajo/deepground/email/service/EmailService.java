@@ -7,6 +7,7 @@ import com.samsamhajo.deepground.email.exception.EmailErrorCode;
 import com.samsamhajo.deepground.email.exception.EmailException;
 import com.samsamhajo.deepground.email.repository.EmailVerificationRepository;
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.member.entity.Role;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -59,6 +60,7 @@ public class EmailService {
                 .orElseThrow(() -> new EmailException(EmailErrorCode.EMAIL_NOT_FOUND));
 
         member.verify();
+        member.updateRole(Role.ROLE_USER);
         memberRepository.save(member);
 
         // 인증 성공 시 Redis에서 인증 코드 삭제

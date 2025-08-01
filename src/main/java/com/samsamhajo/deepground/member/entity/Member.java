@@ -36,12 +36,11 @@ public class Member extends BaseEntity {
     @Column(name = "is_verified", nullable = false)
     private boolean isVerified = false;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "provider", nullable = false)
-    private Provider provider;
+    @Column(name = "google_id")
+    private String googleId;
 
-    @Column(name = "provider_id")
-    private String providerId;
+    @Column(name = "naver_id")
+    private String naverId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
@@ -57,24 +56,25 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "member_id")
     private List<CommunityPlaceReview> communityPlaceReviews = new ArrayList<>();
 
-    private Member(String email, String password, String nickname, Provider provider, String providerId, Role role) {
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private MemberProfile memberProfile;
+
+    private Member(String email, String password, String nickname, Role role) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
-        this.provider = provider;
-        this.providerId = providerId;
-        this.isVerified = (provider != Provider.LOCAL);
+        this.isVerified = (password == null);
         this.role = role;
     }
 
     //일반 회원가입 정적 메소드
     public static Member createLocalMember(String email, String password, String nickname) {
-        return new Member(email, password, nickname, Provider.LOCAL, null, Role.ROLE_USER);
+        return new Member(email, password, nickname, Role.ROLE_GUEST);
     }
 
     //소셜 로그인 용 정적 메소드
-    public static Member createSocialMember(String email, String nickname, Provider provider, String providerId) {
-        return new Member(email, null, nickname, provider, providerId, Role.ROLE_USER);
+    public static Member createSocialMember(String email, String nickname) {
+        return new Member(email, null, nickname, Role.ROLE_USER);
     }
 
     public void verify() {
@@ -89,10 +89,27 @@ public class Member extends BaseEntity {
         this.nickname = nickname;
     }
 
+    public void updateRole(Role role) {
+        this.role = role;
+    }
+
     // 소셜 로그인 시 닉네임 동기화
     public Member update(String nickname) {
         this.nickname = nickname;
         return this;
+    }
+
+    public void linkSocialAccount(Provider provider, String socialId) {
+        switch (provider) {
+            case GOOGLE -> this.googleId = socialId;
+            case NAVER -> this.naverId = socialId;
+        }
+        this.isVerified = true;
+    }
+
+    // 프로필 등록
+    public void linkProfile(MemberProfile profile) {
+        this.memberProfile = profile;
     }
 }
 
