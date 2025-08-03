@@ -31,9 +31,6 @@ public class SpecificAddress extends BaseEntity {
     @Column(name="specific_address_place_name")
     private String name;
 
-    @Column(name="specific_address_place_phone_number")
-    private Long number;
-
     /**
      * POINT 클래스 명시를 해주고, SQLTypes.GEOMETRY라고 명시를 해준 후에
      * MYSQL에서 해당 컬럼은 POINT라고 지정 해줘야 POINT 클래스 인식 후 사용 가능
@@ -42,10 +39,7 @@ public class SpecificAddress extends BaseEntity {
     @JdbcTypeCode(SqlTypes.GEOMETRY)
     private Point locationPoint;
 
-    @Column(name = "specific_address_name")
-    private String name;
-
-    @Column(name = "phone")
+    @Column(name = "specific_address_place_phone")
     private String phone;
 
     @Column(name = "place_url")
@@ -87,6 +81,18 @@ public class SpecificAddress extends BaseEntity {
                 placeUrl,
                 locationPoint.getY(), // 위도 = Y
                 locationPoint.getX()  // 경도 = X
+        );
+    }
+
+    public static SpecificAddress of(String location, Point locationPoint) {
+        return new SpecificAddress(
+                location,
+                locationPoint,
+                null,  // name
+                null,  // phone
+                null,  // placeUrl
+                locationPoint.getY(),
+                locationPoint.getX()
         );
     }
 }

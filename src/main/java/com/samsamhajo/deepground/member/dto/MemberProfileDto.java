@@ -1,6 +1,5 @@
 package com.samsamhajo.deepground.member.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.entity.MemberProfile;
 import jakarta.validation.constraints.NotBlank;
@@ -35,7 +34,8 @@ public class MemberProfileDto {
 
     private String education;
 
-//    @NotNull (message = "한가지 이상의 기술 스택을 입력해주세요")
+    //    @NotNull (message = "한가지 이상의 기술 스택을 입력해주세요")
+    @Builder.Default
     private List<String> techStack = new ArrayList<>();
 
     @URL(message = "올바른 URL 형식이 아닙니다.")

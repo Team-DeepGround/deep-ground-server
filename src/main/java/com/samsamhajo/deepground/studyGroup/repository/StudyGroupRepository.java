@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.studyGroup.repository;
 
 import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
+import com.samsamhajo.deepground.studyGroup.entity.OnOffline;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupReply;
 import java.util.List;
@@ -35,7 +36,7 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
       @Param("status") GroupStatus status,
       @Param("keyword") String keyword,
       @Param("stackNames") List<String> stackNames,
-      @Param("onOffline") String onOffline,
+      @Param("onOffline") OnOffline onOffline,
       Pageable pageable
   );
 
