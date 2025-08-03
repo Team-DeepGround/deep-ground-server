@@ -22,17 +22,17 @@ public interface SpecificAddressRepository extends JpaRepository<SpecificAddress
 
     Optional<SpecificAddress> findByNameAndLocation(String name, String location);
 
-    @Query("SELECT sa.name, sa.number " +
+    @Query("SELECT sa.name, sa.phone " +
             "FROM SpecificAddress sa " +
             "LEFT JOIN sa.communityPlaceReviews r " +
-            "GROUP BY sa.name, sa.number " +
+            "GROUP BY sa.name, sa.phone " +
             "ORDER BY COUNT(r) DESC")
     List<CommunityPlaceReviewDto> findAllCommunityPlaceByReviewCountDesc();
 
-    @Query("SELECT sa.name, sa.number " +
+    @Query("SELECT sa.name, sa.phone " +
             "FROM SpecificAddress sa " +
             "LEFT JOIN sa.communityPlaceReviews r " +
-            "GROUP BY sa.name, sa.number " +
+            "GROUP BY sa.name, sa.phone " +
             "ORDER BY AVG(r.scope) DESC")
     List<CommunityPlaceReviewDto> findAllCommunityPlaceByReviewScopeDesc();
 }
