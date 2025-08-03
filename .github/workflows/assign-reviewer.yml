@@ -44,7 +44,7 @@ jobs:
         run: node dist/scripts/assignReviewer.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_KAKAO_WEBHOOK_URL }}
           DISCORD_MENTION_JUNGWON: ${{ secrets.DISCORD_MENTION_JUNGWON }}
           DISCORD_MENTION_SEEUN: ${{ secrets.DISCORD_MENTION_SEEUN }}
           DISCORD_MENTION_JAEHWAN: ${{ secrets.DISCORD_MENTION_JAEHWAN }}
