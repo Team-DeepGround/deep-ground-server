@@ -3,6 +3,7 @@ package com.samsamhajo.deepground;
 import com.samsamhajo.deepground.global.config.MongoConfig;
 import com.samsamhajo.deepground.global.config.S3Config;
 import com.samsamhajo.deepground.global.upload.S3Uploader;
+import com.samsamhajo.deepground.support.TestMailConfig;
 import com.samsamhajo.deepground.support.TestRedisConfig;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,7 +12,7 @@ import org.springframework.context.annotation.Import;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Import(TestRedisConfig.class)
+@Import({TestMailConfig.class, TestRedisConfig.class})
 public abstract class IntegrationTestSupport {
 
     @MockBean
