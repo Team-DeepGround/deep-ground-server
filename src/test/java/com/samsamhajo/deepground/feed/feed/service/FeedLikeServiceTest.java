@@ -70,7 +70,7 @@ class FeedLikeServiceTest {
     @DisplayName("피드 좋아요 증가 실패 - 이미 좋아요를 누른 경우")
     void feedLikeIncreaseFailWithAlreadyLiked() {
         // given
-        Member testMember = Member.createLocalMember(TEST_EMAIL, TEST_PASSWORD, TEST_NICKNAME);
+        Member testMember = mock(Member.class);
 
         // given
         when(feedLikeRepository.existsByFeedIdAndMemberId(1L, 1L)).thenReturn(true);
@@ -86,7 +86,7 @@ class FeedLikeServiceTest {
     @DisplayName("피드 좋아요 감소 성공")
     void feedLikeDecreaseSuccess() {
         // given
-        Member testMember = Member.createLocalMember(TEST_EMAIL, TEST_PASSWORD, TEST_NICKNAME);
+        Member testMember = mock(Member.class);
         Feed testFeed = Feed.of(TEST_CONTENT, testMember);
         FeedLike feedLike = FeedLike.of(testFeed, testMember);
 

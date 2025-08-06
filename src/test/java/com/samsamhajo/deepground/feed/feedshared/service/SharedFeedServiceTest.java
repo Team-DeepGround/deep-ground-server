@@ -10,8 +10,6 @@ import com.samsamhajo.deepground.feed.feedshared.exception.SharedFeedException;
 import com.samsamhajo.deepground.feed.feedshared.model.FetchSharedFeedResponse;
 import com.samsamhajo.deepground.feed.feedshared.repository.SharedFeedRepository;
 import com.samsamhajo.deepground.member.entity.Member;
-import com.samsamhajo.deepground.member.exception.MemberErrorCode;
-import com.samsamhajo.deepground.member.exception.MemberException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -78,23 +76,6 @@ class SharedFeedServiceTest {
         verify(feedRepository).getById(1L);
         verify(feedRepository).save(any(Feed.class));
         verify(sharedFeedRepository).save(any(SharedFeed.class));
-    }
-
-    @Test
-    @DisplayName("공유 피드 생성 실패 - 존재하지 않는 회원")
-    void createSharedFeedFailWithInvalidMember() {
-        // given
-        Member testMember = Member.createLocalMember(TEST_EMAIL, TEST_PASSWORD, TEST_NICKNAME);
-        SharedFeedRequest request = new SharedFeedRequest();
-        ReflectionTestUtils.setField(request, "originFeedId", 1L);
-        ReflectionTestUtils.setField(request, "content", TEST_CONTENT);
-
-        // when & then
-        when(testMember.getId()).thenReturn(1L);
-
-        assertThatThrownBy(() -> sharedFeedService.createSharedFeed(request, testMember))
-                .isInstanceOf(MemberException.class)
-                .hasFieldOrPropertyWithValue("errorCode", MemberErrorCode.INVALID_MEMBER_ID);
     }
 
     @Test

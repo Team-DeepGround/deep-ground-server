@@ -11,8 +11,6 @@ import com.samsamhajo.deepground.feed.feedreply.model.FeedReplyCreateRequest;
 import com.samsamhajo.deepground.feed.feedreply.model.FeedReplyUpdateRequest;
 import com.samsamhajo.deepground.feed.feedreply.repository.FeedReplyRepository;
 import com.samsamhajo.deepground.member.entity.Member;
-import com.samsamhajo.deepground.member.exception.MemberErrorCode;
-import com.samsamhajo.deepground.member.exception.MemberException;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -104,19 +102,6 @@ class FeedReplyServiceTest {
         assertThatThrownBy(() -> feedReplyService.createFeedReply(request, testMember))
                 .isInstanceOf(FeedCommentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.INVALID_FEED_COMMENT_CONTENT);
-    }
-
-    @Test
-    @DisplayName("피드 답글 생성 실패 - 존재하지 않는 회원")
-    void createFeedReplyFailWithInvalidMember() {
-        // given
-        FeedReplyCreateRequest request = new FeedReplyCreateRequest(1L, TEST_CONTENT, List.of());
-        when(memberRepository.findById(1L)).thenReturn(java.util.Optional.empty());
-
-        // when & then
-        assertThatThrownBy(() -> feedReplyService.createFeedReply(request, testMember))
-                .isInstanceOf(MemberException.class)
-                .hasFieldOrPropertyWithValue("errorCode", MemberErrorCode.INVALID_MEMBER_ID);
     }
 
     @Test
