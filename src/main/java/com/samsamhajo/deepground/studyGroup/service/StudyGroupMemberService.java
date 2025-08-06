@@ -12,6 +12,7 @@ import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundExceptio
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupInviteTokenRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -71,6 +72,12 @@ public class StudyGroupMemberService {
     // 중복 요청 방지
     if (studyGroupMemberRepository.existsByMemberAndStudyGroup(member, studyGroup)) {
       throw new IllegalStateException("이미 참가 요청을 했거나 참여 중입니다.");
+    }
+
+    // 모집 기간 외 신청 방지
+    LocalDate today = LocalDate.now();
+    if (today.isBefore(studyGroup.getRecruitStartDate()) || today.isAfter(studyGroup.getRecruitEndDate())) {
+      throw new IllegalStateException("스터디 그룹 모집 기간이 아닙니다.");
     }
 
     StudyGroupMember pendingRequest = StudyGroupMember.of(member, studyGroup, false);
