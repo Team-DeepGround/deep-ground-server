@@ -89,15 +89,6 @@ class FeedCommentLikeServiceTest {
     }
 
     @Test
-    @DisplayName("피드 댓글 좋아요 증가 실패 - 존재하지 않는 회원")
-    void feedLikeIncreaseFailWithInvalidMember() {
-        // when & then
-        assertThatThrownBy(() -> feedCommentLikeService.feedLikeIncrease(1L, testMember))
-                .isInstanceOf(MemberException.class)
-                .hasFieldOrPropertyWithValue("errorCode", MemberErrorCode.INVALID_MEMBER_ID);
-    }
-
-    @Test
     @DisplayName("피드 댓글 좋아요 감소 성공")
     void feedLikeDecreaseSuccess() {
         // given

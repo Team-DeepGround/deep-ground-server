@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.auth.service;
 
+import com.samsamhajo.deepground.IntegrationTestSupport;
 import com.samsamhajo.deepground.auth.dto.LoginRequest;
 import com.samsamhajo.deepground.auth.dto.LoginResponse;
 import com.samsamhajo.deepground.auth.repository.RefreshTokenRepository;
@@ -9,14 +10,12 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 @Transactional
-public class LogoutTest {
+public class LogoutTest extends IntegrationTestSupport {
     @Autowired
     private AuthService authService;
 

@@ -1,7 +1,6 @@
 package com.samsamhajo.deepground.Friend.FriendService;
 
-
-
+import com.samsamhajo.deepground.IntegrationTestSupport;
 import com.samsamhajo.deepground.friend.Dto.FriendDto;
 import com.samsamhajo.deepground.friend.Exception.FriendErrorCode;
 import com.samsamhajo.deepground.friend.Exception.FriendException;
@@ -14,17 +13,13 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
-@SpringBootTest
 @Transactional
-public class FriendsTest {
+public class FriendsTest extends IntegrationTestSupport {
 
     @Autowired
     private FriendService friendService;

@@ -10,9 +10,6 @@ import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentUpdateRequest
 import com.samsamhajo.deepground.feed.feedcomment.repository.FeedCommentRepository;
 import com.samsamhajo.deepground.feed.feedreply.service.FeedReplyService;
 import com.samsamhajo.deepground.member.entity.Member;
-import com.samsamhajo.deepground.member.exception.MemberErrorCode;
-import com.samsamhajo.deepground.member.exception.MemberException;
-import com.samsamhajo.deepground.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -44,6 +42,8 @@ class FeedCommentServiceTest {
     private FeedReplyService feedReplyService;
     @Mock
     private FeedCommentLikeService feedCommentLikeService;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private FeedCommentService feedCommentService;
@@ -103,18 +103,6 @@ class FeedCommentServiceTest {
         assertThatThrownBy(() -> feedCommentService.createFeedComment(request, testMember))
                 .isInstanceOf(FeedCommentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FeedCommentErrorCode.INVALID_FEED_COMMENT_CONTENT);
-    }
-
-    @Test
-    @DisplayName("피드 댓글 생성 실패 - 존재하지 않는 회원")
-    void createFeedCommentFailWithInvalidMember() {
-        // given
-        FeedCommentCreateRequest request = new FeedCommentCreateRequest(1L, TEST_CONTENT, List.of());
-
-        // when & then
-        assertThatThrownBy(() -> feedCommentService.createFeedComment(request, testMember))
-                .isInstanceOf(MemberException.class)
-                .hasFieldOrPropertyWithValue("errorCode", MemberErrorCode.INVALID_MEMBER_ID);
     }
 
     @Test

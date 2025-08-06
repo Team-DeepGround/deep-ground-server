@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.email.service;
 
+import com.samsamhajo.deepground.IntegrationTestSupport;
 import com.samsamhajo.deepground.email.dto.EmailRequest;
 import com.samsamhajo.deepground.email.dto.EmailResponse;
 import com.samsamhajo.deepground.email.dto.EmailVerifyRequest;
@@ -9,7 +10,6 @@ import com.samsamhajo.deepground.email.repository.EmailVerificationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -17,9 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
 @Transactional
-public class EmailServiceTest {
+public class EmailServiceTest extends IntegrationTestSupport {
 
     @Autowired
     private EmailService emailService;
