@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.auth.service;
 
+import com.samsamhajo.deepground.IntegrationTestSupport;
 import com.samsamhajo.deepground.auth.dto.PasswordResetEmailResponse;
 import com.samsamhajo.deepground.auth.dto.PasswordResetRequest;
 import com.samsamhajo.deepground.auth.dto.PasswordResetResponse;
@@ -12,15 +13,13 @@ import com.samsamhajo.deepground.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 @Transactional
-public class PasswordResetTest {
+public class PasswordResetTest extends IntegrationTestSupport {
 
     @Autowired
     private AuthService authService;

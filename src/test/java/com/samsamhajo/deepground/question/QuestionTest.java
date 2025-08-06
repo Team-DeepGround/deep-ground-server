@@ -1,5 +1,6 @@
-package com.samsamhajo.deepground;
+package com.samsamhajo.deepground.question;
 
+import com.samsamhajo.deepground.IntegrationTestSupport;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateRequestDto;
@@ -17,7 +18,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,11 +28,9 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-
-@SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class QuestionTest {
+public class QuestionTest extends IntegrationTestSupport {
 
     @Autowired
     private QuestionRepository questionRepository;

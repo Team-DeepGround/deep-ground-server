@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.auth.service;
 
+import com.samsamhajo.deepground.IntegrationTestSupport;
 import com.samsamhajo.deepground.auth.dto.LoginRequest;
 import com.samsamhajo.deepground.auth.dto.LoginResponse;
 import com.samsamhajo.deepground.auth.dto.TokenRefreshRequest;
@@ -13,16 +14,14 @@ import com.samsamhajo.deepground.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
 @Transactional
-public class RefreshAccessTokenTest {
+public class RefreshAccessTokenTest extends IntegrationTestSupport {
 
     @Autowired
     private AuthService authService;
