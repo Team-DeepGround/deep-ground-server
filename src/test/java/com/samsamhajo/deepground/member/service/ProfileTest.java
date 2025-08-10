@@ -53,7 +53,7 @@ public class ProfileTest extends IntegrationTestSupport {
 
         TechStack java = techStackRepository.save(TechStack.of("Java", "백엔드"));
         TechStack jS = techStackRepository.save(TechStack.of("JavaScript", "프론트엔드"));
-        TechStack spring = techStackRepository.save(TechStack.of("Spring", "프론트엔드"));
+        TechStack spring = techStackRepository.save(TechStack.of("Spring", "백엔드"));
 
         profile = MemberProfile.create(
                 "https://example.com/profile.jpg", // profileImage
