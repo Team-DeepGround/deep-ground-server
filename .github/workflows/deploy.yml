@@ -64,13 +64,13 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:${{ github.ref_name }}
             ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
           labels: version=${{ github.ref_name }}
-        # EC2에 배포
-      - name: Deploy to EC2
+        # OCI에 배포
+      - name: Deploy to OCI
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{ secrets.EC2_HOST }}
+          host: ${{ secrets.OCI_HOST }}
           username: ubuntu
-          key: ${{ secrets.EC2_KEY }}
+          key: ${{ secrets.OCI_KEY }}
           script: |
             cd /home/ubuntu/deepground
 
