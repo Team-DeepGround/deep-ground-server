@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -70,6 +71,8 @@ public class AnswerService {
                 QNANotificationData.answer(answer)
         ));
 
+        LocalDateTime createdAt = answer.getCreatedAt();
+
         return AnswerCreateResponseDto.of(
                 saved.getAnswerContent(),
                 saved.getQuestion().getId(),
@@ -77,7 +80,9 @@ public class AnswerService {
                 saved.getId()
                 , comments,
                 saved.getAnswerLikeCount(),
-                mediaUrl
+                mediaUrl,
+                createdAt,
+                answer.getMember().getNickname()
         );
     }
 
@@ -171,6 +176,8 @@ public class AnswerService {
                                     comment.getMember().getNickname()
                             )).collect(Collectors.toList());
 
+                    LocalDateTime createdAt = answer.getCreatedAt();
+
                     return new AnswerCreateResponseDto(
                             answer.getAnswerContent(),
                             answer.getQuestion().getId(),
@@ -178,7 +185,9 @@ public class AnswerService {
                             answer.getId(),
                             commentDTOs,
                             answer.getAnswerLikeCount(),
-                            mediaUrl
+                            mediaUrl,
+                            createdAt,
+                            answer.getMember().getNickname()
                     );
                         }).collect(Collectors.toList());
     }
@@ -204,36 +213,36 @@ public class AnswerService {
 
 
 
-    @Transactional(readOnly = true)
-    public List<AnswerCreateResponseDto> getAnswersByQuestionId1(Long questionId) {
-        // 특정 질문에 대한 답변들 조회
-        List<Answer> answers = answerRepository.findAllByQuestionId(questionId);
-
-        return answers.stream()
-                .map(answer -> {
-                    // 각 답변에 대한 미디어 URL 조회 (중요!)
-                    List<String> mediaUrl = answerMediaRepository.findAllByAnswerId(answer.getId()).stream()
-                            .map(AnswerMedia::getMediaUrl)
-                            .collect(Collectors.toList());
-
-                    List<CommentDTO> commentDTOs = answer.getComments().stream()
-                            .map(comment -> CommentDTO.of(
-                                    comment.getId(),
-                                    comment.getCommentContent(),
-                                    comment.getMember().getId(),
-                                    comment.getMember().getNickname()
-                            )).collect(Collectors.toList());
-
-                    return new AnswerCreateResponseDto(
-                            answer.getAnswerContent(),
-                            answer.getQuestion().getId(),
-                            answer.getMember().getId(),
-                            answer.getId(),
-                            commentDTOs,
-                            answer.getAnswerLikeCount(),
-                            mediaUrl
-                    );
-                }).collect(Collectors.toList());
-    }
+//    @Transactional(readOnly = true)
+//    public List<AnswerCreateResponseDto> getAnswersByQuestionId1(Long questionId) {
+//        // 특정 질문에 대한 답변들 조회
+//        List<Answer> answers = answerRepository.findAllByQuestionId(questionId);
+//
+//        return answers.stream()
+//                .map(answer -> {
+//                    // 각 답변에 대한 미디어 URL 조회 (중요!)
+//                    List<String> mediaUrl = answerMediaRepository.findAllByAnswerId(answer.getId()).stream()
+//                            .map(AnswerMedia::getMediaUrl)
+//                            .collect(Collectors.toList());
+//
+//                    List<CommentDTO> commentDTOs = answer.getComments().stream()
+//                            .map(comment -> CommentDTO.of(
+//                                    comment.getId(),
+//                                    comment.getCommentContent(),
+//                                    comment.getMember().getId(),
+//                                    comment.getMember().getNickname()
+//                            )).collect(Collectors.toList());
+//
+//                    return new AnswerCreateResponseDto(
+//                            answer.getAnswerContent(),
+//                            answer.getQuestion().getId(),
+//                            answer.getMember().getId(),
+//                            answer.getId(),
+//                            commentDTOs,
+//                            answer.getAnswerLikeCount(),
+//                            mediaUrl
+//                    );
+//                }).collect(Collectors.toList());
+//    }
 
 }

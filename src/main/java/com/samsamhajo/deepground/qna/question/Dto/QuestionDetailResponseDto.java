@@ -5,7 +5,9 @@ import com.samsamhajo.deepground.qna.comment.dto.CommentDTO;
 import com.samsamhajo.deepground.qna.question.entity.QuestionStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.joda.time.DateTime;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -21,6 +23,7 @@ public class QuestionDetailResponseDto {
     private int answerCount;
     private QuestionStatus questionStatus;
     private List<String> mediaUrl;
+    private LocalDateTime createdAt;
 
     private List<AnswerCreateResponseDto> answers;
 
@@ -34,6 +37,7 @@ public class QuestionDetailResponseDto {
             int answerCount,
             QuestionStatus questionStatus,
             List<String> mediaUrl,
+            LocalDateTime createdAt,
             List<AnswerCreateResponseDto> answers// 추가
     ) {
         this.questionId = questionId;
@@ -45,6 +49,7 @@ public class QuestionDetailResponseDto {
         this.answerCount = answerCount;
         this.questionStatus = questionStatus;
         this.mediaUrl = mediaUrl;
+        this.createdAt = createdAt;
         this.answers = answers;// 추가
     }
 
@@ -58,6 +63,7 @@ public class QuestionDetailResponseDto {
             int answerCount,
             QuestionStatus questionStatus,
             List<String> mediaUrl,
+            LocalDateTime createdAt,
             List<AnswerCreateResponseDto> answers
     ) {
         return new QuestionDetailResponseDto(
@@ -70,6 +76,7 @@ public class QuestionDetailResponseDto {
                 answerCount,
                 questionStatus,
                 mediaUrl,
+                createdAt,
                 answers
         );
     }

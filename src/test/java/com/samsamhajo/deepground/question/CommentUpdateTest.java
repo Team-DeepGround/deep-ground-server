@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.question;
 
 import com.samsamhajo.deepground.IntegrationTestSupport;
+import com.samsamhajo.deepground.global.upload.S3Uploader;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateRequestDto;
@@ -33,6 +34,9 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 
 @Transactional
 public class CommentUpdateTest extends IntegrationTestSupport {
@@ -56,6 +60,9 @@ public class CommentUpdateTest extends IntegrationTestSupport {
     private Long memberId2;
     private Long commentId2;
 
+    @Autowired
+    private S3Uploader s3Uploader;
+
     @BeforeEach
     public void 회원_저장() {
         Member member = Member.createLocalMember("2@gmail.com", "asd", "dotae");
@@ -65,6 +72,11 @@ public class CommentUpdateTest extends IntegrationTestSupport {
         Member member2 = Member.createLocalMember("2@gmail.com", "asd", "dotae");
         memberRepository.save(member2);
         memberId2 = member2.getId();
+
+        given(s3Uploader.upload(any(MultipartFile.class), anyString()))
+                .willAnswer(invocation ->
+                        "http://localhost/test/" +
+                                invocation.getArgument(0, MultipartFile.class).getOriginalFilename());
     }
 
     @Test

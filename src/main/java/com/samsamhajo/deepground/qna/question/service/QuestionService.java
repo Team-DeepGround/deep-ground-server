@@ -20,12 +20,14 @@ import com.samsamhajo.deepground.qna.question.repository.QuestionTagRepository;
 import com.samsamhajo.deepground.techStack.entity.TechStack;
 import com.samsamhajo.deepground.techStack.repository.TechStackRepository;
 import lombok.RequiredArgsConstructor;
+import org.joda.time.DateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -211,6 +213,8 @@ public class QuestionService{
 
         List<AnswerCreateResponseDto> answers = answerService.getAnswersByQuestionId(questionId);
 
+        LocalDateTime createdAt = questionRepository.findById(questionId).get().getCreatedAt();
+
         return QuestionDetailResponseDto.of(
                 question.getId(),
                 question.getTitle(),
@@ -221,6 +225,7 @@ public class QuestionService{
                 answerCount,
                 question.getQuestionStatus(),
                 mediaUrl,
+                createdAt,
                 answers
         );
     }
