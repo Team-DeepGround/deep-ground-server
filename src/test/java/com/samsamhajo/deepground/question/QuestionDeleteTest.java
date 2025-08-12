@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.question;
 
 import com.samsamhajo.deepground.IntegrationTestSupport;
+import com.samsamhajo.deepground.global.upload.S3Uploader;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateRequestDto;
@@ -27,6 +28,9 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 
 @Transactional
 @ExtendWith(SpringExtension.class)
@@ -47,6 +51,9 @@ public class QuestionDeleteTest extends IntegrationTestSupport {
     private Long memberId;
     private Long memberId2;
 
+    @Autowired
+    private S3Uploader s3Uploader;
+
     @BeforeEach
     void 테스트용_멤버_저장() {
         // 테스트용 멤버 저장
@@ -55,6 +62,10 @@ public class QuestionDeleteTest extends IntegrationTestSupport {
         memberRepository.save(member);
         memberId = member.getId();
         memberId2 = member2.getId();
+        given(s3Uploader.upload(any(MultipartFile.class), anyString()))
+                .willAnswer(invocation ->
+                        "http://localhost/test/" +
+                                invocation.getArgument(0, MultipartFile.class).getOriginalFilename());
     }
 
     @Test

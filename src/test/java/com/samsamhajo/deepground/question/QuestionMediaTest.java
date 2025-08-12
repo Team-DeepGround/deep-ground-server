@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.question;
 
 import com.samsamhajo.deepground.IntegrationTestSupport;
+import com.samsamhajo.deepground.global.upload.S3Uploader;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateRequestDto;
@@ -13,6 +14,7 @@ import com.samsamhajo.deepground.qna.question.service.QuestionMediaService;
 import com.samsamhajo.deepground.qna.question.service.QuestionService;
 import com.samsamhajo.deepground.techStack.entity.TechStack;
 import com.samsamhajo.deepground.techStack.repository.TechStackRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 
 @Transactional
 public class QuestionMediaTest extends IntegrationTestSupport {
@@ -45,6 +50,16 @@ public class QuestionMediaTest extends IntegrationTestSupport {
     private TechStackRepository techStackRepository;
     @Autowired
     private QuestionRepository questionRepository;
+    @Autowired
+    private S3Uploader s3Uploader;
+
+    @BeforeEach
+    void setUp() {
+        given(s3Uploader.upload(any(MultipartFile.class), anyString()))
+                .willAnswer(invocation ->
+                        "http://localhost/test/" +
+                                invocation.getArgument(0, MultipartFile.class).getOriginalFilename());
+    }
 
     @Test
     @DisplayName("질문_미디어_생성_후 삭제_확인_테스트")

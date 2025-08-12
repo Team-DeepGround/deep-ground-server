@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.question;
 
 import com.samsamhajo.deepground.IntegrationTestSupport;
+import com.samsamhajo.deepground.global.upload.S3Uploader;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateRequestDto;
@@ -16,6 +17,8 @@ import com.samsamhajo.deepground.techStack.repository.TechStackRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
@@ -27,8 +30,10 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 
-@AutoConfigureMockMvc
 @Transactional
 public class QuestionTest extends IntegrationTestSupport {
 
@@ -49,12 +54,19 @@ public class QuestionTest extends IntegrationTestSupport {
 
     private Long memberId;
 
+    @Autowired
+    private S3Uploader s3Uploader;
+
     @BeforeEach
     void 테스트용_멤버_저장() {
         // 테스트용 멤버 저장
         Member member = Member.createLocalMember("test@naver.com", "password123", "tester");
         memberRepository.save(member);
         memberId = member.getId();
+        given(s3Uploader.upload(any(MultipartFile.class), anyString()))
+                .willAnswer(invocation ->
+                        "http://localhost/test/" +
+                                invocation.getArgument(0, MultipartFile.class).getOriginalFilename());
     }
 
     @Test

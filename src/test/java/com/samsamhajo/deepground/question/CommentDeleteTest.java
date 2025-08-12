@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.question;
 
 import com.samsamhajo.deepground.IntegrationTestSupport;
+import com.samsamhajo.deepground.global.upload.S3Uploader;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateRequestDto;
@@ -31,6 +32,9 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 
 @Transactional
 public class CommentDeleteTest extends IntegrationTestSupport {
@@ -48,6 +52,9 @@ public class CommentDeleteTest extends IntegrationTestSupport {
     @Autowired
     private TechStackRepository techStackRepository;
 
+    @Autowired
+    private S3Uploader s3Uploader;
+
     private Long memberId;
     private Long memberId2;
 
@@ -60,6 +67,11 @@ public class CommentDeleteTest extends IntegrationTestSupport {
         Member member2 = Member.createLocalMember("2@gmail.com", "asd", "dotae");
         memberRepository.save(member2);
         memberId2 = member2.getId();
+
+        given(s3Uploader.upload(any(MultipartFile.class), anyString()))
+                .willAnswer(invocation ->
+                        "http://localhost/test/" +
+                                invocation.getArgument(0, MultipartFile.class).getOriginalFilename());
     }
 
     @Test
