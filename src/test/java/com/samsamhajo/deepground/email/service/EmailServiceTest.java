@@ -7,8 +7,12 @@ import com.samsamhajo.deepground.email.dto.EmailVerifyRequest;
 import com.samsamhajo.deepground.email.exception.EmailErrorCode;
 import com.samsamhajo.deepground.email.exception.EmailException;
 import com.samsamhajo.deepground.email.repository.EmailVerificationRepository;
+import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.member.entity.Role;
+import com.samsamhajo.deepground.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Transactional
 public class EmailServiceTest extends IntegrationTestSupport {
+
+    @Autowired
+    MemberRepository memberRepository;
 
     @Autowired
     private EmailService emailService;
@@ -50,14 +57,46 @@ public class EmailServiceTest extends IntegrationTestSupport {
 
     @Test
     void 이메일_인증코드_검증_성공() {
-        // given
+        // given: 테스트 회원 저장 (ROLE_GUEST, 미인증)
+        Member member = Member.createLocalMember(TEST_EMAIL, "pw", "tester");
+        memberRepository.saveAndFlush(member); // ← flush로 즉시 반영
+
+        // 인증코드 저장
         emailVerificationRepository.save(TEST_EMAIL, TEST_CODE, 300L);
         EmailVerifyRequest request = new EmailVerifyRequest(TEST_EMAIL, TEST_CODE);
 
-        // when & then
-        assertDoesNotThrow(() -> emailService.verifyEmail(request));
+        // when
+        boolean result = emailService.verifyEmail(request);
+
+        // then
+        assertThat(result).isTrue();
         assertThat(emailVerificationRepository.exists(TEST_EMAIL)).isFalse();
+
+        // 멤버 상태도 확인(선택)
+        Member reloaded = memberRepository.findByEmail(TEST_EMAIL).orElseThrow();
+        assertThat(reloaded.isVerified()).isTrue();
+        assertThat(reloaded.getRole()).isEqualTo(Role.ROLE_USER);
     }
+
+    @Test
+    void 이메일_인증상태_확인() {
+        // given: 회원 저장
+        Member member = Member.createLocalMember(TEST_EMAIL, "pw", "tester");
+        memberRepository.saveAndFlush(member);
+
+        // 코드 저장 → 아직 미인증 상태
+        emailVerificationRepository.save(TEST_EMAIL, TEST_CODE, 300L);
+        assertThat(emailService.isVerified(TEST_EMAIL)).isFalse();
+
+        // when: 인증 완료
+        EmailVerifyRequest request = new EmailVerifyRequest(TEST_EMAIL, TEST_CODE);
+        emailService.verifyEmail(request);
+
+        // then: 코드 삭제되어 인증됨
+        assertThat(emailService.isVerified(TEST_EMAIL)).isTrue();
+    }
+
+
 
     @Test
     void 잘못된_인증코드로_검증_실패() {
@@ -85,21 +124,6 @@ public class EmailServiceTest extends IntegrationTestSupport {
 
         // then
         assertEquals(EmailErrorCode.VERIFICATION_CODE_EXPIRED, exception.getErrorCode());
-    }
-
-    @Test
-    void 이메일_인증상태_확인() {
-        // given
-        emailVerificationRepository.save(TEST_EMAIL, TEST_CODE, 300L);
-
-        // when & then
-        assertThat(emailService.isVerified(TEST_EMAIL)).isFalse();
-
-        // 인증 완료 후
-        EmailVerifyRequest request = new EmailVerifyRequest(TEST_EMAIL, TEST_CODE);
-        emailService.verifyEmail(request);
-
-        assertThat(emailService.isVerified(TEST_EMAIL)).isTrue();
     }
 
     @Test
