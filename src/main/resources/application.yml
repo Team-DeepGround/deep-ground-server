@@ -79,7 +79,7 @@ spring:
         api-key: ${spring.ai.openai.api-key}  # 환경변수 혹은 yml에 직접 입력
     base-url: https://api.openai.com/v1
     chat:
-      model: gpt-3.5-turbo
+      model: gpt-4o-mini
     embedding:
       model: text-embedding-3-small
 
