@@ -64,7 +64,7 @@ public class Report extends BaseEntity {
     }
 
     private Report(ReportTargetType targetType, Long targetId, ReportReason reason, String content,
-                   boolean isAutoBanned, Member reporter, Member reportedMember, AIReviewResult aiReviewResult) {
+                   boolean isAutoBanned, Member reporter, Member reportedMember, AIReviewResult aiReviewResult, boolean isProcessed, String actionTaken) {
         this.targetType = targetType;
         this.targetId = targetId;
         this.reason = reason;
@@ -73,11 +73,13 @@ public class Report extends BaseEntity {
         this.reporter = reporter;
         this.reportedMember = reportedMember;
         this.aiReviewResult = aiReviewResult;
+        this.isProcessed = isProcessed;
+        this.actionTaken = actionTaken;
     }
 
     public static Report of(ReportTargetType targetType, Long targetId, ReportReason reason, String content,
-                            boolean isAutoBanned, Member reporter, Member reportedMember, AIReviewResult aiResult) {
-        return new Report(targetType, targetId, reason, content, isAutoBanned, reporter, reportedMember, aiResult);
+                            boolean isAutoBanned, Member reporter, Member reportedMember, AIReviewResult aiResult, boolean isProcessed,String actionTaken) {
+        return new Report(targetType, targetId, reason, content, isAutoBanned, reporter, reportedMember, aiResult, isProcessed, actionTaken);
     }
 }
 

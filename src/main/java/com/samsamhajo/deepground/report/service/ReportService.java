@@ -4,6 +4,7 @@ import com.samsamhajo.deepground.feed.feed.entity.Feed;
 import com.samsamhajo.deepground.feed.feed.exception.FeedErrorCode;
 import com.samsamhajo.deepground.feed.feed.exception.FeedException;
 import com.samsamhajo.deepground.feed.feed.repository.FeedRepository;
+import com.samsamhajo.deepground.feed.feed.service.FeedService;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
 import com.samsamhajo.deepground.member.exception.MemberException;
@@ -31,6 +32,7 @@ public class ReportService {
     private final FeedRepository feedRepository;
     private final StudyGroupMemberRepository studyGroupMemberRepository;
     private final ReportPostAIClient aiClient;
+    private final FeedService feedService;
 
     public ReportResponse createReport(ReportRequest request, Long reporterId) {
         Member reporter = memberRepository.findById(reporterId)
@@ -49,6 +51,8 @@ public class ReportService {
         Member reportedMember = null;
         boolean isAutoBanned = false;
         AIReviewResult result = AIReviewResult.PENDING;
+        boolean isProcessed = false;
+        String actionTaken = "관리자에게 위임";
 
         if (targetType == ReportTargetType.FEED) {
             Feed feed = feedRepository.findById(targetId)
@@ -61,7 +65,13 @@ public class ReportService {
             result = aiResult.getResult();
 
             if (isAutoBanned) {
-                feedRepository.delete(feed); // 자동 제재 적용
+                feedService.deleteFeed(feed.getId());
+                actionTaken = "피드 삭제";
+                isProcessed = true;
+            }
+            if (aiResult.getResult() == AIReviewResult.REJECTED) {
+                actionTaken = "피드 유지";
+                isProcessed = true;
             }
         }
 
@@ -84,7 +94,9 @@ public class ReportService {
                 isAutoBanned,
                 reporter,
                 reportedMember,
-                result
+                result,
+                isProcessed,
+                actionTaken
         );
 
         reportRepository.save(report);
