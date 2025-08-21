@@ -71,7 +71,7 @@ public class RefreshAccessTokenTest extends IntegrationTestSupport {
     @Test
     void 액세스토큰_재발급_성공() {
         // given
-        String refreshToken = jwtProvider.createRefreshToken(member.getId());
+        String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getRole().name());
         refreshTokenRepository.save(member.getId(), refreshToken, 3600L);
         TokenRefreshRequest request = new TokenRefreshRequest(refreshToken);
 
@@ -109,7 +109,7 @@ public class RefreshAccessTokenTest extends IntegrationTestSupport {
     @Test
     void 리프레시토큰_유효기간_충분_시_액세스토큰만_재발급() {
         // given
-        String refreshToken = jwtProvider.createRefreshToken(member.getId());
+        String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getRole().name());
         refreshTokenRepository.save(member.getId(), refreshToken, 604800L); // 7일
         TokenRefreshRequest request = new TokenRefreshRequest(refreshToken);
 
@@ -128,7 +128,7 @@ public class RefreshAccessTokenTest extends IntegrationTestSupport {
     @Test
     void 저장되지_않은_리프레시토큰으로_재발급_실패() {
         // given
-        String refreshToken = jwtProvider.createRefreshToken(member.getId());
+        String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getRole().name());
         TokenRefreshRequest request = new TokenRefreshRequest(refreshToken);
 
         // when & then
@@ -151,7 +151,7 @@ public class RefreshAccessTokenTest extends IntegrationTestSupport {
     @Test
     void 다른_리프레시토큰_값으로_재발급_실패() {
         // given
-        String savedRefreshToken = jwtProvider.createRefreshToken(member.getId());
+        String savedRefreshToken = jwtProvider.createRefreshToken(member.getId(), member.getRole().name());
         refreshTokenRepository.save(member.getId(), savedRefreshToken, 3600L);
 
         Member member2 = Member.createLocalMember(
@@ -163,7 +163,7 @@ public class RefreshAccessTokenTest extends IntegrationTestSupport {
         member2.verify();
         memberRepository.save(member2);
 
-        String differentRefreshToken = jwtProvider.createRefreshToken(member2.getId());
+        String differentRefreshToken = jwtProvider.createRefreshToken(member2.getId(), member2.getRole().name());
         TokenRefreshRequest request = new TokenRefreshRequest(differentRefreshToken);
 
         // when & then
