@@ -33,51 +33,56 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-             ${{ runner.os }}-gradle-
-        # Gradle로 프로젝트 빌드
+            ${{ runner.os }}-gradle-
+        # 4. 테스트 및 빌드
       - name: Build with Gradle
-        run: ./gradlew build
-      - name: application.yml 생성
-        run: |
-            mkdir -p ./src/main/resources && cd $_
-            touch ./application.yml
-            echo "${{ secrets.STAGING_YML }}" > ./application.yml
-            cat ./application.yml
-            working-directory: ${{ env.working-directory }}
+        run: ./gradlew clean build
+
         # Docker 빌드를 위한 설정
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
+
         # Docker Hub 로그인
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-        #  Docker 이미지 빌드 + 푸시
-      - name: Build and Push Docker Image
-        uses: docker:build-push-action@v2
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:${{ github.ref_name }}
-            ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
-          labels: version=${{ github.ref_name }}
-        # EC2에 배포
-      - name: Deploy to EC2
+
+      - name: Docker 이미지 생성 (ARM64)
+        run: |
+          docker buildx create --use
+          docker buildx build --platform linux/arm64 -t ${{ secrets.DOCKER_REPOSITORY }} --load .
+
+      - name: Docker 이미지에 Tag 붙이기
+        run: docker tag ${{ secrets.DOCKER_REPOSITORY }} ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
+
+      - name: Docker Hub에 Docker 이미지 Push하기
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
+
+        # OCI에 배포
+      - name: Deploy to OCI
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{ secrets.EC2_HOST }}
+          host: ${{ secrets.OCI_HOST }}
           username: ubuntu
-          key: ${{ secrets.EC2_KEY }}
+          key: ${{ secrets.OCI_KEY }}
           script: |
-            cd /home/ubuntu/deepground
+            cd /home/ubuntu/studen
 
             echo "${{ secrets.ENV }}" | base64 -d > .env
             chmod 600 .env # .env 
+            
+            docker compose down || true
+            
+            docker compose pull
+            docker compose up -d
 
-            chmod +x deploy.sh
-            ./deploy.sh
+             sleep 20
+            echo "=== Docker Compose 서비스 상태 ==="
+            docker ps
+            
+            echo "=== 컨테이너 로그 확인 ==="
+            docker compose logs --tail 30
 
             rm .env

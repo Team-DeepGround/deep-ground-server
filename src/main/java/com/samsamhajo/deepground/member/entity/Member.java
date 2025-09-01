@@ -3,7 +3,6 @@ package com.samsamhajo.deepground.member.entity;
 import com.samsamhajo.deepground.global.BaseEntity;
 import com.samsamhajo.deepground.interest.entity.MemberInterest;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
-import com.samsamhajo.deepground.techStack.entity.MemberTechStack;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

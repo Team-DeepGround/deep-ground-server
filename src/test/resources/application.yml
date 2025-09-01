@@ -60,12 +60,12 @@ spring:
       host: ${MONGO_HOST}
       port: ${MONGO_PORT}
       database: ${MONGO_DATABASE}
-#      username: ${MONGO_USERNAME}
-#      password: ${MONGO_PASSWORD}
+      username: ${MONGO_USERNAME}
+      password: ${MONGO_PASSWORD}
       auto-index-creation: true
   mail:
-    host: smtp.gmail.com
-    port: 587
+    host: smtp.daum.net
+    port: 465
     username: ${EMAIL_USERNAME}
     password: ${EMAIL_PASSWORD}
     properties:
