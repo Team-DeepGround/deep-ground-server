@@ -60,6 +60,7 @@ jobs:
       - name: Docker Hub에 Docker 이미지 Push하기
         run: docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
 
+
         # OCI에 배포
       - name: Deploy to OCI
         uses: appleboy/ssh-action@v0.1.10

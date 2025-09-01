@@ -4,6 +4,7 @@ import com.samsamhajo.deepground.qna.comment.dto.CommentDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -16,9 +17,11 @@ public class AnswerCreateResponseDto {
     private List<CommentDTO> comments;
     private int likeCount;
     private List<String> mediaUrls;
+    private LocalDateTime createdAt;
+    private String nickname;
 
 
-    public AnswerCreateResponseDto(String answerContent, Long questionId, Long memberId, Long answerId, List<CommentDTO> comments, int likeCount, List<String> mediaUrls) {
+    public AnswerCreateResponseDto(String answerContent, Long questionId, Long memberId, Long answerId, List<CommentDTO> comments, int likeCount, List<String> mediaUrls, LocalDateTime createdAt, String nickname) {
         this.answerContent = answerContent;
         this.questionId = questionId;
         this.memberId = memberId;
@@ -26,10 +29,12 @@ public class AnswerCreateResponseDto {
         this.comments = comments;
         this.likeCount = likeCount;
         this.mediaUrls = mediaUrls;
+        this.createdAt = createdAt;
+        this.nickname = nickname;
     }
 
-    public static AnswerCreateResponseDto of(String answerContent, Long questionId, Long memberId, Long answerId, List<CommentDTO> comments, int likeCount, List<String> mediaUrls) {
-        return new AnswerCreateResponseDto(answerContent, questionId, memberId, answerId, comments, likeCount, mediaUrls);
+    public static AnswerCreateResponseDto of(String answerContent, Long questionId, Long memberId, Long answerId, List<CommentDTO> comments, int likeCount, List<String> mediaUrls, LocalDateTime createdAt, String nickname) {
+        return new AnswerCreateResponseDto(answerContent, questionId, memberId, answerId, comments, likeCount, mediaUrls, createdAt, nickname);
     }
 
 }
