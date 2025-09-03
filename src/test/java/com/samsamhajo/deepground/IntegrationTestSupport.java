@@ -1,5 +1,7 @@
 package com.samsamhajo.deepground;
 
+import com.samsamhajo.deepground.auth.jwt.JwtProvider;
+import com.samsamhajo.deepground.auth.oauth.OAuth2AuthenticationSuccessHandler;
 import com.samsamhajo.deepground.global.config.MongoConfig;
 import com.samsamhajo.deepground.global.config.S3Config;
 import com.samsamhajo.deepground.global.upload.S3Uploader;
@@ -27,4 +29,10 @@ public abstract class IntegrationTestSupport {
     
     @MockBean
     protected MongoConfig mongoConfig;
+
+    @MockBean
+    protected JwtProvider jwtProvider;
+
+    @MockBean
+    protected OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 }
