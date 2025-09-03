@@ -39,6 +39,9 @@ jobs:
         run: ./gradlew clean build --info
         env:
           SPRING_PROFILES_ACTIVE: test
+          JWT_SECRET: test-jwt-secret-key-for-testing-minimum-256-bits-required
+          JWT_REFRESH_TOKEN_VALIDITY_IN_SECONDS: 604800
+          JWT_ACCESS_TOKEN_VALIDITY_IN_SECONDS: 2222
 
         # Docker 빌드를 위한 설정
       - name: Set up Docker Buildx
