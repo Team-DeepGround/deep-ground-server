@@ -36,7 +36,9 @@ jobs:
             ${{ runner.os }}-gradle-
         # 4. 테스트 및 빌드
       - name: Build with Gradle
-        run: ./gradlew clean build
+        run: ./gradlew clean build --info --stacktrace
+        env:
+          SPRING_PROFILES_ACTIVE: test
 
         # Docker 빌드를 위한 설정
       - name: Set up Docker Buildx
