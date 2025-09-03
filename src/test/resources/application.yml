@@ -69,7 +69,7 @@ spring:
             enable: true
   ai:
     openai:
-      api-key: ${spring.ai.openai.api-key}  # 환경변수 혹은 yml에 직접 입력
+      api-key: ${OPENAI_API_KEY}  # 환경변수 혹은 yml에 직접 입력
   base-url: https://api.openai.com/v1
   chat:
     model: gpt-4o-mini
