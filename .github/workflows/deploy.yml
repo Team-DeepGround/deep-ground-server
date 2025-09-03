@@ -36,7 +36,7 @@ jobs:
             ${{ runner.os }}-gradle-
         # 4. 테스트 및 빌드
       - name: Build with Gradle
-        run: ./gradlew clean build --info --stacktrace
+        run: ./gradlew clean build --info
         env:
           SPRING_PROFILES_ACTIVE: test
 
