@@ -24,11 +24,6 @@ spring:
       max-request-size: 20MB
   config:
     import: optional:file:./.env[.properties]
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
     hikari:
       maximum-pool-size: 50
       minimum-idle: 10
@@ -52,15 +47,11 @@ spring:
         use_sql_comments: true
     open-in-view: false
     show-sql: false
-  data:
-    redis:
-      host: localhost
-      port: 63790
   mail:
     host: smtp.daum.net
     port: 465
-    username: tset1
-    password: test1
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -69,7 +60,7 @@ spring:
             enable: true
   ai:
     openai:
-      api-key: ${OPENAI_API_KEY}  # 환경변수 혹은 yml에 직접 입력
+      api-key: ${spring.ai.openai.api-key}  # 환경변수 혹은 yml에 직접 입력
   base-url: https://api.openai.com/v1
   chat:
     model: gpt-4o-mini
