@@ -34,9 +34,16 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
+      - name: Create .env for tests
+        run: |
+          echo "${{ secrets.ENV }}" | base64 -d > .env
+          chmod 600 .env
+
         # 4. 테스트 및 빌드
       - name: Build with Gradle
         run: ./gradlew clean build
+
 
         # Docker 빌드를 위한 설정
       - name: Set up Docker Buildx
