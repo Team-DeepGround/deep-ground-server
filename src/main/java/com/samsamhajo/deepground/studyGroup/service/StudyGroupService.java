@@ -145,7 +145,7 @@ public class StudyGroupService {
         request.getStudyEndDate(),
         request.getRecruitStartDate(),
         request.getRecruitEndDate(),
-        request.getGroupMemberCount(),
+        request.getMaxMembers(),
         creator,
         request.getIsOffline(),
         request.getStudyLocation()
@@ -208,7 +208,7 @@ public class StudyGroupService {
       throw new IllegalArgumentException("스터디 시작일은 종료일보다 이전이어야 합니다.");
     }
 
-    if (request.getGroupMemberCount() <= 0) {
+    if (request.getMaxMembers() <= 0) {
       throw new IllegalArgumentException("정원은 1명 이상이어야 합니다.");
     }
 

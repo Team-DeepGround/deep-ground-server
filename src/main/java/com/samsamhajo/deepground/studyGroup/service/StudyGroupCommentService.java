@@ -9,6 +9,7 @@ import com.samsamhajo.deepground.studyGroup.dto.StudyGroupReplyResponse;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupComment;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupReply;
+import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupCommentRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupReplyRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
@@ -32,7 +33,7 @@ public class StudyGroupCommentService {
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
     StudyGroup studyGroup = studyGroupRepository.findById(requestDto.getStudyGroupId())
-        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 스터디 그룹입니다."));
+        .orElseThrow(() -> new StudyGroupNotFoundException(requestDto.getStudyGroupId()));
 
     StudyGroupComment comment = StudyGroupComment.of(studyGroup, member, requestDto.getContent());
     StudyGroupComment saved = commentRepository.save(comment);

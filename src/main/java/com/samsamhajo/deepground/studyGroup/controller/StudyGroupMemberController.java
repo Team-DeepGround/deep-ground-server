@@ -73,4 +73,19 @@ public class StudyGroupMemberController {
         .status(StudyGroupSuccessCode.READ_SUCCESS.getStatus())
         .body(SuccessResponse.of(StudyGroupSuccessCode.READ_SUCCESS, response));
   }
+
+  @DeleteMapping("/{studyGroupId}/leave")
+  public ResponseEntity<SuccessResponse<?>> leaveStudyGroup(
+      @PathVariable Long studyGroupId,
+      @AuthenticationPrincipal CustomUserDetails customUserDetails
+  ) {
+    Member member = customUserDetails.getMember();
+    GlobalLogger.info("스터디 탈퇴 요청", member.getEmail(), "스터디 ID:", studyGroupId);
+
+    studyGroupMemberService.leaveStudyGroup(studyGroupId, member);
+
+    return ResponseEntity
+        .status(StudyGroupSuccessCode.UPDATE_SUCCESS.getStatus())
+        .body(SuccessResponse.of(StudyGroupSuccessCode.UPDATE_SUCCESS));
+  }
 }
