@@ -69,7 +69,7 @@ public class StudyGroupMemberService {
   @Transactional
   public void requestToJoin(Member member, Long studyGroupId) {
     StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
-        .orElseThrow(() -> new IllegalArgumentException("스터디 그룹이 존재하지 않습니다."));
+        .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
 
     // 중복 요청 방지
     if (studyGroupMemberRepository.existsByMemberAndStudyGroup(member, studyGroup)) {

@@ -4,6 +4,7 @@ import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupInviteRequest;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupInviteToken;
+import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupInviteTokenRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import jakarta.transaction.Transactional;
@@ -23,7 +24,7 @@ public class StudyGroupInviteService {
   @Transactional
   public void inviteByEmail(Member inviter, StudyGroupInviteRequest request) {
     StudyGroup group = studyGroupRepository.findById(request.getStudyGroupId())
-        .orElseThrow(() -> new IllegalArgumentException("스터디 그룹이 존재하지 않습니다."));
+        .orElseThrow(() -> new StudyGroupNotFoundException(request.getStudyGroupId()));
 
     if (!group.getCreator().getId().equals(inviter.getId())) {
       throw new SecurityException("스터디 생성자만 초대할 수 있습니다.");
