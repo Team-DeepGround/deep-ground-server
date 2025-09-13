@@ -9,6 +9,8 @@ import com.samsamhajo.deepground.studyGroup.dto.StudyGroupMemberSummary;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
+import com.samsamhajo.deepground.studyGroup.exception.StudyGroupErrorCode;
+import com.samsamhajo.deepground.studyGroup.exception.StudyGroupException;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupInviteTokenRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
@@ -89,6 +91,21 @@ public class StudyGroupMemberService {
         StudyGroupNotificationData.join(studyGroup)
     ));
 
+  }
+
+  @Transactional
+  public void leaveStudyGroup(Long studyGroupId, Member member) {
+    StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
+        .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
+
+    StudyGroupMember studyGroupMember = studyGroupMemberRepository.findByStudyGroupIdAndMemberId(studyGroupId, member.getId())
+        .orElseThrow(() -> new IllegalArgumentException("스터디에 참여하고 있지 않습니다."));
+
+    if (studyGroup.getCreator().getId().equals(member.getId())) {
+        throw new StudyGroupException(StudyGroupErrorCode.MEMBER_IS_LEADER);
+    }
+
+    studyGroupMemberRepository.delete(studyGroupMember);
   }
 
 }
