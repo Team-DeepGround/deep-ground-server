@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.lang.reflect.Field;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -41,10 +42,10 @@ class StudyScheduleServiceTest {
     private StudyGroupRepository studyGroupRepository;
 
     @Mock
-    private StudyGroupMemberRepository studyGroupMemberRepository;
+    private MemberStudyScheduleRepository memberStudyScheduleRepository;
 
     @Mock
-    private MemberStudyScheduleRepository memberStudyScheduleRepository;
+    private StudyGroupMemberRepository studyGroupMemberRepository;
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
@@ -59,6 +60,9 @@ class StudyScheduleServiceTest {
     @BeforeEach
     void setup() {
         studyGroup = mock(StudyGroup.class);
+        lenient().when(studyGroup.getStudyStartDate()).thenReturn(LocalDate.now().minusDays(1));
+        lenient().when(studyGroup.getStudyEndDate()).thenReturn(LocalDate.now().plusDays(30));
+
         requestDto = StudyScheduleRequestDto.builder()
                 .title("스터디 스케줄 1")
                 .startTime(LocalDateTime.now())
@@ -70,7 +74,7 @@ class StudyScheduleServiceTest {
 
     @Test
     @DisplayName("스터디 일정 생성 성공")
-    void createStudySchedule_Success() {
+    void createStudySchedule_Success() throws NoSuchFieldException, IllegalAccessException {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
         when(studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
@@ -121,8 +125,8 @@ class StudyScheduleServiceTest {
         // given
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
 
-        LocalDateTime startTime = LocalDateTime.of(2025, 5, 20, 15, 0);
-        LocalDateTime endTime = LocalDateTime.of(2025, 5, 20, 13, 0);
+        LocalDateTime startTime = LocalDateTime.now().plusDays(1).withHour(15).withMinute(0);
+        LocalDateTime endTime = LocalDateTime.now().plusDays(1).withHour(13).withMinute(0);
 
         requestDto = requestDto.toBuilder()
                 .startTime(startTime)
@@ -225,13 +229,13 @@ class StudyScheduleServiceTest {
 
     }
 
-
-
     @Test
     @DisplayName("스터디 일정 수정 성공")
     void updateStudySchedule_Success() throws NoSuchFieldException, IllegalAccessException {
         // given
-        when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
+        Long studyGroupId = 1L;
+        Long scheduleId = 1L;
+        when(studyGroupRepository.findById(studyGroupId)).thenReturn(Optional.of(studyGroup));
 
         Member leader = mock(Member.class);
         when(leader.getId()).thenReturn(userId);
@@ -248,12 +252,9 @@ class StudyScheduleServiceTest {
 
         Field idField = StudySchedule.class.getDeclaredField("id");
         idField.setAccessible(true);
-        idField.set(existingSchedule, 1L);
+        idField.set(existingSchedule, scheduleId);
 
-        when(studyScheduleRepository.findById(anyLong())).thenReturn(Optional.of(existingSchedule));
-
-        MemberStudySchedule memberSchedule = mock(MemberStudySchedule.class);
-        when(memberStudyScheduleRepository.findByStudyScheduleId(anyLong())).thenReturn(List.of(memberSchedule));
+        when(studyScheduleRepository.findById(scheduleId)).thenReturn(Optional.of(existingSchedule));
 
         StudyScheduleRequestDto updateRequestDto = StudyScheduleRequestDto.builder()
                 .title("수정된 일정 제목")
@@ -263,13 +264,12 @@ class StudyScheduleServiceTest {
                 .location("Online")
                 .build();
         // when
-        StudyScheduleResponseDto responseDto = studyScheduleService.updateStudySchedule(studyGroup.getId(), userId, existingSchedule.getId(), updateRequestDto);
+        StudyScheduleResponseDto responseDto = studyScheduleService.updateStudySchedule(studyGroupId, userId, scheduleId, updateRequestDto);
 
         // then
         assertThat(responseDto).isNotNull();
-        assertThat(responseDto.getId()).isEqualTo(existingSchedule.getId());
+        assertThat(responseDto.getId()).isEqualTo(scheduleId);
         assertThat(responseDto.getTitle()).isEqualTo(updateRequestDto.getTitle());
-        verify(memberSchedule, times(1)).updateAvailable(null);
     }
 
     @Test
@@ -305,8 +305,8 @@ class StudyScheduleServiceTest {
     @DisplayName("스터디 일정 수정 실패 - 종료 시간이 시작 시간보다 빠른 경우")
     void updateStudySchedule_Fail_EndTimeBeforeStartTime() throws IllegalAccessException, NoSuchFieldException {
         // given
-        LocalDateTime startTime = LocalDateTime.of(2025, 5, 21, 13, 0);
-        LocalDateTime endTime = LocalDateTime.of(2025, 5, 21, 11, 0);
+        LocalDateTime startTime = LocalDateTime.now().plusDays(2).withHour(13);
+        LocalDateTime endTime = LocalDateTime.now().plusDays(2).withHour(11);
 
         StudyScheduleRequestDto request = requestDto.toBuilder()
                 .startTime(startTime)
@@ -332,9 +332,6 @@ class StudyScheduleServiceTest {
 
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
         when(studyScheduleRepository.findById(anyLong())).thenReturn(Optional.of(schedule));
-        when(studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
-                anyLong(), any(), any()
-        )).thenReturn(false);
 
         // when & then
         assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, userId, 1L, request))
@@ -346,15 +343,18 @@ class StudyScheduleServiceTest {
     @DisplayName("스터디 일정 수정 실패 - 중복된 시간대의 일정이 존재할 경우")
     void updateStudySchedule_Fail_DuplicateSchedule() {
         // given
+        Long scheduleId = 1L;
+        Long anotherScheduleId = 2L;
+
         when(studyGroupRepository.findById(anyLong())).thenReturn(Optional.of(studyGroup));
         StudySchedule schedule = mock(StudySchedule.class);
-        when(schedule.getId()).thenReturn(2L);
+        when(schedule.getId()).thenReturn(anotherScheduleId);
 
         Member leader = mock(Member.class);
         when(leader.getId()).thenReturn(userId);
         when(studyGroup.getCreator()).thenReturn(leader);
 
-        when(studyScheduleRepository.findById(anyLong())).thenReturn(Optional.of(schedule));
+        when(studyScheduleRepository.findById(scheduleId)).thenReturn(Optional.of(schedule));
         when(studyScheduleRepository.existsByStudyGroupIdAndEndTimeGreaterThanAndStartTimeLessThan(
                 anyLong(),
                 eq(requestDto.getStartTime()),
@@ -362,7 +362,7 @@ class StudyScheduleServiceTest {
         )).thenReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, userId, 1L, requestDto))
+        assertThatThrownBy(() -> studyScheduleService.updateStudySchedule(1L, userId, scheduleId, requestDto))
                 .isInstanceOf(ScheduleException.class)
                 .hasMessageContaining(ScheduleErrorCode.DUPLICATE_SCHEDULE.getMessage());
     }

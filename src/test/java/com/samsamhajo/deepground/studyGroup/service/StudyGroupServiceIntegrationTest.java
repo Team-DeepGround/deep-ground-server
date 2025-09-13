@@ -54,7 +54,7 @@ class StudyGroupServiceIntegrationTest extends IntegrationTestSupport {
         .studyEndDate(LocalDate.now().plusDays(30))
         .recruitStartDate(LocalDate.now())
         .recruitEndDate(LocalDate.now().plusDays(5))
-        .groupMemberCount(5)
+        .maxMembers(5)
         .isOffline(true)
         .studyLocation("신촌")
         .build();

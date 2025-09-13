@@ -113,7 +113,7 @@ class StudyGroupCommentServiceTest extends IntegrationTestSupport {
 
     // expect
     assertThatThrownBy(() -> commentService.writeComment(request, memberId))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessage("존재하지 않는 스터디 그룹입니다.");
+        .isInstanceOf(com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException.class)
+        .hasMessage("해당 ID의 스터디 그룹을 찾을 수 없습니다: " + invalidGroupId);
   }
 }

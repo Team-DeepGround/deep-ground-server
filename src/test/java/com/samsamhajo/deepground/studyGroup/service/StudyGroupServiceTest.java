@@ -53,7 +53,7 @@ public class StudyGroupServiceTest {
                 .studyEndDate(now.plusDays(30))
                 .recruitStartDate(now)
                 .recruitEndDate(now.plusDays(5))
-                .groupMemberCount(5)
+                .maxMembers(5)
                 .isOffline(true)
                 .studyLocation("강남")
                 .build();
@@ -115,7 +115,7 @@ public class StudyGroupServiceTest {
         // given
         Member creator = mock(Member.class);
         StudyGroupCreateRequest request = validRequest().toBuilder()
-                .groupMemberCount(0)
+                .maxMembers(0)
                 .build();
 
         // when & then
