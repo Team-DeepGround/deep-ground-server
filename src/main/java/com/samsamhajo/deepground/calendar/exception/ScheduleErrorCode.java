@@ -16,7 +16,8 @@ public enum ScheduleErrorCode implements ErrorCode {
     MISMATCHED_GROUP(HttpStatus.FORBIDDEN, "해당 스케줄은 요청한 스터디 그룹에 속하지 않습니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 멤버를 찾을 수 없습니다."),
     CANNOT_SET_DETAILS_WITHOUT_ATTENDANCE(HttpStatus.BAD_REQUEST,"참석 여부를 먼저 선택해야 중요 여부와 메모를 입력할 수 있습니다."),
-    UNAUTHORIZED_USER(HttpStatus.FORBIDDEN, "해당 스터디 그룹의 생성자가 아닙니다.");
+    UNAUTHORIZED_USER(HttpStatus.FORBIDDEN, "해당 스터디 그룹의 생성자가 아닙니다."),
+    SCHEDULE_OUT_OF_BOUNDS(HttpStatus.BAD_REQUEST, "일정은 스터디 기간 내에만 등록할 수 있습니다.");
 
 
     private final HttpStatus status;

@@ -39,6 +39,7 @@ public class StudyScheduleService {
                                                         StudyScheduleRequestDto requestDto) {
 
         StudyGroup studyGroup = validateStudyGroup(studyGroupId);
+        validateScheduleBounds(studyGroup, requestDto);
         validateSchedule(studyGroupId, requestDto);
 
         validateStudyLeader(userId, studyGroup);
@@ -99,6 +100,7 @@ public class StudyScheduleService {
                                                         StudyScheduleRequestDto requestDto) {
 
         StudyGroup studyGroup = validateStudyGroup(studyGroupId);
+        validateScheduleBounds(studyGroup, requestDto);
         validateStudyLeader(userId, studyGroup);
 
         StudySchedule studySchedule = studyScheduleRepository.findById(scheduleId)
@@ -173,6 +175,13 @@ public class StudyScheduleService {
     private void validateStudyLeader(Long userId, StudyGroup studyGroup) {
         if (!studyGroup.getCreator().getId().equals(userId)) {
             throw new ScheduleException(ScheduleErrorCode.UNAUTHORIZED_USER);
+        }
+    }
+
+    private void validateScheduleBounds(StudyGroup studyGroup, StudyScheduleRequestDto requestDto) {
+        if (requestDto.getStartTime().toLocalDate().isBefore(studyGroup.getStudyStartDate()) ||
+                requestDto.getEndTime().toLocalDate().isAfter(studyGroup.getStudyEndDate())) {
+            throw new ScheduleException(ScheduleErrorCode.SCHEDULE_OUT_OF_BOUNDS);
         }
     }
 }
