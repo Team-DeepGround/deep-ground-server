@@ -1,0 +1,18 @@
+groups:
+  groupA:
+    - githubName: speculatingwook
+      discordKey: BEONGWOOK
+    - githubName: paka-jo
+      discordKey: JUNGWON
+#    - githubName: ynyejin
+#      discordKey: YEJIN
+    - githubName: jaehwannnnnn
+      discordKey: JAEHWAN
+
+  groupB:
+#    - githubName: 0-tae
+#      discordKey: YONGTAE
+    - githubName: Yunsung-Jo
+      discordKey: YUNSUNG
+    - githubName: dotae1
+      discordKey: DABIN

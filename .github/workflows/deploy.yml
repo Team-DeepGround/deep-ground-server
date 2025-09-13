@@ -1,0 +1,104 @@
+name: Deploy
+on:
+  push:
+    branches: [ "main"]
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  working-directory: .
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+       # GitHub 저장소 코드 내려받기
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        # JDK version 설정
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+        # Gradle caching - 빌드 시간 향상
+      - name: Gradle Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Create .env for tests
+        run: |
+          echo "${{ secrets.ENV }}" | base64 -d > .env
+          chmod 600 .env
+
+        # 4. 테스트 및 빌드
+      - name: Build with Gradle
+        run: ./gradlew clean build
+
+       # 테스트 후 .env 파일 정리
+      - name: Clean up .env after tests
+        if: always()
+        run: |
+          if [ -f .env ]; then
+            rm .env
+          fi
+
+        # Docker 빌드를 위한 설정
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+        # Docker Hub 로그인
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # ARM64 Docker 이미지 빌드 및 푸시
+      - name: Build and Push ARM64 Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/arm64
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
+            ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+        # OCI에 배포
+      - name: Deploy to OCI
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.OCI_HOST }}
+          username: ubuntu
+          key: ${{ secrets.OCI_KEY }}
+          script: |
+            cd /home/ubuntu/studen
+
+            echo "${{ secrets.ENV }}" | base64 -d > .env
+            chmod 600 .env # .env 
+            
+            docker compose down || true
+            
+            docker compose pull
+            docker compose up -d
+
+             sleep 20
+            echo "=== Docker Compose 서비스 상태 ==="
+            docker ps
+            
+            echo "=== 컨테이너 로그 확인 ==="
+            docker compose logs --tail 30
+
+            rm .env
