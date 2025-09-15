@@ -85,8 +85,6 @@ jobs:
           key: ${{ secrets.OCI_KEY }}
           script: |
             cd /home/ubuntu/studen
-            
-            echo "${{ steps.checkout.outputs.content }}" > docker-compose.yml
 
             echo "${{ secrets.ENV }}" | base64 -d > .env
             chmod 600 .env # .env 
