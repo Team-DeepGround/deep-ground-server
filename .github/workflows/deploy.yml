@@ -77,29 +77,33 @@ jobs:
           cache-to: type=gha,mode=max
 
         # OCI에 배포
+      # ... (이전 단계들)
+
+      # OCI에 배포
       - name: Deploy to OCI
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.OCI_HOST }}
           username: ubuntu
           key: ${{ secrets.OCI_KEY }}
+          # 로컬 파일(main 브랜치에서 checkout된)을 서버로 복사
+          copy:
+            - src: docker-compose.yml
+              dst: /home/ubuntu/studen/docker-compose.yml
           script: |
             cd /home/ubuntu/studen
-            
-            echo "${{ steps.checkout.outputs.content }}" > docker-compose.yml
 
             echo "${{ secrets.ENV }}" | base64 -d > .env
-            chmod 600 .env # .env 
-            
+            chmod 600 .env
+
             docker compose down || true
-            
             docker compose pull
             docker compose up -d
 
             sleep 20
             echo "=== Docker Compose 서비스 상태 ==="
             docker ps
-            
+
             echo "=== 컨테이너 로그 확인 ==="
             docker compose logs --tail 30
 
