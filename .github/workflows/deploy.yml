@@ -85,6 +85,8 @@ jobs:
           key: ${{ secrets.OCI_KEY }}
           script: |
             cd /home/ubuntu/studen
+            
+            echo "${{ steps.checkout.outputs.content }}" > docker-compose.yml
 
             echo "${{ secrets.ENV }}" | base64 -d > .env
             chmod 600 .env # .env 
@@ -94,7 +96,7 @@ jobs:
             docker compose pull
             docker compose up -d
 
-             sleep 20
+            sleep 20
             echo "=== Docker Compose 서비스 상태 ==="
             docker ps
             
