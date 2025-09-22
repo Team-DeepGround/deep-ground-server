@@ -1,7 +1,6 @@
 services:
   api-server:
-    build: .
-    image: api-server:latest
+    image: ${DOCKER_REPOSITORY}/${IMAGE_NAME}:${TAG:-latest}
     ports:
       - "8080:8080"
     env_file:
