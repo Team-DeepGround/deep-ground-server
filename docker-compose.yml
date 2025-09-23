@@ -1,6 +1,6 @@
 services:
   api-server:
-    image: ${DOCKER_REPOSITORY}/${IMAGE_NAME}:${TAG:-latest}
+    image: wjd5107/deepground-server:latest
     ports:
       - "8080:8080"
     env_file:
