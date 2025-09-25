@@ -161,4 +161,14 @@ cloud:
     stack:
       auto: false
 
+management:
+  metrics:
+    binders:
+      processor:
+        enabled: false
+      jvm:
+        enabled: false
+      system:
+        enabled: false
+
 
