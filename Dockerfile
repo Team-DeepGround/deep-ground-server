@@ -14,4 +14,4 @@ COPY build/libs/*.jar app.jar
 EXPOSE 8080
 
 # 컨테이너가 실행될 때 실행할 명령어
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75", "-jar", "app.jar"]
