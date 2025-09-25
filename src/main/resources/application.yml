@@ -42,6 +42,7 @@ spring:
         queue-capacity: 200
         keep-alive: 60s
   jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect   #Hibernate의 비효율적인 DB 메타데이터 조회를 막기 위해 명시
     hibernate:
       ddl-auto: update
     properties:
