@@ -1,5 +1,5 @@
 # OpenJDK 17의 slim 버전을 기반 이미지로 사용합니다
-FROM openjdk:17-jdk-slim
+FROM openjdk:17.0.12-jdk-slim
 
 # 시간대 설정
 ENV TZ=Asia/Seoul
