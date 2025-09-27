@@ -19,7 +19,6 @@ services:
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
-    user: "1001:1001"
     ports:
       - "3000:3000"
     volumes:
