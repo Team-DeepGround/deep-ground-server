@@ -25,3 +25,6 @@ services:
       - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
+
+volumes:
+  grafana-data:
