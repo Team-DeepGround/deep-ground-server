@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-alpine
+FROM openjdk:17-jdk-slim
 
 # 시간대 설정
 ENV TZ=Asia/Seoul
