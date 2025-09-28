@@ -167,5 +167,8 @@ management:
     web:
       exposure:
         include: "prometheus,health,metrics"
+  metrics:
+    enable:
+      processor: false
 
 

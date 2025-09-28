@@ -11,6 +11,10 @@ RUN ./gradlew clean bootJar -PexcludeSecrets=true
 # === [2단계: 런타임 이미지] ======================================
 FROM openjdk:17-slim-buster
 
+RUN apt-get update && \
+    apt-get install -y procps && \
+    rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Spring Boot JAR 복사
