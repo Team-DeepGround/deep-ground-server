@@ -22,4 +22,4 @@ COPY --from=build /workspace/app/build/libs/*.jar /app/app.jar
 
 EXPOSE 8080
 
-CMD ["java", "-Djdk.internal.platform.Container.enabled=false", "-jar", "/app/app.jar"]
+CMD ["java", "-Djdk.internal.platform.Container.enabled=false", "-Dspring.jmx.enabled=false", "-jar", "/app/app.jar"]
