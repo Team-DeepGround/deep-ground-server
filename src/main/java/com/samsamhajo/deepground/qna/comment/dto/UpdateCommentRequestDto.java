@@ -8,7 +8,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UpdateCommentRequestDto {
 
-    @NotBlank(message = "댓글은 비어있을 수 없습니다.")
+    @NotBlank(message = "댓글은 필수로 입력해야 합니다.")
     private String commentContent;
     private Long answerId;
     private Long commentId;

@@ -63,8 +63,6 @@ public class AnswerService {
         question.incrementAnswerCount();
         List<String> mediaUrl = createAnswerMedia(answerCreateRequestDto, answer);
 
-        List<CommentDTO> comments = new ArrayList<>();
-
         // 답변 알림
         eventPublisher.publishEvent(NotificationEvent.of(
                 question.getMember().getId(),
@@ -77,8 +75,7 @@ public class AnswerService {
                 saved.getAnswerContent(),
                 saved.getQuestion().getId(),
                 saved.getMember().getId(),
-                saved.getId()
-                , comments,
+                saved.getId(),
                 saved.getAnswerLikeCount(),
                 mediaUrl,
                 createdAt,
@@ -168,14 +165,6 @@ public class AnswerService {
                             .map(AnswerMedia::getMediaUrl)
                             .collect(Collectors.toList());
 
-                    List<CommentDTO> commentDTOs = answer.getComments().stream()
-                            .map(comment -> CommentDTO.of(
-                                    comment.getId(),
-                                    comment.getCommentContent(),
-                                    comment.getMember().getId(),
-                                    comment.getMember().getNickname()
-                            )).collect(Collectors.toList());
-
                     LocalDateTime createdAt = answer.getCreatedAt();
 
                     return new AnswerCreateResponseDto(
@@ -183,7 +172,6 @@ public class AnswerService {
                             answer.getQuestion().getId(),
                             answer.getMember().getId(),
                             answer.getId(),
-                            commentDTOs,
                             answer.getAnswerLikeCount(),
                             mediaUrl,
                             createdAt,

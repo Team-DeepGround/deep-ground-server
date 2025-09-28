@@ -5,8 +5,8 @@ import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.qna.comment.dto.UpdateCommentRequestDto;
 import com.samsamhajo.deepground.qna.comment.dto.UpdateCommentResponseDto;
-import com.samsamhajo.deepground.qna.comment.dto.CommentCreateRequestDto;
-import com.samsamhajo.deepground.qna.comment.dto.CommentCreateResponseDto;
+import com.samsamhajo.deepground.qna.comment.dto.CreateCommentRequest;
+import com.samsamhajo.deepground.qna.comment.dto.CommentCreateResponse;
 import com.samsamhajo.deepground.qna.comment.exception.CommentSuccessCode;
 import com.samsamhajo.deepground.qna.comment.service.CommentService;
 import jakarta.validation.Valid;
@@ -31,10 +31,9 @@ public class CommentController {
     @PutMapping({"/{commentId}"})
     public ResponseEntity<SuccessResponse> updateComment(
             @Valid @RequestBody UpdateCommentRequestDto updateCommentRequestDto,
-            @PathVariable Long commentId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
             ) {
-        UpdateCommentResponseDto updateCommentResponseDto = commentService.updateComment(commentId,updateCommentRequestDto,
+        UpdateCommentResponseDto updateCommentResponseDto = commentService.updateComment(updateCommentRequestDto,
                 customUserDetails.getMember().getId());
 
         return ResponseEntity
@@ -45,11 +44,10 @@ public class CommentController {
     @DeleteMapping({"/{commentId}"})
     public ResponseEntity<SuccessResponse> deleteComment(
             @PathVariable Long commentId,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestParam Long answerId
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
-        commentService.deleteComment(commentId, customUserDetails.getMember().getId(), answerId);
+        commentService.deleteComment(commentId, customUserDetails.getMember().getId());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -59,16 +57,16 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<SuccessResponse> createComment(
-            @Valid @RequestBody CommentCreateRequestDto commentCreateRequestDto,
+            @Valid @RequestBody CreateCommentRequest createCommentRequest,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
 
-        CommentCreateResponseDto commentCreateResponseDto = commentService.createComment(commentCreateRequestDto,
+        CommentCreateResponse commentCreateResponse = commentService.createComment(createCommentRequest,
                 customUserDetails.getMember().getId());
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(SuccessResponse.of(CommentSuccessCode.COMMENT_CREATED, commentCreateResponseDto));
+                .body(SuccessResponse.of(CommentSuccessCode.COMMENT_CREATED, commentCreateResponse));
 
 
     }

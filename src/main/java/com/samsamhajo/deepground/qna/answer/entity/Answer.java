@@ -41,9 +41,6 @@ public class Answer extends BaseEntity {
     @JoinColumn(name = "question_id")
     private Question question;
 
-    @OneToMany(mappedBy = "answer", cascade = CascadeType.REMOVE)
-    private List<Comment> comments = new ArrayList<>();
-
     @OneToMany(mappedBy = "answer", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<AnswerMedia> answerMedia = new ArrayList<>();
 
