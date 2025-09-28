@@ -5,8 +5,6 @@ server:
   name: studen
   forward-headers-strategy: framework
   tomcat:
-    mbeanregistry:
-      enabled: true
     threads:
       max: 400
       min-spare: 20
