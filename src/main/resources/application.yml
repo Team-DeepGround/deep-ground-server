@@ -74,7 +74,7 @@ spring:
             enable: true
   ai:
     openai:
-      api-key: ${OPENAI_API_KEY}  # 환경변수 혹은 yml에 직접 입력
+      api-key: ${OPENAI_API_KEY}
       base-url: https://api.openai.com/v1
       chat:
         options:
@@ -169,5 +169,6 @@ management:
   metrics:
     enable:
       processor: false
+      system: false
 
 
