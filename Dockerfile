@@ -1,25 +1,14 @@
-# === [1단계: 빌드 단계] =========================================
-FROM openjdk:17-slim AS build
-WORKDIR /workspace/app
+# OpenJDK 17의 slim 버전을 기반 이미지로 사용합니다
+FROM openjdk:17-jdk-slim
 
-COPY gradlew build.gradle settings.gradle ./
-COPY ./gradle ./gradle/
-COPY ./src ./src/
-RUN chmod +x ./gradlew
-RUN ./gradlew clean bootJar -PexcludeSecrets=true
-
-# === [2단계: 런타임 이미지] ======================================
-FROM openjdk:17-slim
-
-RUN apt-get update && \
-    apt-get install -y procps && \
-    rm -rf /var/lib/apt/lists/*
-
+# 작업 디렉토리 설정
 WORKDIR /app
 
-# Spring Boot JAR 복사
-COPY --from=build /workspace/app/build/libs/*.jar /app/app.jar
+# 빌드된 JAR 파일 복사
+COPY build/libs/*.jar app.jar
 
+# 컨테이너가 8080 포트에서 통신하도록 설정합니다.
 EXPOSE 8080
 
+# 컨테이너가 실행될 때 실행할 명령어
 CMD ["java", "-Djdk.internal.platform.Container.enabled=false", "-Dspring.jmx.enabled=false", "-jar", "/app/app.jar"]
