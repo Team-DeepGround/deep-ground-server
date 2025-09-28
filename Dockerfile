@@ -1,5 +1,5 @@
 # === [1단계: 빌드 단계] =========================================
-FROM openjdk:17-slim-bookworm AS build
+FROM openjdk:17-slim AS build
 WORKDIR /workspace/app
 
 COPY gradlew build.gradle settings.gradle ./
@@ -9,7 +9,7 @@ RUN chmod +x ./gradlew
 RUN ./gradlew clean bootJar -PexcludeSecrets=true
 
 # === [2단계: 런타임 이미지] ======================================
-FROM openjdk:17-slim-bookworm
+FROM openjdk:17-slim
 
 WORKDIR /app
 
