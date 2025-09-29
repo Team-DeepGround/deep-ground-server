@@ -11,4 +11,4 @@ COPY build/libs/*.jar app.jar
 EXPOSE 8080
 
 # 컨테이너가 실행될 때 실행할 명령어
-CMD java -Djdk.internal.platform.Container .enabled=false -Dspring.jmx.enabled=false  -jar /app/app.jar
+CMD java -Djdk.internal.platform.Container.enabled=false -Dspring.jmx.enabled=false  -jar /app/app.jar
