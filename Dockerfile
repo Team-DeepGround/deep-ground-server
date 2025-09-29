@@ -1,5 +1,5 @@
 # OpenJDK 17의 slim 버전을 기반 이미지로 사용합니다
-FROM openjdk:17-jdk-slim
+FROM openjdk:21-jdk-slim
 
 # 작업 디렉토리 설정
 WORKDIR /app
@@ -11,4 +11,4 @@ COPY build/libs/*.jar app.jar
 EXPOSE 8080
 
 # 컨테이너가 실행될 때 실행할 명령어
-CMD java -Djdk.internal.platform.Container.enabled=false -Dspring.jmx.enabled=false  -jar /app/app.jar
+CMD java -Djdk.internal.platform.Container .enabled=false -Dspring.jmx.enabled=false  -jar /app/app.jar
