@@ -59,7 +59,6 @@ public class AnswerController {
     @PutMapping(value = "/{answerId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse> updateAnswer(
             @Valid @ModelAttribute AnswerUpdateRequestDto answerUpdateRequestDto,
-            @PathVariable Long answerId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
         AnswerUpdateResponseDto answerUpdateResponseDto = answerService.updateAnswer(answerUpdateRequestDto,

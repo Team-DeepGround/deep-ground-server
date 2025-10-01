@@ -43,9 +43,6 @@ public class Question extends BaseEntity {
     private Member member;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Answer> answers = new ArrayList<>();
-
-    @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<QuestionTag> questionTags = new ArrayList<>();
 
     private Question(String title, String content, Member member) {

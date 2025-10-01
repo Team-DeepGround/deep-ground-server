@@ -44,10 +44,6 @@ public class Answer extends BaseEntity {
     @OneToMany(mappedBy = "answer", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<AnswerMedia> answerMedia = new ArrayList<>();
 
-    @OneToMany(mappedBy = "answer", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<AnswerLike> answerLikes = new ArrayList<>();
-
-
     private Answer(String answerContent, Member member, Question question) {
         this.answerContent = answerContent;
         this.member = member;
