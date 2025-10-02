@@ -12,6 +12,7 @@ import com.samsamhajo.deepground.qna.answer.repository.AnswerMediaRepository;
 import com.samsamhajo.deepground.qna.answer.repository.AnswerRepository;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerErrorCode;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerException;
+import com.samsamhajo.deepground.qna.comment.repository.CommentRepository;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.validation.CommonValidation;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class AnswerService {
     private final ApplicationEventPublisher eventPublisher;
     private final CommonValidation commonValidation;
     private final AnswerLikeRepository answerLikeRepository;
+    private final CommentRepository commentRepository;
 
 
     @Transactional
@@ -64,15 +66,17 @@ public class AnswerService {
     }
 
     @Transactional
-    public Long deleteAnswer(Long answerId, Long memberId) {
+    public Long deleteAnswer(Long answerId, Long memberId, Long questionId) {
 
-        Question question = commonValidation.QuestionValidation(answerId);
+        Question question = commonValidation.QuestionValidation(questionId);
         Answer answer = commonValidation.AnswerValidation(answerId);
 
         if (!answer.getMember().getId().equals(memberId)) {
             throw new AnswerException(AnswerErrorCode.ANSWER_MEMBER_MISMTACH);
         } else {
+            commentRepository.deleteAllByAnswerId(answerId);
             answerLikeRepository.deleteAllByAnswerId(answerId);
+            answerMediaRepository.deleteAllByAnswerId(answerId);
             answerRepository.deleteById(answer.getId());
         }
         //TODO event를 통해 Question, Answer 책임 분리

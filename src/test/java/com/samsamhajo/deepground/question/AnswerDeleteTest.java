@@ -102,7 +102,7 @@ public class AnswerDeleteTest extends IntegrationTestSupport {
         Long answerId = answerCreateResponseDto.getAnswerId();
 
         // 답변 삭제
-        Long deleteId = answerService.deleteAnswer(answerId, memberId);
+        Long deleteId = answerService.deleteAnswer(answerId, memberId, questionId);
 
         assertThat(answerRepository.findById(answerId).isEmpty()).isTrue();
         assertThat(deleteId.equals(answerId)).isTrue();

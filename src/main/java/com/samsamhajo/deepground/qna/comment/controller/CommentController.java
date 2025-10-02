@@ -3,10 +3,7 @@ package com.samsamhajo.deepground.qna.comment.controller;
 
 import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
-import com.samsamhajo.deepground.qna.comment.dto.UpdateCommentRequestDto;
-import com.samsamhajo.deepground.qna.comment.dto.UpdateCommentResponseDto;
-import com.samsamhajo.deepground.qna.comment.dto.CreateCommentRequest;
-import com.samsamhajo.deepground.qna.comment.dto.CommentCreateResponse;
+import com.samsamhajo.deepground.qna.comment.dto.*;
 import com.samsamhajo.deepground.qna.comment.exception.CommentSuccessCode;
 import com.samsamhajo.deepground.qna.comment.service.CommentService;
 import jakarta.validation.Valid;
@@ -18,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 
 @RestController
@@ -67,8 +66,19 @@ public class CommentController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(SuccessResponse.of(CommentSuccessCode.COMMENT_CREATED, commentCreateResponse));
+    }
 
+    @GetMapping("/comments")
+    public ResponseEntity<SuccessResponse>  getComments(
+            @RequestParam Long answerId,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ) {
 
+       List<CommentDetail> commentDetail = commentService.getComments(answerId, customUserDetails.getMember().getId());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.of(CommentSuccessCode.COMMENT_SUCCESS_SEARCH,commentDetail));
     }
 }
 

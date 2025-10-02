@@ -5,10 +5,7 @@ import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.notification.entity.data.QNANotificationData;
 import com.samsamhajo.deepground.notification.event.NotificationEvent;
 import com.samsamhajo.deepground.qna.answer.entity.Answer;
-import com.samsamhajo.deepground.qna.comment.dto.CreateCommentRequest;
-import com.samsamhajo.deepground.qna.comment.dto.CommentCreateResponse;
-import com.samsamhajo.deepground.qna.comment.dto.UpdateCommentRequestDto;
-import com.samsamhajo.deepground.qna.comment.dto.UpdateCommentResponseDto;
+import com.samsamhajo.deepground.qna.comment.dto.*;
 import com.samsamhajo.deepground.qna.comment.entity.Comment;
 import com.samsamhajo.deepground.qna.comment.exception.CommentErrorCode;
 import com.samsamhajo.deepground.qna.comment.exception.CommentException;
@@ -18,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -87,6 +87,18 @@ public class CommentService {
             commentRepository.deleteById(commentId);
         }
         return commentId;
+    }
+
+    @Transactional(readOnly = true)
+    public List<CommentDetail> getComments(Long answerId, Long memberId) {
+
+        commonValidation.AnswerValidation(answerId);
+        List<Comment> comments = commentRepository.findAllByAnswerIdWithMember(answerId);
+
+        return comments.stream()
+                .map(comment -> {
+                    return CommentDetail.of(comment);
+                }).collect(Collectors.toList());
     }
 }
 
