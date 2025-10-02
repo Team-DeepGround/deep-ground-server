@@ -62,7 +62,7 @@ spring:
       password: ${MONGO_PASSWORD}
       auto-index-creation: true
   mail:
-    host: smtp.daum.com
+    host: smtp.daum.net
     port: 465
     username: ${EMAIL_USERNAME}
     password: ${EMAIL_PASSWORD}
@@ -70,7 +70,7 @@ spring:
       mail:
         smtp:
           auth: true
-          starttls:
+          ssl:
             enable: true
   ai:
     openai:
