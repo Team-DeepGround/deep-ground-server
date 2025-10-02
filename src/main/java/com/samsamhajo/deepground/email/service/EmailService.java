@@ -11,6 +11,7 @@ import com.samsamhajo.deepground.member.entity.Role;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,9 @@ public class EmailService {
     private static final int VERIFICATION_CODE_LENGTH = 6;
     private static final long VERIFICATION_CODE_TTL = 300L;
     private final MemberRepository memberRepository;
+
+    @Value("${EMAIL_USERNAME}")
+    private String fromEmailAddress;
 
     public EmailResponse sendVerificationEmail(EmailRequest request) {
         String email = request.getEmail();
@@ -72,6 +76,7 @@ public class EmailService {
     private void sendEmail(String to, String subject, String content) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmailAddress);
             message.setTo(to);
             message.setSubject(subject);
             message.setText(content);
