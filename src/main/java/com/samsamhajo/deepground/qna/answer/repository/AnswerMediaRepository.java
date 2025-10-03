@@ -10,6 +10,7 @@ import java.util.Optional;
 @Repository
 public interface AnswerMediaRepository extends JpaRepository<AnswerMedia, Long> {
     List<AnswerMedia> findAllByAnswerId(Long answerId);
+    List<AnswerMedia> findAllByAnswerIdIn(List<Long> answerIds);
     void deleteAllByAnswerId(Long answerId);
     Optional<AnswerMedia> findByMediaUrl(String mediaUrl);
 }

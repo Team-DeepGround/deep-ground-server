@@ -7,24 +7,22 @@ import com.samsamhajo.deepground.notification.event.NotificationEvent;
 import com.samsamhajo.deepground.qna.answer.dto.*;
 import com.samsamhajo.deepground.qna.answer.entity.Answer;
 import com.samsamhajo.deepground.qna.answer.entity.AnswerMedia;
+import com.samsamhajo.deepground.qna.answer.repository.AnswerLikeRepository;
 import com.samsamhajo.deepground.qna.answer.repository.AnswerMediaRepository;
 import com.samsamhajo.deepground.qna.answer.repository.AnswerRepository;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerErrorCode;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerException;
-import com.samsamhajo.deepground.qna.comment.dto.CommentDTO;
+import com.samsamhajo.deepground.qna.comment.repository.CommentRepository;
 import com.samsamhajo.deepground.qna.question.entity.Question;
-import com.samsamhajo.deepground.qna.question.exception.QuestionErrorCode;
-import com.samsamhajo.deepground.qna.question.exception.QuestionException;
-import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
+import com.samsamhajo.deepground.qna.validation.CommonValidation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,25 +31,19 @@ public class AnswerService {
 
     private final AnswerRepository answerRepository;
     private final MemberRepository memberRepository;
-    private final QuestionRepository questionRepository;
     private final AnswerMediaService answerMediaService;
-    private final AnswerLikeService answerLikeService;
     private final AnswerMediaRepository answerMediaRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final CommonValidation commonValidation;
+    private final AnswerLikeRepository answerLikeRepository;
+    private final CommentRepository commentRepository;
 
 
     @Transactional
     public AnswerCreateResponseDto createAnswer(AnswerCreateRequestDto answerCreateRequestDto, Long memberId) {
 
-        Member member = memberRepository.findById(memberId).orElseThrow(() ->
-                new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
-        Question question = questionRepository.findById(answerCreateRequestDto.getQuestionId())
-                .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
-
-        if(!StringUtils.hasText(answerCreateRequestDto.getAnswerContent())) {
-            throw new AnswerException(AnswerErrorCode.ANSWER_CONTENT_REQUIRED);
-        }
+        Member member = memberRepository.getReferenceById(memberId);
+        Question question = commonValidation.QuestionValidation(answerCreateRequestDto.getQuestionId());
 
         Answer answer = Answer.of(
                 answerCreateRequestDto.getAnswerContent(),
@@ -60,10 +52,9 @@ public class AnswerService {
         );
 
         Answer saved = answerRepository.save(answer);
+        //TODO : Event를 통한 Question과 책임 분리 고려
         question.incrementAnswerCount();
         List<String> mediaUrl = createAnswerMedia(answerCreateRequestDto, answer);
-
-        List<CommentDTO> comments = new ArrayList<>();
 
         // 답변 알림
         eventPublisher.publishEvent(NotificationEvent.of(
@@ -71,38 +62,24 @@ public class AnswerService {
                 QNANotificationData.answer(answer)
         ));
 
-        LocalDateTime createdAt = answer.getCreatedAt();
-
-        return AnswerCreateResponseDto.of(
-                saved.getAnswerContent(),
-                saved.getQuestion().getId(),
-                saved.getMember().getId(),
-                saved.getId()
-                , comments,
-                saved.getAnswerLikeCount(),
-                mediaUrl,
-                createdAt,
-                answer.getMember().getNickname()
-        );
+        return AnswerCreateResponseDto.of(answer, mediaUrl);
     }
 
     @Transactional
-    public Long deleteAnswer(Long answerId, Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(()->
-                new IllegalArgumentException("존재하지 않는 사용자입니다."));
+    public Long deleteAnswer(Long answerId, Long memberId, Long questionId) {
 
-        Answer answer = answerRepository.findById(answerId)
-                .orElseThrow(() -> new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND));
+        Question question = commonValidation.QuestionValidation(questionId);
+        Answer answer = commonValidation.AnswerValidation(answerId);
 
         if (!answer.getMember().getId().equals(memberId)) {
             throw new AnswerException(AnswerErrorCode.ANSWER_MEMBER_MISMTACH);
+        } else {
+            commentRepository.deleteAllByAnswerId(answerId);
+            answerLikeRepository.deleteAllByAnswerId(answerId);
+            answerMediaRepository.deleteAllByAnswerId(answerId);
+            answerRepository.deleteById(answer.getId());
         }
-        Question question = questionRepository.findById(answer.getQuestion().getId())
-                .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
-
-        answerMediaService.deleteAnswerMedia(answerId);
-        answerLikeService.deleteAllByAnswerId(answerId);
-        answerRepository.deleteById(answer.getId());
+        //TODO event를 통해 Question, Answer 책임 분리
         question.decrementAnswerCount();
 
         return answer.getId();
@@ -111,29 +88,17 @@ public class AnswerService {
     @Transactional
     public AnswerUpdateResponseDto updateAnswer(AnswerUpdateRequestDto answerUpdateRequestDto, Long memberId) {
 
-
-        Member member = memberRepository.findById(memberId).orElseThrow(() ->
-                new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
-        Question question = questionRepository.findById(answerUpdateRequestDto.getQuestionId())
-                .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
-
-        Answer answer = answerRepository.findById(answerUpdateRequestDto.getAnswerId())
-                .orElseThrow(()-> new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND));
-
-        if(!StringUtils.hasText(answerUpdateRequestDto.getAnswerContent())) {
-            throw new AnswerException(AnswerErrorCode.ANSWER_CONTENT_REQUIRED);
-        }
+        Member member = memberRepository.getReferenceById(memberId);
+        Answer answer = commonValidation.AnswerValidation(answerUpdateRequestDto.getAnswerId());
 
         if(!answer.getMember().getId().equals(memberId)) {
             throw new AnswerException(AnswerErrorCode.ANSWER_MEMBER_MISMTACH);
+        } else {
+            answer.updateAnswer(answerUpdateRequestDto.getAnswerContent());
         }
-
-        answer.updateAnswer(answerUpdateRequestDto.getAnswerContent());
 
         answerMediaService.deleteAnswerMedia(answer.getId());
         List<String> mediaUrl = updateAnswerMedia(answerUpdateRequestDto, answer);
-
 
         return AnswerUpdateResponseDto.of(
                 answer.getAnswerContent(),
@@ -143,106 +108,62 @@ public class AnswerService {
                 mediaUrl
         );
     }
+
+    // Image 업로드 메서드
     private List<String> createAnswerMedia(AnswerCreateRequestDto answerCreateRequestDto, Answer answer) {
        return answerMediaService.createAnswerMedia(answer, answerCreateRequestDto.getImages());
     }
 
+    // Image 수정 메서드
     private List<String> updateAnswerMedia(AnswerUpdateRequestDto answerUpdateRequestDto, Answer answer) {
         return answerMediaService.createAnswerMedia(answer, answerUpdateRequestDto.getImages());
     }
 
+    // Question에 달린 답변 수 조회
     public int countAnswersByQuestionId(Long questionId) {
-        Question question = questionRepository.findById(questionId).orElseThrow(()-> {
-            throw new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND);
-        });
+        Question question = commonValidation.QuestionValidation(questionId);
         return question.getAnswerCount();
     }
 
+    // 질문에 달린 답변 목록 조회
     @Transactional(readOnly = true)
     public List<AnswerCreateResponseDto> getAnswersByQuestionId(Long questionId) {
-        List<Answer> answers = answerRepository.findAllByQuestionId(questionId);
+        List<Answer> answers = answerRepository.findAllByQuestionIdWithMember(questionId);
+        //질문에 달린 답변이 없으면 빈 List반환
+        if(answers.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Long> answerIds = answers.stream()
+                .map(Answer::getId)
+                .collect(Collectors.toList());
+
+        List<AnswerMedia> medias = answerMediaRepository.findAllByAnswerIdIn(answerIds);
+
+        //Media를 answerId를 기준으로 grouping 처리
+        Map<Long, List<String>> mediaUrl = medias.stream()
+                .collect(Collectors.groupingBy(
+                        media -> media.getAnswer().getId(),
+                        Collectors.mapping(AnswerMedia::getMediaUrl, Collectors.toList())
+                ));
 
         return answers.stream()
                 .map(answer -> {
-                    List<String> mediaUrl = answerMediaRepository.findAllByAnswerId(answer.getId()).stream()
-                            .map(AnswerMedia::getMediaUrl)
-                            .collect(Collectors.toList());
-
-                    List<CommentDTO> commentDTOs = answer.getComments().stream()
-                            .map(comment -> CommentDTO.of(
-                                    comment.getId(),
-                                    comment.getCommentContent(),
-                                    comment.getMember().getId(),
-                                    comment.getMember().getNickname()
-                            )).collect(Collectors.toList());
-
-                    LocalDateTime createdAt = answer.getCreatedAt();
-
-                    return new AnswerCreateResponseDto(
-                            answer.getAnswerContent(),
-                            answer.getQuestion().getId(),
-                            answer.getMember().getId(),
-                            answer.getId(),
-                            commentDTOs,
-                            answer.getAnswerLikeCount(),
-                            mediaUrl,
-                            createdAt,
-                            answer.getMember().getNickname()
-                    );
-                        }).collect(Collectors.toList());
+                    List<String> mediaUrls = mediaUrl.getOrDefault(answer.getId(), Collections.emptyList());
+                    return AnswerCreateResponseDto.of(answer, mediaUrls);
+                }).collect(Collectors.toList());
     }
 
+    // 특정 답변 수정을 위한 조회 로직
     @Transactional(readOnly = true)
     public AnswerEditResponseDto getAnswerEditInfo(Long answerId, Long memberId) {
-        Answer answer = answerRepository.findById(answerId)
-                .orElseThrow(() -> new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND));
+        Answer answer =commonValidation.AnswerValidation(answerId);
 
         List<String> mediaUrls = answerMediaRepository.findAllByAnswerId(answerId)
                 .stream()
                 .map(AnswerMedia::getMediaUrl)
                 .collect(Collectors.toList());
 
-        return new AnswerEditResponseDto(
-                answer.getId(),
-                answer.getQuestion().getId(),
-                answer.getAnswerContent(),
-                mediaUrls
-        );
+        return AnswerEditResponseDto.of(answer, mediaUrls);
     }
-
-
-
-
-//    @Transactional(readOnly = true)
-//    public List<AnswerCreateResponseDto> getAnswersByQuestionId1(Long questionId) {
-//        // 특정 질문에 대한 답변들 조회
-//        List<Answer> answers = answerRepository.findAllByQuestionId(questionId);
-//
-//        return answers.stream()
-//                .map(answer -> {
-//                    // 각 답변에 대한 미디어 URL 조회 (중요!)
-//                    List<String> mediaUrl = answerMediaRepository.findAllByAnswerId(answer.getId()).stream()
-//                            .map(AnswerMedia::getMediaUrl)
-//                            .collect(Collectors.toList());
-//
-//                    List<CommentDTO> commentDTOs = answer.getComments().stream()
-//                            .map(comment -> CommentDTO.of(
-//                                    comment.getId(),
-//                                    comment.getCommentContent(),
-//                                    comment.getMember().getId(),
-//                                    comment.getMember().getNickname()
-//                            )).collect(Collectors.toList());
-//
-//                    return new AnswerCreateResponseDto(
-//                            answer.getAnswerContent(),
-//                            answer.getQuestion().getId(),
-//                            answer.getMember().getId(),
-//                            answer.getId(),
-//                            commentDTOs,
-//                            answer.getAnswerLikeCount(),
-//                            mediaUrl
-//                    );
-//                }).collect(Collectors.toList());
-//    }
-
 }

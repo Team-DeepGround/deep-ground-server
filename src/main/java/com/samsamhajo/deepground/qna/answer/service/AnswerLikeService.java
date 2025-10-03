@@ -8,6 +8,7 @@ import com.samsamhajo.deepground.qna.answer.exception.AnswerErrorCode;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerException;
 import com.samsamhajo.deepground.qna.answer.repository.AnswerLikeRepository;
 import com.samsamhajo.deepground.qna.answer.repository.AnswerRepository;
+import com.samsamhajo.deepground.qna.validation.CommonValidation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,15 +20,13 @@ public class AnswerLikeService {
     private final MemberRepository memberRepository;
     private final AnswerRepository answerRepository;
     private final AnswerLikeRepository answerLikeRepository;
+    private final CommonValidation commonValidation;
 
     @Transactional
     public void answerLike(Long answerId, Long memberId) {
 
-        Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
-        Answer answer = answerRepository.findById(answerId).orElseThrow(
-                () -> new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND));
+        Member member = commonValidation.MemberValidation(memberId);
+        Answer answer = commonValidation.AnswerValidation(answerId);
 
         if(answerLikeRepository.existsByAnswerIdAndMemberId(answerId, memberId)) {
             throw new AnswerException(AnswerErrorCode.ANSWER_ALREADY_LIKED);
@@ -41,17 +40,9 @@ public class AnswerLikeService {
         @Transactional
     public void answerUnLike(Long answerId, Long memberId) {
 
-        Answer answer = answerRepository.findById(answerId).orElseThrow(
-                () -> new AnswerException(AnswerErrorCode.ANSWER_NOT_FOUND));
-
-        AnswerLike answerLike = answerLikeRepository.findByAnswerIdAndMemberId(answerId, memberId).orElseThrow(
-                () -> new AnswerException(AnswerErrorCode.ANSWER_LIKE_NOT_FOUND));
-
+        Answer answer = commonValidation.AnswerValidation(answerId);
+        AnswerLike answerLike = commonValidation.LikeValidation(answerId, memberId);
         answerLikeRepository.delete(answerLike);
         answer.decrementAnswerLikeCount();
-    }
-
-    public void deleteAllByAnswerId(Long answerId) {
-        answerLikeRepository.deleteAllByAnswerId(answerId);
     }
 }

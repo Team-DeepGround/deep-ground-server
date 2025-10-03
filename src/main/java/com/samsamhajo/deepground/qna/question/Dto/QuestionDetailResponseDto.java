@@ -1,11 +1,11 @@
 package com.samsamhajo.deepground.qna.question.Dto;
 
+import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
-import com.samsamhajo.deepground.qna.comment.dto.CommentDTO;
+import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.entity.QuestionStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.joda.time.DateTime;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,55 +28,40 @@ public class QuestionDetailResponseDto {
     private List<AnswerCreateResponseDto> answers;
 
     public QuestionDetailResponseDto(
-            Long questionId,
-            String title,
-            String content,
-            Long memberId,
-            String nickname,
+            Question question,
+            Member member,
             List<String> techStacks,
-            int answerCount,
             QuestionStatus questionStatus,
             List<String> mediaUrl,
-            LocalDateTime createdAt,
-            List<AnswerCreateResponseDto> answers// 추가
+            List<AnswerCreateResponseDto> answers
     ) {
-        this.questionId = questionId;
-        this.title = title;
-        this.content = content;
-        this.memberId = memberId;
-        this.nickname = nickname;
+        this.questionId = question.getId();
+        this.title = question.getTitle();
+        this.content = question.getContent();
+        this.memberId = member.getId();
+        this.nickname = member.getNickname();
         this.techStacks = techStacks;
-        this.answerCount = answerCount;
+        this.answerCount = question.getAnswerCount();
         this.questionStatus = questionStatus;
         this.mediaUrl = mediaUrl;
-        this.createdAt = createdAt;
+        this.createdAt = question.getCreatedAt();
         this.answers = answers;// 추가
     }
 
     public static QuestionDetailResponseDto of(
-            Long questionId,
-            String title,
-            String content,
-            Long memberId,
-            String nickname,
+            Question question,
+            Member member,
             List<String> techStacks,
-            int answerCount,
             QuestionStatus questionStatus,
             List<String> mediaUrl,
-            LocalDateTime createdAt,
             List<AnswerCreateResponseDto> answers
     ) {
         return new QuestionDetailResponseDto(
-                questionId,
-                title,
-                content,
-                memberId,
-                nickname,
+                question,
+                member,
                 techStacks,
-                answerCount,
                 questionStatus,
                 mediaUrl,
-                createdAt,
                 answers
         );
     }
