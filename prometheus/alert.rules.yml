@@ -1,0 +1,11 @@
+groups:
+  - name: GeneralAlerts
+    rules:
+      - alert: InstanceDown
+        expr: up == 0
+        for: 2m # 2분 이상 다운 상태일 때만 알림 발생
+        labels:
+          severity: critical
+        annotations:
+          summary: "인스턴스 다운: {{ $labels.instance }}"
+          description: "`{{ $labels.job }}` 잡의 인스턴스 `{{ $labels.instance }}`가 2분 이상 응답하지 않습니다."

@@ -1,0 +1,26 @@
+server:
+  http_listen_port: 9080 # promtail 상태확인할때 사용하는 웹 인터페이스 포트
+  grpc_listen_port: 0
+
+clients: # 수집한 로그 보내는 주소
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # 모든 도커 컨테이너의 로그를 자동으로 수집
+  - job_name: containers
+    docker_scrape_configs:
+      - targets: [unix:///var/run/docker.sock]
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: 'container'
+      - source_labels: ['__meta_docker_container_id']
+        target_label: 'container_id'
+
+  # 호스트 서버의 시스템 로그 수집
+  - job_name: system
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: varlogs
+          __path__: /var/log/*log

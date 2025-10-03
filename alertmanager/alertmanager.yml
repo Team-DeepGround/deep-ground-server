@@ -1,0 +1,27 @@
+global:
+  # 이메일 발신자로 표시될 이메일
+  smtp_from: 'studen@domain.com'
+  smtp_smarthost: 'smtp.daum.net:465'
+  smtp_auth_username: 'studen_support@studen.co.kr'
+  smtp_auth_password: '${SMTP_PASSWORD}'
+# Prometheus로부터 경고를 받았을 때, 경고를 어떻게 처리하고 보낼지 정하는 규칙 최상위 레벨
+route:
+  group_by: ['alertname', 'job'] #여러 알림 동시 발생 시 하나의 그룹으로 묶어 한번만 알람 보냄
+  group_wait: 30s #알람 발생 후 30초동안 발생한 알람은 한 그룹으로 엮임
+  group_interval: 5m # 첫 알람 발생 후 5분동안은 대기
+  repeat_interval: 2h # 해결되지 않은 문제가 알림 발생 시, 주기적으로 다시 보냄
+  # 기본 수신자를 리스트로 지정하여 여러 채널로 동시 발송
+  receiver: 'default-group'
+
+receivers:
+  # Slack과 Email을 모두 받는 기본 그룹
+  - name: 'default-group'
+    webhook_configs:
+      - url: 'https://discord.com/api/webhooks/1423707112730660966/u33Buk8ANXeFixU40LF-J0GbRRyYs-hKD8lmZBf9NVCrkX1847Pb6Ep4lpQqRbDSCpIQ'
+        send_resolved: true
+    email_configs:
+      - to: '9636515@gmail.com'
+      - to: 'wjd1357912@gmail.com'
+      - to: 'jj980915@naver.com'
+        send_resolved: true
+
