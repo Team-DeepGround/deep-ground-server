@@ -1,0 +1,35 @@
+global:
+  scrape_interval: 15s # 15초에 한번 대상 데이터 수집
+
+rule_files:
+  - /etc/prometheus/alert.rules.yml #경고를 발생시킬 규칙이 정의된 파일 위치 지정
+
+alerting: #경고 발생시 9093 포트로 경고 보내
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
+
+scrape_configs: # 무엇을 감시 할지 대상 목록
+  - job_name: 'prometheus' #자기 자신의 상태 감시
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'node' #OCI서버 리소스 정보 수집
+    static_configs:
+      - targets: [ 'node-exporter:9100' ]
+
+  # Docker 컨테이너들을 자동으로 찾아내서 감시하는 방식
+  - job_name: 'docker-containers'
+    # Docker와 통신 후 컨테이너 정보 가져오도록 설정
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+    # 찾아낸 컨테이너들에서 라벨을 추출하여 Prometheus 라벨로 재가공
+    relabel_configs:
+      # prometheus.io/scrape=true 라벨이 붙은 컨테이너만 감시
+      - source_labels: [__meta_docker_container_label_prometheus_io_scrape]
+        action: keep
+        regex: true
+      # 컨테이너 이름을 job 라벨로 사용
+      - source_labels: [__meta_docker_container_name]
+        regex: /(.*)
+        target_label: job
