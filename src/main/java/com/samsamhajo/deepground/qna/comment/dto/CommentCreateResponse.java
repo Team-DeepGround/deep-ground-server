@@ -2,13 +2,13 @@ package com.samsamhajo.deepground.qna.comment.dto;
 
 
 import com.samsamhajo.deepground.qna.comment.entity.Comment;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentCreateResponse {
 
     private String commentContent;

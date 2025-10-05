@@ -43,7 +43,7 @@ public class AnswerController {
 
     }
 
-    @DeleteMapping("/{answerId}")
+    @DeleteMapping("/{questionId}/{answerId}")
     public ResponseEntity<SuccessResponse> deleteAnswer(
             @PathVariable Long answerId, Long questionId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails){
