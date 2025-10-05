@@ -6,7 +6,7 @@ import lombok.*;
 
 @Getter
 @Setter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class CreateCommentRequest {
     @NotBlank(message = "댓글 내용은 필수로 입력해야 합니다.")
     private String commentContent;

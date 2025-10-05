@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class UpdateCommentRequestDto {
 
     @NotBlank(message = "댓글은 필수로 입력해야 합니다.")
