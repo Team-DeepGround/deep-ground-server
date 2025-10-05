@@ -23,6 +23,7 @@ public class QuestionUpdateRequestDto {
     @NotBlank(message = "제목은 필수입니다.")
     private String title;
 
+    @Size(min = 1, message = "내용은 1글자 이상 입력해야 합니다.")
     @NotBlank(message = "내용은 필수입니다.")
     private String content;
 
