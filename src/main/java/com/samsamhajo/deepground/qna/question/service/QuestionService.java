@@ -1,13 +1,8 @@
 package com.samsamhajo.deepground.qna.question.service;
 
 import com.samsamhajo.deepground.member.entity.Member;
-import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
-import com.samsamhajo.deepground.qna.answer.dto.AnswerUpdateResponseDto;
 import com.samsamhajo.deepground.qna.answer.service.AnswerService;
-import com.samsamhajo.deepground.qna.comment.dto.CommentDTO;
-import com.samsamhajo.deepground.qna.comment.entity.Comment;
-import com.samsamhajo.deepground.qna.comment.repository.CommentRepository;
 import com.samsamhajo.deepground.qna.question.Dto.*;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.entity.QuestionMedia;
@@ -17,15 +12,14 @@ import com.samsamhajo.deepground.qna.question.exception.QuestionException;
 import com.samsamhajo.deepground.qna.question.repository.QuestionMediaRepository;
 import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
 import com.samsamhajo.deepground.qna.question.repository.QuestionTagRepository;
+import com.samsamhajo.deepground.qna.validation.CommonValidation;
 import com.samsamhajo.deepground.techStack.entity.TechStack;
 import com.samsamhajo.deepground.techStack.repository.TechStackRepository;
 import lombok.RequiredArgsConstructor;
-import org.joda.time.DateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,26 +33,16 @@ public class QuestionService{
     private final QuestionMediaService questionMediaService;
     private final QuestionTagRepository questionTagRepository;
     private final TechStackRepository techStackRepository;
-    private final MemberRepository memberRepository;
     private final QuestionTagService questionTagService;
     private final AnswerService answerService;
     private final QuestionTagService tagService;
     private final QuestionMediaRepository questionMediaRepository;
-    private final CommentRepository commentRepository;
+    private final CommonValidation commonValidation;
 
-    //질문 생성
+    //Question 생성 메서드
     @Transactional
     public QuestionCreateResponseDto createQuestion(QuestionCreateRequestDto questionCreateRequestDto, Long memberId) {
-       Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
-
-        if(!StringUtils.hasText(questionCreateRequestDto.getTitle())) {
-            throw new QuestionException(QuestionErrorCode.QUESTION_TITLE_REQUIRED);
-        }
-
-        if(!StringUtils.hasText(questionCreateRequestDto.getContent())) {
-            throw new QuestionException(QuestionErrorCode.QUESTION_CONTENT_REQUIRED);
-        }
+       Member member = commonValidation.MemberValidation(memberId);
 
         Question question = Question.of(
                 questionCreateRequestDto.getTitle(),
@@ -70,55 +54,35 @@ public class QuestionService{
         List<String> mediaUrl = createQuestionMedia(questionCreateRequestDto, question);
         questionTagService.createQuestionTag(question, questionCreateRequestDto.getTechStacks());
 
-
-
         return QuestionCreateResponseDto.of(
-                saved.getId(),
-                saved.getTitle(),
-                saved.getContent(),
-                memberId,
-                questionCreateRequestDto.getTechStacks()
-                ,mediaUrl
+                question,
+                questionCreateRequestDto.getTechStacks(),
+                mediaUrl
         );
     }
 
+    //Question 삭제 메서드
     @Transactional
     public Long deleteQuestion(Long questionId, Long memberId) {
 
-        Member member = memberRepository.findById(memberId).orElseThrow(
-                ()-> new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH));
-
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
+        Question question = commonValidation.QuestionValidation(questionId);
 
         if(!question.getMember().getId().equals(memberId)) {
             throw new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH);
+        } else {
+            questionTagRepository.deleteAllByQuestionId(questionId);
+            questionMediaService.deleteQuestionMedia(questionId);
+            questionRepository.deleteById(questionId);
         }
 
-        questionTagRepository.deleteAllByQuestionId(questionId);
-        questionMediaService.deleteQuestionMedia(questionId);
-        questionRepository.deleteById(questionId);
-
         return question.getId();
-
     }
 
+    //Question 수정 메서드
     @Transactional
     public QuestionUpdateResponseDto updateQuestion(QuestionUpdateRequestDto questionUpdateRequestDto, Long memberId) {
 
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH));
-
-        if(!StringUtils.hasText(questionUpdateRequestDto.getTitle())) {
-            throw new QuestionException(QuestionErrorCode.QUESTION_TITLE_REQUIRED);
-        }
-
-        if(!StringUtils.hasText(questionUpdateRequestDto.getContent())) {
-            throw new QuestionException(QuestionErrorCode.QUESTION_CONTENT_REQUIRED);
-        }
-
-        Question question = questionRepository.findById(questionUpdateRequestDto.getQuestionId())
-                .orElseThrow(()-> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
+        Question question = commonValidation.QuestionValidation(questionUpdateRequestDto.getQuestionId());
 
         if(!question.getMember().getId().equals(memberId)) {
             throw new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH);
@@ -127,13 +91,13 @@ public class QuestionService{
         questionTagRepository.deleteAllByQuestionId(question.getId());
 
         List<String> techStacks = questionUpdateRequestDto.getTechStacks();
+
         for (String name : techStacks) {
             TechStack techStack = techStackRepository.findByName(name)
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 태그: " + name));
             QuestionTag questionTag = QuestionTag.of(question, techStack);
             questionTagRepository.save(questionTag);
         }
-
 
         question.updateQuesiton(questionUpdateRequestDto.getTitle(), questionUpdateRequestDto.getContent());
         questionMediaService.deleteQuestionMedia(question.getId());
@@ -143,12 +107,13 @@ public class QuestionService{
                 question.getId(),
                 question.getTitle(),
                 question.getContent(),
-                member.getId(),
+                question.getMember().getId(),
                 techStacks,
                 mediaUrl
         );
 
     }
+
     private List<String> createQuestionMedia(QuestionCreateRequestDto questionCreateRequestDto, Question question) {
         return questionMediaService.createQuestionMedia(question, questionCreateRequestDto.getImages());
 
@@ -158,19 +123,16 @@ public class QuestionService{
         return questionMediaService.createQuestionMedia(question, questionUpdateRequestDto.getImages());
     }
 
+    //Question 상태 수정 메서드
     @Transactional
     public QuestionUpdateStatusResponseDto updateQuestionStatus(QuestionUpdateStatusRequestDto questionUpdateStatusRequestDto, Long memberId, Long questionId) {
 
-        Member member = memberRepository.findById(memberId).orElseThrow(
-                ()-> new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH));
-
-        Question question = questionRepository.findById(questionId).orElseThrow(
-                () -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
+        Member member = commonValidation.MemberValidation(memberId);
+        Question question = commonValidation.QuestionValidation(questionId);
 
         if(!member.getId().equals(memberId)) {
             throw new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH);
-        }
-        question.updateStatus(questionUpdateStatusRequestDto.getStatus());
+        } else { question.updateStatus(questionUpdateStatusRequestDto.getStatus());}
 
         return QuestionUpdateStatusResponseDto.of(
                 question.getId(),
@@ -179,7 +141,7 @@ public class QuestionService{
         );
     }
 
-
+    //Question 리스트 조회 메서드
     @Transactional(readOnly = true)
     public QuestionListResponseDto getQuestions(Pageable pageable) {
         Page<Question> questionPage = questionRepository.findAll(pageable);
@@ -200,36 +162,35 @@ public class QuestionService{
         return QuestionListResponseDto.of(summaries, questionPage.getTotalPages());
     }
 
+    //Question 상세 조회 메서드
     @Transactional(readOnly = true)
     public QuestionDetailResponseDto getQuestionDetail(Long questionId, Long memberId) {
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
+
+        Member member = commonValidation.MemberValidation(memberId);
+        Question question = commonValidation.QuestionValidation(questionId);
+
         List<QuestionMedia> questionMedia = questionMediaRepository.findAllByQuestionId(questionId);
-        int answerCount = answerService.countAnswersByQuestionId(questionId);
+
         List<String> techStacks = tagService.getStackNamesByQuestionId(questionId);
+
         List<String> mediaUrl = questionMedia.stream()
                 .map(QuestionMedia::getMediaUrl)
                 .collect(Collectors.toList());
 
         List<AnswerCreateResponseDto> answers = answerService.getAnswersByQuestionId(questionId);
 
-        LocalDateTime createdAt = questionRepository.findById(questionId).get().getCreatedAt();
-
         return QuestionDetailResponseDto.of(
-                question.getId(),
-                question.getTitle(),
-                question.getContent(),
-                question.getMember().getId(),
-                question.getMember().getNickname(),
+                question,
+                member,
                 techStacks,
-                answerCount,
                 question.getQuestionStatus(),
                 mediaUrl,
-                createdAt,
                 answers
         );
     }
 
+    //member가 작성한 question리스트 조회 메서드
+    //TODO : 현재 마이페이지에 내가 조회한 Question이 없는 관계로 추후에 생긴 후 Refactoring 할 예정
     @Transactional(readOnly = true)
     public QuestionListResponseDto getQuestionsByMemberId(Long memberId, Pageable pageable) {
         Page<Question> questionPage = questionRepository.findByMemberId(memberId, pageable);
