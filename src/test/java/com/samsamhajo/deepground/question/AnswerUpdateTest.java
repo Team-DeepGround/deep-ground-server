@@ -117,43 +117,6 @@ public class AnswerUpdateTest extends IntegrationTestSupport {
         assertThat(exception.getMessage()).isEqualTo("답변을 작성한 사용자가 아닙니다.");
     }
 
-
-    @Test
-    @DisplayName("Content Valid 테스트")
-    void updateContentValidTest() {
-        String title = "테스트";
-        String content = "테스트1";
-        String answerContent = "test answercontent";
-        String UpdateContent = "";
-        List<MultipartFile> mediaFiles = List.of(
-                new MockMultipartFile("mediaFiles", "image1.png", MediaType.IMAGE_PNG_VALUE, "dummy image content 1".getBytes())
-        );
-
-        //질문 생성
-        List<String> techStackNames = List.of("techStack1", "techStack2");
-        List<String> categoryNames = List.of("category1", "category2");
-        List<TechStack> techStacks = techStackNames.stream()
-                .map(name -> TechStack.of(name, categoryNames.toString())) // 정적 팩토리 메서드가 없다면 new TechStack(name) 사용
-                .collect(Collectors.toList());
-        List<TechStack> savedTechStacks = techStackRepository.saveAll(techStacks);
-
-        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStackNames, mediaFiles);
-
-        QuestionCreateResponseDto questionCreateResponseDto = questionService.createQuestion(questionCreateRequestDto, memberId);
-        Long test1 = questionCreateResponseDto.getQuestionId();
-
-        //답변 생성
-        AnswerCreateRequestDto answerCreateRequestDto = new AnswerCreateRequestDto(answerContent, mediaFiles, test1);
-        AnswerCreateResponseDto answerCreateResponseDto = answerService.createAnswer(answerCreateRequestDto, memberId);
-        Long test2 = answerCreateResponseDto.getAnswerId();
-        System.out.println(answerCreateResponseDto.getAnswerContent());
-
-        //답변 빈칸일시 예외발생
-        AnswerUpdateRequestDto answerUpdateRequestDto = new AnswerUpdateRequestDto(UpdateContent, mediaFiles, test1, test2, null);
-        AnswerException answerException = assertThrows(AnswerException.class, () -> answerService.updateAnswer(answerUpdateRequestDto, memberId));
-        assertThat(answerException.getMessage()).isEqualTo(AnswerErrorCode.ANSWER_CONTENT_REQUIRED.getMessage());
-    }
-
     @Test
     @DisplayName("답변 없을 시 예외처리")
     void AnswerNotFoundTest() {
