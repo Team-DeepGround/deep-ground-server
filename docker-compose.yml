@@ -94,12 +94,13 @@ services:
     networks:
       - monitoring
     restart: unless-stopped
+    privileged: true
     volumes:
       # 범용적인 도커 로그 수집
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       # 설정 & 데이터를 폴더로 묶어 체계적 관리
-      - ./promtail/promtail-config.yaml:/etc/promtail/promtail-config.yaml
+      - ./promtail/promtail-config.yaml:/etc/promtail/promtail-config.yaml:ro
        # logFile을 어디까지 읽었는지 그 위치를 저장하는 폴더 (재시작시 로그 중복 전송 방지)
       - ./promtail/positions:/tmp
     command:
