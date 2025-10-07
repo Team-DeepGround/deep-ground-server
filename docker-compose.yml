@@ -5,6 +5,7 @@ services:
       - "8080:8080"
     labels:
       - "prometheus.io/scrape=true"
+      - "prometheus.io/path=/api/v1/actuator/prometheus"
     env_file:
       - .env
     restart: unless-stopped
