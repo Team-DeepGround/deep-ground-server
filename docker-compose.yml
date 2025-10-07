@@ -98,6 +98,8 @@ services:
     user: "root"
     security_opt:
       - "apparmor=unconfined"
+    group_add:
+      - "988"  # getent group docker 명령으로 확인한 GID
     volumes:
       # 범용적인 도커 로그 수집
       - /var/run/docker.sock:/var/run/docker.sock:ro
