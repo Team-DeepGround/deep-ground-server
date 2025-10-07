@@ -105,7 +105,6 @@ services:
       - ./promtail/promtail-config.yaml:/etc/promtail/promtail-config.yaml:ro
       # logFile을 어디까지 읽었는지 그 위치를 저장하는 폴더
       - ./promtail/positions:/tmp
-      - /home/ubuntu/studen/logs:/home/ubuntu/studen/logs:ro
     command:
       - -config.file=/etc/promtail/promtail-config.yaml
       - -positions.file=/tmp/positions.yaml
