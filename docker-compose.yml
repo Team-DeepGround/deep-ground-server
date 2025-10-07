@@ -37,19 +37,19 @@ services:
     depends_on:
       - prometheus
     restart: unless-stopped
-  # 사용자권한은 따로 설정 X
+
   loki:
-    image: grafana/loki:3.4.1 #Docker Image 버전
+    image: grafana/loki:3.4.1
     container_name: loki
     networks:
       - monitoring
     ports:
       - "3100:3100"
-    volumes: #데이터 저장 방식
+    volumes:
       - ./loki/loki-config.yaml:/etc/loki/config.yaml
       - loki-data:/loki
     restart: unless-stopped
-    command: #설정파일 경로
+    command:
       - -config.file=/etc/loki/config.yaml
 
   alertmanager:
@@ -84,7 +84,6 @@ services:
       - '--path.sysfs=/host/sys'
       - '--path.rootfs=/rootfs'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-    # Prometheus와 같은 네트워크에 있어야 Prometheus가 접근 가능
     ports:
       - "9100:9100"
 
@@ -94,28 +93,36 @@ services:
     networks:
       - monitoring
     restart: unless-stopped
+    # [핵심] user와 privileged 설정
+    user: root
     privileged: true
-    user: "root"
-    security_opt:
-      - "apparmor=unconfined"
-    group_add:
-      - "988"  # getent group docker 명령으로 확인한 GID
     volumes:
-      # 범용적인 도커 로그 수집
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-
-      # [수정] 호스트 시스템 로그 수집을 위해 /var/log 마운트 추가
-      - /var/log:/var/log:ro
-
-      # 설정 & 데이터를 폴더로 묶어 체계적 관리
-      - ./promtail/promtail-config.yaml:/etc/promtail/promtail-config.yaml:ro
-       # logFile을 어디까지 읽었는지 그 위치를 저장하는 폴더 (재시작시 로그 중복 전송 방지)
-      - ./promtail/positions:/tmp
+      # [중요] type: bind 명시적으로 지정
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      - type: bind
+        source: /var/lib/docker/containers
+        target: /var/lib/docker/containers
+        read_only: true
+      - type: bind
+        source: /var/log
+        target: /var/log
+        read_only: true
+      - type: bind
+        source: ./promtail/promtail-config.yaml
+        target: /etc/promtail/promtail-config.yaml
+        read_only: true
+      - type: bind
+        source: ./promtail/positions
+        target: /tmp
     command:
       - -config.file=/etc/promtail/promtail-config.yaml
       - -positions.file=/tmp/positions.yaml
 
+networks:
+  monitoring:
+    driver: bridge
 
 volumes:
   grafana-data:
