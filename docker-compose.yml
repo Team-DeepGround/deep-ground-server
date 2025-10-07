@@ -96,10 +96,12 @@ services:
     restart: unless-stopped
     privileged: true
     user: "root"
+    security_opt:
+      - "apparmor=unconfined"
     volumes:
       # 범용적인 도커 로그 수집
-      - /var/run/docker.sock:/var/run/docker.sock:ro:z
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro:z
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
 
       # [수정] 호스트 시스템 로그 수집을 위해 /var/log 마운트 추가
       - /var/log:/var/log:ro
