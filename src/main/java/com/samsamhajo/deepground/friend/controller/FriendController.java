@@ -7,12 +7,11 @@ import com.samsamhajo.deepground.friend.Dto.FriendRequestDto;
 import com.samsamhajo.deepground.friend.Exception.FriendSuccessCode;
 import com.samsamhajo.deepground.friend.service.FriendService;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
-import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.global.utils.GlobalLogger;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +30,8 @@ public class FriendController {
 
         Long memberId = userDetails.getMember().getId();
         Long friendId = friendService.sendFriendRequest(memberId, dto.getReceiverEmail());
+        GlobalLogger.info("friend request log={}","요청 멤버 id:"+ memberId+"친구 고유 id:"+friendId);
+
         return ResponseEntity
                         .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_REQUEST,friendId));
     }
@@ -89,6 +90,8 @@ public class FriendController {
                                                                 @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long memberId = userDetails.getMember().getId();
         Long friendId = friendService.sendProfileFriendRequest(memberId, receiverId);
+        GlobalLogger.info("friend request from profile={}","요청 멤버 id:"+ memberId+"고유 친구 id:"+friendId);
+
 
         return ResponseEntity
                 .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_REQUEST,friendId));
