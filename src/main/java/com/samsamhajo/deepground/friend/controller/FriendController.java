@@ -7,6 +7,7 @@ import com.samsamhajo.deepground.friend.Dto.FriendRequestDto;
 import com.samsamhajo.deepground.friend.Exception.FriendSuccessCode;
 import com.samsamhajo.deepground.friend.service.FriendService;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
+import com.samsamhajo.deepground.global.utils.GlobalLogger;
 import com.samsamhajo.deepground.member.entity.Member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,9 @@ public class FriendController {
 
         Long memberId = userDetails.getMember().getId();
         Long friendId = friendService.sendFriendRequest(memberId, dto.getReceiverEmail());
+
+        GlobalLogger.info("friend request log={}","요청 멤버 id:"+ memberId+"친구 고유 id:"+friendId);
+
         return ResponseEntity
                         .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_REQUEST,friendId));
     }
