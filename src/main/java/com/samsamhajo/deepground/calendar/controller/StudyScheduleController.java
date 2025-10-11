@@ -6,7 +6,6 @@ import com.samsamhajo.deepground.calendar.dto.StudyScheduleResponseDto;
 import com.samsamhajo.deepground.calendar.exception.ScheduleSuccessCode;
 import com.samsamhajo.deepground.calendar.service.StudyScheduleService;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
-import com.samsamhajo.deepground.global.utils.GlobalLogger;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +30,6 @@ public class StudyScheduleController {
         Long userId = userDetails.getMember().getId();
 
         StudyScheduleResponseDto responseDto = studyScheduleService.createStudySchedule(studyGroupId, userId, requestDto);
-        GlobalLogger.info("create Schedule={}","생성 회원 id"+ userId+"스터디 그룹 id:"+studyGroupId);
         return ResponseEntity.status(ScheduleSuccessCode.SCHEDULE_CREATED.getStatus())
                 .body(SuccessResponse.of(ScheduleSuccessCode.SCHEDULE_CREATED, responseDto));
     }
@@ -45,7 +43,6 @@ public class StudyScheduleController {
         return ResponseEntity.status(ScheduleSuccessCode.SCHEDULE_FOUND.getStatus())
                 .body(SuccessResponse.of(ScheduleSuccessCode.SCHEDULE_FOUND, schedules));
     }
-
     @PatchMapping("/schedules/{scheduleId}")
     public ResponseEntity<SuccessResponse<StudyScheduleResponseDto>> updateSchedule(
             @PathVariable Long studyGroupId,
