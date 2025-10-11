@@ -1,167 +1,166 @@
 package com.samsamhajo.deepground.question;
 
-import com.samsamhajo.deepground.IntegrationTestSupport;
-import com.samsamhajo.deepground.global.upload.S3Uploader;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
-import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateRequestDto;
-import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
-import com.samsamhajo.deepground.qna.answer.repository.AnswerRepository;
-import com.samsamhajo.deepground.qna.answer.service.AnswerService;
-import com.samsamhajo.deepground.qna.comment.dto.CommentCreateRequestDto;
-import com.samsamhajo.deepground.qna.comment.dto.CommentCreateResponseDto;
-import com.samsamhajo.deepground.qna.comment.exception.CommentErrorCode;
+import com.samsamhajo.deepground.qna.answer.entity.Answer;
+import com.samsamhajo.deepground.qna.comment.dto.CommentCreateResponse;
+import com.samsamhajo.deepground.qna.comment.dto.CreateCommentRequest;
+import com.samsamhajo.deepground.qna.comment.dto.UpdateCommentRequestDto;
+import com.samsamhajo.deepground.qna.comment.dto.UpdateCommentResponseDto;
+import com.samsamhajo.deepground.qna.comment.entity.Comment;
 import com.samsamhajo.deepground.qna.comment.exception.CommentException;
 import com.samsamhajo.deepground.qna.comment.repository.CommentRepository;
 import com.samsamhajo.deepground.qna.comment.service.CommentService;
-import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateRequestDto;
-import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateResponseDto;
-import com.samsamhajo.deepground.qna.question.service.QuestionService;
-import com.samsamhajo.deepground.techStack.entity.TechStack;
-import com.samsamhajo.deepground.techStack.repository.TechStackRepository;
-import org.junit.jupiter.api.Assertions;
+import com.samsamhajo.deepground.qna.question.entity.Question;
+import com.samsamhajo.deepground.qna.validation.CommonValidation;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
-@Transactional
-public class CommentTest extends IntegrationTestSupport {
+@ExtendWith(MockitoExtension.class)
+public class CommentTest {
 
-    @Autowired
+    @InjectMocks
     private CommentService commentService;
-    @Autowired
+
+    @Mock
     private CommentRepository commentRepository;
-    @Autowired
-    private AnswerService answerService;
-    @Autowired
-    private AnswerRepository answerRepository;
-    @Autowired
+    @Mock
+    private CommonValidation commonValidation;
+    @Mock
     private MemberRepository memberRepository;
-    private Long memberId;
-    private Long questionId;
-    private Long answerId;
-    private Long commentId;
-    @Autowired
-    private QuestionService questionService;
-    @Autowired
-    private TechStackRepository techStackRepository;
-    @Autowired
-    private S3Uploader s3Uploader;
+
+    private Question question;
+    private Answer answer;
+    private Comment comment;
+    private Member member;
+    private Member member1;
 
     @BeforeEach
-    public void 회원_저장() {
-        Member member = Member.createLocalMember("2@gmail.com", "asd", "dotae");
-        memberRepository.save(member);
-        memberId = member.getId();
-        given(s3Uploader.upload(any(MultipartFile.class), anyString()))
-                .willAnswer(invocation ->
-                        "http://localhost/test/" +
-                                invocation.getArgument(0, MultipartFile.class).getOriginalFilename());
+    public void Mock회원() {
+        member = Member.createLocalMember(
+                "9636515@gmail.com",
+                "test1234@",
+                "Dotae"
+        );
+
+        member1 = Member.createLocalMember(
+                "test@gmail.com",
+                "test1224",
+                "Guest"
+        );
+        question = Question.of(
+                "테스트 제목",
+                "테스트 내용",
+                member
+        );
+        answer = Answer.of(
+                "테스트 답변 내용",
+                member,
+                question
+        );
+        comment = Comment.of(
+                "테스트 댓글 내용",
+                member,
+                answer
+        );
+
+        //Mock 객체를 위해 ID값 주입
+        ReflectionTestUtils.setField(member, "id", 1L);
+        ReflectionTestUtils.setField(member1, "id", 2L);
+        ReflectionTestUtils.setField(question, "id", 1L);
+        ReflectionTestUtils.setField(answer, "id", 1L);
+        ReflectionTestUtils.setField(comment, "id", 1L);
     }
 
     @Test
-    @DisplayName("댓글 생성 테스트")
-    public void createCommentTest() {
+    @DisplayName("댓글 작성 성공")
+    public void commentTest() {
 
-        String title = "테스트";
-        String content = "테스트1";
-
-        String answerContent = "test answercontent";
-
-        List<Long> techStack = List.of(1L, 2L);
-
-        List<MultipartFile> mediaFiles = List.of(
-                new MockMultipartFile("mediaFiles", "image1.png", MediaType.IMAGE_PNG_VALUE, "dummy image content 1".getBytes())
-        );
-
-        //질문 생성
-        List<String> techStackNames = List.of("techStack1", "techStack2");
-        List<String> categoryNames = List.of("category1", "category2");
-        List<TechStack> techStacks = techStackNames.stream()
-                .map(name -> TechStack.of(name, categoryNames.toString())) // 정적 팩토리 메서드가 없다면 new TechStack(name) 사용
-                .collect(Collectors.toList());
-        List<TechStack> savedTechStacks = techStackRepository.saveAll(techStacks);
-
-        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStackNames, mediaFiles);
-
-        QuestionCreateResponseDto questionCreateResponseDto = questionService.createQuestion(questionCreateRequestDto, memberId);
-        questionId = questionCreateResponseDto.getQuestionId();
-
-        //답변 생성
-        AnswerCreateRequestDto answerCreateRequestDto = new AnswerCreateRequestDto(answerContent, mediaFiles, questionId);
-        AnswerCreateResponseDto answerCreateResponseDto = answerService.createAnswer(answerCreateRequestDto, memberId);
-        answerId = answerCreateResponseDto.getAnswerId();
-
-        //댓글 생성
         String commentContent = "테스트 댓글 내용";
-        CommentCreateRequestDto commentCreateRequestDto = new CommentCreateRequestDto(commentContent, answerId);
-        CommentCreateResponseDto commentCreateResponseDto = commentService.createComment(commentCreateRequestDto, memberId);
-        commentId = commentCreateResponseDto.getCommentId();
-        System.out.println(commentId);
+        CreateCommentRequest request = new CreateCommentRequest(commentContent, answer.getId());
 
-        //작성한 댓글이 맞게 들어갔는지
-        assertThat(commentCreateResponseDto.getCommentContent()).isEqualTo(commentContent);
-        //맞는 답변에 댓글이 달렸는지
-        assertThat(commentCreateResponseDto.getAnswerId()).isEqualTo(answerId);
-        //생성된 commentID가 repository에 저장된 id와 동일한지
-        assertThat(commentRepository.findById(commentId)).isNotNull();
+        //answerId가 호출되면, 우리가 만든 answer 객체 반환 -> 없으면 validation null point exception 발생
+        when(commonValidation.AnswerValidation(answer.getId())).thenReturn(answer);
+
+        //commentRepository에서 어떤 Comment객체라도 받게된다면, comment Return
+        when(commentRepository.save(any(Comment.class))).thenReturn(comment);
+
+        CommentCreateResponse response = commentService.createComment(request, member.getId());
+
+        // comment, answer, memberId 일치 여부 + 우리가 작성한 commentContent내용 일치 여부 확인
+        assertThat(response.getCommentId()).isEqualTo(comment.getId());
+        assertThat(response.getCommentContent()).isEqualTo(commentContent);
+        assertThat(response.getMemberId()).isEqualTo(member.getId());
+        assertThat(response.getAnswerId()).isEqualTo(answer.getId());
     }
 
     @Test
-    @DisplayName("댓글_길이제한_예외처리테스트")
-    public void commentExceptionTest() {
+    @DisplayName("댓글 수정 성공")
+    public void modifyCommentTest() {
+        String commentContent = "테스트 댓글 내용";
+        String modifyContent = "테스트 댓글 수정";
 
-        String title = "테스트";
-        String content = "테스트1";
+        UpdateCommentRequestDto request = new UpdateCommentRequestDto(modifyContent, answer.getId(), comment.getId());
 
-        String answerContent = "test answercontent";
+        when(commonValidation.CommentValidation(comment.getId())).thenReturn(comment);
 
-        List<Long> techStack = List.of(1L, 2L);
+        UpdateCommentResponseDto response = commentService.updateComment(request, member.getId());
 
-        List<MultipartFile> mediaFiles = List.of(
-                new MockMultipartFile("mediaFiles", "image1.png", MediaType.IMAGE_PNG_VALUE, "dummy image content 1".getBytes())
-        );
-
-        //질문 생성
-        List<String> techStackNames = List.of("techStack1", "techStack2");
-        List<String> categoryNames = List.of("category1", "category2");
-        List<TechStack> techStacks = techStackNames.stream()
-                .map(name -> TechStack.of(name, categoryNames.toString())) // 정적 팩토리 메서드가 없다면 new TechStack(name) 사용
-                .collect(Collectors.toList());
-        List<TechStack> savedTechStacks = techStackRepository.saveAll(techStacks);
-
-        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStackNames, mediaFiles);
-
-        QuestionCreateResponseDto questionCreateResponseDto = questionService.createQuestion(questionCreateRequestDto, memberId);
-        questionId = questionCreateResponseDto.getQuestionId();
-
-        //답변 생성
-        AnswerCreateRequestDto answerCreateRequestDto = new AnswerCreateRequestDto(answerContent, mediaFiles, questionId);
-        AnswerCreateResponseDto answerCreateResponseDto = answerService.createAnswer(answerCreateRequestDto, memberId);
-        answerId = answerCreateResponseDto.getAnswerId();
-
-        String commentContent = "";
-        try {
-            CommentCreateRequestDto commentCreateRequestDto = new CommentCreateRequestDto(commentContent, answerId);
-            CommentCreateResponseDto commentCreateResponseDto = commentService.createComment(commentCreateRequestDto, memberId);
-            commentId = commentCreateResponseDto.getCommentId();
-        } catch(CommentException exception) {
-            Assertions.assertEquals(CommentErrorCode.COMMENT_REQUIRED, exception.getErrorCode());
-        }
-
+        assertThat(response.getCommentContent()).isNotEqualTo(commentContent);
+        assertThat(response.getMemberId()).isEqualTo(member.getId());
 
     }
+
+    @Test
+    @DisplayName("댓글 수정 실패 : 작성자가 아닌 경우")
+    public void modifyCommentFailTest() {
+        String modifyContent = "테스트 댓글 수정";
+        UpdateCommentRequestDto request = new UpdateCommentRequestDto(modifyContent, answer.getId(), comment.getId());
+
+        when(commonValidation.CommentValidation(comment.getId())).thenReturn(comment);
+
+        CommentException exception = assertThrows(CommentException.class, () -> {
+            commentService.updateComment(request, member1.getId());
+        });
+
+        //예외 터지는 지 처리 여부
+        assertThat(exception.getErrorCode().getMessage()).isEqualTo("댓글을 작성한 멤버가 아닙니다.");
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 성공")
+    public void deleteCommentTest() {
+
+        when(commonValidation.CommentValidation(comment.getId())).thenReturn(comment);
+
+        commentService.deleteComment(comment.getId(), member.getId());
+
+        assertThat(commentRepository.findById(comment.getId())).isEmpty();
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 실패 : 작성자가 아닌 경우")
+    public void deleteCommentFailTest() {
+
+        when(commonValidation.CommentValidation(comment.getId())).thenReturn(comment);
+
+        CommentException exception = assertThrows(CommentException.class, () -> {
+            commentService.deleteComment(comment.getId(), member1.getId());
+        });
+
+        assertThat(exception.getErrorCode().getMessage()).isEqualTo("댓글을 작성한 멤버가 아닙니다.");
+    }
+
+
 }

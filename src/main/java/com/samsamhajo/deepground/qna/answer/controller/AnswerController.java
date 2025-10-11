@@ -32,7 +32,6 @@ public class AnswerController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     )
     {
-
         answerCreateRequestDto.setImages(images);
 
         AnswerCreateResponseDto answerCreateResponseDto = answerService.createAnswer(answerCreateRequestDto
@@ -44,12 +43,12 @@ public class AnswerController {
 
     }
 
-    @DeleteMapping("/{answerId}")
+    @DeleteMapping("/{questionId}/{answerId}")
     public ResponseEntity<SuccessResponse> deleteAnswer(
-            @PathVariable Long answerId,
+            @PathVariable Long answerId, Long questionId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails){
 
-                answerService.deleteAnswer(answerId, customUserDetails.getMember().getId());
+                answerService.deleteAnswer(answerId, customUserDetails.getMember().getId(),  questionId);
 
                 return ResponseEntity
                         .status(HttpStatus.OK)
@@ -59,7 +58,6 @@ public class AnswerController {
     @PutMapping(value = "/{answerId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse> updateAnswer(
             @Valid @ModelAttribute AnswerUpdateRequestDto answerUpdateRequestDto,
-            @PathVariable Long answerId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails
     ) {
         AnswerUpdateResponseDto answerUpdateResponseDto = answerService.updateAnswer(answerUpdateRequestDto,
