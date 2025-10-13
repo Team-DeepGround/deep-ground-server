@@ -6,6 +6,7 @@ import com.samsamhajo.deepground.feed.feed.exception.FeedSuccessCode;
 import com.samsamhajo.deepground.feed.feed.model.*;
 import com.samsamhajo.deepground.feed.feed.service.FeedService;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
+import com.samsamhajo.deepground.global.utils.GlobalLogger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,7 +27,7 @@ public class FeedController {
     public ResponseEntity<SuccessResponse<Feed>> createFeed(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @ModelAttribute FeedCreateRequest request) {
-
+        GlobalLogger.info("피드 생성 요청 - memberId: {}", userDetails.getMember().getId());
         feedService.createFeed(request, userDetails.getMember());
 
         return ResponseEntity

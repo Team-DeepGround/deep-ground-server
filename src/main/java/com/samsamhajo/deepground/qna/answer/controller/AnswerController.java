@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.qna.answer.controller;
 
 import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
+import com.samsamhajo.deepground.global.utils.GlobalLogger;
 import com.samsamhajo.deepground.qna.answer.dto.*;
 import com.samsamhajo.deepground.qna.answer.service.AnswerService;
 import com.samsamhajo.deepground.qna.answer.exception.AnswerSuccessCode;
@@ -36,6 +37,7 @@ public class AnswerController {
 
         AnswerCreateResponseDto answerCreateResponseDto = answerService.createAnswer(answerCreateRequestDto
         , customUserDetails.getMember().getId());
+        GlobalLogger.info("답변 생성 = {}", answerCreateResponseDto.getAnswerId(), "회원 ID = {}", customUserDetails.getMember().getId());
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
