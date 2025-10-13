@@ -29,14 +29,12 @@ public class PresenceService {
 
     @EventListener
     public void handleSseSubscribeEvent(SseSubscribeEvent event) {
-        log.info("{}번 사용자: Online", event.memberId());
         presenceRepository.save(event.memberId(), DEFAULT_TIMEOUT);
         publishPresenceEvent(event.memberId(), true);
     }
 
     @EventListener
     public void handleSseUnsubscribeEvent(SseUnsubscribeEvent event) {
-        log.info("{}번 사용자: Offline", event.memberId());
         presenceRepository.deleteById(event.memberId());
         publishPresenceEvent(event.memberId(), isOnlineMember(event.memberId()));
     }
