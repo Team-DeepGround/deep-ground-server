@@ -37,6 +37,7 @@ public class QuestionController {
 
         questionRequestDto.setImages(images);
         QuestionCreateResponseDto questionCreateResponseDto = questionService.createQuestion(questionRequestDto, customUserDetails.getMember().getId());
+        GlobalLogger.info("질문 생성 = {}",  questionCreateResponseDto.getQuestionId(), "멤버ID= {}", customUserDetails.getMember().getId());
 
 
         return ResponseEntity
@@ -64,6 +65,7 @@ public class QuestionController {
             ,@AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
         questionService.deleteQuestion(questionId, customUserDetails.getMember().getId());
+        GlobalLogger.info("삭제 요청 멤버ID= {}", customUserDetails.getMember().getId());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -76,9 +78,6 @@ public class QuestionController {
             @Valid @RequestBody QuestionUpdateStatusRequestDto questionUpdateStatusRequestDto,
             @PathVariable Long questionId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
-
-        System.out.println("questionId = " + questionId);
-        System.out.println("memberId = " + customUserDetails.getMember().getId());
 
         QuestionUpdateStatusResponseDto questionUpdateStatusResponseDto = questionService.updateQuestionStatus(questionUpdateStatusRequestDto,
                 customUserDetails.getMember().getId(), questionId);
@@ -93,6 +92,7 @@ public class QuestionController {
             @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
             ){
         QuestionListResponseDto questionListResponseDto = questionService.getQuestions(pageable);
+        GlobalLogger.info("질문 조회 = {}", questionListResponseDto.getQuestions().size());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -115,6 +115,7 @@ public class QuestionController {
             @PageableDefault(size = 5, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         QuestionListResponseDto questions = questionService.getQuestionsByMemberId(customUserDetails.getMember().getId(), pageable);
+        GlobalLogger.info("질문 조회 = {}", questions.getQuestions().size());
         return ResponseEntity.ok(questions);
     }
 

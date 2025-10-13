@@ -3,6 +3,7 @@ package com.samsamhajo.deepground.qna.comment.controller;
 
 import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
+import com.samsamhajo.deepground.global.utils.GlobalLogger;
 import com.samsamhajo.deepground.qna.comment.dto.*;
 import com.samsamhajo.deepground.qna.comment.exception.CommentSuccessCode;
 import com.samsamhajo.deepground.qna.comment.service.CommentService;
@@ -62,6 +63,7 @@ public class CommentController {
 
         CommentCreateResponse commentCreateResponse = commentService.createComment(createCommentRequest,
                 customUserDetails.getMember().getId());
+        GlobalLogger.info("댓글 생성 = {}",  commentCreateResponse.getCommentId(), "회원ID = {}",  customUserDetails.getMember().getId());
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
