@@ -9,6 +9,7 @@ import com.samsamhajo.deepground.email.repository.EmailVerificationRepository;
 import com.samsamhajo.deepground.email.service.EmailService;
 import com.samsamhajo.deepground.auth.repository.RefreshTokenRepository;
 
+import com.samsamhajo.deepground.global.utils.GlobalLogger;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
@@ -46,6 +47,7 @@ public class AuthService {
         );
 
         Member savedMember = memberRepository.save(member);
+        GlobalLogger.info("회원가입 성공 - email: {}, memberId: {}", savedMember.getEmail(), savedMember.getId());
         return savedMember.getId();
     }
 
@@ -60,9 +62,10 @@ public class AuthService {
         }
 
         if (member.isBanned()) {
-            throw new AuthException(AuthErrorCode.BANNED_MEMBER); // ⚠️ 새로운 에러코드 필요
+            throw new AuthException(AuthErrorCode.BANNED_MEMBER);
         }
 
+        GlobalLogger.info("로그인 성공 = email: {}, memberId: {}", member.getEmail(), member.getId());
         String accessToken = jwtProvider.createAccessToken(member.getId(), member.getRole().name());
         String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getRole().name());
 
