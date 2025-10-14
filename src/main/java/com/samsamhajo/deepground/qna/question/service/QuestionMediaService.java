@@ -1,19 +1,19 @@
 package com.samsamhajo.deepground.qna.question.service;
 
-
-import com.nimbusds.oauth2.sdk.util.CollectionUtils;
 import com.samsamhajo.deepground.global.upload.S3Uploader;
 import com.samsamhajo.deepground.media.MediaUtils;
 import com.samsamhajo.deepground.qna.question.Dto.QuestionMediaResponse;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.entity.QuestionMedia;
+import com.samsamhajo.deepground.qna.question.exception.QuestionErrorCode;
+import com.samsamhajo.deepground.qna.question.exception.QuestionException;
 import com.samsamhajo.deepground.qna.question.repository.QuestionMediaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.webjars.NotFoundException;
+
 
 import java.util.Collections;
 import java.util.List;
@@ -70,7 +70,7 @@ public class QuestionMediaService {
 
     public QuestionMediaResponse questionFetchMedia(String mediaUrl) {
         QuestionMedia questionMedia = questionMediaRepository.findByMediaUrl(mediaUrl)
-                .orElseThrow(() -> new NotFoundException("이미지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new QuestionException(QuestionErrorCode.NOT_FOUND_IMAGE));
 
         InputStreamResource media = MediaUtils.getMedia(questionMedia.getMediaUrl());
 
