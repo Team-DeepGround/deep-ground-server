@@ -88,7 +88,7 @@ public class CommentTest {
     public void commentTest() {
 
         String commentContent = "테스트 댓글 내용";
-        CreateCommentRequest request = new CreateCommentRequest(commentContent, answer.getId());
+        CreateCommentRequest request = CreateCommentRequest.of(commentContent, answer.getId());
 
         //answerId가 호출되면, 우리가 만든 answer 객체 반환 -> 없으면 validation null point exception 발생
         when(commonValidation.AnswerValidation(answer.getId())).thenReturn(answer);
@@ -111,7 +111,7 @@ public class CommentTest {
         String commentContent = "테스트 댓글 내용";
         String modifyContent = "테스트 댓글 수정";
 
-        UpdateCommentRequestDto request = new UpdateCommentRequestDto(modifyContent, answer.getId(), comment.getId());
+        UpdateCommentRequestDto request = UpdateCommentRequestDto.of(modifyContent, answer.getId(), comment.getId());
 
         when(commonValidation.CommentValidation(comment.getId())).thenReturn(comment);
 
@@ -126,7 +126,7 @@ public class CommentTest {
     @DisplayName("댓글 수정 실패 : 작성자가 아닌 경우")
     public void modifyCommentFailTest() {
         String modifyContent = "테스트 댓글 수정";
-        UpdateCommentRequestDto request = new UpdateCommentRequestDto(modifyContent, answer.getId(), comment.getId());
+        UpdateCommentRequestDto request = UpdateCommentRequestDto.of(modifyContent, answer.getId(), comment.getId());
 
         when(commonValidation.CommentValidation(comment.getId())).thenReturn(comment);
 
