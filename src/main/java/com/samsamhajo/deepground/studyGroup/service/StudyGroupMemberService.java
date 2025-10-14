@@ -68,7 +68,7 @@ public class StudyGroupMemberService {
 
   @Transactional
   public void requestToJoin(Member member, Long studyGroupId) {
-    StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
+    StudyGroup studyGroup = studyGroupRepository.findByIdForUpdate(studyGroupId)
         .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
 
     // 중복 요청 방지
@@ -95,7 +95,7 @@ public class StudyGroupMemberService {
 
   @Transactional
   public void leaveStudyGroup(Long studyGroupId, Member member) {
-    StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
+    StudyGroup studyGroup = studyGroupRepository.findByIdForUpdate(studyGroupId)
         .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
 
     StudyGroupMember studyGroupMember = studyGroupMemberRepository.findByStudyGroupIdAndMemberId(studyGroupId, member.getId())

@@ -63,6 +63,7 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
   List<StudyGroup> findAllByCreator_IdOrderByCreatedAtDesc(Long memberId);
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
-  Optional<StudyGroup> findById(Long id);
+  @Query("SELECT sg FROM StudyGroup sg WHERE sg.id = :id")
+  Optional<StudyGroup> findByIdForUpdate(@Param("id") Long id);;
 
 }
