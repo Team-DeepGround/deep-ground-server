@@ -166,8 +166,8 @@ public class QuestionService{
     @Transactional(readOnly = true)
     public QuestionDetailResponseDto getQuestionDetail(Long questionId, Long memberId) {
 
-        Member member = commonValidation.MemberValidation(memberId);
         Question question = commonValidation.QuestionValidation(questionId);
+        Member writeMember = question.getMember();
 
         List<QuestionMedia> questionMedia = questionMediaRepository.findAllByQuestionId(questionId);
 
@@ -181,7 +181,7 @@ public class QuestionService{
 
         return QuestionDetailResponseDto.of(
                 question,
-                member,
+                writeMember,
                 techStacks,
                 question.getQuestionStatus(),
                 mediaUrl,

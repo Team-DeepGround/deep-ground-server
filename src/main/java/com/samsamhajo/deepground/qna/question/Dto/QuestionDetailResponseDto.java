@@ -38,7 +38,7 @@ public class QuestionDetailResponseDto {
         this.questionId = question.getId();
         this.title = question.getTitle();
         this.content = question.getContent();
-        this.memberId = member.getId();
+        this.memberId = question.getMember().getId();
         this.nickname = member.getNickname();
         this.techStacks = techStacks;
         this.answerCount = question.getAnswerCount();
