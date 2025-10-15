@@ -19,24 +19,29 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @Builder
 public class MemberProfileDto {
+    private String email;
 
     private String profileImage;
 
     @NotBlank (message = "닉네임을 입력해주세요")
     private String nickname;
 
+    @NotBlank(message = "자기소개를 입력해주세요.")
     private String introduction;
 
+    @NotBlank(message = "직업을 입력해주세요.")
     private String job;
 
+    @NotBlank(message = "회사를 입력해주세요.")
     private String company;
 
     @NotBlank (message = "사는 지역을 입력해주세요")
     private String liveIn;
 
+    @NotBlank (message = "학력을 입력해주세요.")
     private String education;
 
-//    @NotNull (message = "한가지 이상의 기술 스택을 입력해주세요")
+    @NotNull (message = "한가지 이상의 기술 스택을 입력해주세요")
     @Builder.Default
     private List<String> techStack = new ArrayList<>();
 
@@ -55,6 +60,7 @@ public class MemberProfileDto {
     public static MemberProfileDto from(MemberProfile profile, Member member) {
 
         return MemberProfileDto.builder()
+                .email(member.getEmail())
                 .profileImage(profile.getProfileImage())
                 .nickname(member.getNickname())
                 .introduction(profile.getIntroduction())
@@ -75,6 +81,7 @@ public class MemberProfileDto {
     public static MemberProfileDto of(MemberProfile profile) {
 
         return MemberProfileDto.builder()
+                .email(profile.getMember().getEmail())
                 .profileImage(profile.getProfileImage())
                 .nickname(profile.getMember().getNickname())
                 .introduction(profile.getIntroduction())
