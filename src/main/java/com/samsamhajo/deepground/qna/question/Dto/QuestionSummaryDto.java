@@ -1,5 +1,6 @@
 package com.samsamhajo.deepground.qna.question.Dto;
 
+import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.entity.QuestionStatus;
 import lombok.Getter;
@@ -18,21 +19,27 @@ public class QuestionSummaryDto {
     private int answerCount;
     private LocalDate createdAt;
     private List<String> mediaUrl;
+    private String imageUrl;
 
-    public static QuestionSummaryDto of(Question q, List<String> techStacks, int answerCount,List<String> mediaUrl) {
-        return new QuestionSummaryDto(q.getId(), q.getTitle(), q.getMember().getId(), q.getMember().getNickname(), q.getQuestionStatus(), techStacks, answerCount, q.getCreatedAt().toLocalDate(), mediaUrl);
+    public static QuestionSummaryDto of(Question q, List<String> techStacks, int answerCount,List<String> mediaUrl, Member member) {
+        String imageUrl = null; // 기본값은 null
+        if (member.getMemberProfile() != null) {
+            imageUrl = member.getMemberProfile().getProfileImage();
+        }
+        return new QuestionSummaryDto(q.getId(), q.getTitle(), member , q.getQuestionStatus(), techStacks, answerCount, q.getCreatedAt().toLocalDate(), mediaUrl, imageUrl);
     }
 
-    public QuestionSummaryDto(Long questionId, String title, Long memberId, String nickname, QuestionStatus questionStatus ,List<String> techStacks, int answerCount, LocalDate createdAt, List<String> mediaUrl) {
+    public QuestionSummaryDto(Long questionId, String title, Member member , QuestionStatus questionStatus , List<String> techStacks, int answerCount, LocalDate createdAt, List<String> mediaUrl, String imageUrl) {
         this.questionId = questionId;
         this.title = title;
-        this.memberId = memberId;
-        this.nickname = nickname;
+        this.memberId = member.getId();
+        this.nickname = member.getNickname();
         this.status = questionStatus;
         this.techStacks = techStacks;
         this.answerCount = answerCount;
         this.createdAt = createdAt;
         this.mediaUrl = mediaUrl;
+        this.imageUrl = (member.getMemberProfile() != null) ? member.getMemberProfile().getProfileImage() : null;
     }
 }
 

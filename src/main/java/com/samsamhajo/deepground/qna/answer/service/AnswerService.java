@@ -127,10 +127,11 @@ public class AnswerService {
 
     // 질문에 달린 답변 목록 조회
     @Transactional(readOnly = true)
-    public List<AnswerCreateResponseDto> getAnswersByQuestionId(Long questionId) {
+    public List<AnswerDetailDto> getAnswersByQuestionId(Long questionId) {
+        Question question = commonValidation.QuestionValidation(questionId);
         List<Answer> answers = answerRepository.findAllByQuestionIdWithMember(questionId);
-        //질문에 달린 답변이 없으면 빈 List반환
-        if(answers.isEmpty()) {
+
+        if (answers.isEmpty()) {
             return Collections.emptyList();
         }
 
@@ -140,8 +141,7 @@ public class AnswerService {
 
         List<AnswerMedia> medias = answerMediaRepository.findAllByAnswerIdIn(answerIds);
 
-        //Media를 answerId를 기준으로 grouping 처리
-        Map<Long, List<String>> mediaUrl = medias.stream()
+        Map<Long, List<String>> mediaUrlMap = medias.stream()
                 .collect(Collectors.groupingBy(
                         media -> media.getAnswer().getId(),
                         Collectors.mapping(AnswerMedia::getMediaUrl, Collectors.toList())
@@ -149,8 +149,25 @@ public class AnswerService {
 
         return answers.stream()
                 .map(answer -> {
-                    List<String> mediaUrls = mediaUrl.getOrDefault(answer.getId(), Collections.emptyList());
-                    return AnswerCreateResponseDto.of(answer, mediaUrls);
+                    // 3. 각 답변(answer)에 맞는 실제 작성자(author)를 가져옴
+                    Member author = answer.getMember();
+
+                    // 4. 프로필이 null일 경우를 대비한 방어 코드 추가
+                    String imageUrl = (author.getMemberProfile() != null)
+                            ? author.getMemberProfile().getProfileImage()
+                            : null;
+
+                    List<String> mediaUrls = mediaUrlMap.getOrDefault(answer.getId(), Collections.emptyList());
+
+                    // 5. DTO 생성자에 올바른 인자들을 전달
+                    return AnswerDetailDto.of(
+                            question,
+                            answer,
+                            author,
+                            mediaUrls,
+                            answer.getCreatedAt(), // 답변의 생성 시간 전달
+                            imageUrl
+                    );
                 }).collect(Collectors.toList());
     }
 

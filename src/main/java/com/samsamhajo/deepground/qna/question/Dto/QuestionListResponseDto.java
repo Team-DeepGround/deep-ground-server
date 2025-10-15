@@ -9,6 +9,7 @@ public class QuestionListResponseDto {
     private List<QuestionSummaryDto> questions;
     private int totalPages;
 
+
     public static QuestionListResponseDto of(List<QuestionSummaryDto> questions, int totalPages) {
         return new QuestionListResponseDto(questions, totalPages);
     }

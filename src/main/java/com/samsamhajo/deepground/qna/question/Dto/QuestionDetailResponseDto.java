@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.qna.question.Dto;
 
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
+import com.samsamhajo.deepground.qna.answer.dto.AnswerDetailDto;
 import com.samsamhajo.deepground.qna.question.entity.Question;
 import com.samsamhajo.deepground.qna.question.entity.QuestionStatus;
 import lombok.Getter;
@@ -24,8 +25,9 @@ public class QuestionDetailResponseDto {
     private QuestionStatus questionStatus;
     private List<String> mediaUrl;
     private LocalDateTime createdAt;
+    private String imageUrl;
 
-    private List<AnswerCreateResponseDto> answers;
+    private List<AnswerDetailDto> answers;
 
     public QuestionDetailResponseDto(
             Question question,
@@ -33,7 +35,9 @@ public class QuestionDetailResponseDto {
             List<String> techStacks,
             QuestionStatus questionStatus,
             List<String> mediaUrl,
-            List<AnswerCreateResponseDto> answers
+            String imageUrl,
+            List<AnswerDetailDto> answers
+
     ) {
         this.questionId = question.getId();
         this.title = question.getTitle();
@@ -45,6 +49,7 @@ public class QuestionDetailResponseDto {
         this.questionStatus = questionStatus;
         this.mediaUrl = mediaUrl;
         this.createdAt = question.getCreatedAt();
+        this.imageUrl = imageUrl;
         this.answers = answers;// 추가
     }
 
@@ -54,7 +59,8 @@ public class QuestionDetailResponseDto {
             List<String> techStacks,
             QuestionStatus questionStatus,
             List<String> mediaUrl,
-            List<AnswerCreateResponseDto> answers
+            String imageUrl,
+            List<AnswerDetailDto> answers
     ) {
         return new QuestionDetailResponseDto(
                 question,
@@ -62,6 +68,7 @@ public class QuestionDetailResponseDto {
                 techStacks,
                 questionStatus,
                 mediaUrl,
+                member.getMemberProfile().getProfileImage(),
                 answers
         );
     }

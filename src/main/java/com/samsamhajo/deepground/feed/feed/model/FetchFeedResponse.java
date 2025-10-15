@@ -15,6 +15,7 @@ public class FetchFeedResponse {
     private String memberName;
     private String content;
     private int likeCount;
+    private String profileImageUrl;
 
     private boolean isLiked;
 

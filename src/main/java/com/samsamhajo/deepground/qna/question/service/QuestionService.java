@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.qna.question.service;
 
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
+import com.samsamhajo.deepground.qna.answer.dto.AnswerDetailDto;
 import com.samsamhajo.deepground.qna.answer.service.AnswerService;
 import com.samsamhajo.deepground.qna.question.Dto.*;
 import com.samsamhajo.deepground.qna.question.entity.Question;
@@ -148,6 +149,7 @@ public class QuestionService{
 
         List<QuestionSummaryDto> summaries = questionPage.stream()
                 .map(question -> {
+                    Member member = commonValidation.MemberValidation(question.getMember().getId());
                     List<String> teckStacks = tagService.getStackNamesByQuestionId(question.getId());
                     int answerCount = answerService.countAnswersByQuestionId(question.getId());
 
@@ -155,8 +157,7 @@ public class QuestionService{
                             .map(QuestionMedia::getMediaUrl)
                             .toList();
 
-
-                    return QuestionSummaryDto.of(question, teckStacks, answerCount, mediaUrl);
+                    return QuestionSummaryDto.of(question, teckStacks, answerCount, mediaUrl, member);
                 }).toList();
 
         return QuestionListResponseDto.of(summaries, questionPage.getTotalPages());
@@ -177,7 +178,7 @@ public class QuestionService{
                 .map(QuestionMedia::getMediaUrl)
                 .collect(Collectors.toList());
 
-        List<AnswerCreateResponseDto> answers = answerService.getAnswersByQuestionId(questionId);
+        List<AnswerDetailDto> answers = answerService.getAnswersByQuestionId(questionId);
 
         return QuestionDetailResponseDto.of(
                 question,
@@ -185,6 +186,7 @@ public class QuestionService{
                 techStacks,
                 question.getQuestionStatus(),
                 mediaUrl,
+                writeMember.getMemberProfile().getProfileImage(),
                 answers
         );
     }
@@ -197,6 +199,7 @@ public class QuestionService{
 
         List<QuestionSummaryDto> summaries = questionPage.stream()
                 .map(question -> {
+                    Member member = commonValidation.MemberValidation(question.getMember().getId());
                     List<String> techStacks = questionTagService.getStackNamesByQuestionId(question.getId());
                     int answerCount = answerService.countAnswersByQuestionId(question.getId());
                     List<String> mediaUrls = questionMediaRepository.findAllByQuestionId(question.getId())
@@ -204,7 +207,7 @@ public class QuestionService{
                             .map(qm -> qm.getMediaUrl())
                             .toList();
 
-                    return QuestionSummaryDto.of(question, techStacks, answerCount, mediaUrls);
+                    return QuestionSummaryDto.of(question, techStacks, answerCount, mediaUrls, member);
                 }).toList();
 
         return QuestionListResponseDto.of(summaries, questionPage.getTotalPages());
