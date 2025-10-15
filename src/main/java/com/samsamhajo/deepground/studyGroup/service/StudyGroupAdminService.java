@@ -63,7 +63,7 @@ public class StudyGroupAdminService {
   @jakarta.transaction.Transactional
   public void acceptMember(Long studyGroupId, Long targetMemberId, Member requester) {
     // 스터디 존재 확인
-    StudyGroup group = studyGroupRepository.findById(studyGroupId)
+    StudyGroup group = studyGroupRepository.findByIdForUpdate(studyGroupId)
         .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
 
     // 요청자가 스터디장인지 확인
@@ -97,7 +97,7 @@ public class StudyGroupAdminService {
 
   @Transactional
   public void kickMember(StudyGroupKickRequest request, Member requester) {
-    StudyGroup group = studyGroupRepository.findById(request.getStudyGroupId())
+    StudyGroup group = studyGroupRepository.findByIdForUpdate(request.getStudyGroupId())
         .orElseThrow(() -> new StudyGroupNotFoundException(request.getStudyGroupId()));
 
     if (!group.getCreator().getId().equals(requester.getId())) {

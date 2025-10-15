@@ -183,7 +183,7 @@ public class StudyGroupService {
 
   @Transactional
   public void softDeleteStudyGroup(Long studyGroupId, Member requester) {
-    var studyGroup = studyGroupRepository.findById(studyGroupId)
+    var studyGroup = studyGroupRepository.findByIdForUpdate(studyGroupId)
         .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
 
     if (!studyGroup.getCreator().getId().equals(requester.getId())) {
