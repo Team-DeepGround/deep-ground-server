@@ -14,5 +14,9 @@ public class UpdateCommentRequestDto {
     private Long answerId;
     private Long commentId;
 
+    public static UpdateCommentRequestDto of(String commentContent, Long answerId, Long commentId) {
+        return new UpdateCommentRequestDto(commentContent, answerId, commentId);
+    }
+
 }
 

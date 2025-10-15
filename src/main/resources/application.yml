@@ -53,13 +53,13 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
-      password: ${REDIS_PASSWORD}
+#      password: ${REDIS_PASSWORD}
     mongodb:
       host: ${MONGO_HOST}
       port: ${MONGO_PORT}
       database: ${MONGO_DATABASE}
-      username: ${MONGO_USERNAME}
-      password: ${MONGO_PASSWORD}
+#      username: ${MONGO_USERNAME}
+#      password: ${MONGO_PASSWORD}
       auto-index-creation: true
   mail:
     host: smtp.daum.net

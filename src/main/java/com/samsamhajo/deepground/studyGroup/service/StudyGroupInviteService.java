@@ -23,7 +23,7 @@ public class StudyGroupInviteService {
 
   @Transactional
   public void inviteByEmail(Member inviter, StudyGroupInviteRequest request) {
-    StudyGroup group = studyGroupRepository.findById(request.getStudyGroupId())
+    StudyGroup group = studyGroupRepository.findByIdForUpdate(request.getStudyGroupId())
         .orElseThrow(() -> new StudyGroupNotFoundException(request.getStudyGroupId()));
 
     if (!group.getCreator().getId().equals(inviter.getId())) {
