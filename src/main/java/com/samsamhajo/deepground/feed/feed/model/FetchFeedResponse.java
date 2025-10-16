@@ -11,6 +11,7 @@ import java.util.List;
 @Builder
 public class FetchFeedResponse {
     private long memberId;
+    private long profileId;
     private long feedId;
     private String memberName;
     private String content;

@@ -81,5 +81,7 @@ public class MemberController {
         return ResponseEntity
                 .ok(SuccessResponse.of(ProfileSuccessCode.GET_SUCCESS_PROFILE, profile));
     }
+
+
 }
 
