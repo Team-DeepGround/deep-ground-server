@@ -13,6 +13,7 @@ import java.util.List;
 public class FetchSharedFeedResponse {
     private long feedId;
     private long memberId;
+    private long profileId;
     private String memberName;
     private String content;
     private int profileImageId;
@@ -26,6 +27,7 @@ public class FetchSharedFeedResponse {
         return FetchSharedFeedResponse.builder()
                 .feedId(originFeed.getId())
                 .memberId(originFeed.getMember().getId())
+                .profileId(originFeed.getMember().getMemberProfile().getProfileId())
                 .memberName(originFeed.getMember().getNickname())
                 .content(originFeed.getContent())
                 .createdAt(originFeed.getCreatedAt().toLocalDate())
