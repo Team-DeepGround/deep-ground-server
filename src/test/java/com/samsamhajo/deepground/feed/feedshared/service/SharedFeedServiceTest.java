@@ -10,12 +10,14 @@ import com.samsamhajo.deepground.feed.feedshared.exception.SharedFeedException;
 import com.samsamhajo.deepground.feed.feedshared.model.FetchSharedFeedResponse;
 import com.samsamhajo.deepground.feed.feedshared.repository.SharedFeedRepository;
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.member.entity.MemberProfile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -83,6 +85,14 @@ class SharedFeedServiceTest {
     void getSharedFeedResponseSuccess() {
         // given
         Member testMember = Member.createLocalMember(TEST_EMAIL, TEST_PASSWORD, TEST_NICKNAME);
+
+        // 🔸 원본 작성자 프로필 생성 & 연결
+        MemberProfile profile = MemberProfile.create(
+                null, testMember, "소개", "직업", "회사", "서울", "학력",
+                new ArrayList<>(), null, null, null, null
+        );
+        ReflectionTestUtils.setField(profile, "profileId", 20L);
+
         Feed originFeed = Feed.of(TEST_CONTENT, testMember);
         Feed newFeed = Feed.of(TEST_CONTENT, testMember);
         SharedFeed sharedFeed = SharedFeed.of(newFeed, originFeed, testMember);
@@ -107,7 +117,11 @@ class SharedFeedServiceTest {
         assertThat(response.getMemberName()).isEqualTo(TEST_NICKNAME);
         assertThat(response.getContent()).isEqualTo(TEST_CONTENT);
         assertThat(response.getMediaIds()).hasSize(2);
+
+        // (선택) FetchSharedFeedResponse 모델에 profileId를 추가했다면 검증
+        // assertThat(response.getProfileId()).isEqualTo(20L);
     }
+
 
     @Test
     @DisplayName("공유 피드 조회 실패 - 존재하지 않는 공유 피드")
