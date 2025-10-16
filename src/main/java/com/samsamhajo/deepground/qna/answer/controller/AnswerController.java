@@ -47,7 +47,7 @@ public class AnswerController {
 
     @DeleteMapping("/{questionId}/{answerId}")
     public ResponseEntity<SuccessResponse> deleteAnswer(
-            @PathVariable Long answerId, Long questionId,
+            @PathVariable Long questionId, @PathVariable Long answerId,
             @AuthenticationPrincipal CustomUserDetails customUserDetails){
 
                 answerService.deleteAnswer(answerId, customUserDetails.getMember().getId(),  questionId);
