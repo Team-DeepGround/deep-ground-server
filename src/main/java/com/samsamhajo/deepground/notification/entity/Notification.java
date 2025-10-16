@@ -25,6 +25,9 @@ public class Notification extends BaseDocument {
     @Field("is_read")
     private boolean read = false;
 
+    @Field("is_deleted")
+    private boolean deleted = false;
+
     private Notification(Long receiverId, NotificationData data) {
         this.receiverId = receiverId;
         this.data = data;
@@ -36,5 +39,9 @@ public class Notification extends BaseDocument {
 
     public void read() {
         this.read = true;
+    }
+
+    public void delete() {
+       this.deleted = true;
     }
 }

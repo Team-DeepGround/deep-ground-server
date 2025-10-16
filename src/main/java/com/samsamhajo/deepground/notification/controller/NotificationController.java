@@ -11,12 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/notifications")
@@ -73,5 +68,15 @@ public class NotificationController {
         NotificationUnreadResponse response = notificationService.getUnreadCount(memberId);
         return ResponseEntity
                 .ok(SuccessResponse.of(NotificationSuccessCode.NOTIFICATION_UNREAD_COUNT_RETRIEVED, response));
+    }
+
+    @DeleteMapping("/{notificationId}")
+    public ResponseEntity<SuccessResponse> deleteNotification(
+            @PathVariable String notificationId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        notificationService.deleteNotification(userDetails.getMember().getId(), notificationId);
+        return ResponseEntity
+                .ok(SuccessResponse.of(NotificationSuccessCode.NOTIFICATION_SUCCESS_DELETED));
     }
 }

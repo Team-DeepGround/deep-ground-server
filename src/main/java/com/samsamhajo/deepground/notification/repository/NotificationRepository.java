@@ -17,4 +17,6 @@ public interface NotificationRepository extends MongoRepository<Notification, St
     void updateAllByReceiverId(Long receiverId);
 
     Long countByReceiverIdAndReadFalse(Long receiverId);
+
+    Optional<Notification> findByIdAndReceiverIdAndDeletedFalse(String notificationId, Long receiverId);
 }

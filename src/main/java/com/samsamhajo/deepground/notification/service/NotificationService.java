@@ -80,4 +80,13 @@ public class NotificationService {
 
         return NotificationUnreadResponse.of(unreadCount);
     }
+
+    public void deleteNotification(Long receiverId, String notificationId) {
+        Notification notification = notificationRepository.findByIdAndReceiverIdAndDeletedFalse(notificationId, receiverId)
+                .orElseThrow(() -> new NotificationException(NotificationErrorCode.NOTIFICATION_NOT_FOUND));
+
+        notification.delete();
+
+        notificationRepository.save(notification);
+    }
 }
