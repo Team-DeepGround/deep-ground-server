@@ -1,7 +1,6 @@
 package com.samsamhajo.deepground.global.upload;
 
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.samsamhajo.deepground.global.upload.exception.UploadErrorCode;
 import com.samsamhajo.deepground.global.upload.exception.UploadException;
