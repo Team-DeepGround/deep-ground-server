@@ -9,6 +9,11 @@ import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.exception.MemberErrorCode;
 import com.samsamhajo.deepground.member.exception.MemberException;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
+import com.samsamhajo.deepground.qna.question.entity.Question;
+import com.samsamhajo.deepground.qna.question.exception.QuestionErrorCode;
+import com.samsamhajo.deepground.qna.question.exception.QuestionException;
+import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
+import com.samsamhajo.deepground.qna.question.service.QuestionService;
 import com.samsamhajo.deepground.report.dto.ReportRequest;
 import com.samsamhajo.deepground.report.dto.ReportResponse;
 import com.samsamhajo.deepground.report.entity.Report;
@@ -30,6 +35,8 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final MemberRepository memberRepository;
     private final FeedRepository feedRepository;
+    private final QuestionRepository questionRepository;
+    private final QuestionService questionService;
     private final StudyGroupMemberRepository studyGroupMemberRepository;
     private final ReportPostAIClient aiClient;
     private final FeedService feedService;
@@ -66,6 +73,26 @@ public class ReportService {
 
             if (isAutoBanned) {
                 feedService.deleteFeed(feed.getId());
+                actionTaken = "피드 삭제";
+                isProcessed = true;
+            }
+            if (aiResult.getResult() == AIReviewResult.REJECTED) {
+                actionTaken = "피드 유지";
+                isProcessed = true;
+            }
+        }
+
+        if (targetType == ReportTargetType.QUESTION) {
+            Question question = questionRepository.findById(targetId)
+                .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
+            reportedMember = question.getMember();
+
+            var aiResult = aiClient.reviewQuestion(request.reason(), request.content(), question.getContent());
+            isAutoBanned = aiResult.getResult() == AIReviewResult.ACCEPTED;
+            result = aiResult.getResult();
+
+            if (isAutoBanned) {
+                questionService.deleteQuestion(question.getId());
                 actionTaken = "피드 삭제";
                 isProcessed = true;
             }
