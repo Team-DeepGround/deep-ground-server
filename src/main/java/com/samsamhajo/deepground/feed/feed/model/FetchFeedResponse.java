@@ -10,9 +10,9 @@ import java.util.List;
 @Getter
 @Builder
 public class FetchFeedResponse {
-    private long memberId;
-    private long profileId;
-    private long feedId;
+    private Long memberId;
+    private Long profileId;
+    private Long feedId;
     private String memberName;
     private String content;
     private int likeCount;
@@ -22,7 +22,7 @@ public class FetchFeedResponse {
 
     private int commentCount;
     private int shareCount;
-    private int profileImageId;
+    private String profileImageUrl;
     private LocalDate createdAt;
     private List<Long> mediaIds;
 

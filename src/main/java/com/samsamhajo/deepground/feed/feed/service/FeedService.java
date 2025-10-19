@@ -9,12 +9,15 @@ import com.samsamhajo.deepground.feed.feedcomment.service.FeedCommentService;
 import com.samsamhajo.deepground.feed.feedshared.model.FetchSharedFeedResponse;
 import com.samsamhajo.deepground.feed.feedshared.service.SharedFeedService;
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.member.entity.MemberProfile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -62,22 +65,35 @@ public class FeedService {
     public FetchFeedResponse getFeed(Long feedId, Long memberId) {
         Feed feed = feedRepository.getById(feedId);
 
+        boolean isUserAuthenticated = (memberId != null);
+
         FetchSharedFeedResponse sharedFeedResponse =
                 sharedFeedService.getSharedFeedResponse(feed.getId());
+        Member member = feed.getMember();
+
+        Long profileId = Optional.ofNullable(member.getMemberProfile())
+                .map(MemberProfile::getProfileId)
+                .orElse(null);
+
+        boolean isLikedByCurrentUser = false;
+        if (isUserAuthenticated) {
+            isLikedByCurrentUser = feedLikeService.isLiked(feed.getId(), memberId);
+        }
 
         return FetchFeedResponse.builder()
                 .feedId(feed.getId())
                 .content(feed.getContent())
                 .createdAt(feed.getCreatedAt().toLocalDate())
                 .memberId(feed.getMember().getId())
-                .profileId(feed.getMember().getMemberProfile().getProfileId())
+                .profileId(profileId)
                 .memberName(feed.getMember().getNickname())
                 .profileImageUrl(feed.getMember().getMemberProfile().getProfileImage())
                 .mediaIds(feedMediaService.findAllMediaIdsByFeedId(feed.getId()))
                 .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId()))
                 .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))
                 .likeCount(feedLikeService.countFeedLikeByFeedId(feed.getId()))
-                .isLiked(feedLikeService.isLiked(feed.getId(), memberId))
+                .isLiked(isLikedByCurrentUser)
+                .profileImageUrl(member.getMemberProfile().getProfileImage())
                 .isShared(sharedFeedResponse != null)
                 .sharedFeed(sharedFeedResponse)
                 .build();
@@ -86,6 +102,8 @@ public class FeedService {
     public FetchFeedsResponse getFeeds(Pageable pageable, Long memberId) {
 
         Page<Feed> feeds = feedRepository.findAll(pageable);
+
+        boolean isUserAuthenticated = (memberId != null);
 
         return FetchFeedsResponse.of(
                 feeds.getContent().stream()
@@ -100,19 +118,31 @@ public class FeedService {
                                     FetchSharedFeedResponse sharedFeedResponse =
                                             sharedFeedService.getSharedFeedResponse(feed.getId());
 
+                                    Member member = feed.getMember();
+
+                                    Long profileId = Optional.ofNullable(member.getMemberProfile())
+                                            .map(MemberProfile::getProfileId)
+                                            .orElse(null);
+
+                                    boolean isLikedByCurrentUser = false;
+                                    if (isUserAuthenticated) {
+                                        isLikedByCurrentUser = feedLikeService.isLiked(feed.getId(), memberId);
+                                    }
+
                                     return FetchFeedResponse.builder()
                                             .feedId(feed.getId())
                                             .content(feed.getContent())
                                             .createdAt(feed.getCreatedAt().toLocalDate())
                                             .memberId(feed.getMember().getId())
-                                            .profileId(feed.getMember().getMemberProfile().getProfileId())
+                                            .profileId(profileId)
                                             .memberName(feed.getMember().getNickname())
                                             .profileImageUrl(profileImageUrl)
                                             .mediaIds(feedMediaService.findAllMediaIdsByFeedId(feed.getId()))
                                             .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId()))
                                             .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))
                                             .likeCount(feedLikeService.countFeedLikeByFeedId(feed.getId()))
-                                            .isLiked(feedLikeService.isLiked(feed.getId(), memberId))
+                                            .isLiked(isLikedByCurrentUser)
+                                            .profileImageUrl(member.getMemberProfile().getProfileImage())
                                             .isShared(sharedFeedResponse != null)
                                             .sharedFeed(sharedFeedResponse)
                                             .build();

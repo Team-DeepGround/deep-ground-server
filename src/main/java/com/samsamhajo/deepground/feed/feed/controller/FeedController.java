@@ -39,7 +39,10 @@ public class FeedController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Long memberId = userDetails.getMember().getId();
+        Long memberId = null;
+        if (userDetails != null) {
+            memberId = userDetails.getMember().getId();
+        }
         FetchFeedsResponse response = feedService.getFeeds(pageable, memberId);
 
         return ResponseEntity
@@ -63,7 +66,11 @@ public class FeedController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable("feedId") Long feedId) {
 
-        Long memberId = userDetails.getMember().getId();
+        Long memberId = null;
+        if (userDetails != null) {
+            memberId = userDetails.getMember().getId();
+        }
+
         FetchFeedResponse response = feedService.getFeed(feedId, memberId);
 
         return ResponseEntity
