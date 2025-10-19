@@ -19,6 +19,7 @@ public class QuestionDetailResponseDto {
     private String title;
     private String content;
     private Long memberId;
+    private Long memberProfileId;
     private String nickname;
     private List<String> techStacks;
     private int answerCount;
@@ -35,6 +36,7 @@ public class QuestionDetailResponseDto {
             List<String> techStacks,
             QuestionStatus questionStatus,
             List<String> mediaUrl,
+            Long  memberProfileId,
             String imageUrl,
             List<AnswerDetailDto> answers
 
@@ -43,6 +45,7 @@ public class QuestionDetailResponseDto {
         this.title = question.getTitle();
         this.content = question.getContent();
         this.memberId = question.getMember().getId();
+        this.memberProfileId = question.getMember().getMemberProfile().getProfileId();
         this.nickname = member.getNickname();
         this.techStacks = techStacks;
         this.answerCount = question.getAnswerCount();
@@ -68,6 +71,7 @@ public class QuestionDetailResponseDto {
                 techStacks,
                 questionStatus,
                 mediaUrl,
+                member.getMemberProfile().getProfileId(),
                 member.getMemberProfile().getProfileImage(),
                 answers
         );

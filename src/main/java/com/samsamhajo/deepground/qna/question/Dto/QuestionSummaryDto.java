@@ -13,6 +13,7 @@ public class QuestionSummaryDto {
     private Long questionId;
     private String title;
     private Long memberId;
+    private Long memberProfileId;
     private String nickname;
     private QuestionStatus status;
     private List<String> techStacks;
@@ -26,13 +27,14 @@ public class QuestionSummaryDto {
         if (member.getMemberProfile() != null) {
             imageUrl = member.getMemberProfile().getProfileImage();
         }
-        return new QuestionSummaryDto(q.getId(), q.getTitle(), member , q.getQuestionStatus(), techStacks, answerCount, q.getCreatedAt().toLocalDate(), mediaUrl, imageUrl);
+        return new QuestionSummaryDto(q.getId(), q.getTitle(), member, q.getQuestionStatus(), techStacks, answerCount, q.getCreatedAt().toLocalDate(), mediaUrl, imageUrl);
     }
 
     public QuestionSummaryDto(Long questionId, String title, Member member , QuestionStatus questionStatus , List<String> techStacks, int answerCount, LocalDate createdAt, List<String> mediaUrl, String imageUrl) {
         this.questionId = questionId;
         this.title = title;
         this.memberId = member.getId();
+        this.memberProfileId = member.getMemberProfile().getProfileId();
         this.nickname = member.getNickname();
         this.status = questionStatus;
         this.techStacks = techStacks;

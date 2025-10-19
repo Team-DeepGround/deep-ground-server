@@ -28,10 +28,10 @@ public interface StudyGroupMemberRepository extends JpaRepository<StudyGroupMemb
 
   List<StudyGroupMember> findAllByStudyGroupIdAndIsAllowedTrue(Long studyGroupId);
 
-  @Query("SELECT m FROM StudyGroupMember m JOIN FETCH m.member WHERE m.studyGroup.id = :studyGroupId")
+  @Query("SELECT m FROM StudyGroupMember m JOIN FETCH m.member WHERE m.studyGroup.id = :studyGroupId AND m.deleted = false")
   List<StudyGroupMember> findAllWithMemberByStudyGroupId(@Param("studyGroupId") Long studyGroupId);
 
-  @Query("SELECT m FROM StudyGroupMember m JOIN FETCH m.member WHERE m.studyGroup.id = :studyGroupId AND m.isAllowed = true ORDER BY m.createdAt ASC")
+  @Query("SELECT m FROM StudyGroupMember m JOIN FETCH m.member WHERE m.studyGroup.id = :studyGroupId AND m.isAllowed = true AND m.deleted = false ORDER BY m.createdAt ASC")
   List<StudyGroupMember> findAcceptedMembersWithInfo(@Param("studyGroupId") Long studyGroupId);
 
   int countByStudyGroup_IdAndIsAllowedTrue(Long studyGroupId);

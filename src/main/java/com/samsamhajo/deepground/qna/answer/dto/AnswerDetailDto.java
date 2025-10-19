@@ -18,6 +18,7 @@ public class AnswerDetailDto {
     private String answerContent;
     private Long questionId;
     private Long memberId;
+    private Long memberProfileId;
     private Long answerId;
     private int likeCount;
     private List<String> mediaUrl;
@@ -37,6 +38,7 @@ public class AnswerDetailDto {
         this.answerContent = answer.getAnswerContent();
         this.questionId = question.getId();
         this.memberId = member.getId();
+        this.memberProfileId = member.getMemberProfile().getProfileId();
         this.answerId = answer.getId();
         this.likeCount = answer.getAnswerLikeCount();
         this.mediaUrl = mediaUrl;

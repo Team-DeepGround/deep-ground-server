@@ -3,6 +3,8 @@ package com.samsamhajo.deepground.qna.question.service;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerDetailDto;
+import com.samsamhajo.deepground.qna.answer.entity.Answer;
+import com.samsamhajo.deepground.qna.answer.repository.AnswerRepository;
 import com.samsamhajo.deepground.qna.answer.service.AnswerService;
 import com.samsamhajo.deepground.qna.question.Dto.*;
 import com.samsamhajo.deepground.qna.question.entity.Question;
@@ -33,6 +35,7 @@ public class QuestionService{
     private final QuestionRepository questionRepository;
     private final QuestionMediaService questionMediaService;
     private final QuestionTagRepository questionTagRepository;
+    private final AnswerRepository answerRepository;
     private final TechStackRepository techStackRepository;
     private final QuestionTagService questionTagService;
     private final AnswerService answerService;
@@ -71,6 +74,8 @@ public class QuestionService{
         if(!question.getMember().getId().equals(memberId)) {
             throw new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH);
         } else {
+            List<Answer> answers = answerRepository.findAllByQuestionId(questionId);
+            answerRepository.deleteAll(answers);
             questionTagRepository.deleteAllByQuestionId(questionId);
             questionMediaService.deleteQuestionMedia(questionId);
             questionRepository.deleteById(questionId);
@@ -211,6 +216,14 @@ public class QuestionService{
                 }).toList();
 
         return QuestionListResponseDto.of(summaries, questionPage.getTotalPages());
+    }
+
+    @Transactional
+    public void deleteQuestion(Long questionId) {
+        questionTagRepository.deleteAllByQuestionId(questionId);
+        questionMediaService.deleteQuestionMedia(questionId);
+        questionRepository.deleteById(questionId);
+
     }
 
 
