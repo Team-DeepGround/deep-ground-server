@@ -27,18 +27,20 @@ public class FeedMediaService {
     private final S3Uploader s3Uploader;
 
     @Transactional
-    public void createFeedMedia(Feed feed, List<MultipartFile> images){
-        if(CollectionUtils.isEmpty(images)) return;
+    public void createFeedMedia(Feed feed, List<MultipartFile> images) {
+        if (CollectionUtils.isEmpty(images)) return;
 
-        feedMediaRepository.saveAll(
-                images.stream()
-                        .map(image -> FeedMedia.of(
-                                MediaUtils.generateMediaUrl(image),
-                                MediaUtils.getExtension(image),
-                                feed))
-                        .toList()
-        );
+        List<FeedMedia> mediaEntities = images.stream()
+                .map(image -> {
+                    String url = s3Uploader.upload(image, "feed-media");
+                    String extension = getExtension(image.getOriginalFilename());
+                    return FeedMedia.of(url, extension, feed);
+                })
+                .toList();
+
+        feedMediaRepository.saveAll(mediaEntities);
     }
+
 
     public FeedMediaResponse fetchFeedMedia(Long feedMediaId) {
         FeedMedia feedMedia = feedMediaRepository.getById(feedMediaId);
