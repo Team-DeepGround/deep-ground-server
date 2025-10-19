@@ -11,9 +11,9 @@ import java.util.List;
 @Getter
 @Builder
 public class FetchSharedFeedResponse {
-    private long feedId;
-    private long memberId;
-    private long profileId;
+    private Long feedId;
+    private Long memberId;
+    private Long profileId;
     private String memberName;
     private String content;
     private int profileImageId;
