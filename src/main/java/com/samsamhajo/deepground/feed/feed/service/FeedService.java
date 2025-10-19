@@ -92,6 +92,7 @@ public class FeedService {
                 .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))
                 .likeCount(feedLikeService.countFeedLikeByFeedId(feed.getId()))
                 .isLiked(isLikedByCurrentUser)
+                .profileImageUrl(member.getMemberProfile().getProfileImage())
                 .isShared(sharedFeedResponse != null)
                 .sharedFeed(sharedFeedResponse)
                 .build();
@@ -132,6 +133,7 @@ public class FeedService {
                                             .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))
                                             .likeCount(feedLikeService.countFeedLikeByFeedId(feed.getId()))
                                             .isLiked(isLikedByCurrentUser)
+                                            .profileImageUrl(member.getMemberProfile().getProfileImage())
                                             .isShared(sharedFeedResponse != null)
                                             .sharedFeed(sharedFeedResponse)
                                             .build();

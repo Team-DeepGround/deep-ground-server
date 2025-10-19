@@ -21,7 +21,7 @@ public class FetchFeedResponse {
 
     private int commentCount;
     private int shareCount;
-    private int profileImageId;
+    private String profileImageUrl;
     private LocalDate createdAt;
     private List<Long> mediaIds;
 
