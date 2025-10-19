@@ -5,6 +5,7 @@ import com.samsamhajo.deepground.feed.feed.entity.FeedMedia;
 import com.samsamhajo.deepground.feed.feed.model.FeedMediaResponse;
 import com.samsamhajo.deepground.feed.feed.model.FeedUpdateRequest;
 import com.samsamhajo.deepground.feed.feed.repository.FeedMediaRepository;
+import com.samsamhajo.deepground.global.upload.S3Uploader;
 import com.samsamhajo.deepground.media.MediaErrorCode;
 import com.samsamhajo.deepground.media.MediaException;
 import com.samsamhajo.deepground.media.MediaUtils;
@@ -34,6 +35,9 @@ class FeedMediaServiceTest {
 
     @Mock
     private FeedMediaRepository feedMediaRepository;
+
+    @Mock
+    private S3Uploader s3Uploader;
 
     @InjectMocks
     private FeedMediaService feedMediaService;
@@ -83,6 +87,7 @@ class FeedMediaServiceTest {
             feedMediaService.createFeedMedia(testFeed, List.of(testImage));
 
             // then
+            verify(s3Uploader).upload(any(MultipartFile.class), eq("feed-media"));
             verify(feedMediaRepository).saveAll(anyList());
         }
     }
@@ -181,6 +186,7 @@ class FeedMediaServiceTest {
 
             // then
             mediaUtils.verify(() -> MediaUtils.deleteMedia(TEST_MEDIA_URL));
+            verify(s3Uploader).upload(any(MultipartFile.class), eq("feed-media"));
             verify(feedMediaRepository).deleteAllByFeedId(1L);
             verify(feedMediaRepository).saveAll(anyList());
         }
