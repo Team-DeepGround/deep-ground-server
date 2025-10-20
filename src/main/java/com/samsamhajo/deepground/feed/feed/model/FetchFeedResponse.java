@@ -23,7 +23,7 @@ public class FetchFeedResponse {
     private int shareCount;
     private String profileImageUrl;
     private LocalDate createdAt;
-    private List<Long> mediaIds;
+    private List<String> mediaUrls;
 
     private boolean isShared;
     private FetchSharedFeedResponse sharedFeed;

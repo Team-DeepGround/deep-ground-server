@@ -41,14 +41,6 @@ public class FeedMediaService {
         feedMediaRepository.saveAll(mediaEntities);
     }
 
-
-    public FeedMediaResponse fetchFeedMedia(Long feedMediaId) {
-        FeedMedia feedMedia = feedMediaRepository.getById(feedMediaId);
-        InputStreamResource media = MediaUtils.getMedia(feedMedia.getMediaUrl());
-
-        return FeedMediaResponse.of(media, feedMedia.getExtension());
-    }
-
     public List<FeedMedia> findAllByFeed(Feed feed) {
         return feedMediaRepository.findAllByFeedId(feed.getId());
     }
@@ -73,6 +65,13 @@ public class FeedMediaService {
         if (request.getImages() != null && !request.getImages().isEmpty()) {
             createFeedMedia(feed, request.getImages());
         }
+    }
+
+    public List<String> findAllMediaUrlsByFeedId(Long feedId) {
+        return feedMediaRepository.findAllByFeedId(feedId)
+                .stream()
+                .map(FeedMedia::getMediaUrl)
+                .toList();
     }
 
     public List<Long> findAllMediaIdsByFeedId(Long feedId) {
