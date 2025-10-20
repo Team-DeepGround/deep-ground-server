@@ -133,7 +133,7 @@ class FeedServiceTest {
         // given
         Member testMember = Member.createLocalMember(TEST_EMAIL, TEST_PASSWORD, TEST_NICKNAME);
 
-        // 🔸 프로필 생성 & 멤버에 연결 (liveIn은 not-null)
+        //  프로필 생성 & 멤버에 연결 (liveIn은 not-null)
         MemberProfile profile = MemberProfile.create(
                 null,              // profileImage
                 testMember,

@@ -47,6 +47,7 @@ public class PresenceService {
         List<Long> friendIds = friendService.getFriendMemberIdByMemberId(memberId);
 
         List<Boolean> isOnline = presenceRepository.findOnlineMembers(friendIds);
+
         return IntStream.range(0, friendIds.size())
                 .mapToObj(i -> new PresenceDto(friendIds.get(i), isOnline.get(i)))
                 .toList();

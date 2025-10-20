@@ -10,6 +10,10 @@ import com.samsamhajo.deepground.feed.feedcomment.model.FeedCommentUpdateRequest
 import com.samsamhajo.deepground.feed.feedcomment.repository.FeedCommentRepository;
 import com.samsamhajo.deepground.feed.feedreply.service.FeedReplyService;
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.member.entity.MemberProfile;
+import com.samsamhajo.deepground.techStack.entity.MemberTechStack;
+import com.samsamhajo.deepground.techStack.entity.TechStack;
+import com.samsamhajo.deepground.techStack.repository.TechStackRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,8 +26,10 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import static com.samsamhajo.deepground.studyGroup.entity.TechTag.JAVA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,6 +50,10 @@ class FeedCommentServiceTest {
     private FeedCommentLikeService feedCommentLikeService;
     @Mock
     private ApplicationEventPublisher eventPublisher;
+    @Mock
+    private Member member;
+    @Mock
+    private TechStackRepository techStackRepository;
 
     @InjectMocks
     private FeedCommentService feedCommentService;
@@ -57,6 +67,7 @@ class FeedCommentServiceTest {
     private Feed testFeed;
     private FeedComment testFeedComment;
     private MockMultipartFile testImage;
+    private MemberProfile testProfile;
 
     @BeforeEach
     void setUp() {
@@ -70,7 +81,12 @@ class FeedCommentServiceTest {
                 "test image content".getBytes()
         );
 
+        testProfile = MemberProfile.create("http://test.url/image.jpg",testMember,"test","test","test","test",
+                "test",new ArrayList<>(),null,null,null,null);
+
         ReflectionTestUtils.setField(testMember, "id", 1L);
+        ReflectionTestUtils.setField(testProfile, "profileId", 1L);
+        ReflectionTestUtils.setField(testProfile, "profileImage", "http://test.url/image.jpg");
         ReflectionTestUtils.setField(testFeed, "id", 1L);
         ReflectionTestUtils.setField(testFeedComment, "id", 1L);
     }
@@ -186,6 +202,8 @@ class FeedCommentServiceTest {
         assertThat(comment.getMediaIds()).isEmpty();
         assertThat(comment.getReplyCount()).isEqualTo(2);
         assertThat(comment.getLikeCount()).isEqualTo(5);
+        assertThat(comment.getProfileId()).isEqualTo(1L);
+        assertThat(comment.getProfileImageUrl()).isEqualTo("http://test.url/image.jpg");
     }
 
     @Test
