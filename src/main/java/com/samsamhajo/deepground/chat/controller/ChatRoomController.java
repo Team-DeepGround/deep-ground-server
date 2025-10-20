@@ -18,12 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.parameters.P;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/chatrooms")
@@ -75,5 +71,16 @@ public class ChatRoomController {
         );
         return ResponseEntity
                 .ok(SuccessResponse.of(ChatSuccessCode.CHAT_MESSAGE_RETRIEVED, messages));
+    }
+
+    @DeleteMapping("/{chatroomId}")
+    public ResponseEntity<SuccessResponse> leaveFriendChatRoom(
+            @PathVariable Long chatroomId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        chatRoomMemberService.leaveChatRoom(chatroomId,userDetails.getMember().getId());
+
+        return ResponseEntity
+                .ok(SuccessResponse.of(ChatSuccessCode.SUCCESS_CHATROOM_LEAVE),chatroomId);
     }
 }
