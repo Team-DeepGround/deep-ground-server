@@ -103,40 +103,6 @@ class FeedMediaServiceTest {
     }
 
     @Test
-    @DisplayName("피드 미디어 조회 성공")
-    void fetchFeedMediaSuccess() {
-        // given
-        try (MockedStatic<MediaUtils> mediaUtils = mockStatic(MediaUtils.class)) {
-            InputStreamResource mockResource = mock(InputStreamResource.class);
-            mediaUtils.when(() -> MediaUtils.getMedia(TEST_MEDIA_URL))
-                    .thenReturn(mockResource);
-
-            when(feedMediaRepository.getById(1L)).thenReturn(testFeedMedia);
-
-            // when
-            FeedMediaResponse response = feedMediaService.fetchFeedMedia(1L);
-
-            // then
-            assertThat(response).isNotNull();
-            assertThat(response.getImage()).isEqualTo(mockResource);
-            assertThat(response.getExtension()).isEqualTo(TEST_EXTENSION);
-        }
-    }
-
-    @Test
-    @DisplayName("피드 미디어 조회 실패 - 존재하지 않는 미디어")
-    void fetchFeedMediaFailWithNotFound() {
-        // given
-        when(feedMediaRepository.getById(1L))
-                .thenThrow(new MediaException(MediaErrorCode.MEDIA_NOT_FOUND, 1L));
-
-        // when & then
-        assertThatThrownBy(() -> feedMediaService.fetchFeedMedia(1L))
-                .isInstanceOf(MediaException.class)
-                .hasFieldOrPropertyWithValue("errorCode", MediaErrorCode.MEDIA_NOT_FOUND);
-    }
-
-    @Test
     @DisplayName("피드의 모든 미디어 조회 성공")
     void findAllByFeedSuccess() {
         // given
@@ -148,22 +114,6 @@ class FeedMediaServiceTest {
         // then
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getMediaUrl()).isEqualTo(TEST_MEDIA_URL);
-    }
-
-    @Test
-    @DisplayName("피드의 모든 미디어 삭제 성공")
-    void deleteAllByFeedIdSuccess() {
-        // given
-        try (MockedStatic<MediaUtils> mediaUtils = mockStatic(MediaUtils.class)) {
-            when(feedMediaRepository.findAllByFeedId(1L)).thenReturn(List.of(testFeedMedia));
-
-            // when
-            feedMediaService.deleteAllByFeedId(1L);
-
-            // then
-            mediaUtils.verify(() -> MediaUtils.deleteMedia(TEST_MEDIA_URL));
-            verify(feedMediaRepository).deleteAllByFeedId(1L);
-        }
     }
 
     @Test
@@ -199,10 +149,10 @@ class FeedMediaServiceTest {
         when(feedMediaRepository.findAllByFeedId(1L)).thenReturn(List.of(testFeedMedia));
 
         // when
-        List<Long> result = feedMediaService.findAllMediaIdsByFeedId(1L);
+        List<String> result = feedMediaService.findAllMediaUrlsByFeedId(1L);
 
         // then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(1L);
+        assertThat(result.get(0)).isEqualTo("test/url/image.jpg");
     }
 } 

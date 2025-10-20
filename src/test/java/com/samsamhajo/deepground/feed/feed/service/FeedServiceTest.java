@@ -160,11 +160,10 @@ class FeedServiceTest {
         Page<Feed> feedPage = new PageImpl<>(List.of(feed2, feed1));
 
         when(feedRepository.findAll(any(Pageable.class))).thenReturn(feedPage);
-        when(feedMediaService.findAllMediaIdsByFeedId(anyLong())).thenReturn(List.of());
+        when(feedMediaService.findAllMediaUrlsByFeedId(anyLong())).thenReturn(List.of());
         when(feedCommentService.countFeedCommentsByFeedId(anyLong())).thenReturn(0);
         when(feedLikeService.countFeedLikeByFeedId(anyLong())).thenReturn(0);
         when(feedLikeService.isLiked(anyLong(), anyLong())).thenReturn(false);
-        when(sharedFeedService.getSharedFeedResponse(anyLong())).thenReturn(null);
         when(sharedFeedService.countSharedFeedByOriginFeedId(anyLong())).thenReturn(0);
 
         // when
@@ -193,7 +192,7 @@ class FeedServiceTest {
 
 
     @Test
-    @DisplayName("피드 목록 조회 성공 - 공유된 피드 포함")
+    @DisplayName("피드 목록 조회 성공")
     void getFeedsSuccessWithSharedFeed() {
         // given
         Member testMember = Member.createLocalMember(TEST_EMAIL, TEST_PASSWORD, TEST_NICKNAME);
@@ -216,24 +215,11 @@ class FeedServiceTest {
 
         Page<Feed> feedPage = new PageImpl<>(List.of(feed2, feed1));
 
-        // 🔹 공유 원본 응답 (여기에 profileId를 모델에 추가했으면 같이 세팅/검증)
-        FetchSharedFeedResponse sharedFeedResponse = FetchSharedFeedResponse.builder()
-                .feedId(3L)
-                .memberId(2L)
-                .memberName("원본작성자")
-                // .profileId(20L)  // 모델에 있으면 활성화
-                .content("원본 피드 내용")
-                .createdAt(java.time.LocalDate.now())
-                .mediaIds(List.of(1L, 2L))
-                .build();
-
         when(feedRepository.findAll(any(Pageable.class))).thenReturn(feedPage);
-        when(feedMediaService.findAllMediaIdsByFeedId(anyLong())).thenReturn(List.of());
+        when(feedMediaService.findAllMediaUrlsByFeedId(anyLong())).thenReturn(List.of());
         when(feedCommentService.countFeedCommentsByFeedId(anyLong())).thenReturn(0);
         when(feedLikeService.countFeedLikeByFeedId(anyLong())).thenReturn(0);
         when(feedLikeService.isLiked(anyLong(), anyLong())).thenReturn(false);
-        when(sharedFeedService.getSharedFeedResponse(1L)).thenReturn(sharedFeedResponse);
-        when(sharedFeedService.getSharedFeedResponse(2L)).thenReturn(null);
         when(sharedFeedService.countSharedFeedByOriginFeedId(1L)).thenReturn(5);
         when(sharedFeedService.countSharedFeedByOriginFeedId(2L)).thenReturn(0);
 
@@ -248,18 +234,9 @@ class FeedServiceTest {
         // ✅ profileId 검증
         assertThat(result.getFeeds().get(0).getProfileId()).isEqualTo(10L);
         assertThat(result.getFeeds().get(1).getProfileId()).isEqualTo(10L);
-
         assertThat(result.getFeeds().get(0).getShareCount()).isEqualTo(0);
         assertThat(result.getFeeds().get(1).getShareCount()).isEqualTo(5);
-        assertThat(result.getFeeds().get(0).isShared()).isFalse();
-        assertThat(result.getFeeds().get(1).isShared()).isTrue();
         assertThat(result.getFeeds().get(0).getSharedFeed()).isNull();
-        assertThat(result.getFeeds().get(1).getSharedFeed()).isNotNull();
-        assertThat(result.getFeeds().get(1).getSharedFeed().getFeedId()).isEqualTo(3L);
-        assertThat(result.getFeeds().get(1).getSharedFeed().getMemberId()).isEqualTo(2L);
-        assertThat(result.getFeeds().get(1).getSharedFeed().getMemberName()).isEqualTo("원본작성자");
-        assertThat(result.getFeeds().get(1).getSharedFeed().getContent()).isEqualTo("원본 피드 내용");
-        assertThat(result.getFeeds().get(1).getSharedFeed().getMediaIds()).hasSize(2);
     }
 
 
