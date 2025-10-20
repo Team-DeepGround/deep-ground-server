@@ -106,6 +106,8 @@ public class FeedCommentService {
                                 .replyCount(feedReplyService.countFeedRepliesByFeedCommentId(feedComment.getId()))
                                 .likeCount(feedCommentLikeService.countFeedCommentLikeByFeedId(feedComment.getId()))
                                 .isLiked(feedCommentLikeService.isLiked(feedComment.getId(),memberId))
+                                .profileId(feedComment.getMember().getMemberProfile().getProfileId())
+                                .profileImageUrl(feedComment.getMember().getMemberProfile().getProfileImage())
                                 .build()).toList());
     }
 

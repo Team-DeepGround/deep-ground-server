@@ -17,7 +17,8 @@ public class FetchFeedCommentResponse {
     private int replyCount;
     private int likeCount;
     private boolean isLiked;
-    private int profileImageId;
+    private Long profileId;
+    private String profileImageUrl;
     private LocalDate createdAt;
 
     private List<Long> mediaIds;
