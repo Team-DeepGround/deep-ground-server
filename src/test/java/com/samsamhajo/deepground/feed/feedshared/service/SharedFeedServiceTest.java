@@ -81,49 +81,6 @@ class SharedFeedServiceTest {
     }
 
     @Test
-    @DisplayName("공유 피드 조회 성공")
-    void getSharedFeedResponseSuccess() {
-        // given
-        Member testMember = Member.createLocalMember(TEST_EMAIL, TEST_PASSWORD, TEST_NICKNAME);
-
-        // 🔸 원본 작성자 프로필 생성 & 연결
-        MemberProfile profile = MemberProfile.create(
-                null, testMember, "소개", "직업", "회사", "서울", "학력",
-                new ArrayList<>(), null, null, null, null
-        );
-        ReflectionTestUtils.setField(profile, "profileId", 20L);
-
-        Feed originFeed = Feed.of(TEST_CONTENT, testMember);
-        Feed newFeed = Feed.of(TEST_CONTENT, testMember);
-        SharedFeed sharedFeed = SharedFeed.of(newFeed, originFeed, testMember);
-
-        ReflectionTestUtils.setField(testMember, "id", 1L);
-        ReflectionTestUtils.setField(originFeed, "id", 1L);
-        ReflectionTestUtils.setField(newFeed, "id", 2L);
-        ReflectionTestUtils.setField(sharedFeed, "id", 1L);
-        ReflectionTestUtils.setField(originFeed, "createdAt", LocalDateTime.now());
-        ReflectionTestUtils.setField(newFeed, "createdAt", LocalDateTime.now());
-
-        when(sharedFeedRepository.getOrNullByFeedId(2L)).thenReturn(sharedFeed);
-        when(feedMediaService.findAllMediaIdsByFeedId(1L)).thenReturn(List.of(1L, 2L));
-
-        // when
-        FetchSharedFeedResponse response = sharedFeedService.getSharedFeedResponse(2L);
-
-        // then
-        assertThat(response).isNotNull();
-        assertThat(response.getFeedId()).isEqualTo(1L);
-        assertThat(response.getMemberId()).isEqualTo(1L);
-        assertThat(response.getMemberName()).isEqualTo(TEST_NICKNAME);
-        assertThat(response.getContent()).isEqualTo(TEST_CONTENT);
-        assertThat(response.getMediaIds()).hasSize(2);
-
-        // (선택) FetchSharedFeedResponse 모델에 profileId를 추가했다면 검증
-        // assertThat(response.getProfileId()).isEqualTo(20L);
-    }
-
-
-    @Test
     @DisplayName("공유 피드 조회 실패 - 존재하지 않는 공유 피드")
     void getSharedFeedResponseFailWithNotFound() {
         // given

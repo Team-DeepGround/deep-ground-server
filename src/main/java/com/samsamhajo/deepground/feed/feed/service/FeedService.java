@@ -67,8 +67,6 @@ public class FeedService {
 
         boolean isUserAuthenticated = (memberId != null);
 
-        FetchSharedFeedResponse sharedFeedResponse =
-                sharedFeedService.getSharedFeedResponse(feed.getId());
         Member member = feed.getMember();
 
         Long profileId = Optional.ofNullable(member.getMemberProfile())
@@ -87,14 +85,12 @@ public class FeedService {
                 .memberId(feed.getMember().getId())
                 .profileId(profileId)
                 .memberName(feed.getMember().getNickname())
-                .mediaIds(feedMediaService.findAllMediaIdsByFeedId(feed.getId()))
+                .mediaUrls(feedMediaService.findAllMediaUrlsByFeedId(feed.getId()))
                 .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId()))
                 .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))
                 .likeCount(feedLikeService.countFeedLikeByFeedId(feed.getId()))
                 .isLiked(isLikedByCurrentUser)
                 .profileImageUrl(member.getMemberProfile().getProfileImage())
-                .isShared(sharedFeedResponse != null)
-                .sharedFeed(sharedFeedResponse)
                 .build();
     }
 
@@ -107,8 +103,6 @@ public class FeedService {
         return FetchFeedsResponse.of(
                 feeds.getContent().stream()
                         .map(feed -> {
-                                    FetchSharedFeedResponse sharedFeedResponse =
-                                            sharedFeedService.getSharedFeedResponse(feed.getId());
 
                                     Member member = feed.getMember();
 
@@ -128,14 +122,12 @@ public class FeedService {
                                             .memberId(feed.getMember().getId())
                                             .profileId(profileId)
                                             .memberName(feed.getMember().getNickname())
-                                            .mediaIds(feedMediaService.findAllMediaIdsByFeedId(feed.getId()))
+                                            .mediaUrls(feedMediaService.findAllMediaUrlsByFeedId(feed.getId()))
                                             .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId()))
                                             .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))
                                             .likeCount(feedLikeService.countFeedLikeByFeedId(feed.getId()))
                                             .isLiked(isLikedByCurrentUser)
                                             .profileImageUrl(member.getMemberProfile().getProfileImage())
-                                            .isShared(sharedFeedResponse != null)
-                                            .sharedFeed(sharedFeedResponse)
                                             .build();
                                 }
                         ).toList(),
