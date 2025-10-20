@@ -87,7 +87,6 @@ public class FeedService {
                 .memberId(feed.getMember().getId())
                 .profileId(profileId)
                 .memberName(feed.getMember().getNickname())
-                .profileImageUrl(feed.getMember().getMemberProfile().getProfileImage())
                 .mediaIds(feedMediaService.findAllMediaIdsByFeedId(feed.getId()))
                 .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId()))
                 .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))
@@ -108,13 +107,6 @@ public class FeedService {
         return FetchFeedsResponse.of(
                 feeds.getContent().stream()
                         .map(feed -> {
-
-                            Member wirteMember = feed.getMember();
-
-                            String profileImageUrl = (wirteMember.getMemberProfile() != null)
-                                    ? wirteMember.getMemberProfile().getProfileImage()
-                                    : null;
-
                                     FetchSharedFeedResponse sharedFeedResponse =
                                             sharedFeedService.getSharedFeedResponse(feed.getId());
 
@@ -136,7 +128,6 @@ public class FeedService {
                                             .memberId(feed.getMember().getId())
                                             .profileId(profileId)
                                             .memberName(feed.getMember().getNickname())
-                                            .profileImageUrl(profileImageUrl)
                                             .mediaIds(feedMediaService.findAllMediaIdsByFeedId(feed.getId()))
                                             .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId()))
                                             .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))

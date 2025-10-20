@@ -16,7 +16,7 @@ public class FetchSharedFeedResponse {
     private Long profileId;
     private String memberName;
     private String content;
-    private int profileImageId;
+    private String profileImageUrl;
     private LocalDate createdAt;
     private List<Long> mediaIds;
 
