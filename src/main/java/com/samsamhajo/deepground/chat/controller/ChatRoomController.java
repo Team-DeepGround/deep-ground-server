@@ -81,6 +81,6 @@ public class ChatRoomController {
         chatRoomMemberService.leaveChatRoom(chatroomId,userDetails.getMember().getId());
 
         return ResponseEntity
-                .ok(SuccessResponse.of(ChatSuccessCode.SUCCESS_CHATROOM_LEAVE),chatroomId);
+                .ok(SuccessResponse.of(ChatSuccessCode.SUCCESS_CHATROOM_LEAVE,chatroomId));
     }
 }
