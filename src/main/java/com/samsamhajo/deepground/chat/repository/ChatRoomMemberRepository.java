@@ -32,6 +32,7 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
             + "JOIN ChatRoomMember friendCrm ON friendCrm.chatRoom.id = cr.id AND friendCrm.member.id != crm.member.id "
             + "JOIN friendCrm.member friend "
             + "WHERE crm.member.id = :memberId AND cr.type = 'FRIEND' "
+            + "AND crm.deleted = false "
             + "ORDER BY crm.lastReadMessageTime DESC")
     Page<ChatRoomInfo> findByMemberIdAndChatRoomTypeFriend(Long memberId, Pageable pageable);
 
@@ -42,6 +43,7 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
             + "JOIN StudyGroup sg ON sg.chatRoom.id = cr.id "
             + "JOIN ChatRoomMember members ON members.chatRoom.id = cr.id "
             + "WHERE crm.member.id = :memberId AND cr.type = 'STUDY_GROUP' "
+            + "AND crm.deleted = false "
             + "GROUP BY sg.id, cr.id, sg.title, crm.lastReadMessageTime "
             + "ORDER BY crm.lastReadMessageTime DESC")
     Page<ChatRoomInfo> findByMemberIdAndChatRoomTypeStudyGroup(Long memberId, Pageable pageable);
