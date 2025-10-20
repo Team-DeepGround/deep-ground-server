@@ -30,6 +30,7 @@ public class StudyGroupMemberService {
   private final StudyGroupRepository studyGroupRepository;
   private final StudyGroupMemberRepository studyGroupMemberRepository;
   private final ApplicationEventPublisher eventPublisher;
+  private final ChatRoomMemberService chatRoomMemberService;
 
   @Transactional
   public List<StudyGroupMemberSummary> getAcceptedMembers(Long studyGroupId) {
@@ -103,6 +104,13 @@ public class StudyGroupMemberService {
 
     if (studyGroup.getCreator().getId().equals(member.getId())) {
         throw new StudyGroupException(StudyGroupErrorCode.MEMBER_IS_LEADER);
+    }
+
+    if (studyGroupMember.getIsAllowed()) {
+      chatRoomMemberService.leaveChatRoom(
+              studyGroup.getChatRoom().getId(),
+              member.getId()
+      );
     }
 
     studyGroupMemberRepository.delete(studyGroupMember);
