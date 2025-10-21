@@ -9,6 +9,7 @@ import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCreateRequest;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupCreateResponse;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import jakarta.transaction.Transactional;
@@ -76,7 +77,7 @@ class StudyGroupServiceIntegrationTest extends IntegrationTestSupport {
         .findFirst();
 
     assertThat(membership).isPresent();
-    assertThat(membership.get().getIsAllowed()).isTrue();
+    assertThat(membership.get().getStudyGroupMemberStatus()).isEqualTo(StudyGroupMemberStatus.APPROVED);
 
     assertThat(group.getChatRoom()).isNotNull();
 //    assertThat(group.getChatRoom().getChatRoomType()).isEqualTo(ChatRoomType.STUDY_GROUP);

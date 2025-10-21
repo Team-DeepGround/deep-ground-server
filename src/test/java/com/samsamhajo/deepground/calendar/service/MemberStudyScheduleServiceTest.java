@@ -10,6 +10,7 @@ import com.samsamhajo.deepground.calendar.exception.ScheduleException;
 import com.samsamhajo.deepground.calendar.repository.MemberStudyScheduleRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,7 +58,7 @@ public class MemberStudyScheduleServiceTest {
         Member member = mock(Member.class);
         MemberStudySchedule memberStudySchedule = MemberStudySchedule.of(member, studySchedule, true, true, "memo");
 
-        when(memberStudyScheduleRepository.findAllByMemberId(userId)).thenReturn(List.of(memberStudySchedule));
+        when(memberStudyScheduleRepository.findAllByMemberId(userId, StudyGroupMemberStatus.APPROVED)).thenReturn(List.of(memberStudySchedule));
 
         // when
         List<MemberScheduleCalendarResponseDto> result = memberStudyScheduleService.findAllByMemberId(userId);
