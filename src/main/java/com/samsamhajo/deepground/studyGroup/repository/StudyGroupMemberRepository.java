@@ -22,6 +22,7 @@ public interface StudyGroupMemberRepository extends JpaRepository<StudyGroupMemb
   WHERE m.member.id = :memberId
     AND m.isAllowed = true
     AND sg.creator.id <> :memberId
+    AND sg.deleted = false
   ORDER BY sg.createdAt DESC
 """)
   List<StudyGroupMember> findAllByMemberIdAndIsAllowedTrueAndNotCreator(@Param("memberId") Long memberId);
