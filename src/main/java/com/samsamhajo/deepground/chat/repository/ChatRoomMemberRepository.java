@@ -22,7 +22,7 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
     @Query("SELECT crm FROM ChatRoomMember crm JOIN FETCH crm.member WHERE crm.chatRoom.id = :chatRoomId")
     List<ChatRoomMember> findByChatRoomId(Long chatRoomId);
 
-    @Query("SELECT crm FROM ChatRoomMember crm JOIN FETCH crm.member WHERE crm.chatRoom.id = :chatRoomId AND crm.member.id = :memberId")
+    @Query("SELECT crm FROM ChatRoomMember crm JOIN FETCH crm.member WHERE crm.chatRoom.id = :chatRoomId AND crm.member.id = :memberId AND crm.deleted = false ")
     Optional<ChatRoomMember> findByChatRoomIdAndMemberId(Long chatRoomId, Long memberId);
 
     @Query("SELECT NEW com.samsamhajo.deepground.chat.dto.ChatRoomInfo("
