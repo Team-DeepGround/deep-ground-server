@@ -13,6 +13,7 @@ import com.samsamhajo.deepground.notification.entity.data.ScheduleNotificationDa
 import com.samsamhajo.deepground.notification.event.NotificationEvent;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +57,7 @@ public class StudyScheduleService {
         StudySchedule savedSchedule = studyScheduleRepository.save(studySchedule);
 
         List<Member> members = new ArrayList<>(studyGroupMemberRepository
-                .findAllByStudyGroupIdAndIsAllowedTrue(studyGroupId)
+                .findAllByStudyGroupIdAndStudyGroupMemberStatus(studyGroupId, StudyGroupMemberStatus.APPROVED)
                 .stream()
                 .map(StudyGroupMember::getMember)
                 .toList());
