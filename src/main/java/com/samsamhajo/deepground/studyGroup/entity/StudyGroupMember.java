@@ -8,11 +8,16 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
+
+import static com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus.APPROVED;
+import static com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus.NOT_APPLIED;
 
 @Entity
 @Getter
 @Table(name = "study_group_members")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLRestriction("is_deleted = false")
 public class StudyGroupMember extends BaseEntity {
 
     @Id
@@ -28,24 +33,28 @@ public class StudyGroupMember extends BaseEntity {
     @JoinColumn(name = "study_group_id", nullable = false)
     private StudyGroup studyGroup;
 
-    @Column(name = "is_allowed", nullable = false)
-    private Boolean isAllowed = false;
+    @Enumerated
+    private StudyGroupMemberStatus studyGroupMemberStatus;
 
-    private StudyGroupMember(Member member, StudyGroup studyGroup, Boolean isAllowed) {
+    private StudyGroupMember(Member member, StudyGroup studyGroup,StudyGroupMemberStatus studyGroupMemberStatus) {
         this.member = member;
         this.studyGroup = studyGroup;
-        this.isAllowed = isAllowed;
+        this.studyGroupMemberStatus = studyGroupMemberStatus;
     }
 
-    public static StudyGroupMember of(Member member, StudyGroup studyGroup, Boolean isAllowed) {
-        return new StudyGroupMember(member, studyGroup, isAllowed);
+    public static StudyGroupMember join(Member member, StudyGroup studyGroup) {
+        return new StudyGroupMember(member, studyGroup ,StudyGroupMemberStatus.PENDING);
+    }
+
+    public static StudyGroupMember of(Member member, StudyGroup studyGroup) {
+        return new StudyGroupMember(member, studyGroup , APPROVED);
     }
 
     public void allowMember() {
-        this.isAllowed = true;
+        this.studyGroupMemberStatus = APPROVED;
     }
 
-    public void banMember() {
-        this.isAllowed = false;
+    public void kickMember() {
+        this.studyGroupMemberStatus = NOT_APPLIED;
     }
 }

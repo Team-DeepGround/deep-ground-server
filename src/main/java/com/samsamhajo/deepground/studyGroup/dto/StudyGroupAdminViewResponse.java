@@ -1,6 +1,8 @@
 package com.samsamhajo.deepground.studyGroup.dto;
 
 import java.util.List;
+
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -19,6 +21,6 @@ public class StudyGroupAdminViewResponse {
   public static class MemberStatusDto {
     private Long memberId;
     private String nickname;
-    private Boolean isAllowed;
+    private StudyGroupMemberStatus studyGroupMemberStatus;
   }
 }

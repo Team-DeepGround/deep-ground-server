@@ -10,6 +10,8 @@ import com.samsamhajo.deepground.calendar.exception.ScheduleErrorCode;
 import com.samsamhajo.deepground.calendar.exception.ScheduleException;
 import com.samsamhajo.deepground.calendar.repository.MemberStudyScheduleRepository;
 import java.util.List;
+
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +25,7 @@ public class MemberStudyScheduleService {
     @Transactional(readOnly = true)
     public List<MemberScheduleCalendarResponseDto> findAllByMemberId(Long userId) {
 
-        List<MemberStudySchedule> schedules = memberStudyScheduleRepository.findAllByMemberId(userId);
+        List<MemberStudySchedule> schedules = memberStudyScheduleRepository.findAllByMemberId(userId, StudyGroupMemberStatus.APPROVED);
 
         return schedules.stream()
                 .map(MemberScheduleCalendarResponseDto::from)
