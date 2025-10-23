@@ -64,7 +64,7 @@ class StudyGroupRepositoryTest extends IntegrationTestSupport {
     em.flush();
     em.clear();
 
-    StudyGroupMember groupMember = StudyGroupMember.of(participant, savedGroup, true);
+    StudyGroupMember groupMember = StudyGroupMember.of(participant, savedGroup);
     StudyGroupComment comment = StudyGroupComment.of(savedGroup, participant, "댓글입니다");
 
     em.persist(groupMember);

@@ -84,7 +84,7 @@ public class CommentService {
         if(!comment.getMember().getId().equals(memberId)) {
             throw new CommentException(CommentErrorCode.COMMENT_MEMBER_MISMATCH);
         } else {
-            commentRepository.deleteById(commentId);
+            comment.softDelete();
         }
         return commentId;
     }
