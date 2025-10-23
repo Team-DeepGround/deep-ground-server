@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long> {
     Page<Question> findByMemberId(Long memberId, Pageable pageable);
-    Page<Question> findAllByIsDeletedFalse(Pageable pageable);
+    Page<Question> findAllByDeletedFalse(Pageable pageable);
     Optional<Question> findByIdAndDeletedFalse(Long questionId);
 
 }
