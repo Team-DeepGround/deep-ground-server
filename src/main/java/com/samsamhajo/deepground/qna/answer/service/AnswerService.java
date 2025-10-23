@@ -141,7 +141,7 @@ public class AnswerService {
                 .map(Answer::getId)
                 .collect(Collectors.toList());
 
-        List<AnswerMedia> medias = answerMediaRepository.findAllByAnswerIdInAndIsDeletedFalse(answerIds);
+        List<AnswerMedia> medias = answerMediaRepository.findAllByAnswerIdInAndDeletedFalse(answerIds);
 
         Map<Long, List<String>> mediaUrlMap = medias.stream()
                 .collect(Collectors.groupingBy(

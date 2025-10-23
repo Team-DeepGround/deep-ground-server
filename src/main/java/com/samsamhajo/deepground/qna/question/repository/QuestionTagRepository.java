@@ -17,5 +17,5 @@ public interface QuestionTagRepository extends JpaRepository<QuestionTag, Long> 
 
     List<QuestionTag> findAllByQuestionId(Long questionId);
 
-    List<QuestionTag> findByTagIdAndIsDeletedFalse(Long techStackId);
+    List<QuestionTag> findByTechStackIdAndDeletedFalse(Long techStackId);
 }
