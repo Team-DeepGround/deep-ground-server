@@ -151,7 +151,7 @@ public class QuestionService{
     //Question 리스트 조회 메서드
     @Transactional(readOnly = true)
     public QuestionListResponseDto getQuestions(Pageable pageable) {
-        Page<Question> questionPage = questionRepository.findAllByIsDeletedFalse(pageable);
+        Page<Question> questionPage = questionRepository.findAllByDeletedFalse(pageable);
 
         List<QuestionSummaryDto> summaries = questionPage.stream()
                 .map(question -> {
@@ -178,7 +178,7 @@ public class QuestionService{
                 .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
         Member writeMember = question.getMember();
 
-        List<QuestionMedia> questionMedia = questionMediaRepository.findAllByIsDeletedFalse(question.getId());
+        List<QuestionMedia> questionMedia = questionMediaRepository.findAllByQuestionIdAndDeletedFalse(question.getId());
 
         List<String> techStacks = tagService.getStackNamesByQuestionId(questionId);
 
