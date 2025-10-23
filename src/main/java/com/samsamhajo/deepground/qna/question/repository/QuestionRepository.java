@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long> {
     Page<Question> findByMemberId(Long memberId, Pageable pageable);
+    Page<Question> findAllByIsDeletedFalse(Pageable pageable);
 
 }
 

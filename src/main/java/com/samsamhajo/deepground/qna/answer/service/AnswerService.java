@@ -74,10 +74,11 @@ public class AnswerService {
         if (!answer.getMember().getId().equals(memberId)) {
             throw new AnswerException(AnswerErrorCode.ANSWER_MEMBER_MISMTACH);
         } else {
-            commentRepository.deleteAllByAnswerId(answerId);
-            answerLikeRepository.deleteAllByAnswerId(answerId);
-            answerMediaRepository.deleteAllByAnswerId(answerId);
-            answerRepository.deleteById(answer.getId());
+//            commentRepository.deleteAllByAnswerId(answerId);
+//            answerLikeRepository.deleteAllByAnswerId(answerId);
+//            answerMediaRepository.deleteAllByAnswerId(answerId);
+//            answerRepository.deleteById(answer.getId());
+            answer.softDelete();
         }
         //TODO event를 통해 Question, Answer 책임 분리
         question.decrementAnswerCount();
@@ -136,10 +137,11 @@ public class AnswerService {
         }
 
         List<Long> answerIds = answers.stream()
+                .filter(answer -> !answer.isDeleted())
                 .map(Answer::getId)
                 .collect(Collectors.toList());
 
-        List<AnswerMedia> medias = answerMediaRepository.findAllByAnswerIdIn(answerIds);
+        List<AnswerMedia> medias = answerMediaRepository.findAllByAnswerIdInAndIsDeletedFalse(answerIds);
 
         Map<Long, List<String>> mediaUrlMap = medias.stream()
                 .collect(Collectors.groupingBy(

@@ -74,11 +74,12 @@ public class QuestionService{
         if(!question.getMember().getId().equals(memberId)) {
             throw new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH);
         } else {
-            List<Answer> answers = answerRepository.findAllByQuestionId(questionId);
-            answerRepository.deleteAll(answers);
-            questionTagRepository.deleteAllByQuestionId(questionId);
-            questionMediaService.deleteQuestionMedia(questionId);
-            questionRepository.deleteById(questionId);
+//            List<Answer> answers = answerRepository.findAllByQuestionId(questionId);
+//            answerRepository.deleteAll(answers);
+//            questionTagRepository.deleteAllByQuestionId(questionId);
+//            questionMediaService.deleteQuestionMedia(questionId);
+//            questionRepository.deleteById(questionId);
+            question.softDelete();
         }
 
         return question.getId();
@@ -150,7 +151,7 @@ public class QuestionService{
     //Question 리스트 조회 메서드
     @Transactional(readOnly = true)
     public QuestionListResponseDto getQuestions(Pageable pageable) {
-        Page<Question> questionPage = questionRepository.findAll(pageable);
+        Page<Question> questionPage = questionRepository.findAllByIsDeletedFalse(pageable);
 
         List<QuestionSummaryDto> summaries = questionPage.stream()
                 .map(question -> {
