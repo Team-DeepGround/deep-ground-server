@@ -35,7 +35,7 @@ public class QuestionTagService {
 
     @Transactional(readOnly = true)
     public List<QuestionTagResponseDto> getQuestionsByTechStackId(Long techStackId) {
-        List<QuestionTag> tags = questionTagRepository.findByTechStackId(techStackId);
+        List<QuestionTag> tags = questionTagRepository.findByTagIdAndIsDeletedFalse(techStackId);
 
         return tags.stream()
                 .map(tag -> new QuestionTagResponseDto(

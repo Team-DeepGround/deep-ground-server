@@ -173,10 +173,12 @@ public class QuestionService{
     @Transactional(readOnly = true)
     public QuestionDetailResponseDto getQuestionDetail(Long questionId, Long memberId) {
 
-        Question question = commonValidation.QuestionValidation(questionId);
+//        Question question = commonValidation.QuestionValidation(questionId);
+        Question question = questionRepository.findByIdAndDeletedFalse(questionId)
+                .orElseThrow(() -> new QuestionException(QuestionErrorCode.QUESTION_NOT_FOUND));
         Member writeMember = question.getMember();
 
-        List<QuestionMedia> questionMedia = questionMediaRepository.findAllByQuestionId(questionId);
+        List<QuestionMedia> questionMedia = questionMediaRepository.findAllByIsDeletedFalse(question.getId());
 
         List<String> techStacks = tagService.getStackNamesByQuestionId(questionId);
 

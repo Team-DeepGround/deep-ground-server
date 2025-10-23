@@ -17,6 +17,8 @@ public interface QuestionMediaRepository extends JpaRepository<QuestionMedia, Lo
 //    @Query("SELECT qm FROM QuestionMedia qm WHERE qm.question.id = :questionId AND qm.deleted = false")
 //    List<QuestionMedia> findAllByQuestionId(@Param("questionId") Long questionId);
 
+    List<QuestionMedia> findAllByIsDeletedFalse(Long questionId);
+
     void deleteAllByQuestionId(Long questionId);
 
     Optional<QuestionMedia> findByMediaUrl(String mediaUrl);
