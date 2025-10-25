@@ -1,16 +1,14 @@
-package com.samsamhajo.deepground.admin.exception;
-
+package com.samsamhajo.deepground.support.exception;
 
 import com.samsamhajo.deepground.global.error.core.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @RequiredArgsConstructor
-public enum AdminErrorCode implements ErrorCode {
+public enum InquiryErrorCode implements ErrorCode {
 
-    INVALID_BAN_DAYS(HttpStatus.BAD_REQUEST, "정지 기간은 1일 이상이어야 합니다."),
-    ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 관리자 계정이 존재하지 않습니다.");
-
+    INQUIRY_NOT_FOUND(HttpStatus.NOT_FOUND, "문의가 존재하지 않습니다."),
+    ;
     private final HttpStatus status;
     private final String message;
 
@@ -21,6 +19,6 @@ public enum AdminErrorCode implements ErrorCode {
 
     @Override
     public String getMessage() {
-        return "[ADMIN ERROR] " + message;
+        return "[INQUIRY ERROR] " + message;
     }
 }
