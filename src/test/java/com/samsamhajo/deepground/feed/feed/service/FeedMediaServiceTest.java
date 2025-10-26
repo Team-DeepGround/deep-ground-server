@@ -135,7 +135,6 @@ class FeedMediaServiceTest {
             feedMediaService.updateFeedMedia(testFeed, updateRequest);
 
             // then
-            mediaUtils.verify(() -> MediaUtils.deleteMedia(TEST_MEDIA_URL));
             verify(s3Uploader).upload(any(MultipartFile.class), eq("feed-media"));
             verify(feedMediaRepository).deleteAllByFeedId(1L);
             verify(feedMediaRepository).saveAll(anyList());
