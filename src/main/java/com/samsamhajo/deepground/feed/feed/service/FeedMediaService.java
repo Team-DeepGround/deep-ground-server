@@ -47,12 +47,6 @@ public class FeedMediaService {
     
     @Transactional
     public void deleteAllByFeedId(Long feedId) {
-        // 파일 시스템에서 물리적 미디어 파일 삭제
-        List<FeedMedia> mediaList = feedMediaRepository.findAllByFeedId(feedId);
-        for (FeedMedia media : mediaList) {
-            MediaUtils.deleteMedia(media.getMediaUrl());
-        }
-        
         // DB에서 삭제 (JPA Query Method 사용)
         feedMediaRepository.deleteAllByFeedId(feedId);
     }
