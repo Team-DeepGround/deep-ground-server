@@ -126,7 +126,6 @@ class FeedMediaServiceTest {
             mediaUtils.when(() -> MediaUtils.getExtension(any(MultipartFile.class)))
                     .thenReturn(TEST_EXTENSION);
 
-            when(feedMediaRepository.findAllByFeedId(1L)).thenReturn(List.of(testFeedMedia));
             when(feedMediaRepository.saveAll(anyList())).thenReturn(List.of(testFeedMedia));
 
             FeedUpdateRequest updateRequest = new FeedUpdateRequest(TEST_CONTENT, List.of(testImage));
