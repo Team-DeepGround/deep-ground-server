@@ -23,7 +23,6 @@ public class MemberProfileDto {
 
     private String profileImage;
 
-    @NotBlank (message = "닉네임을 입력해주세요")
     private String nickname;
 
     @NotBlank(message = "자기소개를 입력해주세요.")
