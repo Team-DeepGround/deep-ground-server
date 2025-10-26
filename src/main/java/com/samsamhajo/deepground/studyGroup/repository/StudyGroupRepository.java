@@ -28,6 +28,7 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
         OR (:keyword IS NULL OR LOWER(sg.explanation) LIKE LOWER(CONCAT('%', :keyword, '%')))
     )
     AND (:stackNames IS NULL OR ts.name IN :stackNames)
+    AND sg.deleted = false
     AND (:onOffline IS NULL OR
         (:onOffline = 'ONLINE' AND sg.isOffline = false) OR
         (:onOffline = 'OFFLINE' AND sg.isOffline = true) OR
@@ -60,6 +61,9 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
 """)
   List<StudyGroupReply> findRepliesByCommentIds(@Param("commentIds") List<Long> commentIds);
 
+  @Query("SELECT sg FROM StudyGroup sg " +
+          "WHERE sg.creator.id = :memberId AND sg.deleted = false " +
+          "ORDER BY sg.createdAt DESC")
   List<StudyGroup> findAllByCreator_IdOrderByCreatedAtDesc(Long memberId);
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)

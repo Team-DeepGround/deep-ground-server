@@ -8,6 +8,7 @@ import com.samsamhajo.deepground.studyGroup.dto.StudyGroupAdminViewResponse;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupKickRequest;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
+import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus;
 import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundException;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupMemberRepository;
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupRepository;
@@ -19,6 +20,8 @@ import org.springframework.security.access.AccessDeniedException;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus.APPROVED;
 
 @Service
 @RequiredArgsConstructor
@@ -39,14 +42,14 @@ public class StudyGroupAdminService {
     List<StudyGroupMember> memberList =
         studyGroupMemberRepository.findAllWithMemberByStudyGroupId(studyGroupId);
 
-    int approved = studyGroupMemberRepository.countByStudyGroup_IdAndIsAllowedTrue(studyGroupId);
-    int waiting = studyGroupMemberRepository.countByStudyGroup_IdAndIsAllowedFalse(studyGroupId);
+    int approved = studyGroupMemberRepository.countByStudyGroup_IdAndStudyGroupMemberStatus(studyGroupId, APPROVED);
+    int waiting = studyGroupMemberRepository.countByStudyGroup_IdAndStudyGroupMemberStatus(studyGroupId,StudyGroupMemberStatus.PENDING);
 
     List<StudyGroupAdminViewResponse.MemberStatusDto> members = memberList.stream()
         .map(m -> StudyGroupAdminViewResponse.MemberStatusDto.builder()
             .memberId(m.getMember().getId())
             .nickname(m.getMember().getNickname())
-            .isAllowed(m.getIsAllowed())
+            .studyGroupMemberStatus(m.getStudyGroupMemberStatus())
             .build())
         .collect(Collectors.toList());
 
@@ -73,11 +76,11 @@ public class StudyGroupAdminService {
 
     // 신청자 존재 및 상태 확인
     StudyGroupMember member = studyGroupMemberRepository
-        .findByStudyGroupIdAndMemberId(studyGroupId, targetMemberId)
+        .findByStudyGroupIdAndMemberIdAndDeletedFalse(studyGroupId, targetMemberId)
         .orElseThrow(() -> new IllegalArgumentException("신청자가 존재하지 않습니다."));
 
     // 이미 수락된 경우 예외 처리
-    if (Boolean.TRUE.equals(member.getIsAllowed())) {
+    if (member.getStudyGroupMemberStatus() == APPROVED) {
       throw new IllegalStateException("이미 수락된 멤버입니다.");
     }
 
@@ -108,12 +111,12 @@ public class StudyGroupAdminService {
       throw new IllegalArgumentException("자기 자신은 강퇴할 수 없습니다.");
     }
 
-    StudyGroupMember target = studyGroupMemberRepository.findByStudyGroupIdAndMemberId(
+    StudyGroupMember target = studyGroupMemberRepository.findByStudyGroupIdAndMemberIdAndDeletedFalse(
             request.getStudyGroupId(), request.getTargetMemberId())
         .orElseThrow(() -> new IllegalArgumentException("대상 멤버가 스터디에 존재하지 않습니다."));
 
     // 채팅방 멤버 삭제
-    if (target.getIsAllowed()) {
+    if (target.getStudyGroupMemberStatus() == APPROVED) {
       chatRoomMemberService.leaveChatRoom(group.getChatRoom().getId(), target.getMember().getId());
 
       // 스터디 그룹 강퇴 알림
@@ -122,6 +125,8 @@ public class StudyGroupAdminService {
           StudyGroupNotificationData.kick(group)
       ));
     }
+
+    target.kickMember();
 
     target.softDelete();
   }

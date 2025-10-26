@@ -40,11 +40,11 @@ public class StudyGroupService {
 
 
   @Transactional
-  public StudyGroupDetailResponse getStudyGroupDetail(Long studyGroupId, Long memberId) {
-    StudyGroup group = studyGroupRepository.findWithCreatorAndCommentsById(studyGroupId)
-        .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
+    public StudyGroupDetailResponse getStudyGroupDetail(Long studyGroupId, Long memberId) {
+      StudyGroup group = studyGroupRepository.findWithCreatorAndCommentsById(studyGroupId)
+              .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
 
-    List<Long> commentIds = group.getComments().stream()
+      List<Long> commentIds = group.getComments().stream()
         .map(StudyGroupComment::getId)
         .toList();
 
@@ -59,11 +59,10 @@ public class StudyGroupService {
 
   public StudyGroupMemberStatus getMemberStatus(Long studyGroupId, Long memberId) {
     Optional<StudyGroupMember> memberOpt =
-        studyGroupMemberRepository.findByStudyGroupIdAndMemberId(studyGroupId, memberId);
+        studyGroupMemberRepository.findByStudyGroupIdAndMemberIdAndDeletedFalse(studyGroupId, memberId);
 
-    return memberOpt.map(studyGroupMember -> studyGroupMember.getIsAllowed()
-        ? StudyGroupMemberStatus.APPROVED
-        : StudyGroupMemberStatus.PENDING).orElse(StudyGroupMemberStatus.NOT_APPLIED);
+    return memberOpt.map(StudyGroupMember::getStudyGroupMemberStatus)
+            .orElse(StudyGroupMemberStatus.NOT_APPLIED);
 
   }
 
@@ -73,6 +72,7 @@ public class StudyGroupService {
             .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
 
     return group.getMembers().stream()
+            .filter(m -> m.getStudyGroupMemberStatus() == StudyGroupMemberStatus.APPROVED)
             .map(m -> {
               Member member = m.getMember();
               MemberProfile profile = member.getMemberProfile();
@@ -156,15 +156,16 @@ public class StudyGroupService {
       StudyGroupTechTag link = StudyGroupTechTag.of(savedGroup, techStack);
       studyGroupTechTagRepository.save(link);
     }
-    StudyGroupMember groupMember = StudyGroupMember.of(creator, savedGroup, true);
+    StudyGroupMember groupMember = StudyGroupMember.of(creator, savedGroup);
     studyGroupMemberRepository.save(groupMember);
     return StudyGroupCreateResponse.from(savedGroup);
   }
 
   public List<StudyGroupParticipationResponse> getStudyGroupsByMember(Long memberId) {
     List<StudyGroupMember> studyGroupMembers =
-        studyGroupMemberRepository.findAllByMemberIdAndIsAllowedTrueAndNotCreator(
-            memberId);
+        studyGroupMemberRepository.findAllByMemberIdAndStudyGroupMemberStatusAndNotCreator(
+                memberId,
+                StudyGroupMemberStatus.APPROVED);
 
     return studyGroupMembers.stream()
         .map(member -> StudyGroupParticipationResponse.from(

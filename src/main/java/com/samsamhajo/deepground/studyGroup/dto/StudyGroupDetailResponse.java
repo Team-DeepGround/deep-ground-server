@@ -19,6 +19,9 @@ public class StudyGroupDetailResponse {
   private String title;
   private String explanation;
   private String writer;
+  private Long writeMemberId;
+  private Long profileId;
+  private String nickname;
   private int memberCount;
   private int groupLimit;
   private String location;
@@ -39,6 +42,7 @@ public class StudyGroupDetailResponse {
         .title(group.getTitle())
         .explanation(group.getExplanation())
         .writer(group.getCreator().getNickname())
+            .writeMemberId(group.getCreator().getId())
         .memberCount(group.getMembers().size())
         .groupLimit(group.getGroupMemberCount())
         .location(group.getStudyLocation())
