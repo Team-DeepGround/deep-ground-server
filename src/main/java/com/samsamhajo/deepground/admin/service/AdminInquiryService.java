@@ -15,7 +15,7 @@ import com.samsamhajo.deepground.support.exception.InquiryErrorCode;
 import com.samsamhajo.deepground.support.exception.InquiryException;
 import com.samsamhajo.deepground.support.repository.InquiryAnswerRepository;
 import com.samsamhajo.deepground.support.repository.InquiryRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +26,7 @@ import static com.samsamhajo.deepground.support.entity.InquiryStatus.IN_PROGRESS
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AdminInquiryService {
 
     private final InquiryRepository inquiryRepository;
