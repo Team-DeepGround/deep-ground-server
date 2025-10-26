@@ -26,7 +26,7 @@ public class MemberController {
     private final MemberService memberService;
     private final PresenceService presenceService;
 
-    @PutMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse<MemberProfileDto>> editMemberProfile(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestPart("profile") @Valid MemberProfileDto memberProfileDto,

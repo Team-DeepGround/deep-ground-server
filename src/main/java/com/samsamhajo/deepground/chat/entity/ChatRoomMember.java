@@ -21,6 +21,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "chat_room_members")
+@SQLRestriction("is_deleted = false")
 public class ChatRoomMember extends BaseEntity {
 
     @Id
