@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.studyGroup.dto;
 
 import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
+import com.samsamhajo.deepground.studyGroup.entity.OnOffline;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import lombok.*;
 
@@ -20,6 +21,7 @@ public class StudyGroupMyListResponse {
   private Integer currentMemberCount;
   private LocalDate studyStartDate;
   private LocalDate studyEndDate;
+  private Boolean isOffline;
 
   public static StudyGroupMyListResponse from(StudyGroup group) {
     return StudyGroupMyListResponse.builder()
@@ -31,6 +33,7 @@ public class StudyGroupMyListResponse {
             .currentMemberCount(group.getMembers().size())
             .studyStartDate(group.getStudyStartDate())
             .studyEndDate(group.getStudyEndDate())
+            .isOffline(group.getIsOffline())
             .build();
   }
 }
