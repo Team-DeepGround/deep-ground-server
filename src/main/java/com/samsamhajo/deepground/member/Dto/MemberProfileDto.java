@@ -19,6 +19,9 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @Builder
 public class MemberProfileDto {
+
+    private Long memberId;
+
     private String email;
 
     private String profileImage;
@@ -59,6 +62,7 @@ public class MemberProfileDto {
     public static MemberProfileDto from(MemberProfile profile, Member member) {
 
         return MemberProfileDto.builder()
+                .memberId(member.getId())
                 .email(member.getEmail())
                 .profileImage(profile.getProfileImage())
                 .nickname(member.getNickname())
@@ -80,6 +84,7 @@ public class MemberProfileDto {
     public static MemberProfileDto of(MemberProfile profile) {
 
         return MemberProfileDto.builder()
+                .memberId(profile.getMember().getId())
                 .email(profile.getMember().getEmail())
                 .profileImage(profile.getProfileImage())
                 .nickname(profile.getMember().getNickname())
