@@ -70,4 +70,40 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
   @Query("SELECT sg FROM StudyGroup sg WHERE sg.id = :id")
   Optional<StudyGroup> findByIdForUpdate(@Param("id") Long id);;
 
+  @Query(
+          value = """
+    SELECT DISTINCT sg
+    FROM StudyGroup sg
+    WHERE sg.deleted = false
+      AND (
+        sg.creator.id = :memberId
+        OR EXISTS (
+          SELECT 1
+          FROM StudyGroupMember sm
+          WHERE sm.studyGroup = sg
+            AND sm.member.id = :memberId
+        )
+      )
+    ORDER BY sg.createdAt DESC
+  """,
+          countQuery = """
+    SELECT COUNT(DISTINCT sg.id)
+    FROM StudyGroup sg
+    WHERE sg.deleted = false
+      AND (
+        sg.creator.id = :memberId
+        OR EXISTS (
+          SELECT 1
+          FROM StudyGroupMember sm
+          WHERE sm.studyGroup = sg
+            AND sm.member.id = :memberId
+        )
+      )
+  """
+  )
+  Page<StudyGroup> findAllCreatedOrJoinedByMemberId(
+          @Param("memberId") Long memberId,
+          Pageable pageable
+  );
+
 }
