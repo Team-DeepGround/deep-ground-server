@@ -7,11 +7,17 @@ import com.samsamhajo.deepground.member.Dto.MemberProfileDto;
 import com.samsamhajo.deepground.member.Dto.PresenceDto;
 import com.samsamhajo.deepground.member.exception.MemberSuccessCode;
 import com.samsamhajo.deepground.member.exception.ProfileSuccessCode;
+import com.samsamhajo.deepground.member.service.MemberStudyService;
 import com.samsamhajo.deepground.member.service.PresenceService;
 import com.samsamhajo.deepground.member.service.MemberService;
+import com.samsamhajo.deepground.studyGroup.dto.MemberStudySummaryResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,6 +31,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final PresenceService presenceService;
+    private final MemberStudyService memberStudyService;
 
     @PatchMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse<MemberProfileDto>> editMemberProfile(
@@ -82,6 +89,14 @@ public class MemberController {
                 .ok(SuccessResponse.of(ProfileSuccessCode.GET_SUCCESS_PROFILE, profile));
     }
 
+    @GetMapping("/{memberId}/studies")
+    public ResponseEntity<SuccessResponse<Page<MemberStudySummaryResponse>>> getMemberStudies(
+            @PathVariable Long memberId,
+            @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        Page<MemberStudySummaryResponse> response = memberStudyService.getMemberStudies(memberId, pageable);
 
+        return ResponseEntity.ok(SuccessResponse.of(MemberSuccessCode.GET_MEMBER_STUDY_SUCCESS, response));
+    }
 }
 
