@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.notification.entity;
 
 import com.samsamhajo.deepground.global.BaseDocument;
 import lombok.Getter;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -11,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Getter
 @Document(collection = "notifications")
 @CompoundIndex(def = "{'receiver_id': 1, 'created_at': -1}")
+@SQLRestriction("is_deleted = false")
 public class Notification extends BaseDocument {
 
     @Id
