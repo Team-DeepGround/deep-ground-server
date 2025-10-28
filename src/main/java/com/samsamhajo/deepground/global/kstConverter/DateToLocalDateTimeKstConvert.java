@@ -13,15 +13,16 @@ import java.util.Date;
 @ReadingConverter
 public class DateToLocalDateTimeKstConvert implements Converter<Date, LocalDateTime> {
 
-    private static final int KST_OFFSET_HOURS = 9;
+    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
     @Override
     public LocalDateTime convert(Date source) {
-        return convertToKst(source);
-    }
-
-    private LocalDateTime convertToKst(Date date) {
-        LocalDateTime localDateTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        return localDateTime.minusHours(KST_OFFSET_HOURS);
+        if (source == null) {
+            return null;
+        }
+        return source.toInstant().atZone(KST).toLocalDateTime();
     }
 }
+
+
+
