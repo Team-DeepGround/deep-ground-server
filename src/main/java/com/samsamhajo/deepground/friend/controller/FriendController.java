@@ -4,6 +4,7 @@ package com.samsamhajo.deepground.friend.controller;
 import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.friend.Dto.FriendDto;
 import com.samsamhajo.deepground.friend.Dto.FriendRequestDto;
+import com.samsamhajo.deepground.friend.Dto.FriendStatusResponse;
 import com.samsamhajo.deepground.friend.Exception.FriendSuccessCode;
 import com.samsamhajo.deepground.friend.service.FriendService;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
@@ -115,5 +116,17 @@ public class FriendController {
         List<FriendDto> friends = friendService.getFriendByMemberId(memberId);
         return ResponseEntity
                 .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_SUCCESS_GET_LIST,friends));
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<SuccessResponse<FriendStatusResponse>> getFriendStatus(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam("targetMemberId") Long targetMemberId
+    ) {
+        Long myId = userDetails.getMember().getId();
+        FriendStatusResponse response = friendService.checkFriendStatus(myId, targetMemberId);
+
+        return ResponseEntity
+                .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_STATUS_FOUND, response));
     }
 }
