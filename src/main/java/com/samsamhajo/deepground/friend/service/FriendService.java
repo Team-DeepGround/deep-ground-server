@@ -2,6 +2,8 @@ package com.samsamhajo.deepground.friend.service;
 
 import com.samsamhajo.deepground.chat.service.ChatRoomService;
 import com.samsamhajo.deepground.friend.Dto.FriendDto;
+import com.samsamhajo.deepground.friend.Dto.FriendStatusResponse;
+import com.samsamhajo.deepground.friend.Dto.ProfileFriendStatus;
 import com.samsamhajo.deepground.friend.Exception.FriendException;
 import com.samsamhajo.deepground.friend.entity.Friend;
 import com.samsamhajo.deepground.friend.Exception.FriendErrorCode;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -242,5 +245,33 @@ public class FriendService {
                     return friend.getReceiveMember().getId();
                 })
                 .toList();
+    }
+
+    public FriendStatusResponse checkFriendStatus(Long myId, Long targetMemberId) {
+
+        if (myId.equals(targetMemberId)) {
+            return new FriendStatusResponse(ProfileFriendStatus.SELF);
+        }
+
+        Optional<Friend> friendship = friendRepository.findFriendship(
+                myId, targetMemberId, FriendStatus.ACCEPT
+        );
+        if (friendship.isPresent()) {
+            return new FriendStatusResponse(ProfileFriendStatus.FRIENDS);
+        }
+
+        Optional<Friend> sentRequest = friendRepository.findByRequestMemberIdAndReceiveMemberId(myId, targetMemberId);
+
+        if (sentRequest.isPresent() && sentRequest.get().getStatus() == FriendStatus.REQUEST) {
+            return new FriendStatusResponse(ProfileFriendStatus.PENDING_SENT);
+        }
+
+        Optional<Friend> receivedRequest = friendRepository.findByRequestMemberIdAndReceiveMemberId(targetMemberId, myId);
+
+        if (receivedRequest.isPresent() && receivedRequest.get().getStatus() == FriendStatus.REQUEST) {
+            return new FriendStatusResponse(ProfileFriendStatus.PENDING_RECEIVED);
+        }
+
+        return new FriendStatusResponse(ProfileFriendStatus.NONE);
     }
 }
