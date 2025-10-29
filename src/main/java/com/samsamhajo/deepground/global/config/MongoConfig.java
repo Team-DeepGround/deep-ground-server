@@ -40,11 +40,13 @@ public class MongoConfig {
         DbRefResolver dbRefResolver = new DefaultDbRefResolver (mongoDatabaseFactory);
         MappingMongoConverter converter = new MappingMongoConverter(dbRefResolver, mongoMappingContext);
 
-//        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
+        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
 
-//        converter.setCustomConversions(new MongoCustomConversions(
-//                List.of(localDateTimeKstConverter, dateKstConverter)
-//        ));
+        converter.setCustomConversions(new MongoCustomConversions(
+                List.of(localDateTimeKstConverter, dateKstConverter)
+        ));
+
+        converter.afterPropertiesSet();
 
         return converter;
 
