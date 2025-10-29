@@ -12,6 +12,7 @@ import com.samsamhajo.deepground.studyGroup.exception.StudyGroupNotFoundExceptio
 import com.samsamhajo.deepground.studyGroup.repository.StudyGroupTechTagRepository;
 import com.samsamhajo.deepground.techStack.entity.TechStack;
 import com.samsamhajo.deepground.techStack.repository.TechStackRepository;
+
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -214,5 +215,11 @@ public class StudyGroupService {
     }
 
     // 필요한 경우 추가 유효성 체크 가능
+  }
+
+  public void updateStudyGroupStatus(LocalDate today) {
+
+    studyGroupRepository.updateStudyGroupsStautsOngoing(today);
+    studyGroupRepository.updateStudyGroupsStautsCompleted(today);
   }
 }
