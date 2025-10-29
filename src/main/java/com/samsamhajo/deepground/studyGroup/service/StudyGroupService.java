@@ -219,7 +219,7 @@ public class StudyGroupService {
 
   public void updateStudyGroupStatus(LocalDate today) {
 
-    studyGroupRepository.updateStudyGroupsStautsOngoing(today);
-    studyGroupRepository.updateStudyGroupsStautsCompleted(today);
+    studyGroupRepository.updateStudyGroupsStatusOngoing(today);
+    studyGroupRepository.updateStudyGroupsStatusCompleted(today);
   }
 }

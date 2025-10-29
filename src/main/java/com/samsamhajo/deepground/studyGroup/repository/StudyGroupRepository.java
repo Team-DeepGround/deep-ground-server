@@ -115,7 +115,7 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
   SET s.groupStatus = 'ONGOING'
   WHERE s.groupStatus = 'RECRUITING'
   AND s.studyStartDate = :today""")
-  void updateStudyGroupsStautsOngoing(@Param("today") LocalDate today);
+  void updateStudyGroupsStatusOngoing(@Param("today") LocalDate today);
 
   @Modifying
   @Query("""
@@ -123,6 +123,6 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
   SET s.groupStatus = 'Completed'
   WHERE (s.groupStatus = 'ONGOING' OR s.groupStatus = 'RECRUITING')
   AND s.studyEndDate < :today""")
-  void updateStudyGroupsStautsCompleted(@Param("today") LocalDate today);
+  void updateStudyGroupsStatusCompleted(@Param("today") LocalDate today);
 
 }
