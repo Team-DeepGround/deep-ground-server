@@ -15,6 +15,10 @@ public class QNANotificationData extends NotificationData {
     @Field("content")
     private String content;
 
+    protected QNANotificationData() {
+        super(null); // (부모 클래스의 기본 생성자 호출)
+    }
+
     public QNANotificationData(NotificationType type, Long questionId, String content) {
         super(type);
         this.questionId = questionId;
