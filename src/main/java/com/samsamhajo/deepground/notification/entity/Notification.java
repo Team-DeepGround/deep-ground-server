@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Getter
 @Document(collection = "notifications")
 @CompoundIndex(def = "{'receiver_id': 1, 'created_at': -1}")
-@SQLRestriction("is_deleted = false")
 public class Notification extends BaseDocument {
 
     @Id

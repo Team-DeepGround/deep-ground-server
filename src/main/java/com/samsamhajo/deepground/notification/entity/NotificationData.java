@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 @Getter
 @Document(collection = "notification_data")
-@SQLRestriction("is_deleted = false")
 public abstract class NotificationData {
 
     private static final int CONTENT_LENGTH = 8;
