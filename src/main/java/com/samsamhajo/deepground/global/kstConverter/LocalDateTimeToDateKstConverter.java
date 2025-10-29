@@ -14,13 +14,23 @@ import java.util.Date;
 @WritingConverter
 public class LocalDateTimeToDateKstConverter implements Converter<LocalDateTime, Date> {
 
-    private static final int KST_OFFSET_HOURS = 9;
+//    private static final int KST_OFFSET_HOURS = 9;
+//
+//    @Override
+//    public Date convert(LocalDateTime source) {
+//        return convertToKst(source);}
+//
+//        private Date convertToKst(LocalDateTime localDateTime) {
+//            return Timestamp.valueOf(localDateTime.plusHours(KST_OFFSET_HOURS));
+//        }
+
+    private static final ZoneId KST = ZoneId.of("Asia/Seoul"); // KST 정의
 
     @Override
     public Date convert(LocalDateTime source) {
-        return convertToKst(source);}
+        if (source == null) return null;
 
-        private Date convertToKst(LocalDateTime localDateTime) {
-            return Timestamp.valueOf(localDateTime.plusHours(KST_OFFSET_HOURS));
-        }
+        // Java의 KST LocalDateTime을 UTC Date로 변환하여 DB에 저장
+        return Date.from(source.atZone(KST).toInstant());
+    }
 }
