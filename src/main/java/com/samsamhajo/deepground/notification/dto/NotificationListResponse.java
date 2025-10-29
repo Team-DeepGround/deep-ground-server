@@ -2,6 +2,7 @@ package com.samsamhajo.deepground.notification.dto;
 
 import com.samsamhajo.deepground.notification.entity.Notification;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,12 +12,12 @@ import lombok.Getter;
 public class NotificationListResponse {
 
     private List<NotificationResponse> notifications;
-    private LocalDateTime nextCursor;
+    private ZonedDateTime nextCursor;
     private boolean hasNext;
 
     public static NotificationListResponse of(
             List<Notification> notifications,
-            LocalDateTime nextCursor,
+            ZonedDateTime nextCursor,
             boolean hasNext
     ) {
         List<NotificationResponse> responses = notifications.stream()
