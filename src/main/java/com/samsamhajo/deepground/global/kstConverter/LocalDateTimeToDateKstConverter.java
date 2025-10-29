@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 @Component
@@ -18,6 +19,6 @@ public class LocalDateTimeToDateKstConverter implements Converter<LocalDateTime,
     @Override
     public Date convert(LocalDateTime source) {
         if (source == null) return null;
-        return Date.from(source.atZone(KST).toInstant());
+        return Date.from(source.toInstant(ZoneOffset.UTC));
     }
 }

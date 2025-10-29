@@ -19,7 +19,7 @@ public class DateToLocalDateTimeKstConvert implements Converter<Date, LocalDateT
     @Override
     public LocalDateTime convert(Date source) {
         if (source == null) return null;
-        return LocalDateTime.ofInstant(source.toInstant(), KST);
+        return LocalDateTime.ofInstant(source.toInstant(), ZoneOffset.UTC).plusHours(9);
     }
 }
 
