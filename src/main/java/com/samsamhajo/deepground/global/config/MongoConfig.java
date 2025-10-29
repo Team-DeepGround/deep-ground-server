@@ -24,12 +24,6 @@ public class MongoConfig {
 //        return new MongoTransactionManager(factory);
 //    }
 
-//    @Bean(name = "kstDateTimeProvider")
-//
-//    public DateTimeProvider kstDateTimeProvider() {
-//
-//        return () -> Optional.of(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
-//    }
     @Bean
     public  MappingMongoConverter mappingMongoConverter(
             MongoDatabaseFactory mongoDatabaseFactory,
@@ -39,8 +33,6 @@ public class MongoConfig {
     )   {
         DbRefResolver dbRefResolver = new DefaultDbRefResolver (mongoDatabaseFactory);
         MappingMongoConverter converter = new MappingMongoConverter(dbRefResolver, mongoMappingContext);
-
-        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
 
         converter.setCustomConversions(new MongoCustomConversions(
                 List.of(localDateTimeKstConverter, dateKstConverter)
