@@ -42,9 +42,9 @@ public class MongoConfig {
 
 //        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
 
-        converter.setCustomConversions(new MongoCustomConversions(
-                List.of(localDateTimeKstConverter, dateKstConverter)
-        ));
+//        converter.setCustomConversions(new MongoCustomConversions(
+//                List.of(localDateTimeKstConverter, dateKstConverter)
+//        ));
 
         return converter;
 
