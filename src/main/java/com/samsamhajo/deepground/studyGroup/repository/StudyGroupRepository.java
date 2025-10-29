@@ -3,10 +3,13 @@ package com.samsamhajo.deepground.studyGroup.repository;
 import com.samsamhajo.deepground.studyGroup.entity.GroupStatus;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupReply;
+
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
@@ -105,5 +108,21 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
           @Param("memberId") Long memberId,
           Pageable pageable
   );
+
+  @Modifying
+  @Query("""
+  UPDATE StudyGroup s
+  SET s.groupStatus = 'ONGOING'
+  WHERE s.groupStatus = 'RECRUITING'
+  AND s.studyStartDate = :today""")
+  void updateStudyGroupsStatusOngoing(@Param("today") LocalDate today);
+
+  @Modifying
+  @Query("""
+  UPDATE StudyGroup s
+  SET s.groupStatus = 'Completed'
+  WHERE (s.groupStatus = 'ONGOING' OR s.groupStatus = 'RECRUITING')
+  AND s.studyEndDate < :today""")
+  void updateStudyGroupsStatusCompleted(@Param("today") LocalDate today);
 
 }
