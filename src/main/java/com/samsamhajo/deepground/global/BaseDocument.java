@@ -1,8 +1,6 @@
 package com.samsamhajo.deepground.global;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -13,9 +11,9 @@ public abstract class BaseDocument {
 
     @CreatedDate
     @Field("created_at")
-    private ZonedDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Field("modified_at")
-    private ZonedDateTime modifiedAt;
+    private LocalDateTime modifiedAt;
 }

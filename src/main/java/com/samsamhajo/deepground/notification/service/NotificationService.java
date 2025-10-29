@@ -12,7 +12,6 @@ import com.samsamhajo.deepground.notification.repository.NotificationRepository;
 import com.samsamhajo.deepground.sse.dto.SseEvent;
 import com.samsamhajo.deepground.sse.dto.SseEventType;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -46,7 +45,7 @@ public class NotificationService {
         });
     }
 
-    public NotificationListResponse getNotifications(Long receiverId, ZonedDateTime cursor, int limit) {
+    public NotificationListResponse getNotifications(Long receiverId, LocalDateTime cursor, int limit) {
         List<Notification> notifications = notificationRepository.findByReceiverIdWithCursor(receiverId, cursor, limit);
 
         boolean hasNext = notifications.size() > limit;
@@ -54,7 +53,7 @@ public class NotificationService {
             notifications = notifications.subList(0, limit);
         }
 
-        ZonedDateTime nextCursor = notifications.isEmpty() ? null
+        LocalDateTime nextCursor = notifications.isEmpty() ? null
                 : notifications.get(notifications.size() - 1).getCreatedAt();
 
         return NotificationListResponse.of(notifications, nextCursor, hasNext);

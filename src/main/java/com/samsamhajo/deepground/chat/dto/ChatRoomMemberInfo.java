@@ -2,8 +2,6 @@ package com.samsamhajo.deepground.chat.dto;
 
 import com.samsamhajo.deepground.chat.entity.ChatRoomMember;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,7 +11,7 @@ public class ChatRoomMemberInfo {
 
     private Long memberId;
     private String nickname;
-    private ZonedDateTime lastReadMessageTime;
+    private LocalDateTime lastReadMessageTime;
     private boolean isMe;
 
     public static ChatRoomMemberInfo of(ChatRoomMember member, boolean isMe) {

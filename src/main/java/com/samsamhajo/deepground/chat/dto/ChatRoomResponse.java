@@ -1,8 +1,6 @@
 package com.samsamhajo.deepground.chat.dto;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,7 +11,7 @@ public class ChatRoomResponse {
     private Long id;
     private Long chatRoomId;
     private String name;
-    private ZonedDateTime lastReadMessageTime;
+    private LocalDateTime lastReadMessageTime;
     private long memberCount;
     private Long unreadCount;
 

@@ -1,8 +1,6 @@
 package com.samsamhajo.deepground.chat.dto;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,5 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReadMessageRequest {
 
-    private ZonedDateTime lastReadMessageTime;
+    private LocalDateTime lastReadMessageTime;
 }

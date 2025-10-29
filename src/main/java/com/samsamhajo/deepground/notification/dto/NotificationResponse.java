@@ -3,8 +3,6 @@ package com.samsamhajo.deepground.notification.dto;
 import com.samsamhajo.deepground.notification.entity.Notification;
 import com.samsamhajo.deepground.notification.entity.NotificationData;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,7 +13,7 @@ public class NotificationResponse {
     private String id;
     private NotificationData data;
     private boolean read;
-    private ZonedDateTime createdAt;
+    private LocalDateTime createdAt;
 
     public static NotificationResponse from(Notification notification) {
         return NotificationResponse.builder()
