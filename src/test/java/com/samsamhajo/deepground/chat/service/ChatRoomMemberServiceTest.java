@@ -17,6 +17,8 @@ import com.samsamhajo.deepground.chat.repository.ChatMessageRepository;
 import com.samsamhajo.deepground.chat.repository.ChatRoomMemberRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +59,7 @@ class ChatRoomMemberServiceTest {
     @DisplayName("채팅방에 참여한다")
     void joinChatRoom() {
         // given
-        LocalDateTime createdAt = LocalDateTime.now();
+        ZonedDateTime createdAt = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
         ChatMessage chatMessage = mock(ChatMessage.class);
 
         when(chatRoom.getId()).thenReturn(chatRoomId);
@@ -116,7 +118,7 @@ class ChatRoomMemberServiceTest {
     void getChatRoomMemberInfo_success() {
         // given
         ChatRoom chatRoom = mock(ChatRoom.class);
-        LocalDateTime lastReadMessageTime = LocalDateTime.now();
+        ZonedDateTime lastReadMessageTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
         Member member = Member.createLocalMember("test@test.com", "password", "test");
         ChatRoomMember otherMember = ChatRoomMember.of(member, chatRoom, lastReadMessageTime);
 
@@ -165,7 +167,7 @@ class ChatRoomMemberServiceTest {
     void getChatRoomMemberInfos_success() {
         // given
         ChatRoom chatRoom = mock(ChatRoom.class);
-        LocalDateTime lastReadMessageTime = LocalDateTime.now();
+        ZonedDateTime lastReadMessageTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
         Member member1 = mock(Member.class);
         Member member2 = mock(Member.class);
         Member member3 = mock(Member.class);

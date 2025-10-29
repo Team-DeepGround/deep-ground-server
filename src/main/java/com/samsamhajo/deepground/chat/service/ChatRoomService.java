@@ -9,6 +9,8 @@ import com.samsamhajo.deepground.chat.repository.ChatRoomMemberRepository;
 import com.samsamhajo.deepground.chat.repository.ChatRoomRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +45,7 @@ public class ChatRoomService {
     }
 
     private void addInitialMember(ChatRoom chatRoom, Member... members) {
-        LocalDateTime lastReadMessageTime = LocalDateTime.now();
+        ZonedDateTime lastReadMessageTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
         List<ChatRoomMember> chatRoomMembers = Arrays.stream(members)
                 .map(member -> ChatRoomMember.of(member, chatRoom, lastReadMessageTime))
                 .toList();
