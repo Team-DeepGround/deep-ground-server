@@ -17,7 +17,8 @@ public class NotificationCustomRepositoryImpl implements NotificationCustomRepos
 
     @Override
     public List<Notification> findByReceiverIdWithCursor(Long receiverId, LocalDateTime cursor, int limit) {
-        Criteria criteria = Criteria.where("receiver_id").is(receiverId);
+        Criteria criteria = Criteria.where("receiver_id").is(receiverId)
+                .and("deleted").is(false);
         if (cursor != null) {
             criteria = criteria.and("created_at").lt(cursor);
         }
