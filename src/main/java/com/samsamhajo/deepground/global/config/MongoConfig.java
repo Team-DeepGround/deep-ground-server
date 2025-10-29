@@ -30,23 +30,23 @@ public class MongoConfig {
 
         return () -> Optional.of(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
     }
-    @Bean
-    public MappingMongoConverter mappingMongoConverter(
-            MongoDatabaseFactory mongoDatabaseFactory,
-            MongoMappingContext mongoMappingContext,
-            LocalDateTimeToDateKstConverter dateKstConverter,
-            DateToLocalDateTimeKstConvert localDateTimeKstConverter
-    )   {
-        DbRefResolver dbRefResolver = new DefaultDbRefResolver (mongoDatabaseFactory);
-        MappingMongoConverter converter = new MappingMongoConverter(dbRefResolver, mongoMappingContext);
-
-//        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
-
-//        converter.setCustomConversions(new MongoCustomConversions(
-//                List.of(localDateTimeKstConverter, dateKstConverter)
-//        ));
-
-        return converter;
-
-    }
+//    @Bean
+//    public MappingMongoConverter mappingMongoConverter(
+//            MongoDatabaseFactory mongoDatabaseFactory,
+//            MongoMappingContext mongoMappingContext,
+//            LocalDateTimeToDateKstConverter dateKstConverter,
+//            DateToLocalDateTimeKstConvert localDateTimeKstConverter
+//    )   {
+//        DbRefResolver dbRefResolver = new DefaultDbRefResolver (mongoDatabaseFactory);
+//        MappingMongoConverter converter = new MappingMongoConverter(dbRefResolver, mongoMappingContext);
+//
+////        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
+//
+////        converter.setCustomConversions(new MongoCustomConversions(
+////                List.of(localDateTimeKstConverter, dateKstConverter)
+////        ));
+//
+//        return converter;
+//
+//    }
 }
