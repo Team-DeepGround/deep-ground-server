@@ -28,14 +28,14 @@ public class MongoConfig {
     public  MappingMongoConverter mappingMongoConverter(
             MongoDatabaseFactory mongoDatabaseFactory,
             MongoMappingContext mongoMappingContext,
-            LocalDateTimeToDateKstConverter dateKstConverter,
-            DateToLocalDateTimeKstConvert localDateTimeKstConverter
+            LocalDateTimeToDateKstConverter dateKstConverter
+//            DateToLocalDateTimeKstConvert localDateTimeKstConverter
     )   {
         DbRefResolver dbRefResolver = new DefaultDbRefResolver (mongoDatabaseFactory);
         MappingMongoConverter converter = new MappingMongoConverter(dbRefResolver, mongoMappingContext);
 
         converter.setCustomConversions(new MongoCustomConversions(
-                List.of(localDateTimeKstConverter, dateKstConverter)
+                List.of(dateKstConverter)
         ));
 
         converter.afterPropertiesSet();
