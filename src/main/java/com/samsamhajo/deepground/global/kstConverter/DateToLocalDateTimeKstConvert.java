@@ -10,6 +10,8 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Date;
 
+import static java.time.ZoneOffset.UTC;
+
 @Component
 @ReadingConverter
 public class DateToLocalDateTimeKstConvert implements Converter<Date, LocalDateTime> {
@@ -20,14 +22,15 @@ public class DateToLocalDateTimeKstConvert implements Converter<Date, LocalDateT
 //        return LocalDateTime.ofInstant(source.toInstant(), ZoneOffset.UTC);
 //    }
 
-    private static final ZoneId KST = ZoneId.of("Asia/Seoul"); // KST 정의
+    private static final ZoneId KST = ZoneId.of("Asia/Seoul");// KST 정의
+    private static final ZoneId UTC = ZoneId.of("UTC");
 
     @Override
     public LocalDateTime convert(Date source) {
         if (source == null) return null;
 
         // DB의 UTC Date를 KST LocalDateTime으로 변환
-        return source.toInstant().atZone(KST).toLocalDateTime();
+        return source.toInstant().atZone(UTC).toLocalDateTime();
     }
 }
 
