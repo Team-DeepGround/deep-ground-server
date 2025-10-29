@@ -19,6 +19,9 @@ public abstract class NotificationData {
     @Field("type")
     private NotificationType type;
 
+    protected NotificationData() {
+        this.type = null;
+    }
     protected NotificationData(NotificationType type) {
         this.type = type;
     }
