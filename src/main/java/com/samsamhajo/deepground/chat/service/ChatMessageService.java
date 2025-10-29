@@ -109,11 +109,6 @@ public class ChatMessageService {
     @Transactional
     public void readMessage(Long chatRoomId, Long memberId, LocalDateTime latestMessageTime) {
 
-        LocalDateTime kstTime = latestMessageTime
-                .atZone(ZoneId.of("UTC"))
-                .withZoneSameInstant(ZoneId.of("Asia/Seoul"))
-                .toLocalDateTime();
-
         ChatRoomMember member = chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, memberId)
                 .orElseThrow(() -> new ChatMessageException(ChatMessageErrorCode.CHATROOM_MEMBER_NOT_FOUND));
 
@@ -125,7 +120,7 @@ public class ChatMessageService {
         String destination = "/chatrooms/" + chatRoomId + "/read-receipt";
         messagePublisher.convertAndSend(
                 destination,
-                ReadMessageResponse.of(memberId, kstTime)
+                ReadMessageResponse.of(memberId, latestMessageTime)
         );
     }
 
