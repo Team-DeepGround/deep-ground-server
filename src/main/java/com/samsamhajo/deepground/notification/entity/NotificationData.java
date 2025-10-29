@@ -2,12 +2,14 @@ package com.samsamhajo.deepground.notification.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 @Getter
 @Document(collection = "notification_data")
+@SQLRestriction("is_deleted = false")
 public abstract class NotificationData {
 
     private static final int CONTENT_LENGTH = 8;
