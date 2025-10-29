@@ -14,11 +14,13 @@ import java.util.Date;
 @WritingConverter
 public class LocalDateTimeToDateKstConverter implements Converter<LocalDateTime, Date> {
 
-    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
+    private static final int KST_OFFSET_HOURS = 9;
 
     @Override
     public Date convert(LocalDateTime source) {
-        if (source == null) return null;
-        return Date.from(source.toInstant(ZoneOffset.UTC));
-    }
+        return convertToKst(source);}
+
+        private Date convertToKst(LocalDateTime localDateTime) {
+            return Timestamp.valueOf(localDateTime.plusHours(KST_OFFSET_HOURS));
+        }
 }
