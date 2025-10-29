@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Configuration
-@EnableMongoAuditing(dateTimeProviderRef = "kstDateTimeProvider")
+@EnableMongoAuditing
 public class MongoConfig {
 //    @Bean
 //    public MongoTransactionManager transactionManager(MongoDatabaseFactory factory) {
