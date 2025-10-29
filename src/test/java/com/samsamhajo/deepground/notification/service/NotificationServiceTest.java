@@ -19,8 +19,6 @@ import com.samsamhajo.deepground.notification.repository.NotificationDataReposit
 import com.samsamhajo.deepground.notification.repository.NotificationRepository;
 import com.samsamhajo.deepground.sse.dto.SseEvent;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.Optional;
@@ -79,7 +77,7 @@ class NotificationServiceTest {
     public class GetNotification {
 
         private final Long receiverId = 1L;
-        private final ZonedDateTime cursor = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        private final LocalDateTime cursor = LocalDateTime.now();
         private final int limit = 10;
 
         @Test

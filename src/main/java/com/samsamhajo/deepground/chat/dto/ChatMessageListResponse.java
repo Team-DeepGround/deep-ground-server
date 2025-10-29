@@ -2,7 +2,6 @@ package com.samsamhajo.deepground.chat.dto;
 
 import com.samsamhajo.deepground.chat.entity.ChatMessage;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,12 +11,12 @@ import lombok.Getter;
 public class ChatMessageListResponse {
 
     private List<ChatMessageResponse> messages;
-    private ZonedDateTime nextCursor;
+    private LocalDateTime nextCursor;
     private boolean hasNext;
 
     public static ChatMessageListResponse of(
             List<ChatMessage> messages,
-            ZonedDateTime nextCursor,
+            LocalDateTime nextCursor,
             boolean hasNext
     ) {
         List<ChatMessageResponse> responses = messages.stream()

@@ -21,7 +21,6 @@ import com.samsamhajo.deepground.sse.dto.SseEvent;
 import com.samsamhajo.deepground.sse.dto.SseEventType;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +41,7 @@ public class ChatMessageService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
-    public ChatMessageListResponse getMessages(Long chatRoomId, Long memberId, ZonedDateTime cursor, int limit) {
+    public ChatMessageListResponse getMessages(Long chatRoomId, Long memberId, LocalDateTime cursor, int limit) {
         if (!chatRoomMemberRepository.existsByChatRoomIdAndMemberId(chatRoomId, memberId)) {
             throw new ChatException(ChatErrorCode.CHATROOM_ACCESS_DENIED);
         }
@@ -50,7 +49,7 @@ public class ChatMessageService {
         return getMessages(chatRoomId, cursor, limit);
     }
 
-    public ChatMessageListResponse getMessages(Long chatRoomId, ZonedDateTime cursor, int limit) {
+    public ChatMessageListResponse getMessages(Long chatRoomId, LocalDateTime cursor, int limit) {
         List<ChatMessage> messages = chatMessageRepository.findByChatRoomIdWithCursor(chatRoomId, cursor, limit);
 
         boolean hasNext = messages.size() > limit;
@@ -58,7 +57,7 @@ public class ChatMessageService {
             messages = messages.subList(0, limit);
         }
 
-        ZonedDateTime nextCursor = messages.isEmpty() ? null
+        LocalDateTime nextCursor = messages.isEmpty() ? null
                 : messages.get(messages.size() - 1).getCreatedAt();
 
         return ChatMessageListResponse.of(messages, nextCursor, hasNext);
@@ -108,7 +107,7 @@ public class ChatMessageService {
     }
 
     @Transactional
-    public void readMessage(Long chatRoomId, Long memberId, ZonedDateTime latestMessageTime) {
+    public void readMessage(Long chatRoomId, Long memberId, LocalDateTime latestMessageTime) {
 
         ChatRoomMember member = chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, memberId)
                 .orElseThrow(() -> new ChatMessageException(ChatMessageErrorCode.CHATROOM_MEMBER_NOT_FOUND));
@@ -125,7 +124,7 @@ public class ChatMessageService {
         );
     }
 
-    private void sendUnreadCount(Long chatRoomId, Long memberId, ZonedDateTime latestMessageTime) {
+    private void sendUnreadCount(Long chatRoomId, Long memberId, LocalDateTime latestMessageTime) {
         List<ChatRoomMember> members = chatRoomMemberRepository.findByChatRoomId(chatRoomId).stream()
                 .filter(member -> !Objects.equals(member.getMember().getId(), memberId))
                 .toList();

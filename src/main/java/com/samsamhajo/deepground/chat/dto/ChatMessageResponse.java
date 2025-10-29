@@ -2,7 +2,6 @@ package com.samsamhajo.deepground.chat.dto;
 
 import com.samsamhajo.deepground.chat.entity.ChatMessage;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.Builder;
@@ -16,7 +15,7 @@ public class ChatMessageResponse {
     private Long senderId;
     private String message;
     private List<String> mediaIds;
-    private ZonedDateTime createdAt;
+    private LocalDateTime createdAt;
 
     public static ChatMessageResponse from(ChatMessage chatMessage) {
         return ChatMessageResponse.builder()

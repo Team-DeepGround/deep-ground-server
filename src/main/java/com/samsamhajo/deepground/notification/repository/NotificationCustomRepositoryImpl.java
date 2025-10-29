@@ -2,7 +2,6 @@ package com.samsamhajo.deepground.notification.repository;
 
 import com.samsamhajo.deepground.notification.entity.Notification;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -17,7 +16,7 @@ public class NotificationCustomRepositoryImpl implements NotificationCustomRepos
     private final MongoTemplate mongoTemplate;
 
     @Override
-    public List<Notification> findByReceiverIdWithCursor(Long receiverId, ZonedDateTime cursor, int limit) {
+    public List<Notification> findByReceiverIdWithCursor(Long receiverId, LocalDateTime cursor, int limit) {
         Criteria criteria = Criteria.where("receiver_id").is(receiverId)
                 .and("deleted").is(false);
         if (cursor != null) {

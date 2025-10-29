@@ -14,8 +14,6 @@ import com.samsamhajo.deepground.chat.repository.ChatMessageRepository;
 import com.samsamhajo.deepground.chat.repository.ChatRoomMemberRepository;
 import com.samsamhajo.deepground.member.entity.Member;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +37,7 @@ public class ChatRoomMemberService {
 
         ChatRoomMember chatRoomMember = chatMessage
                 .map(m -> ChatRoomMember.of(member, chatRoom, m.getCreatedAt()))
-                .orElseGet(() -> ChatRoomMember.of(member, chatRoom, ZonedDateTime.now(ZoneId.of("Asia/Seoul"))));
+                .orElseGet(() -> ChatRoomMember.of(member, chatRoom, LocalDateTime.now()));
 
         chatRoomMemberRepository.save(chatRoomMember);
     }

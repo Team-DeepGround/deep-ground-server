@@ -12,9 +12,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,20 +38,20 @@ public class ChatRoomMember extends BaseEntity {
     private ChatRoom chatRoom;
 
     @Column(name = "last_read_message_time")
-    private ZonedDateTime lastReadMessageTime;
+    private LocalDateTime lastReadMessageTime;
 
-    private ChatRoomMember(Member member, ChatRoom chatRoom, ZonedDateTime lastReadMessageTime) {
+    private ChatRoomMember(Member member, ChatRoom chatRoom, LocalDateTime lastReadMessageTime) {
         this.member = member;
         this.chatRoom = chatRoom;
         this.lastReadMessageTime = lastReadMessageTime;
     }
 
-    public static ChatRoomMember of(Member member, ChatRoom chatRoom, ZonedDateTime lastReadMessageTime) {
+    public static ChatRoomMember of(Member member, ChatRoom chatRoom, LocalDateTime lastReadMessageTime) {
         return new ChatRoomMember(member, chatRoom, lastReadMessageTime);
     }
 
-    public boolean updateLastReadMessageTime(ZonedDateTime lastReadMessageTime) {
-        if (lastReadMessageTime == null || lastReadMessageTime.isAfter(ZonedDateTime.now(ZoneId.of("Asia/Seoul")))) {
+    public boolean updateLastReadMessageTime(LocalDateTime lastReadMessageTime) {
+        if (lastReadMessageTime == null || lastReadMessageTime.isAfter(LocalDateTime.now())) {
             return false;
         }
 

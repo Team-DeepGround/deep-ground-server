@@ -25,8 +25,6 @@ import com.samsamhajo.deepground.chat.repository.ChatMessageRepository;
 import com.samsamhajo.deepground.chat.repository.ChatRoomMemberRepository;
 import com.samsamhajo.deepground.global.message.MessagePublisher;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -57,7 +55,7 @@ public class ChatMessageServiceTest {
 
     private final Long chatRoomId = 1L;
     private final Long memberId = 1L;
-    private final ZonedDateTime cursor = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+    private final LocalDateTime cursor = LocalDateTime.now();
     private final int limit = 20;
 
     @Test
@@ -200,7 +198,7 @@ public class ChatMessageServiceTest {
     @DisplayName("채팅 메시지를 읽음 처리한다")
     void readMessage_success() {
         // given
-        ZonedDateTime latestMessageTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        LocalDateTime latestMessageTime = LocalDateTime.now();
         ChatRoomMember chatRoomMember = mock(ChatRoomMember.class);
 
         when(chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, memberId))
@@ -227,7 +225,7 @@ public class ChatMessageServiceTest {
     @DisplayName("읽음 처리 시 채팅방 멤버를 찾을 수 없다면 예외가 발생한다")
     void readMessage_notFound_throwsException() {
         // given
-        ZonedDateTime latestMessageTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        LocalDateTime latestMessageTime = LocalDateTime.now();
 
         when(chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, memberId))
                 .thenReturn(Optional.empty());
