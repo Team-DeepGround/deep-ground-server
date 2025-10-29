@@ -24,14 +24,14 @@ public class MongoConfig {
 //        return new MongoTransactionManager(factory);
 //    }
 
-    @Bean(name = "kstDateTimeProvider")
-
-    public DateTimeProvider kstDateTimeProvider() {
-
-        return () -> Optional.of(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
-    }
+//    @Bean(name = "kstDateTimeProvider")
+//
+//    public DateTimeProvider kstDateTimeProvider() {
+//
+//        return () -> Optional.of(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+//    }
     @Bean
-    public MappingMongoConverter mappingMongoConverter(
+    public  MappingMongoConverter mappingMongoConverter(
             MongoDatabaseFactory mongoDatabaseFactory,
             MongoMappingContext mongoMappingContext,
             LocalDateTimeToDateKstConverter dateKstConverter,
