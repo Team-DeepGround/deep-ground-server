@@ -50,42 +50,15 @@ public class ChatRoomMember extends BaseEntity {
         return new ChatRoomMember(member, chatRoom, lastReadMessageTime);
     }
 
-//    public boolean updateLastReadMessageTime(LocalDateTime lastReadMessageTime) {
-//        if (lastReadMessageTime == null || lastReadMessageTime.isAfter(LocalDateTime.now())) {
-//            return false;
-//        }
-//
-//        if (this.lastReadMessageTime.isBefore(lastReadMessageTime)) {
-//            this.lastReadMessageTime = lastReadMessageTime;
-//            return true;
-//        }
-//        return false;
-//    }
-
-    public boolean updateLastReadMessageTime(LocalDateTime newTime) {
-        if (newTime == null || newTime.isAfter(LocalDateTime.now())) {
+    public boolean updateLastReadMessageTime(LocalDateTime lastReadMessageTime) {
+        if (lastReadMessageTime == null || lastReadMessageTime.isAfter(LocalDateTime.now())) {
             return false;
         }
 
-        // (방어 코드) 혹시 모를 NullPointerException 방지
-        if (this.lastReadMessageTime == null) {
-            this.lastReadMessageTime = newTime;
+        if (this.lastReadMessageTime.isBefore(lastReadMessageTime)) {
+            this.lastReadMessageTime = lastReadMessageTime;
             return true;
         }
-
-        // 핵심 수정: newTime이 '이전'이 아니라면 (즉, 같거나 이후라면)
-        if (!newTime.isBefore(this.lastReadMessageTime)) {
-
-            // 최적화: 실제로 더 최신일 때만 DB 업데이트 수행
-            if (newTime.isAfter(this.lastReadMessageTime)) {
-                this.lastReadMessageTime = newTime;
-            }
-
-            // '같거나' '이후'이므로 "읽기 성공"으로 간주하고 true 반환
-            return true;
-        }
-
-        // newTime이 oldTime보다 '이전'인 경우 (잘못된 요청)
         return false;
     }
 }
