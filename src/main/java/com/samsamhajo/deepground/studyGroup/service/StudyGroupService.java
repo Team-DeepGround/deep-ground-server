@@ -217,6 +217,7 @@ public class StudyGroupService {
     // 필요한 경우 추가 유효성 체크 가능
   }
 
+  @Transactional
   public void updateStudyGroupStatus(LocalDate today) {
 
     studyGroupRepository.updateStudyGroupsStatusOngoing(today);
