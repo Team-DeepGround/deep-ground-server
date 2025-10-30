@@ -109,7 +109,7 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
           Pageable pageable
   );
 
-  @Modifying
+  @Modifying(clearAutomatically = true)
   @Query("""
   UPDATE StudyGroup s
   SET s.groupStatus = 'ONGOING'
@@ -119,8 +119,8 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
 
   @Modifying
   @Query("""
-  UPDATE StudyGroup s
-  SET s.groupStatus = 'Completed'
+  UPDATE StudyGroup s(clearAutomatically = true)
+  SET s.groupStatus = 'COMPLETED'
   WHERE (s.groupStatus = 'ONGOING' OR s.groupStatus = 'RECRUITING')
   AND s.studyEndDate < :today""")
   void updateStudyGroupsStatusCompleted(@Param("today") LocalDate today);
