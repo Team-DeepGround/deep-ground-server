@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -22,6 +23,9 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id", nullable = false)
     private Long id;
+
+    @Column(name = "public_id", nullable = false, unique = true, columnDefinition = "BINARY(16)")
+    private UUID publicId;
 
     @Column(name = "email", nullable = false)
     private String email;
@@ -118,6 +122,13 @@ public class Member extends BaseEntity {
     // 현재 정지 상태 확인
     public boolean isBanned() {
         return this.banUntil != null && this.banUntil.isAfter(LocalDateTime.now());
+    }
+
+    @PrePersist
+    public void setPublicId() {
+        if (publicId == null) {
+            publicId = UUID.randomUUID();
+        }
     }
 }
 
