@@ -26,6 +26,9 @@ public class S3Uploader {
     @Value("${cloud.aws.s3.bucketName}")
     private String bucket;
 
+    @Value("${app.proxy.media-url-prefix}")
+    private String proxyUrlPrefix;
+
     public String upload(MultipartFile multipartFile, String dirName){
         File uploadFile = convert(multipartFile);
         return upload(uploadFile, dirName);
@@ -43,7 +46,7 @@ public class S3Uploader {
         amazonS3Client.putObject(
                 new PutObjectRequest(bucket, fileName,uploadFile)
                 );
-        return amazonS3Client.getUrl(bucket,fileName).toString();
+        return proxyUrlPrefix + fileName;
     }
 
     private void removeNewFile(File targetFile) {
