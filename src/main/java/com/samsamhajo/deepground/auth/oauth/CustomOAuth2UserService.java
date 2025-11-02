@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -50,13 +51,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private Member saveOrUpdate(OAuthAttributes attributes) {
         Member member = memberRepository.findByEmail(attributes.getEmail())
-                .map(existing ->{
+                .map(existing -> {
                     existing.linkSocialAccount(attributes.getProvider(), attributes.getProviderId());
                     existing.update(attributes.getName());
                     return existing;
                 })
-                .orElseGet(()->{
-                    Member newMember = attributes.toEntity();
+                .orElseGet(() -> {
+                    String nickname = attributes.getName();
+                    if (memberRepository.existsByNickname(nickname)) {
+                        String uniqueSuffix = UUID.randomUUID().toString().substring(0, 4);
+                        nickname = nickname + "_" + uniqueSuffix;
+                    }
+                    Member newMember = Member.createSocialMember(attributes.getEmail(), nickname);
                     newMember.linkSocialAccount(attributes.getProvider(), attributes.getProviderId());
                     return newMember;
                 });

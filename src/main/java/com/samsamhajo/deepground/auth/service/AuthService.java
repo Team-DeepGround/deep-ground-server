@@ -75,14 +75,7 @@ public class AuthService {
                 refreshTokenValidityInSeconds
         );
 
-        return new LoginResponse(
-                accessToken,
-                refreshToken,
-                member.getId(),
-                member.getEmail(),
-                member.getNickname(),
-                member.getRole()
-        );
+        return LoginResponse.from(member, accessToken);
     }
 
     @Transactional
