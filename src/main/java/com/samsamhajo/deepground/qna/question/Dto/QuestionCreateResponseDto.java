@@ -4,6 +4,7 @@ import com.samsamhajo.deepground.qna.question.entity.Question;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 public class QuestionCreateResponseDto {
@@ -11,15 +12,15 @@ public class QuestionCreateResponseDto {
     private Long questionId;
     private String title;
     private String content;
-    private Long memberId;
+    private UUID publicId;
     private List<String> techStacks;
     private List<String> mediaUrls;
 
-    public QuestionCreateResponseDto(Long questionId, String title, String content, Long memberId, List<String> techStacks, List<String> mediaUrls) {
+    public QuestionCreateResponseDto(Long questionId, String title, String content, UUID publicId, List<String> techStacks, List<String> mediaUrls) {
         this.questionId = questionId;
         this.title = title;
         this.content = content;
-        this.memberId = memberId;
+        this.publicId = publicId;
         this.techStacks = techStacks;
         this.mediaUrls = mediaUrls;
     }
@@ -27,8 +28,8 @@ public class QuestionCreateResponseDto {
         Long questionId = question.getId();
         String title = question.getTitle();
         String content = question.getContent();
-        Long memberId = question.getMember().getId();
+        UUID publicId = question.getMember().getPublicId();
 
-        return new QuestionCreateResponseDto(questionId, title, content, memberId, techStacks, mediaUrls);
+        return new QuestionCreateResponseDto(questionId, title, content, publicId, techStacks, mediaUrls);
     }
 }

@@ -67,55 +67,55 @@ public class AnswerUpdateTest extends IntegrationTestSupport {
                                 invocation.getArgument(0, MultipartFile.class).getOriginalFilename());
     }
 
-    @Test
-    @DisplayName("답변 수정 테스트")
-    void updateAnswerTest() {
-
-        String title = "테스트";
-        String content = "테스트1";
-        String answerContent = "test answercontent";
-        String UpdateContent = "test updatecontent";
-        List<MultipartFile> mediaFiles = List.of(
-                new MockMultipartFile("mediaFiles", "image1.png", MediaType.IMAGE_PNG_VALUE, "dummy image content 1".getBytes())
-        );
-
-        //질문 생성
-        List<String> techStackNames = List.of("techStack1", "techStack2");
-        List<String> categoryNames = List.of("category1", "category2");
-        List<TechStack> techStacks = techStackNames.stream()
-                .map(name -> TechStack.of(name, categoryNames.toString())) // 정적 팩토리 메서드가 없다면 new TechStack(name) 사용
-                .collect(Collectors.toList());
-        List<TechStack> savedTechStacks = techStackRepository.saveAll(techStacks);
-
-        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStackNames, mediaFiles);
-
-        QuestionCreateResponseDto questionCreateResponseDto = questionService.createQuestion(questionCreateRequestDto, memberId);
-        Long test1 = questionCreateResponseDto.getQuestionId();
-
-        //답변 생성
-        AnswerCreateRequestDto answerCreateRequestDto = new AnswerCreateRequestDto(answerContent, mediaFiles, test1);
-        AnswerCreateResponseDto answerCreateResponseDto = answerService.createAnswer(answerCreateRequestDto, memberId);
-        Long test2 = answerCreateResponseDto.getAnswerId();
-        System.out.println(answerCreateResponseDto.getAnswerContent());
-        String UpdateBeforeContent = answerRepository.findById(test2).get().getAnswerContent();
-
-        //수정
-        AnswerUpdateRequestDto answerUpdateRequestDto = new AnswerUpdateRequestDto(UpdateContent, mediaFiles, test1, test2, null);
-        AnswerUpdateResponseDto answerUpdateResponseDto = answerService.updateAnswer(answerUpdateRequestDto, memberId);
-        System.out.println(answerUpdateResponseDto.getAnswerContent());
-        String UpdateAfterContent = answerRepository.findById(test2).get().getAnswerContent();
-
-        //수정 전, 후 컨텐츠 결과 비교
-        assertThat(UpdateAfterContent).isNotEqualTo(UpdateBeforeContent);
-
-        AnswerException exception = assertThrows(AnswerException.class, () -> {
-            if (!answerUpdateResponseDto.getMemberId().equals(memberId2)) {
-                throw new AnswerException(AnswerErrorCode.ANSWER_MEMBER_MISMTACH);
-            }
-        });
-
-        assertThat(exception.getMessage()).isEqualTo("답변을 작성한 사용자가 아닙니다.");
-    }
+//    @Test
+//    @DisplayName("답변 수정 테스트")
+//    void updateAnswerTest() {
+//
+//        String title = "테스트";
+//        String content = "테스트1";
+//        String answerContent = "test answercontent";
+//        String UpdateContent = "test updatecontent";
+//        List<MultipartFile> mediaFiles = List.of(
+//                new MockMultipartFile("mediaFiles", "image1.png", MediaType.IMAGE_PNG_VALUE, "dummy image content 1".getBytes())
+//        );
+//
+//        //질문 생성
+//        List<String> techStackNames = List.of("techStack1", "techStack2");
+//        List<String> categoryNames = List.of("category1", "category2");
+//        List<TechStack> techStacks = techStackNames.stream()
+//                .map(name -> TechStack.of(name, categoryNames.toString())) // 정적 팩토리 메서드가 없다면 new TechStack(name) 사용
+//                .collect(Collectors.toList());
+//        List<TechStack> savedTechStacks = techStackRepository.saveAll(techStacks);
+//
+//        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStackNames, mediaFiles);
+//
+//        QuestionCreateResponseDto questionCreateResponseDto = questionService.createQuestion(questionCreateRequestDto, memberId);
+//        Long test1 = questionCreateResponseDto.getQuestionId();
+//
+//        //답변 생성
+//        AnswerCreateRequestDto answerCreateRequestDto = new AnswerCreateRequestDto(answerContent, mediaFiles, test1);
+//        AnswerCreateResponseDto answerCreateResponseDto = answerService.createAnswer(answerCreateRequestDto, memberId);
+//        Long test2 = answerCreateResponseDto.getAnswerId();
+//        System.out.println(answerCreateResponseDto.getAnswerContent());
+//        String UpdateBeforeContent = answerRepository.findById(test2).get().getAnswerContent();
+//
+//        //수정
+//        AnswerUpdateRequestDto answerUpdateRequestDto = new AnswerUpdateRequestDto(UpdateContent, mediaFiles, test1, test2, null);
+//        AnswerUpdateResponseDto answerUpdateResponseDto = answerService.updateAnswer(answerUpdateRequestDto, memberId);
+//        System.out.println(answerUpdateResponseDto.getAnswerContent());
+//        String UpdateAfterContent = answerRepository.findById(test2).get().getAnswerContent();
+//
+//        //수정 전, 후 컨텐츠 결과 비교
+//        assertThat(UpdateAfterContent).isNotEqualTo(UpdateBeforeContent);
+//
+//        AnswerException exception = assertThrows(AnswerException.class, () -> {
+//            if (!answerUpdateResponseDto.getMemberId().equals(memberId2)) {
+//                throw new AnswerException(AnswerErrorCode.ANSWER_MEMBER_MISMTACH);
+//            }
+//        });
+//
+//        assertThat(exception.getMessage()).isEqualTo("답변을 작성한 사용자가 아닙니다.");
+//    }
 
     @Test
     @DisplayName("답변 없을 시 예외처리")

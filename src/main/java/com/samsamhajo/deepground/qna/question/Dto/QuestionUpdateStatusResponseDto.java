@@ -3,20 +3,22 @@ package com.samsamhajo.deepground.qna.question.Dto;
 import com.samsamhajo.deepground.qna.question.entity.QuestionStatus;
 import lombok.Getter;
 
+import java.util.UUID;
+
 @Getter
 public class QuestionUpdateStatusResponseDto {
 
     private Long questionId;
     private QuestionStatus status;
-    private Long memberId;
+    private UUID publicId;
 
 
-   public QuestionUpdateStatusResponseDto(Long questionId, QuestionStatus status, Long memberId) {
+   public QuestionUpdateStatusResponseDto(Long questionId, QuestionStatus status, UUID publicId) {
        this.questionId = questionId;
        this.status = status;
-       this.memberId = memberId;
+       this.publicId = publicId;
    }
-   public static QuestionUpdateStatusResponseDto of(Long questionId, QuestionStatus status, Long memberId) {
-       return new QuestionUpdateStatusResponseDto(questionId, status, memberId);
+   public static QuestionUpdateStatusResponseDto of(Long questionId, QuestionStatus status, UUID publicId) {
+       return new QuestionUpdateStatusResponseDto(questionId, status, publicId);
    }
 }

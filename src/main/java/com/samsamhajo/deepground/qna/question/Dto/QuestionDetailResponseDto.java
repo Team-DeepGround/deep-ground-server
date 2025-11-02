@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
@@ -18,8 +19,8 @@ public class QuestionDetailResponseDto {
     private Long questionId;
     private String title;
     private String content;
-    private Long memberId;
-    private Long memberProfileId;
+    private UUID publicId;
+    private UUID profilePublicId;
     private String nickname;
     private List<String> techStacks;
     private int answerCount;
@@ -36,7 +37,7 @@ public class QuestionDetailResponseDto {
             List<String> techStacks,
             QuestionStatus questionStatus,
             List<String> mediaUrl,
-            Long  memberProfileId,
+            UUID profilePublicId,
             String imageUrl,
             List<AnswerDetailDto> answers
 
@@ -44,8 +45,8 @@ public class QuestionDetailResponseDto {
         this.questionId = question.getId();
         this.title = question.getTitle();
         this.content = question.getContent();
-        this.memberId = question.getMember().getId();
-        this.memberProfileId = question.getMember().getMemberProfile().getProfileId();
+        this.publicId = question.getMember().getPublicId();
+        this.profilePublicId = question.getMember().getMemberProfile().getProfilePublicId();
         this.nickname = member.getNickname();
         this.techStacks = techStacks;
         this.answerCount = question.getAnswerCount();
@@ -71,7 +72,7 @@ public class QuestionDetailResponseDto {
                 techStacks,
                 questionStatus,
                 mediaUrl,
-                member.getMemberProfile().getProfileId(),
+                member.getMemberProfile().getProfilePublicId(),
                 member.getMemberProfile().getProfileImage(),
                 answers
         );

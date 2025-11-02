@@ -7,13 +7,15 @@ import lombok.Getter;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 public class QuestionSummaryDto {
     private Long questionId;
     private String title;
-    private Long memberId;
-    private Long memberProfileId;
+    private UUID publicId;
+    private String content;
+    private UUID profilePublicId;
     private String nickname;
     private QuestionStatus status;
     private List<String> techStacks;
@@ -33,8 +35,8 @@ public class QuestionSummaryDto {
     public QuestionSummaryDto(Long questionId, String title, Member member , QuestionStatus questionStatus , List<String> techStacks, int answerCount, LocalDate createdAt, List<String> mediaUrl, String imageUrl) {
         this.questionId = questionId;
         this.title = title;
-        this.memberId = member.getId();
-        this.memberProfileId = member.getMemberProfile().getProfileId();
+        this.publicId = member.getPublicId();
+        this.profilePublicId = member.getMemberProfile().getProfilePublicId();
         this.nickname = member.getNickname();
         this.status = questionStatus;
         this.techStacks = techStacks;

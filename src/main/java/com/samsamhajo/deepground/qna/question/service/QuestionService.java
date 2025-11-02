@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.qna.question.service;
 
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerDetailDto;
 import com.samsamhajo.deepground.qna.answer.entity.Answer;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,6 +44,7 @@ public class QuestionService{
     private final QuestionTagService tagService;
     private final QuestionMediaRepository questionMediaRepository;
     private final CommonValidation commonValidation;
+    private final MemberRepository memberRepository;
 
     //Question 생성 메서드
     @Transactional
@@ -114,7 +117,7 @@ public class QuestionService{
                 question.getId(),
                 question.getTitle(),
                 question.getContent(),
-                question.getMember().getId(),
+                question.getMember().getPublicId(),
                 techStacks,
                 mediaUrl
         );
@@ -144,7 +147,7 @@ public class QuestionService{
         return QuestionUpdateStatusResponseDto.of(
                 question.getId(),
                 question.getQuestionStatus(),
-                memberId
+                question.getMember().getPublicId()
         );
     }
 

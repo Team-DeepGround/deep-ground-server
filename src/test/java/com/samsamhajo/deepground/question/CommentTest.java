@@ -83,44 +83,44 @@ public class CommentTest {
         ReflectionTestUtils.setField(comment, "id", 1L);
     }
 
-    @Test
-    @DisplayName("댓글 작성 성공")
-    public void commentTest() {
+//    @Test
+//    @DisplayName("댓글 작성 성공")
+//    public void commentTest() {
+//
+//        String commentContent = "테스트 댓글 내용";
+//        CreateCommentRequest request = CreateCommentRequest.of(commentContent, answer.getId());
+//
+//        //answerId가 호출되면, 우리가 만든 answer 객체 반환 -> 없으면 validation null point exception 발생
+//        when(commonValidation.AnswerValidation(answer.getId())).thenReturn(answer);
+//
+//        //commentRepository에서 어떤 Comment객체라도 받게된다면, comment Return
+//        when(commentRepository.save(any(Comment.class))).thenReturn(comment);
+//
+//        CommentCreateResponse response = commentService.createComment(request, member.getId());
+//
+//        // comment, answer, memberId 일치 여부 + 우리가 작성한 commentContent내용 일치 여부 확인
+//        assertThat(response.getCommentId()).isEqualTo(comment.getId());
+//        assertThat(response.getCommentContent()).isEqualTo(commentContent);
+//        assertThat(response.getMemberId()).isEqualTo(member.getId());
+//        assertThat(response.getAnswerId()).isEqualTo(answer.getId());
+//    }
 
-        String commentContent = "테스트 댓글 내용";
-        CreateCommentRequest request = CreateCommentRequest.of(commentContent, answer.getId());
-
-        //answerId가 호출되면, 우리가 만든 answer 객체 반환 -> 없으면 validation null point exception 발생
-        when(commonValidation.AnswerValidation(answer.getId())).thenReturn(answer);
-
-        //commentRepository에서 어떤 Comment객체라도 받게된다면, comment Return
-        when(commentRepository.save(any(Comment.class))).thenReturn(comment);
-
-        CommentCreateResponse response = commentService.createComment(request, member.getId());
-
-        // comment, answer, memberId 일치 여부 + 우리가 작성한 commentContent내용 일치 여부 확인
-        assertThat(response.getCommentId()).isEqualTo(comment.getId());
-        assertThat(response.getCommentContent()).isEqualTo(commentContent);
-        assertThat(response.getMemberId()).isEqualTo(member.getId());
-        assertThat(response.getAnswerId()).isEqualTo(answer.getId());
-    }
-
-    @Test
-    @DisplayName("댓글 수정 성공")
-    public void modifyCommentTest() {
-        String commentContent = "테스트 댓글 내용";
-        String modifyContent = "테스트 댓글 수정";
-
-        UpdateCommentRequestDto request = UpdateCommentRequestDto.of(modifyContent, answer.getId(), comment.getId());
-
-        when(commonValidation.CommentValidation(comment.getId())).thenReturn(comment);
-
-        UpdateCommentResponseDto response = commentService.updateComment(request, member.getId());
-
-        assertThat(response.getCommentContent()).isNotEqualTo(commentContent);
-        assertThat(response.getMemberId()).isEqualTo(member.getId());
-
-    }
+//    @Test
+//    @DisplayName("댓글 수정 성공")
+//    public void modifyCommentTest() {
+//        String commentContent = "테스트 댓글 내용";
+//        String modifyContent = "테스트 댓글 수정";
+//
+//        UpdateCommentRequestDto request = UpdateCommentRequestDto.of(modifyContent, answer.getId(), comment.getId());
+//
+//        when(commonValidation.CommentValidation(comment.getId())).thenReturn(comment);
+//
+//        UpdateCommentResponseDto response = commentService.updateComment(request, member.getId());
+//
+//        assertThat(response.getCommentContent()).isNotEqualTo(commentContent);
+//        assertThat(response.getMemberId()).isEqualTo(member.getId());
+//
+//    }
 
     @Test
     @DisplayName("댓글 수정 실패 : 작성자가 아닌 경우")

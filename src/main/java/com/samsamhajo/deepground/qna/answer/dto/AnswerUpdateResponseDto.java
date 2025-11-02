@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -14,18 +15,18 @@ public class AnswerUpdateResponseDto {
     private String answerContent;
     private Long questionId;
     private Long answerId;
-    private Long memberId;
+    private UUID publicId;
     private List<String> mediaUrl;
 
-    public AnswerUpdateResponseDto(String answerContent, Long questionId, Long answerId, Long memberId, List<String> mediaUrl) {
+    public AnswerUpdateResponseDto(String answerContent, Long questionId, Long answerId, UUID publicId, List<String> mediaUrl) {
         this.answerContent = answerContent;
         this.questionId = questionId;
         this.answerId = answerId;
-        this.memberId = memberId;
+        this.publicId = publicId;
         this.mediaUrl = mediaUrl;
     }
 
-    public static AnswerUpdateResponseDto of(String answerContent, Long questionId, Long answerId, Long memberId, List<String> mediaUrl) {
-        return new AnswerUpdateResponseDto(answerContent, questionId, answerId, memberId, mediaUrl);
+    public static AnswerUpdateResponseDto of(String answerContent, Long questionId, Long answerId, UUID publicId, List<String> mediaUrl) {
+        return new AnswerUpdateResponseDto(answerContent, questionId, answerId, publicId, mediaUrl);
     }
 }
