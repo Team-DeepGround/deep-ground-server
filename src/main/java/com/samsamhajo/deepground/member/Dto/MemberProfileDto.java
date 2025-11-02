@@ -10,6 +10,7 @@ import org.hibernate.validator.constraints.URL;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 @Builder
 public class MemberProfileDto {
 
-    private Long memberId;
+    private UUID publicId;
 
     private String email;
 
@@ -62,7 +63,7 @@ public class MemberProfileDto {
     public static MemberProfileDto from(MemberProfile profile, Member member) {
 
         return MemberProfileDto.builder()
-                .memberId(member.getId())
+                .publicId(member.getPublicId())
                 .email(member.getEmail())
                 .profileImage(profile.getProfileImage())
                 .nickname(member.getNickname())
@@ -84,7 +85,7 @@ public class MemberProfileDto {
     public static MemberProfileDto of(MemberProfile profile) {
 
         return MemberProfileDto.builder()
-                .memberId(profile.getMember().getId())
+                .publicId(profile.getMember().getPublicId())
                 .email(profile.getMember().getEmail())
                 .profileImage(profile.getProfileImage())
                 .nickname(profile.getMember().getNickname())
