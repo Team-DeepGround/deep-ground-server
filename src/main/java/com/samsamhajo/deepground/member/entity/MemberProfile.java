@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -21,6 +22,9 @@ public class MemberProfile extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_profile_id", nullable = false)
     private Long profileId;
+
+    @Column(name = "profile_public_id", nullable = false, unique = true, columnDefinition = "BINARY(16)")
+    private UUID profilePublicId;
 
     @Column(name = "profile_image")
     private String profileImage;
@@ -106,5 +110,12 @@ public class MemberProfile extends BaseEntity {
         this.linkedInUrl = dto.getLinkedInUrl();
         this.websiteUrl = dto.getWebsiteUrl();
         this.twitterUrl = dto.getTwitterUrl();
+    }
+
+    @PrePersist
+    public void setProfilePublicId() {
+        if (profilePublicId == null) {
+            profilePublicId = UUID.randomUUID();
+        }
     }
 }

@@ -148,7 +148,11 @@ swagger:
 app:
   oauth2:
     authorized-redirect-uri: ${OAUTH2_AUTHORIZED_REDIRECT_URI}
-
+  proxy:
+    feed-url-prefix: ${FEED_PROXY_URL}
+    profile-url-prefix: ${PROFILE_PROXY_URL}
+    answer-url-prefix: ${ANSWER_PROXY_URL}
+    question-url-prefix: ${QUESTION_PROXY_URL}
 #AWS S3 관련 설정
 cloud:
   aws:
