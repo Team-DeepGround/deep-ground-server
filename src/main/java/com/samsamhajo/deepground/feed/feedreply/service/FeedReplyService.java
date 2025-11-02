@@ -110,7 +110,7 @@ public class FeedReplyService {
                                 .feedReplyId(feedReply.getId())
                                 .content(feedReply.getContent())
                                 .createdAt(feedReply.getCreatedAt().toLocalDate())
-                                .memberId(feedReply.getMember().getId())
+                                .publicId(feedReply.getMember().getPublicId())
                                 .memberName(feedReply.getMember().getNickname())
                                 .mediaIds(feedReplyMediaService.getFeedReplyMediaIds(feedReply.getId()))
                                 .likeCount(feedReplyLikeService.countFeedReplyLikeByFeedReplyId(feedReply.getId()))

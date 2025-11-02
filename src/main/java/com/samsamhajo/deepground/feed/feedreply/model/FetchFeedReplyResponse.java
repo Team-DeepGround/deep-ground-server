@@ -5,11 +5,12 @@ import lombok.Getter;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Builder
 public class FetchFeedReplyResponse {
-    private long memberId;
+    private UUID publicId;
     private long feedReplyId;
     private String memberName;
     private String content;
