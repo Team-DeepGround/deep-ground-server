@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -49,10 +51,10 @@ public class AuthServiceTest extends IntegrationTestSupport {
         );
 
         // when
-        Long memberId = authService.register(request);
+        UUID publicId = authService.register(request);
 
         // then
-        Member savedMember = memberRepository.findById(memberId)
+        Member savedMember = memberRepository.findByPublicId(publicId)
                 .orElseThrow();
 
         assertThat(savedMember.getEmail()).isEqualTo(request.getEmail());
@@ -137,7 +139,7 @@ public class AuthServiceTest extends IntegrationTestSupport {
         //then
         assertNotNull(response.getAccessToken());
 //        assertNotNull(response.getRefreshToken());
-        assertEquals(member.getId(), response.getMemberId());
+        assertEquals(member.getPublicId(), response.getPublicId());
         assertEquals(member.getEmail(), response.getEmail());
         assertEquals(member.getNickname(), response.getNickname());
     }
