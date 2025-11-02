@@ -33,7 +33,7 @@ public class Member extends BaseEntity {
     @Column(name = "password") // 소셜 로그인 시, 비밀번호는 필요가 없다.
     private String password;
 
-    @Column(name = "nickname", nullable = false)
+    @Column(name = "nickname", nullable = false, unique = true)
     private String nickname;
 
     @Column(name = "is_verified", nullable = false)
