@@ -24,9 +24,11 @@ import com.samsamhajo.deepground.chat.repository.ChatMediaRepository;
 import com.samsamhajo.deepground.chat.repository.ChatMessageRepository;
 import com.samsamhajo.deepground.chat.repository.ChatRoomMemberRepository;
 import com.samsamhajo.deepground.global.message.MessagePublisher;
+import com.samsamhajo.deepground.member.entity.Member;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +38,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class ChatMessageServiceTest {
+class ChatMessageServiceTest {
 
     @InjectMocks
     private ChatMessageService chatMessageService;
@@ -58,24 +60,34 @@ public class ChatMessageServiceTest {
     private final LocalDateTime cursor = LocalDateTime.now();
     private final int limit = 20;
 
+    private ChatRoomMember mockChatRoomMemberWithMember(UUID publicId) {
+        Member member = mock(Member.class);
+        when(member.getPublicId()).thenReturn(publicId);
+
+        ChatRoomMember chatRoomMember = mock(ChatRoomMember.class);
+        when(chatRoomMember.getMember()).thenReturn(member);
+        when(chatRoomMember.updateLastReadMessageTime(any())).thenReturn(true);
+        return chatRoomMember;
+    }
+
     @Test
     @DisplayName("채팅 메시지를 조회하고 다음 페이지가 존재한다")
     void getMessages_hasNextTrue_success() {
         // given
-        int limit = 2;
+        int pageLimit = 2;
         List<ChatMessage> messages = List.of(
                 ChatMessage.of(chatRoomId, memberId, "테스트 1"),
                 ChatMessage.of(chatRoomId, memberId, "테스트 2"),
                 ChatMessage.of(chatRoomId, memberId, "테스트 3")
         );
         when(chatRoomMemberRepository.existsByChatRoomIdAndMemberId(chatRoomId, memberId)).thenReturn(true);
-        when(chatMessageRepository.findByChatRoomIdWithCursor(chatRoomId, cursor, limit)).thenReturn(messages);
+        when(chatMessageRepository.findByChatRoomIdWithCursor(chatRoomId, cursor, pageLimit)).thenReturn(messages);
 
         // when
-        ChatMessageListResponse response = chatMessageService.getMessages(chatRoomId, memberId, cursor, limit);
+        ChatMessageListResponse response = chatMessageService.getMessages(chatRoomId, memberId, cursor, pageLimit);
 
         // then
-        assertThat(response.getMessages()).hasSize(limit);
+        assertThat(response.getMessages()).hasSize(pageLimit);
         assertThat(response.isHasNext()).isTrue();
     }
 
@@ -119,13 +131,13 @@ public class ChatMessageServiceTest {
         ChatMessageRequest request = ChatMessageRequest.builder()
                 .message(message)
                 .build();
+
         ChatMessage chatMessage = ChatMessage.of(chatRoomId, memberId, message);
         when(chatMessageRepository.save(any(ChatMessage.class))).thenReturn(chatMessage);
 
-        ChatRoomMember chatRoomMember = mock(ChatRoomMember.class);
+        ChatRoomMember chatRoomMember = mockChatRoomMemberWithMember(UUID.randomUUID());
         when(chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, memberId))
                 .thenReturn(Optional.of(chatRoomMember));
-        when(chatRoomMember.updateLastReadMessageTime(any())).thenReturn(true);
 
         // when
         chatMessageService.sendMessage(chatRoomId, memberId, request);
@@ -134,10 +146,10 @@ public class ChatMessageServiceTest {
         ArgumentCaptor<ChatMessage> captor = ArgumentCaptor.forClass(ChatMessage.class);
         verify(chatMessageRepository).save(captor.capture());
 
-        ChatMessage savedChatMessage = captor.getValue();
-        assertThat(savedChatMessage.getChatRoomId()).isEqualTo(chatRoomId);
-        assertThat(savedChatMessage.getSenderId()).isEqualTo(memberId);
-        assertThat(savedChatMessage.getMessage()).isEqualTo(message);
+        ChatMessage saved = captor.getValue();
+        assertThat(saved.getChatRoomId()).isEqualTo(chatRoomId);
+        assertThat(saved.getSenderId()).isEqualTo(memberId);
+        assertThat(saved.getMessage()).isEqualTo(message);
 
         String expectedDestination = "/chatrooms/" + chatRoomId + "/message";
         verify(messagePublisher).convertAndSend(eq(expectedDestination), any(ChatMessageResponse.class));
@@ -147,8 +159,7 @@ public class ChatMessageServiceTest {
     @DisplayName("메시지와 미디어가 모두 비어있으면 예외가 발생한다")
     void sendMessage_withEmptyContent_throwsException() {
         // given
-        ChatMessageRequest request = ChatMessageRequest.builder()
-                .build();
+        ChatMessageRequest request = ChatMessageRequest.builder().build();
 
         // when & then
         assertThatThrownBy(() -> chatMessageService.sendMessage(chatRoomId, memberId, request))
@@ -169,14 +180,14 @@ public class ChatMessageServiceTest {
                 .message(message)
                 .mediaIds(mediaIds)
                 .build();
+
         ChatMessage chatMessage = ChatMessage.of(chatRoomId, memberId, message);
         when(chatMessageRepository.save(any(ChatMessage.class))).thenReturn(chatMessage);
         when(chatMediaRepository.findAllByIdAndStatusPending(mediaIds)).thenReturn(chatMedia);
 
-        ChatRoomMember chatRoomMember = mock(ChatRoomMember.class);
+        ChatRoomMember chatRoomMember = mockChatRoomMemberWithMember(UUID.randomUUID());
         when(chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, memberId))
                 .thenReturn(Optional.of(chatRoomMember));
-        when(chatRoomMember.updateLastReadMessageTime(any())).thenReturn(true);
 
         // when
         chatMessageService.sendMessage(chatRoomId, memberId, request);
@@ -185,10 +196,10 @@ public class ChatMessageServiceTest {
         ArgumentCaptor<ChatMessage> captor = ArgumentCaptor.forClass(ChatMessage.class);
         verify(chatMessageRepository).save(captor.capture());
 
-        ChatMessage savedChatMessage = captor.getValue();
-        assertThat(savedChatMessage.getChatRoomId()).isEqualTo(chatRoomId);
-        assertThat(savedChatMessage.getSenderId()).isEqualTo(memberId);
-        assertThat(savedChatMessage.getMessage()).isEqualTo(message);
+        ChatMessage saved = captor.getValue();
+        assertThat(saved.getChatRoomId()).isEqualTo(chatRoomId);
+        assertThat(saved.getSenderId()).isEqualTo(memberId);
+        assertThat(saved.getMessage()).isEqualTo(message);
 
         String expectedDestination = "/chatrooms/" + chatRoomId + "/message";
         verify(messagePublisher).convertAndSend(eq(expectedDestination), any(ChatMessageResponse.class));
@@ -199,11 +210,10 @@ public class ChatMessageServiceTest {
     void readMessage_success() {
         // given
         LocalDateTime latestMessageTime = LocalDateTime.now();
-        ChatRoomMember chatRoomMember = mock(ChatRoomMember.class);
 
+        ChatRoomMember chatRoomMember = mockChatRoomMemberWithMember(UUID.randomUUID());
         when(chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, memberId))
                 .thenReturn(Optional.of(chatRoomMember));
-        when(chatRoomMember.updateLastReadMessageTime(eq(latestMessageTime))).thenReturn(true);
 
         // when
         chatMessageService.readMessage(chatRoomId, memberId, latestMessageTime);
@@ -216,9 +226,8 @@ public class ChatMessageServiceTest {
         String expectedDestination = "/chatrooms/" + chatRoomId + "/read-receipt";
         verify(messagePublisher).convertAndSend(eq(expectedDestination), captor.capture());
 
-        ReadMessageResponse sentResponse = captor.getValue();
-//        assertThat(sentResponse.getMemberId()).isEqualTo(memberId);
-        assertThat(sentResponse.getLastReadMessageTime()).isEqualTo(latestMessageTime);
+        ReadMessageResponse payload = captor.getValue();
+        assertThat(payload.getLastReadMessageTime()).isEqualTo(latestMessageTime);
     }
 
     @Test
@@ -226,12 +235,11 @@ public class ChatMessageServiceTest {
     void readMessage_notFound_throwsException() {
         // given
         LocalDateTime latestMessageTime = LocalDateTime.now();
-
         when(chatRoomMemberRepository.findByChatRoomIdAndMemberId(chatRoomId, memberId))
                 .thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy((() -> chatMessageService.readMessage(chatRoomId, memberId, latestMessageTime)))
+        assertThatThrownBy(() -> chatMessageService.readMessage(chatRoomId, memberId, latestMessageTime))
                 .isInstanceOf(ChatMessageException.class)
                 .hasMessage(ChatMessageErrorCode.CHATROOM_MEMBER_NOT_FOUND.getMessage());
     }
