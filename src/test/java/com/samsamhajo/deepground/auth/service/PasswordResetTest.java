@@ -89,7 +89,7 @@ public class PasswordResetTest extends IntegrationTestSupport {
 
         // then
         assertNotNull(response);
-        assertEquals(member.getPublicId(), response.getPublicId());
+        assertEquals(member.getId(), response.getMemberId());
         assertEquals(member.getEmail(), response.getEmail());
         assertTrue(response.isSuccess());
 

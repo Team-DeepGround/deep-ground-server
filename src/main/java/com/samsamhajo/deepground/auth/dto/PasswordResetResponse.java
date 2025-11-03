@@ -9,19 +9,19 @@ import java.util.UUID;
 @Getter
 @Builder
 public class PasswordResetResponse {
-    private UUID publicId;
+    private Long memberId;
     private String email;
     private boolean isSuccess;
 
-    private PasswordResetResponse(UUID publicId, String email, boolean isSuccess) {
-        this.publicId = publicId;
+    private PasswordResetResponse(Long memberId, String email, boolean isSuccess) {
+        this.memberId = memberId;
         this.email = email;
         this.isSuccess = isSuccess;
     }
 
     public static PasswordResetResponse of(Member member) {
         return PasswordResetResponse.builder()
-                .publicId(member.getPublicId())
+                .memberId(member.getId())
                 .email(member.getEmail())
                 .isSuccess(true)
                 .build();

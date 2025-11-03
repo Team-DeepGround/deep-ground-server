@@ -82,11 +82,9 @@ public class MemberController {
   
     @GetMapping("/profile/{profilePublicId}")
     public ResponseEntity<SuccessResponse<MemberProfileDto>> getUserProfile(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable UUID profilePublicId){
 
-        Long memberId = userDetails.getMember().getId();
-        MemberProfileDto profile = memberService.getUserProfile(memberId,profilePublicId);
+        MemberProfileDto profile = memberService.getUserProfile(profilePublicId);
         return ResponseEntity
                 .ok(SuccessResponse.of(ProfileSuccessCode.GET_SUCCESS_PROFILE, profile));
     }
