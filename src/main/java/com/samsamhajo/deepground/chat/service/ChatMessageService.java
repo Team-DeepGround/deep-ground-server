@@ -120,7 +120,7 @@ public class ChatMessageService {
         String destination = "/chatrooms/" + chatRoomId + "/read-receipt";
         messagePublisher.convertAndSend(
                 destination,
-                ReadMessageResponse.of(memberId, latestMessageTime)
+                ReadMessageResponse.of(member.getMember().getPublicId(), latestMessageTime)
         );
     }
 

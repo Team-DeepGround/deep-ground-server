@@ -2,23 +2,25 @@ package com.samsamhajo.deepground.qna.comment.dto;
 
 import lombok.Getter;
 
+import java.util.UUID;
+
 
 @Getter
 public class CommentDTO {
     private Long commentId;
     private String content;
-    private Long memberId;
+    private UUID publicId;
     private String nickName;
 
-    public CommentDTO(Long commentId, String content, Long memberId, String nickName) {
+    public CommentDTO(Long commentId, String content, UUID publicId, String nickName) {
         this.commentId = commentId;
         this.content = content;
-        this.memberId = memberId;
+        this.publicId = publicId;
         this.nickName = nickName;
     }
 
-    public static CommentDTO of(Long commentId, String content, Long memberId, String nickname) {
-        return new CommentDTO(commentId, content, memberId, nickname);
+    public static CommentDTO of(Long commentId, String content, UUID publicId, String nickname) {
+        return new CommentDTO(commentId, content, publicId, nickname);
     }
 }
 

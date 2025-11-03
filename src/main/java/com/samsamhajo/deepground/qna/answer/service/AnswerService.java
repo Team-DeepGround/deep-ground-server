@@ -105,7 +105,7 @@ public class AnswerService {
                 answer.getAnswerContent(),
                 answer.getQuestion().getId(),
                 answer.getId(),
-                member.getId(),
+                member.getPublicId(),
                 mediaUrl
         );
     }
