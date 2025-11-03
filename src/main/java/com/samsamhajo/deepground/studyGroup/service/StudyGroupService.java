@@ -78,8 +78,8 @@ public class StudyGroupService {
               Member member = m.getMember();
               MemberProfile profile = member.getMemberProfile();
               return ParticipantSummaryDto.builder()
-                      .memberId(member.getId())
-                      .profileId(profile.getProfileId())
+                      .memberPublicId(member.getPublicId())
+                      .profilePublicId(profile.getProfilePublicId())
                       .nickname(member.getNickname())
                       .profileImage(profile.getProfileImage())
                       .build();

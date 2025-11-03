@@ -20,7 +20,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.samsamhajo.deepground.member.utils.MemberUtils.extractProfileId;
+import static com.samsamhajo.deepground.member.utils.MemberUtils.extractProfilePublicId;
 import static com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus.*;
 
 
@@ -39,8 +39,8 @@ public class StudyGroupMemberService {
 
     return studyGroupMemberRepository.findAcceptedMembersWithInfo(studyGroupId, APPROVED).stream()
         .map(member -> StudyGroupMemberSummary.builder()
-                .memberId(member.getMember().getId())
-                .profileId(extractProfileId(member.getMember()))
+                .memberPublicId(member.getMember().getPublicId())
+                .profilePublicId(extractProfilePublicId(member.getMember()))
                 .nickname(member.getMember().getNickname())
                 .isOwner(group.getCreator().getId().equals(member.getMember().getId()))
                 .joinedAt(member.getCreatedAt())
@@ -60,8 +60,8 @@ public class StudyGroupMemberService {
 
     return pending.stream()
         .map(m -> StudyGroupMemberSummary.builder()
-                .memberId(m.getMember().getId())
-                .profileId(extractProfileId(m.getMember()))
+                .memberPublicId(m.getMember().getPublicId())
+                .profilePublicId(extractProfilePublicId(m.getMember()))
                 .nickname(m.getMember().getNickname())
                 .build())
         .toList();

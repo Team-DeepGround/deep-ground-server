@@ -4,18 +4,20 @@ import com.samsamhajo.deepground.friend.entity.Friend;
 import com.samsamhajo.deepground.friend.entity.FriendStatus;
 import lombok.Getter;
 
+import java.util.UUID;
+
 @Getter
 public class FriendDto {
 
     private Long friendId;
     private String otherMemberName;
     private FriendStatus status;
-    private Long profileId;
+    private UUID getProfilePublicId;
 
-    private FriendDto(Long friendId, String otherMemberName, Long profileId, FriendStatus status) {
+    private FriendDto(Long friendId, String otherMemberName, UUID getProfilePublicId, FriendStatus status) {
         this.friendId = friendId;
         this.otherMemberName = otherMemberName;
-        this.profileId = profileId;
+        this.getProfilePublicId = getProfilePublicId;
         this.status = status;
     }
 
@@ -24,7 +26,7 @@ public class FriendDto {
                 friend.getId(),
                 friend.getReceiveMember().getNickname(),
                 friend.getReceiveMember().getMemberProfile() != null
-                        ? friend.getReceiveMember().getMemberProfile().getProfileId()
+                        ? friend.getReceiveMember().getMemberProfile().getProfilePublicId()
                         : null,
                 friend.getStatus()
         );
@@ -35,7 +37,7 @@ public class FriendDto {
                 friend.getId(),
                 friend.getRequestMember().getNickname(),
                 friend.getReceiveMember().getMemberProfile() != null
-                        ? friend.getReceiveMember().getMemberProfile().getProfileId()
+                        ? friend.getReceiveMember().getMemberProfile().getProfilePublicId()
                         : null,
                 friend.getStatus()
         );
