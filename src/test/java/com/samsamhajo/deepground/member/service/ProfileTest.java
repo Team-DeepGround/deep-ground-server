@@ -222,7 +222,7 @@ public class ProfileTest extends IntegrationTestSupport {
         memberRepository.save(member2);
 
         //when
-        MemberProfileDto userProfile = memberService.getUserProfile(member2.getId(), profile.getProfilePublicId());
+        MemberProfileDto userProfile = memberService.getUserProfile(profile.getProfilePublicId());
 
         //then
         assertEquals("알파카", userProfile.getNickname());

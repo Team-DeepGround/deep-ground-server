@@ -51,10 +51,10 @@ public class AuthServiceTest extends IntegrationTestSupport {
         );
 
         // when
-        UUID publicId = authService.register(request);
+        Long memberId = authService.register(request);
 
         // then
-        Member savedMember = memberRepository.findByPublicId(publicId)
+        Member savedMember = memberRepository.findById(memberId)
                 .orElseThrow();
 
         assertThat(savedMember.getEmail()).isEqualTo(request.getEmail());
@@ -139,7 +139,7 @@ public class AuthServiceTest extends IntegrationTestSupport {
         //then
         assertNotNull(response.getAccessToken());
 //        assertNotNull(response.getRefreshToken());
-        assertEquals(member.getPublicId(), response.getPublicId());
+        assertEquals(member.getId(), response.getMemberId());
         assertEquals(member.getEmail(), response.getEmail());
         assertEquals(member.getNickname(), response.getNickname());
     }
