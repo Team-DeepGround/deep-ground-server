@@ -36,7 +36,7 @@ public class AuthService {
     private static final long REISSUE_REFRESH_TOKEN_TIME = 259200L;  // 3일을 초 단위로
 
     @Transactional
-    public UUID register(RegisterRequest request) {
+    public Long register(RegisterRequest request) {
 
         // 중복 검사
         checkEmailDuplicate(request.getEmail());
@@ -50,7 +50,7 @@ public class AuthService {
 
         Member savedMember = memberRepository.save(member);
         GlobalLogger.info("회원가입 성공 - email: {}, memberId: {}", savedMember.getEmail(), savedMember.getId());
-        return savedMember.getPublicId();
+        return savedMember.getId();
     }
 
     @Transactional

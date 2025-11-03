@@ -12,6 +12,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.Query;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.Lock;
@@ -108,6 +110,43 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, Long> {
           @Param("memberId") Long memberId,
           Pageable pageable
   );
+
+  @Query(
+          value = """
+    SELECT DISTINCT sg
+    FROM StudyGroup sg
+    WHERE sg.deleted = false
+      AND (
+        sg.creator.publicId = :publicId
+        OR EXISTS (
+          SELECT 1
+          FROM StudyGroupMember sm
+          WHERE sm.studyGroup = sg
+            AND sm.member.publicId = :publicId
+        )
+      )
+    ORDER BY sg.createdAt DESC
+    """,
+          countQuery = """
+    SELECT COUNT(DISTINCT sg.id)
+    FROM StudyGroup sg
+    WHERE sg.deleted = false
+      AND (
+        sg.creator.publicId = :publicId
+        OR EXISTS (
+          SELECT 1
+          FROM StudyGroupMember sm
+          WHERE sm.studyGroup = sg
+            AND sm.member.publicId = :publicId
+        )
+      )
+    """
+  )
+  Page<StudyGroup> findAllCreatedOrJoinedByPublicId(
+          @Param("publicId") UUID publicId,
+          Pageable pageable
+  );
+
 
   @Modifying(clearAutomatically = true)
   @Query("""

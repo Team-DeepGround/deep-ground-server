@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -117,9 +118,9 @@ public class MemberService {
 
     // TODO: 비공개 프로필 설정 도입 시, memberId와 profileId를 비교하여 접근 제한 예외 처리 추가 예정
     @Transactional(readOnly = true)
-    public MemberProfileDto getUserProfile(Long memberId, Long profileId) {
+    public MemberProfileDto getUserProfile(UUID profilePublicId) {
 
-        MemberProfile profile = profileRepository.findById(profileId)
+        MemberProfile profile = profileRepository.findByProfilePublicId(profilePublicId)
                 .orElseThrow(()-> new ProfileException(ProfileErrorCode.INVALID_PROFILE_ID));
 
 

@@ -13,6 +13,8 @@ import com.samsamhajo.deepground.member.service.MemberService;
 import com.samsamhajo.deepground.studyGroup.dto.MemberStudySummaryResponse;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -78,23 +80,21 @@ public class MemberController {
         return ResponseEntity.ok(SuccessResponse.of(ProfileSuccessCode.GET_MY_PROFILE_SUCCESS, profile));
     }
   
-    @GetMapping("/profile/{profileId}")
+    @GetMapping("/profile/{profilePublicId}")
     public ResponseEntity<SuccessResponse<MemberProfileDto>> getUserProfile(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PathVariable Long profileId){
+            @PathVariable UUID profilePublicId){
 
-        Long memberId = userDetails.getMember().getId();
-        MemberProfileDto profile = memberService.getUserProfile(memberId,profileId);
+        MemberProfileDto profile = memberService.getUserProfile(profilePublicId);
         return ResponseEntity
                 .ok(SuccessResponse.of(ProfileSuccessCode.GET_SUCCESS_PROFILE, profile));
     }
 
-    @GetMapping("/{memberId}/studies")
+    @GetMapping("/{publicId}/studies")
     public ResponseEntity<SuccessResponse<Page<MemberStudySummaryResponse>>> getMemberStudies(
-            @PathVariable Long memberId,
+            @PathVariable UUID publicId,
             @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Page<MemberStudySummaryResponse> response = memberStudyService.getMemberStudies(memberId, pageable);
+        Page<MemberStudySummaryResponse> response = memberStudyService.getMemberStudies(publicId, pageable);
 
         return ResponseEntity.ok(SuccessResponse.of(MemberSuccessCode.GET_MEMBER_STUDY_SUCCESS, response));
     }
