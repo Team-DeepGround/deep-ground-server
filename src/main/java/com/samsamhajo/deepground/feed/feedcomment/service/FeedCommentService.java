@@ -100,7 +100,7 @@ public class FeedCommentService {
                                 .feedCommentId(feedComment.getId())
                                 .content(feedComment.getContent())
                                 .createdAt(feedComment.getCreatedAt().toLocalDate())
-                                .memberId(feedComment.getMember().getId())
+                                .publicId(feedComment.getMember().getPublicId())
                                 .memberName(feedComment.getMember().getNickname())
                                 .mediaIds(feedCommentMediaService.getFeedCommentMediaIds(feedComment.getId()))
                                 .replyCount(feedReplyService.countFeedRepliesByFeedCommentId(feedComment.getId()))

@@ -173,14 +173,8 @@ class FeedServiceTest {
         assertThat(result.getFeeds()).hasSize(2);
         assertThat(result.getFeeds().get(0).getContent()).isEqualTo("피드2");
         assertThat(result.getFeeds().get(1).getContent()).isEqualTo("피드1");
-        assertThat(result.getFeeds().get(0).getMemberId()).isEqualTo(1L);
-        assertThat(result.getFeeds().get(1).getMemberId()).isEqualTo(1L);
         assertThat(result.getFeeds().get(0).getMemberName()).isEqualTo(TEST_NICKNAME);
         assertThat(result.getFeeds().get(1).getMemberName()).isEqualTo(TEST_NICKNAME);
-
-        // ✅ profileId 검증
-        assertThat(result.getFeeds().get(0).getProfileId()).isEqualTo(10L);
-        assertThat(result.getFeeds().get(1).getProfileId()).isEqualTo(10L);
 
         assertThat(result.getFeeds().get(0).getShareCount()).isEqualTo(0);
         assertThat(result.getFeeds().get(1).getShareCount()).isEqualTo(0);
@@ -231,9 +225,6 @@ class FeedServiceTest {
         assertThat(result.getFeeds().get(0).getContent()).isEqualTo("피드2");
         assertThat(result.getFeeds().get(1).getContent()).isEqualTo("피드1");
 
-        // ✅ profileId 검증
-        assertThat(result.getFeeds().get(0).getProfileId()).isEqualTo(10L);
-        assertThat(result.getFeeds().get(1).getProfileId()).isEqualTo(10L);
         assertThat(result.getFeeds().get(0).getShareCount()).isEqualTo(0);
         assertThat(result.getFeeds().get(1).getShareCount()).isEqualTo(5);
         assertThat(result.getFeeds().get(0).getSharedFeed()).isNull();

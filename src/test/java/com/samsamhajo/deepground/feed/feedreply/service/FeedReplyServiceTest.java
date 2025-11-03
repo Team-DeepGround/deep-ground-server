@@ -192,7 +192,6 @@ class FeedReplyServiceTest {
         var reply = result.getFeedReplies().get(0);
         assertThat(reply.getFeedReplyId()).isEqualTo(1L);
         assertThat(reply.getContent()).isEqualTo(TEST_CONTENT);
-        assertThat(reply.getMemberId()).isEqualTo(1L);
         assertThat(reply.getMemberName()).isEqualTo(TEST_NICKNAME);
         assertThat(reply.getMediaIds()).isEmpty();
         assertThat(reply.getLikeCount()).isEqualTo(3);

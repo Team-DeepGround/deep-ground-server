@@ -4,18 +4,20 @@ import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.entity.Role;
 import lombok.Getter;
 
+import java.util.UUID;
+
 @Getter
 public class LoginResponse {
     private final String accessToken;
-    private final Long memberId;
+    private final UUID publicId;
     private final String email;
     private final String nickname;
     private final Role role;
     private final String provider;
 
-    public LoginResponse(String accessToken, Long memberId, String email, String nickname, Role role, String provider) {
+    public LoginResponse(String accessToken, UUID publicId, String email, String nickname, Role role, String provider) {
         this.accessToken = accessToken;
-        this.memberId = memberId;
+        this.publicId = publicId;
         this.email = email;
         this.nickname = nickname;
         this.role = role;
@@ -29,7 +31,7 @@ public class LoginResponse {
 
         return new LoginResponse(
                 accessToken,
-                member.getId(),
+                member.getPublicId(),
                 member.getEmail(),
                 member.getNickname(),
                 member.getRole(),

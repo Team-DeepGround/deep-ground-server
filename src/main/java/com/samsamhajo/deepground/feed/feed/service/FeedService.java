@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -69,8 +70,8 @@ public class FeedService {
 
         Member member = feed.getMember();
 
-        Long profileId = Optional.ofNullable(member.getMemberProfile())
-                .map(MemberProfile::getProfileId)
+        UUID publicProfileId = Optional.ofNullable(member.getMemberProfile())
+                .map(MemberProfile::getProfilePublicId)
                 .orElse(null);
 
         boolean isLikedByCurrentUser = false;
@@ -82,8 +83,8 @@ public class FeedService {
                 .feedId(feed.getId())
                 .content(feed.getContent())
                 .createdAt(feed.getCreatedAt().toLocalDate())
-                .memberId(feed.getMember().getId())
-                .profileId(profileId)
+                .publicId(feed.getMember().getPublicId())
+                .profilePublicId(publicProfileId)
                 .memberName(feed.getMember().getNickname())
                 .mediaUrls(feedMediaService.findAllMediaUrlsByFeedId(feed.getId()))
                 .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId()))
@@ -106,8 +107,8 @@ public class FeedService {
 
                                     Member member = feed.getMember();
 
-                                    Long profileId = Optional.ofNullable(member.getMemberProfile())
-                                            .map(MemberProfile::getProfileId)
+                                    UUID profilePublicId = Optional.ofNullable(member.getMemberProfile())
+                                            .map(MemberProfile::getProfilePublicId)
                                             .orElse(null);
 
                                     boolean isLikedByCurrentUser = false;
@@ -119,8 +120,8 @@ public class FeedService {
                                             .feedId(feed.getId())
                                             .content(feed.getContent())
                                             .createdAt(feed.getCreatedAt().toLocalDate())
-                                            .memberId(feed.getMember().getId())
-                                            .profileId(profileId)
+                                            .publicId(feed.getMember().getPublicId())
+                                            .profilePublicId(profilePublicId)
                                             .memberName(feed.getMember().getNickname())
                                             .mediaUrls(feedMediaService.findAllMediaUrlsByFeedId(feed.getId()))
                                             .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId()))

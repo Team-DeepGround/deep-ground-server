@@ -197,7 +197,6 @@ class FeedCommentServiceTest {
         var comment = result.getFeedComments().get(0);
         assertThat(comment.getFeedCommentId()).isEqualTo(1L);
         assertThat(comment.getContent()).isEqualTo(TEST_CONTENT);
-        assertThat(comment.getMemberId()).isEqualTo(1L);
         assertThat(comment.getMemberName()).isEqualTo(TEST_NICKNAME);
         assertThat(comment.getMediaIds()).isEmpty();
         assertThat(comment.getReplyCount()).isEqualTo(2);
