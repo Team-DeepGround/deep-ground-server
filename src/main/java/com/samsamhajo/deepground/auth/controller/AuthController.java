@@ -5,14 +5,12 @@ import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.auth.service.AuthService;
 import com.samsamhajo.deepground.auth.success.AuthSuccessCode;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
-import com.samsamhajo.deepground.member.entity.Member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
@@ -25,8 +23,8 @@ public class AuthController {
     public ResponseEntity<SuccessResponse<RegisterResponse>> register(
             @Valid @RequestBody RegisterRequest request
     ) {
-        UUID publicId = authService.register(request);
-        RegisterResponse response = new RegisterResponse(publicId, true);
+        Long memberId = authService.register(request);
+        RegisterResponse response = new RegisterResponse(memberId, true);
 
         return ResponseEntity
                 .status(AuthSuccessCode.REGISTER_SUCCESS.getStatus())
