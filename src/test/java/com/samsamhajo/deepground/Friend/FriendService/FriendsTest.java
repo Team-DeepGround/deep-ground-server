@@ -43,7 +43,7 @@ public class FriendsTest extends IntegrationTestSupport {
         requester2 = Member.createLocalMember("gar@gmail.com", "pw", "가");
         requester3 = Member.createLocalMember("den@gmail.com", "pw", "든");
         receiver = Member.createLocalMember("garden@gmail.com", "pw", "가든");
-        receiver2 = Member.createLocalMember("pa@gmail.com","pw","파카");
+        receiver2 = Member.createLocalMember("pa@gmail.com","pw","파카2");
 
 
         memberRepository.save(requester);

@@ -2,9 +2,7 @@ package com.samsamhajo.deepground.qna.answer.dto;
 
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.qna.answer.entity.Answer;
-import com.samsamhajo.deepground.qna.comment.dto.CommentDTO;
 import com.samsamhajo.deepground.qna.question.entity.Question;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

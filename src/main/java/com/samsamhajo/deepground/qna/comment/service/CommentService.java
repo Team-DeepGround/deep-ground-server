@@ -69,7 +69,7 @@ public class CommentService {
 
         return UpdateCommentResponseDto.of(
                 comment.getCommentContent(),
-                comment.getMember().getId(),
+                comment.getMember().getPublicId(),
                 comment.getAnswer().getId(),
                 comment.getId()
         );

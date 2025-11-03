@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.Set;
 
@@ -19,8 +20,8 @@ public class StudyGroupDetailResponse {
   private String title;
   private String explanation;
   private String writer;
-  private Long writeMemberId;
-  private Long profileId;
+  private UUID writeMemberPublicId;
+  private UUID profilePublicId;
   private String nickname;
   private int memberCount;
   private int groupLimit;
@@ -42,7 +43,7 @@ public class StudyGroupDetailResponse {
         .title(group.getTitle())
         .explanation(group.getExplanation())
         .writer(group.getCreator().getNickname())
-            .writeMemberId(group.getCreator().getId())
+            .writeMemberPublicId(group.getCreator().getPublicId())
         .memberCount(group.getMembers().size())
         .groupLimit(group.getGroupMemberCount())
         .location(group.getStudyLocation())

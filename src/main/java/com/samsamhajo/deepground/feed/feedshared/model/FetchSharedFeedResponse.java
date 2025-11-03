@@ -7,13 +7,14 @@ import lombok.Getter;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Builder
 public class FetchSharedFeedResponse {
     private Long feedId;
-    private Long memberId;
-    private Long profileId;
+    private UUID publicId;
+    private UUID profilePublicId;
     private String memberName;
     private String content;
     private String profileImageUrl;
@@ -26,8 +27,8 @@ public class FetchSharedFeedResponse {
 
         return FetchSharedFeedResponse.builder()
                 .feedId(originFeed.getId())
-                .memberId(originFeed.getMember().getId())
-                .profileId(originFeed.getMember().getMemberProfile().getProfileId())
+                .publicId(originFeed.getMember().getPublicId())
+                .profilePublicId(originFeed.getMember().getMemberProfile().getProfilePublicId())
                 .memberName(originFeed.getMember().getNickname())
                 .content(originFeed.getContent())
                 .createdAt(originFeed.getCreatedAt().toLocalDate())

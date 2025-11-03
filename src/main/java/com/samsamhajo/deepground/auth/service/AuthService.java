@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -34,7 +36,7 @@ public class AuthService {
     private static final long REISSUE_REFRESH_TOKEN_TIME = 259200L;  // 3일을 초 단위로
 
     @Transactional
-    public Long register(RegisterRequest request) {
+    public UUID register(RegisterRequest request) {
 
         // 중복 검사
         checkEmailDuplicate(request.getEmail());
@@ -48,7 +50,7 @@ public class AuthService {
 
         Member savedMember = memberRepository.save(member);
         GlobalLogger.info("회원가입 성공 - email: {}, memberId: {}", savedMember.getEmail(), savedMember.getId());
-        return savedMember.getId();
+        return savedMember.getPublicId();
     }
 
     @Transactional
@@ -75,14 +77,7 @@ public class AuthService {
                 refreshTokenValidityInSeconds
         );
 
-        return new LoginResponse(
-                accessToken,
-                refreshToken,
-                member.getId(),
-                member.getEmail(),
-                member.getNickname(),
-                member.getRole()
-        );
+        return LoginResponse.from(member, accessToken);
     }
 
     @Transactional

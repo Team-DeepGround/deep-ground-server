@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -23,8 +25,8 @@ public class AuthController {
     public ResponseEntity<SuccessResponse<RegisterResponse>> register(
             @Valid @RequestBody RegisterRequest request
     ) {
-        Long memberId = authService.register(request);
-        RegisterResponse response = new RegisterResponse(memberId, true);
+        UUID publicId = authService.register(request);
+        RegisterResponse response = new RegisterResponse(publicId, true);
 
         return ResponseEntity
                 .status(AuthSuccessCode.REGISTER_SUCCESS.getStatus())

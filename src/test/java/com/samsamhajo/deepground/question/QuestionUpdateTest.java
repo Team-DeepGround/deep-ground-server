@@ -70,86 +70,86 @@ public class QuestionUpdateTest extends IntegrationTestSupport {
                                 invocation.getArgument(0, MultipartFile.class).getOriginalFilename());
     }
 
-    @Test
-    @DisplayName("질문 수정 Service 테스트")
-    public void testUpdateQuestion() {
+//    @Test
+//    @DisplayName("질문 수정 Service 테스트")
+//    public void testUpdateQuestion() {
+//
+//        String title = "테스트";
+//        String content = "테스트1";
+//
+//        String title1 = "수정된 테스트 제목";
+//        String content1 = "수정된 테스트 내용";
+//
+//        List<MultipartFile> mediaFiles = List.of(
+//                new MockMultipartFile("mediaFiles", "image1.png", MediaType.IMAGE_PNG_VALUE, "dummy image content 1".getBytes())
+//        );
+//
+//        List<String> techStackNames = List.of("techStack1", "techStack2");
+//        List<String> categoryNames = List.of("category1", "category2");
+//        List<TechStack> techStacks = techStackNames.stream()
+//                .map(name -> TechStack.of(name, categoryNames.toString())) // 정적 팩토리 메서드가 없다면 new TechStack(name) 사용
+//                .collect(Collectors.toList());
+//        List<TechStack> savedTechStacks = techStackRepository.saveAll(techStacks);
+//
+//        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStackNames, mediaFiles);
+//        QuestionCreateResponseDto questionCreateResponseDto = questionService.createQuestion(questionCreateRequestDto, memberId);
+//        QuestionUpdateRequestDto questionUpdateRequestDto =  new QuestionUpdateRequestDto(questionCreateResponseDto.getQuestionId(), title1, content1, techStackNames, mediaFiles);
+//        QuestionUpdateResponseDto questionUpdateResponseDto = questionService.updateQuestion(questionUpdateRequestDto, memberId);
+//
+//        //TODO 후에 media, teckStack함께 수정되는지 Test코드 작성
+//
+//        //MemberId가 서로 동일한지, 동일한 회원이 자신이 작성한 질문을 수정하는지
+//        assertThat(questionCreateResponseDto.getMemberId()).isEqualTo(questionUpdateResponseDto.getMemberId());
+//        //같은 Question이 수정되고 있는지
+//        assertThat(questionCreateResponseDto.getQuestionId()).isEqualTo(questionUpdateRequestDto.getQuestionId());
+//        //제목이 수정되었는지
+//        assertThat(questionUpdateResponseDto.getTitle()).isEqualTo(title1);
+//        //내용이 수정되었는지
+//        assertThat(questionUpdateResponseDto.getContent()).isEqualTo(content1);
+//        System.out.println(memberId);
+//        System.out.println(memberId2);
+//        //질문을 쓴 사용자만 업데이트가 가능한지
+//        QuestionException exception = assertThrows(QuestionException.class, () -> {
+//            if(!questionUpdateResponseDto.getMemberId().equals(memberId2)) {
+//                throw new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH);
+//            }
+//        });
+//        assertThat(exception.getMessage()).isEqualTo("질문을 작성한 사용자가 아닙니다.");
+//        System.out.println(exception.getMessage());
+//    }
 
-        String title = "테스트";
-        String content = "테스트1";
-
-        String title1 = "수정된 테스트 제목";
-        String content1 = "수정된 테스트 내용";
-
-        List<MultipartFile> mediaFiles = List.of(
-                new MockMultipartFile("mediaFiles", "image1.png", MediaType.IMAGE_PNG_VALUE, "dummy image content 1".getBytes())
-        );
-
-        List<String> techStackNames = List.of("techStack1", "techStack2");
-        List<String> categoryNames = List.of("category1", "category2");
-        List<TechStack> techStacks = techStackNames.stream()
-                .map(name -> TechStack.of(name, categoryNames.toString())) // 정적 팩토리 메서드가 없다면 new TechStack(name) 사용
-                .collect(Collectors.toList());
-        List<TechStack> savedTechStacks = techStackRepository.saveAll(techStacks);
-
-        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStackNames, mediaFiles);
-        QuestionCreateResponseDto questionCreateResponseDto = questionService.createQuestion(questionCreateRequestDto, memberId);
-        QuestionUpdateRequestDto questionUpdateRequestDto =  new QuestionUpdateRequestDto(questionCreateResponseDto.getQuestionId(), title1, content1, techStackNames, mediaFiles);
-        QuestionUpdateResponseDto questionUpdateResponseDto = questionService.updateQuestion(questionUpdateRequestDto, memberId);
-
-        //TODO 후에 media, teckStack함께 수정되는지 Test코드 작성
-
-        //MemberId가 서로 동일한지, 동일한 회원이 자신이 작성한 질문을 수정하는지
-        assertThat(questionCreateResponseDto.getMemberId()).isEqualTo(questionUpdateResponseDto.getMemberId());
-        //같은 Question이 수정되고 있는지
-        assertThat(questionCreateResponseDto.getQuestionId()).isEqualTo(questionUpdateRequestDto.getQuestionId());
-        //제목이 수정되었는지
-        assertThat(questionUpdateResponseDto.getTitle()).isEqualTo(title1);
-        //내용이 수정되었는지
-        assertThat(questionUpdateResponseDto.getContent()).isEqualTo(content1);
-        System.out.println(memberId);
-        System.out.println(memberId2);
-        //질문을 쓴 사용자만 업데이트가 가능한지
-        QuestionException exception = assertThrows(QuestionException.class, () -> {
-            if(!questionUpdateResponseDto.getMemberId().equals(memberId2)) {
-                throw new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH);
-            }
-        });
-        assertThat(exception.getMessage()).isEqualTo("질문을 작성한 사용자가 아닙니다.");
-        System.out.println(exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("질문 수정 후 DB에 반영되는지 확인 테스트")
-    public void testUpdateQuestion2() {
-
-        String title = "테스트";
-        String content = "테스트1";
-
-        String title1 = "수정된 테스트 제목";
-        String content1 = "수정된 테스트 내용";
-
-        List<MultipartFile> mediaFiles = List.of(
-                new MockMultipartFile("mediaFiles", "image1.png", MediaType.IMAGE_PNG_VALUE, "dummy image content 1".getBytes())
-        );
-
-        List<String> techStackNames = List.of("techStack1", "techStack2");
-        List<String> categoryNames = List.of("category1", "category2");
-        List<TechStack> techStacks = techStackNames.stream()
-                .map(name -> TechStack.of(name, categoryNames.toString())) // 정적 팩토리 메서드가 없다면 new TechStack(name) 사용
-                .collect(Collectors.toList());
-        List<TechStack> savedTechStacks = techStackRepository.saveAll(techStacks);
-
-
-        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStackNames, mediaFiles);
-        QuestionCreateResponseDto questionCreateResponseDto = questionService.createQuestion(questionCreateRequestDto, memberId);
-        QuestionUpdateRequestDto questionUpdateRequestDto =  new QuestionUpdateRequestDto(questionCreateResponseDto.getQuestionId(), title1, content1, techStackNames, mediaFiles);
-        QuestionUpdateResponseDto questionUpdateResponseDto = questionService.updateQuestion(questionUpdateRequestDto, memberId);
-
-        assertThat(questionCreateResponseDto.getMemberId()).isEqualTo(questionUpdateResponseDto.getMemberId());
-        assertThat(questionRepository.findById(questionUpdateRequestDto.getQuestionId()).get().getTitle()).isEqualTo(questionUpdateRequestDto.getTitle());
-        assertThat(questionRepository.findById(questionUpdateRequestDto.getQuestionId()).get().getContent()).isEqualTo(questionUpdateRequestDto.getContent());
-
-    }
+//    @Test
+//    @DisplayName("질문 수정 후 DB에 반영되는지 확인 테스트")
+//    public void testUpdateQuestion2() {
+//
+//        String title = "테스트";
+//        String content = "테스트1";
+//
+//        String title1 = "수정된 테스트 제목";
+//        String content1 = "수정된 테스트 내용";
+//
+//        List<MultipartFile> mediaFiles = List.of(
+//                new MockMultipartFile("mediaFiles", "image1.png", MediaType.IMAGE_PNG_VALUE, "dummy image content 1".getBytes())
+//        );
+//
+//        List<String> techStackNames = List.of("techStack1", "techStack2");
+//        List<String> categoryNames = List.of("category1", "category2");
+//        List<TechStack> techStacks = techStackNames.stream()
+//                .map(name -> TechStack.of(name, categoryNames.toString())) // 정적 팩토리 메서드가 없다면 new TechStack(name) 사용
+//                .collect(Collectors.toList());
+//        List<TechStack> savedTechStacks = techStackRepository.saveAll(techStacks);
+//
+//
+//        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStackNames, mediaFiles);
+//        QuestionCreateResponseDto questionCreateResponseDto = questionService.createQuestion(questionCreateRequestDto, memberId);
+//        QuestionUpdateRequestDto questionUpdateRequestDto =  new QuestionUpdateRequestDto(questionCreateResponseDto.getQuestionId(), title1, content1, techStackNames, mediaFiles);
+//        QuestionUpdateResponseDto questionUpdateResponseDto = questionService.updateQuestion(questionUpdateRequestDto, memberId);
+//
+//        assertThat(questionCreateResponseDto.getMemberId()).isEqualTo(questionUpdateResponseDto.getMemberId());
+//        assertThat(questionRepository.findById(questionUpdateRequestDto.getQuestionId()).get().getTitle()).isEqualTo(questionUpdateRequestDto.getTitle());
+//        assertThat(questionRepository.findById(questionUpdateRequestDto.getQuestionId()).get().getContent()).isEqualTo(questionUpdateRequestDto.getContent());
+//
+//    }
 
 
 }

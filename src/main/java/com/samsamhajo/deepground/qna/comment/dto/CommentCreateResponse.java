@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentCreateResponse {
@@ -14,14 +16,14 @@ public class CommentCreateResponse {
     private String commentContent;
     private Long answerId;
     private Long commentId;
-    private Long memberId;
+    private UUID publicId;
 
     public static CommentCreateResponse changeEntity(Comment comment) {
         return new CommentCreateResponse(
                 comment.getCommentContent(),
                 comment.getAnswer().getId(),
                 comment.getId(),
-                comment.getMember().getId()
+                comment.getMember().getPublicId()
         );
     }
 

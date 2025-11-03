@@ -47,7 +47,7 @@ public class StudyGroupAdminService {
 
     List<StudyGroupAdminViewResponse.MemberStatusDto> members = memberList.stream()
         .map(m -> StudyGroupAdminViewResponse.MemberStatusDto.builder()
-            .memberId(m.getMember().getId())
+            .memberPublicId(m.getMember().getPublicId())
             .nickname(m.getMember().getNickname())
             .studyGroupMemberStatus(m.getStudyGroupMemberStatus())
             .build())

@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.studyGroup.dto;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus;
 import lombok.Builder;
@@ -19,7 +20,7 @@ public class StudyGroupAdminViewResponse {
   @Getter
   @Builder
   public static class MemberStatusDto {
-    private Long memberId;
+    private UUID memberPublicId;
     private String nickname;
     private StudyGroupMemberStatus studyGroupMemberStatus;
   }
