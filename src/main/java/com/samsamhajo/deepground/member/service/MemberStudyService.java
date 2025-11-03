@@ -25,12 +25,12 @@ public class MemberStudyService {
     private final StudyGroupRepository studyGroupRepository;
     private final MemberRepository memberRepository;
 
-    public Page<MemberStudySummaryResponse> getMemberStudies(Long memberId, Pageable pageable) {
-        Member member = memberRepository.findById(memberId)
+    public Page<MemberStudySummaryResponse> getMemberStudies(UUID publicId, Pageable pageable) {
+        Member member = memberRepository.findByPublicId(publicId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         // 해당 멤버가 참여한 스터디 목록 조회
-        Page<StudyGroup> page = studyGroupRepository.findAllCreatedOrJoinedByMemberId(member.getId(), pageable);
+        Page<StudyGroup> page = studyGroupRepository.findAllCreatedOrJoinedByPublicId(member.getPublicId(), pageable);
 
         return page.map(this::toDto);
     }
