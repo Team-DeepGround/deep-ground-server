@@ -41,7 +41,7 @@ public class StudyGroupService {
 
 
   @Transactional
-    public StudyGroupDetailResponse getStudyGroupDetail(Long studyGroupId, Long memberId) {
+    public StudyGroupDetailResponse getStudyGroupDetail(Long studyGroupId, UUID publicId) {
       StudyGroup group = studyGroupRepository.findWithCreatorAndCommentsById(studyGroupId)
               .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
 
@@ -53,14 +53,14 @@ public class StudyGroupService {
 
     Map<Long, List<StudyGroupReply>> replyMap = replies.stream()
         .collect(Collectors.groupingBy(r -> r.getComment().getId()));
-    StudyGroupMemberStatus memberStatus = getMemberStatus(studyGroupId, memberId);
+    StudyGroupMemberStatus memberStatus = getMemberStatus(studyGroupId, publicId);
 
     return StudyGroupDetailResponse.from(group, replyMap, memberStatus);
   }
 
-  public StudyGroupMemberStatus getMemberStatus(Long studyGroupId, Long memberId) {
+  public StudyGroupMemberStatus getMemberStatus(Long studyGroupId, UUID publicId) {
     Optional<StudyGroupMember> memberOpt =
-        studyGroupMemberRepository.findByStudyGroupIdAndMemberIdAndDeletedFalse(studyGroupId, memberId);
+        studyGroupMemberRepository.findByStudyGroupIdAndMemberPublicIdAndDeletedFalse(studyGroupId, publicId);
 
     return memberOpt.map(StudyGroupMember::getStudyGroupMemberStatus)
             .orElse(StudyGroupMemberStatus.NOT_APPLIED);
@@ -129,7 +129,7 @@ public class StudyGroupService {
     List<Long> commentIds = group.getComments().stream().map(c -> c.getId()).toList();
     List<StudyGroupReply> replies = studyGroupRepository.findRepliesByCommentIds(commentIds);
     Map<Long, List<StudyGroupReply>> replyMap = replies.stream().collect(Collectors.groupingBy(r -> r.getComment().getId()));
-    StudyGroupMemberStatus memberStatus = getMemberStatus(group.getId(), updater.getId());
+    StudyGroupMemberStatus memberStatus = getMemberStatus(group.getId(), updater.getPublicId());
 
     return StudyGroupDetailResponse.from(group, replyMap, memberStatus);
   }

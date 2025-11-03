@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Getter
 @Builder
 @AllArgsConstructor
@@ -16,5 +18,5 @@ public class StudyGroupKickRequest {
   private Long studyGroupId;
 
   @NotNull(message = "강퇴할 멤버 ID는 필수입니다.")
-  private Long targetMemberId;
+  private UUID targetMemberPublicId;
 }

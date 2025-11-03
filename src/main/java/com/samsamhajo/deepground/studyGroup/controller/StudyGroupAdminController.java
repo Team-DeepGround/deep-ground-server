@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/study-group")
@@ -37,31 +39,31 @@ public class StudyGroupAdminController {
         .body(SuccessResponse.of(StudyGroupSuccessCode.READ_SUCCESS, response));
   }
 
-  @PostMapping("/{studyGroupId}/accept/{targetMemberId}")
+  @PostMapping("/{studyGroupId}/accept/{targetMemberPublicId}")
   public ResponseEntity<SuccessResponse<?>> acceptMember(
       @PathVariable Long studyGroupId,
-      @PathVariable Long targetMemberId,
+      @PathVariable UUID targetMemberPublicId,
       @AuthenticationPrincipal CustomUserDetails customUserDetails
   ) {
     Member requester = customUserDetails.getMember();
 
-    adminService.acceptMember(studyGroupId, targetMemberId, requester);
+    adminService.acceptMember(studyGroupId, targetMemberPublicId, requester);
 
     return ResponseEntity
         .status(StudyGroupSuccessCode.UPDATE_SUCCESS.getStatus())
         .body(SuccessResponse.of(StudyGroupSuccessCode.UPDATE_SUCCESS));
   }
 
-  @DeleteMapping("/{studyGroupId}/kick/{targetMemberId}")
+  @DeleteMapping("/{studyGroupId}/kick/{targetMemberPublicId}")
   public ResponseEntity<SuccessResponse<?>> kickMember(
       @PathVariable Long studyGroupId,
-      @PathVariable Long targetMemberId,
+      @PathVariable UUID targetMemberPublicId,
       @AuthenticationPrincipal CustomUserDetails customUserDetails
   ) {
     Member requester = customUserDetails.getMember();
-    GlobalLogger.info("스터디 강퇴 요청", requester.getEmail(), studyGroupId, targetMemberId);
+    GlobalLogger.info("스터디 강퇴 요청", requester.getEmail(), studyGroupId, targetMemberPublicId);
 
-    StudyGroupKickRequest request = new StudyGroupKickRequest(studyGroupId, targetMemberId);
+    StudyGroupKickRequest request = new StudyGroupKickRequest(studyGroupId, targetMemberPublicId);
     adminService.kickMember(request, requester);
 
     return ResponseEntity

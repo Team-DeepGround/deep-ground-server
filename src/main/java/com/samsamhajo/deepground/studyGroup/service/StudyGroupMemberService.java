@@ -103,7 +103,7 @@ public class StudyGroupMemberService {
     StudyGroup studyGroup = studyGroupRepository.findByIdForUpdate(studyGroupId)
         .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
 
-    StudyGroupMember studyGroupMember = studyGroupMemberRepository.findByStudyGroupIdAndMemberIdAndDeletedFalse(studyGroupId, member.getId())
+    StudyGroupMember studyGroupMember = studyGroupMemberRepository.findByStudyGroupIdAndMemberPublicIdAndDeletedFalse(studyGroupId, member.getPublicId())
         .orElseThrow(() -> new IllegalArgumentException("스터디에 참여하고 있지 않습니다."));
 
     if (studyGroup.getCreator().getId().equals(member.getId())) {

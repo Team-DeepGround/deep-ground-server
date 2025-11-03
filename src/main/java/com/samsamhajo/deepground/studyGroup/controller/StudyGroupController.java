@@ -33,7 +33,7 @@ public class StudyGroupController {
     GlobalLogger.info("스터디 그룹 상세 조회 요청", studyGroupId);
     Member member = customUserDetails.getMember();
 
-    var response = studyGroupService.getStudyGroupDetail(studyGroupId, member.getId());
+    var response = studyGroupService.getStudyGroupDetail(studyGroupId, member.getPublicId());
 
     return ResponseEntity
         .status(StudyGroupSuccessCode.READ_SUCCESS.getStatus())

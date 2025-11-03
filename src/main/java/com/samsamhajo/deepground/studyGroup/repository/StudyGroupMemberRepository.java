@@ -5,6 +5,7 @@ import com.samsamhajo.deepground.studyGroup.entity.StudyGroup;
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMember;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.samsamhajo.deepground.studyGroup.entity.StudyGroupMemberStatus;
 import jakarta.validation.constraints.NotNull;
@@ -46,6 +47,6 @@ public interface StudyGroupMemberRepository extends JpaRepository<StudyGroupMemb
 
   boolean existsByMemberAndStudyGroupAndStudyGroupMemberStatusIn(Member member, StudyGroup studyGroup, List<StudyGroupMemberStatus> statuses);
 
-  Optional<StudyGroupMember> findByStudyGroupIdAndMemberIdAndDeletedFalse(@NotNull(message = "스터디 그룹 ID는 필수입니다.") Long studyGroupId, @NotNull(message = "강퇴할 멤버 ID는 필수입니다.") Long targetMemberId);
+  Optional<StudyGroupMember> findByStudyGroupIdAndMemberPublicIdAndDeletedFalse(@NotNull(message = "스터디 그룹 ID는 필수입니다.") Long studyGroupId, @NotNull(message = "강퇴할 멤버 ID는 필수입니다.") UUID targetMemberPublicId);
 
 }

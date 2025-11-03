@@ -2,6 +2,9 @@ package com.samsamhajo.deepground.studyGroup.service;
 
 import com.samsamhajo.deepground.chat.service.ChatRoomMemberService;
 import com.samsamhajo.deepground.member.entity.Member;
+import com.samsamhajo.deepground.member.exception.MemberErrorCode;
+import com.samsamhajo.deepground.member.exception.MemberException;
+import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.notification.entity.data.StudyGroupNotificationData;
 import com.samsamhajo.deepground.notification.event.NotificationEvent;
 import com.samsamhajo.deepground.studyGroup.dto.StudyGroupAdminViewResponse;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +34,7 @@ public class StudyGroupAdminService {
   private final StudyGroupMemberRepository studyGroupMemberRepository;
   private final ChatRoomMemberService chatRoomMemberService;
   private final ApplicationEventPublisher eventPublisher;
+  private final MemberRepository memberRepository;
 
   public StudyGroupAdminViewResponse getAdminView(Member requester, Long studyGroupId) {
     StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
@@ -64,7 +69,7 @@ public class StudyGroupAdminService {
   }
 
   @jakarta.transaction.Transactional
-  public void acceptMember(Long studyGroupId, Long targetMemberId, Member requester) {
+  public void acceptMember(Long studyGroupId, UUID targetMemberPublicId, Member requester) {
     // 스터디 존재 확인
     StudyGroup group = studyGroupRepository.findByIdForUpdate(studyGroupId)
         .orElseThrow(() -> new StudyGroupNotFoundException(studyGroupId));
@@ -76,7 +81,7 @@ public class StudyGroupAdminService {
 
     // 신청자 존재 및 상태 확인
     StudyGroupMember member = studyGroupMemberRepository
-        .findByStudyGroupIdAndMemberIdAndDeletedFalse(studyGroupId, targetMemberId)
+        .findByStudyGroupIdAndMemberPublicIdAndDeletedFalse(studyGroupId, targetMemberPublicId)
         .orElseThrow(() -> new IllegalArgumentException("신청자가 존재하지 않습니다."));
 
     // 이미 수락된 경우 예외 처리
@@ -92,7 +97,7 @@ public class StudyGroupAdminService {
 
     // 스터디 그룹 가입 알림
     eventPublisher.publishEvent(NotificationEvent.of(
-        targetMemberId,
+        member.getId(),
         StudyGroupNotificationData.accept(group)
     ));
 
@@ -107,12 +112,12 @@ public class StudyGroupAdminService {
       throw new IllegalArgumentException("스터디장만 강퇴할 수 있습니다.");
     }
 
-    if (request.getTargetMemberId().equals(requester.getId())) {
+    if (request.getTargetMemberPublicId().equals(requester.getPublicId())) {
       throw new IllegalArgumentException("자기 자신은 강퇴할 수 없습니다.");
     }
 
-    StudyGroupMember target = studyGroupMemberRepository.findByStudyGroupIdAndMemberIdAndDeletedFalse(
-            request.getStudyGroupId(), request.getTargetMemberId())
+    StudyGroupMember target = studyGroupMemberRepository.findByStudyGroupIdAndMemberPublicIdAndDeletedFalse(
+            request.getStudyGroupId(), request.getTargetMemberPublicId())
         .orElseThrow(() -> new IllegalArgumentException("대상 멤버가 스터디에 존재하지 않습니다."));
 
     // 채팅방 멤버 삭제
@@ -121,7 +126,7 @@ public class StudyGroupAdminService {
 
       // 스터디 그룹 강퇴 알림
       eventPublisher.publishEvent(NotificationEvent.of(
-          request.getTargetMemberId(),
+              target.getId(),
           StudyGroupNotificationData.kick(group)
       ));
     }
