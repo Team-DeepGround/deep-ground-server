@@ -25,6 +25,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     String email(String email);
 
     Long countByCreatedAtAfter(LocalDateTime time);
+
+    Optional<Member> findByNickname(String receiverNickname);
 }
 
 
