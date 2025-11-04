@@ -10,14 +10,14 @@ import java.util.UUID;
 public class FriendDto {
 
     private Long friendId;
-    private String otherMemberName;
+    private String otherMemberNickname;
     private FriendStatus status;
-    private UUID getProfilePublicId;
+    private UUID profilePublicId;
 
-    private FriendDto(Long friendId, String otherMemberName, UUID getProfilePublicId, FriendStatus status) {
+    private FriendDto(Long friendId, String otherMemberNickname, UUID profilePublicId, FriendStatus status) {
         this.friendId = friendId;
-        this.otherMemberName = otherMemberName;
-        this.getProfilePublicId = getProfilePublicId;
+        this.otherMemberNickname = otherMemberNickname;
+        this.profilePublicId = profilePublicId;
         this.status = status;
     }
 
