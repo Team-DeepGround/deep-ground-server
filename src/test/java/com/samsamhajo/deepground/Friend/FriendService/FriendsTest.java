@@ -60,7 +60,7 @@ public class FriendsTest extends IntegrationTestSupport {
         Long requesterId = requester.getId(); // 로그인 사용자
         Long receiverId = receiver.getId();
 
-        Long friendId = friendService.sendFriendRequest(requesterId, receiver.getEmail());
+        Long friendId = friendService.sendFriendRequest(requesterId, receiver.getNickname());
         friendService.acceptFriendRequest(friendId, receiverId);
 
         // when
@@ -76,8 +76,8 @@ public class FriendsTest extends IntegrationTestSupport {
     @Test
     public void 친구_목록() throws Exception {
         //given
-        Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
-        Long friendId2 = friendService.sendFriendRequest(requester.getId(), receiver2.getEmail());
+        Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getNickname());
+        Long friendId2 = friendService.sendFriendRequest(requester.getId(), receiver2.getNickname());
 
         friendService.acceptFriendRequest(friendId, receiver.getId());
         friendService.acceptFriendRequest(friendId2, receiver2.getId());
@@ -86,8 +86,8 @@ public class FriendsTest extends IntegrationTestSupport {
 
         //then
 
-        assertTrue(friends.stream().anyMatch(f -> f.getOtherMemberName().equals(receiver.getNickname())));
-        assertTrue(friends.stream().anyMatch(f -> f.getOtherMemberName().equals(receiver2.getNickname())));
+        assertTrue(friends.stream().anyMatch(f -> f.getOtherMemberNickname().equals(receiver.getNickname())));
+        assertTrue(friends.stream().anyMatch(f -> f.getOtherMemberNickname().equals(receiver2.getNickname())));
     }
 
 }
