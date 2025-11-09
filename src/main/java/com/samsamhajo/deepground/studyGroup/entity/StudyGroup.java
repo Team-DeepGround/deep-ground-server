@@ -11,6 +11,7 @@ import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDate;
 
@@ -68,6 +69,7 @@ public class StudyGroup extends BaseEntity {
     private ChatRoom chatRoom;
 
     @OneToMany(mappedBy = "studyGroup", fetch = FetchType.EAGER)
+    @Where(clause = "study_group_member_status = 2")
     private final Set<StudyGroupMember> members = new HashSet<>();
 
     @OneToMany(mappedBy = "studyGroup")
