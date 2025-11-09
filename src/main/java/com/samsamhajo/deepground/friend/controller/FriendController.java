@@ -32,7 +32,7 @@ public class FriendController {
                                                          @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         Long memberId = userDetails.getMember().getId();
-        Long friendId = friendService.sendFriendRequest(memberId, dto.getReceiverEmail());
+        Long friendId = friendService.sendFriendRequest(memberId, dto.getNickname());
 
         GlobalLogger.info("friend request log={}","요청 멤버 id:"+ memberId+"친구 고유 id:"+friendId);
 

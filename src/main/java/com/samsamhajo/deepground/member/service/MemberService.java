@@ -124,6 +124,6 @@ public class MemberService {
                 .orElseThrow(()-> new ProfileException(ProfileErrorCode.INVALID_PROFILE_ID));
 
 
-        return MemberProfileDto.of(profile);
+        return MemberProfileDto.other(profile);
     }
 }

@@ -68,16 +68,16 @@ public class FriendReceiveTest extends IntegrationTestSupport {
         assertEquals(3, receiveList.size());
 
 
-        assertTrue(receiveList.stream().anyMatch(f -> f.getOtherMemberName().equals(requester.getNickname())));
-        assertTrue(receiveList.stream().anyMatch(f -> f.getOtherMemberName().equals(requester2.getNickname())));
-        assertTrue(receiveList.stream().anyMatch(f -> f.getOtherMemberName().equals(requester3.getNickname())));
+        assertTrue(receiveList.stream().anyMatch(f -> f.getOtherMemberNickname().equals(requester.getNickname())));
+        assertTrue(receiveList.stream().anyMatch(f -> f.getOtherMemberNickname().equals(requester2.getNickname())));
+        assertTrue(receiveList.stream().anyMatch(f -> f.getOtherMemberNickname().equals(requester3.getNickname())));
 
     }
 
     @Test
     public void 친구_요청_수락() throws Exception {
         //given
-        Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
+        Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getNickname());
 
         //when
         friendService.acceptFriendRequest(friendId, receiver.getId());
@@ -90,7 +90,7 @@ public class FriendReceiveTest extends IntegrationTestSupport {
     @Test
     public void 다른_사용자_수락_예외() throws Exception {
         //given
-        Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
+        Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getNickname());
 
         //when
         FriendException exception = assertThrows(FriendException.class, () ->
@@ -116,7 +116,7 @@ public class FriendReceiveTest extends IntegrationTestSupport {
     @Test
     public void 친구_요청_거절() throws Exception {
         //given
-        Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
+        Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getNickname());
 
         //when
         friendService.refusalFriendRequest(friendId, receiver.getId());
@@ -129,7 +129,7 @@ public class FriendReceiveTest extends IntegrationTestSupport {
     @Test
     public void 다른_사용자_거절_예외() throws Exception {
         //given
-        Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
+        Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getNickname());
 
         //when
         FriendException exception = assertThrows(FriendException.class, () ->

@@ -57,35 +57,35 @@ public class FriendRequestTest extends IntegrationTestSupport {
     @Test
     public void 친구_요청() throws Exception {
         //given
-        Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
+        Long friendId = friendService.sendFriendRequest(requester.getId(), receiver.getNickname());
         //when
         Friend saved = friendRepository.findById(friendId).get();
 
         //then
         assertEquals(requester.getId(), saved.getRequestMember().getId());
-        assertEquals(receiver.getEmail(), saved.getReceiveMember().getEmail());
+        assertEquals(receiver.getNickname(), saved.getReceiveMember().getNickname());
         assertEquals(FriendStatus.REQUEST, saved.getStatus());
     }
 
     @Test
-    public void 없는_이메일_예외() throws Exception {
+    public void 없는_닉네임_예외() throws Exception {
         //given
-        friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
+        friendService.sendFriendRequest(requester.getId(), receiver.getNickname());
         //when,then
         MemberException exception = assertThrows(MemberException.class, () ->
-                friendService.sendFriendRequest(requester.getId(), "garde@gmail.com"));
+                friendService.sendFriendRequest(requester.getId(),"크" ));
 
-        assertEquals(MemberErrorCode.INVALID_MEMBER_EMAIL, exception.getErrorCode());
+        assertEquals(MemberErrorCode.INVALID_MEMBER_NICKNAME, exception.getErrorCode());
     }
 
     @Test
     public void 본인_계정에_친구_요청_예외() throws Exception {
         //given
-        friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
+        friendService.sendFriendRequest(requester.getId(), receiver.getNickname());
 
         //when,then
         FriendException exception = assertThrows(FriendException.class, () ->
-                friendService.sendFriendRequest(requester.getId(), requester.getEmail()));
+                friendService.sendFriendRequest(requester.getId(), requester.getNickname()));
 
         assertEquals(FriendErrorCode.SELF_REQUEST, exception.getErrorCode());
     }
@@ -93,11 +93,11 @@ public class FriendRequestTest extends IntegrationTestSupport {
     @Test
     public void 중복_친구_요청예외() throws Exception {
         //given
-        friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
+        friendService.sendFriendRequest(requester.getId(), receiver.getNickname());
 
         //when,then
         FriendException exception = assertThrows(FriendException.class, () ->
-                friendService.sendFriendRequest(requester.getId(), receiver.getEmail()));
+                friendService.sendFriendRequest(requester.getId(), receiver.getNickname()));
 
         assertEquals(FriendErrorCode.ALREADY_REQUESTED, exception.getErrorCode());
     }
@@ -112,7 +112,7 @@ public class FriendRequestTest extends IntegrationTestSupport {
 
         //when,then
         FriendException exception = assertThrows(FriendException.class, () ->
-                friendService.sendFriendRequest(requester.getId(), receiver.getEmail()));
+                friendService.sendFriendRequest(requester.getId(), receiver.getNickname()));
 
         assertEquals(FriendErrorCode.ALREADY_FRIEND, exception.getErrorCode());
     }
@@ -120,9 +120,9 @@ public class FriendRequestTest extends IntegrationTestSupport {
     @Test
     public void 친구_목록() throws Exception {
         //given
-        friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
-        friendService.sendFriendRequest(requester.getId(), receiver2.getEmail());
-        friendService.sendFriendRequest(requester.getId(), receiver3.getEmail());
+        friendService.sendFriendRequest(requester.getId(), receiver.getNickname());
+        friendService.sendFriendRequest(requester.getId(), receiver2.getNickname());
+        friendService.sendFriendRequest(requester.getId(), receiver3.getNickname());
         //when
         List<FriendDto> sentList = friendService.findSentFriendRequest(requester.getId());
 
@@ -130,16 +130,16 @@ public class FriendRequestTest extends IntegrationTestSupport {
         assertEquals(3, sentList.size());
 
 
-        assertTrue(sentList.stream().anyMatch(f -> f.getOtherMemberName().equals(receiver.getNickname())));
-        assertTrue(sentList.stream().anyMatch(f -> f.getOtherMemberName().equals(receiver2.getNickname())));
-        assertTrue(sentList.stream().anyMatch(f -> f.getOtherMemberName().equals(receiver3.getNickname())));
+        assertTrue(sentList.stream().anyMatch(f -> f.getOtherMemberNickname().equals(receiver.getNickname())));
+        assertTrue(sentList.stream().anyMatch(f -> f.getOtherMemberNickname().equals(receiver2.getNickname())));
+        assertTrue(sentList.stream().anyMatch(f -> f.getOtherMemberNickname().equals(receiver3.getNickname())));
 
     }
 
     @Test
     public void 친구_요청_취소() throws Exception {
         //given
-        friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
+        friendService.sendFriendRequest(requester.getId(), receiver.getNickname());
         List<FriendDto> sentList = friendService.findSentFriendRequest(requester.getId());
         Long friendId = sentList.get(0).getFriendId();
         //when
@@ -216,7 +216,7 @@ public class FriendRequestTest extends IntegrationTestSupport {
     @Test
     public void 중복_친구_요청_프로필_예외() throws Exception {
         //given
-        friendService.sendFriendRequest(requester.getId(), receiver.getEmail());
+        friendService.sendFriendRequest(requester.getId(), receiver.getNickname());
 
         //when,then
         FriendException exception = assertThrows(FriendException.class, () ->
@@ -228,7 +228,7 @@ public class FriendRequestTest extends IntegrationTestSupport {
     @Test
     public void 상대방_이미_보낸_친구_요청_프로필() throws Exception {
         //given
-        friendService.sendFriendRequest(receiver.getId(), requester.getEmail());
+        friendService.sendFriendRequest(receiver.getId(), requester.getNickname());
 
         //when,then
         FriendException exception = assertThrows(FriendException.class, () ->

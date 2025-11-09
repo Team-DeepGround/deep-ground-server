@@ -34,15 +34,15 @@ public class FriendService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public Long sendFriendRequest(Long requesterId, String receiverEmail) {
+    public Long sendFriendRequest(Long requesterId, String receiverNickname) {
 
         Member requester = memberRepository.findById(requesterId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.INVALID_MEMBER_EMAIL));
 
-        Member receiver = memberRepository.findByEmail(receiverEmail)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.INVALID_MEMBER_EMAIL));
+        Member receiver = memberRepository.findByNickname(receiverNickname)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.INVALID_MEMBER_NICKNAME));
 
-        validateSendRequest(requester, receiver, receiverEmail);
+        validateSendRequest(requester, receiver, receiverNickname);
 
         Friend friend = Friend.request(requester, receiver);
         friendRepository.save(friend);
@@ -56,12 +56,12 @@ public class FriendService {
         return friend.getId();
     }
 
-    private void validateSendRequest(Member requester, Member receiver, String receiverEmail) {
+    private void validateSendRequest(Member requester, Member receiver, String receiverNickname) {
 
-        if (receiverEmail == null || receiverEmail.trim().isEmpty()) {
-            throw new FriendException(FriendErrorCode.BLANK_EMAIL);
+        if (receiverNickname == null || receiverNickname.trim().isEmpty()) {
+            throw new FriendException(FriendErrorCode.BLANK_NICKNAME);
         }
-        if (requester.getEmail().equals(receiver.getEmail())) {
+        if (requester.getNickname().equals(receiver.getNickname())) {
             throw new FriendException(FriendErrorCode.SELF_REQUEST);
         }
         if (friendRepository.existsByRequestMemberAndReceiveMemberAndStatus(requester, receiver, FriendStatus.ACCEPT)) {

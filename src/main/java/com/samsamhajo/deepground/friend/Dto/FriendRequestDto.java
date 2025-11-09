@@ -11,9 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FriendRequestDto {
 
-        @NotBlank(message = "이메일을 입력해주세요")
-        @Email(message = "올바른 이메일 형식을 입력해주세요")
-        private String receiverEmail;
+        @NotBlank(message = "상대방 닉네임을 입력해주세요")
+        private String nickname;
 
 }
 
