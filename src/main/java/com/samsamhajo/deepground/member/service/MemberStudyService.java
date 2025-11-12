@@ -59,7 +59,8 @@ public class MemberStudyService {
                 g.getGroupMemberCount(),
                 currentMembers,
                 g.getGroupStatus() != null ? g.getGroupStatus().name() : null,
-                tags
+                tags,
+                g.getCreator().getNickname()
         );
     }
 }
