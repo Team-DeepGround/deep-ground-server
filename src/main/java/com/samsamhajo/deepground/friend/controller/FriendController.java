@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @RestController
@@ -121,10 +122,10 @@ public class FriendController {
     @GetMapping("/status")
     public ResponseEntity<SuccessResponse<FriendStatusResponse>> getFriendStatus(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam("targetMemberId") Long targetMemberId
-    ) {
-        Long myId = userDetails.getMember().getId();
-        FriendStatusResponse response = friendService.checkFriendStatus(myId, targetMemberId);
+            @RequestParam("targetPublicId") UUID targetPublicId
+            ) {
+        UUID myPublicId = userDetails.getMember().getPublicId();
+        FriendStatusResponse response = friendService.checkFriendStatus(myPublicId, targetPublicId);
 
         return ResponseEntity
                 .ok(SuccessResponse.of(FriendSuccessCode.FRIEND_STATUS_FOUND, response));
