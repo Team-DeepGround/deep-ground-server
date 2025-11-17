@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
@@ -247,7 +248,16 @@ public class FriendService {
                 .toList();
     }
 
-    public FriendStatusResponse checkFriendStatus(Long myId, Long targetMemberId) {
+    public FriendStatusResponse checkFriendStatus(UUID myPublicId, UUID targetPublicId) {
+
+        Member me = memberRepository.findByPublicId(myPublicId)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Member target = memberRepository.findByPublicId(targetPublicId)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        Long myId = me.getId();
+        Long targetMemberId = target.getId();
 
         if (myId.equals(targetMemberId)) {
             return new FriendStatusResponse(ProfileFriendStatus.SELF);
