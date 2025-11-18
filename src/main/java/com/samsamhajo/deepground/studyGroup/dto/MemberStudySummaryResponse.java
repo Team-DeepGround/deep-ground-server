@@ -16,6 +16,7 @@ public record MemberStudySummaryResponse(
         Integer groupMemberCount,
         Integer currentMemberCount,
         String groupStatus,
-        List<TagDto> tags
+        List<TagDto> tags,
+        String ownerNickname
 ) {
 }
