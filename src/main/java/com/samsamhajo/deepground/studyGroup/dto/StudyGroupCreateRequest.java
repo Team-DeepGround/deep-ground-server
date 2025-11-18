@@ -19,11 +19,11 @@ import lombok.NoArgsConstructor;
 public class StudyGroupCreateRequest {
 
   @NotBlank(message = "제목은 필수입니다.")
-  @Size(min = 2, max = 30, message = "제목은 2자 이상 30자 이하로 입력해주세요.")
+  @Size(min = 2, max = 100, message = "제목은 2자 이상 100자 이하로 입력해주세요.")
   private String title;
 
   @NotBlank(message = "설명은 필수입니다.")
-  @Size(max = 500, message = "설명은 500자 이하로 입력해주세요.")
+  @Size(max = 1000, message = "설명은 1000자 이하로 입력해주세요.")
   private String explanation;
 
   @NotNull(message = "스터디 시작일은 필수입니다.")
