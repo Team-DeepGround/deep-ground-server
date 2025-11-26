@@ -1,153 +1,300 @@
 package com.samsamhajo.deepground.question;
 
-import com.samsamhajo.deepground.IntegrationTestSupport;
-import com.samsamhajo.deepground.global.upload.S3Uploader;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.repository.MemberRepository;
-import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateRequestDto;
-import com.samsamhajo.deepground.qna.question.Dto.QuestionCreateResponseDto;
+import com.samsamhajo.deepground.qna.answer.entity.Answer;
+import com.samsamhajo.deepground.qna.comment.entity.Comment;
+import com.samsamhajo.deepground.qna.question.Dto.*;
 import com.samsamhajo.deepground.qna.question.entity.Question;
-import com.samsamhajo.deepground.qna.question.entity.QuestionTag;
+import com.samsamhajo.deepground.qna.question.entity.QuestionStatus;
 import com.samsamhajo.deepground.qna.question.exception.QuestionException;
 import com.samsamhajo.deepground.qna.question.repository.QuestionRepository;
 import com.samsamhajo.deepground.qna.question.repository.QuestionTagRepository;
+import com.samsamhajo.deepground.qna.question.service.QuestionMediaService;
 import com.samsamhajo.deepground.qna.question.service.QuestionService;
+import com.samsamhajo.deepground.qna.question.service.QuestionTagService;
+import com.samsamhajo.deepground.qna.validation.CommonValidation;
 import com.samsamhajo.deepground.techStack.entity.TechStack;
 import com.samsamhajo.deepground.techStack.repository.TechStackRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
+
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
-@Transactional
-public class QuestionTest extends IntegrationTestSupport {
+@ExtendWith(MockitoExtension.class)
+public class QuestionTest {
 
-    @Autowired
-    private QuestionRepository questionRepository;
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
+    @InjectMocks
     private QuestionService questionService;
 
-    @Autowired
-    private TechStackRepository techStackRepository;
+    @Mock
+    private QuestionRepository questionRepository;
 
-    @Autowired
+    @Mock
+    private MemberRepository memberRepository;
+
+    @Mock
+    private CommonValidation commonValidation;
+
+    @Mock
+    private QuestionMediaService questionMediaService;
+
+    @Mock
+    private QuestionTagService questionTagService;
+
+    @Mock
     private QuestionTagRepository questionTagRepository;
 
-    private Long memberId;
+    @Mock
+    private TechStackRepository techStackRepository;
 
-    @Autowired
-    private S3Uploader s3Uploader;
+    private Question question;
+    private Answer answer;
+    private Member member;
+    private Member member1;
+    private Comment comment;
 
     @BeforeEach
-    void 테스트용_멤버_저장() {
-        // 테스트용 멤버 저장
-        Member member = Member.createLocalMember("test@naver.com", "password123", "tester");
-        memberRepository.save(member);
-        memberId = member.getId();
-        given(s3Uploader.upload(any(MultipartFile.class), anyString()))
-                .willAnswer(invocation ->
-                        "http://localhost/test/" +
-                                invocation.getArgument(0, MultipartFile.class).getOriginalFilename());
-    }
-
-    @Test
-    @DisplayName("질문 생성 통합 테스트 - 성공")
-    void createQuestion_success() throws Exception {
-        // given
-        String title = "통합 테스트 질문 제목";
-        String content = "이것은 질문 내용입니다.";
-
-        List<MultipartFile> mediaFiles = List.of(
-                new MockMultipartFile("mediaFiles", "image1.png", MediaType.IMAGE_PNG_VALUE, "dummy image content 1".getBytes())
+    public void Mock회원() {
+        member = Member.createLocalMember(
+                "9636515@gmail.com",
+                "test1234@",
+                "Dotae"
         );
 
-
-        List<String> techStackNames = List.of("techStack1", "techStack2");
-        List<String> categoryNames = List.of("category1", "category2");
-        List<TechStack> techStacks = techStackNames.stream()
-                .map(name -> TechStack.of(name, categoryNames.toString())) // 정적 팩토리 메서드가 없다면 new TechStack(name) 사용
-                .collect(Collectors.toList());
-        List<TechStack> savedTechStacks = techStackRepository.saveAll(techStacks);
-
-        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStackNames, mediaFiles);
-
-        QuestionCreateResponseDto questionCreateResponseDto = questionService.createQuestion(questionCreateRequestDto, memberId);
-
-        // assert DB에 잘 들어갔는지 확인
-        assertThat(questionRepository.findById(questionCreateResponseDto.getQuestionId())).isPresent();
-        assertThat(questionRepository.findById(questionCreateResponseDto.getQuestionId()).get().getTitle()).isEqualTo(title);
-
-        // 해당 질문에 연결된 QuestionTag가 잘 저장되었는지 확인
-        List<QuestionTag> questionTags = questionTagRepository.findAllByQuestionId(questionCreateResponseDto.getQuestionId());
-        assertThat(questionTags).hasSize(techStackNames.size());
-
-        // 저장된 태그 이름 확인
-        List<String> savedTagNames = questionTags.stream()
-                .map(qt -> qt.getTechStack().getName())
-                .toList();
-        assertThat(savedTagNames).containsExactlyInAnyOrderElementsOf(techStackNames);
-    }
-
-    @Test
-    @DisplayName("질문 생성 성공 서비스 단위 테스트")
-    void QuestionServiceTest() throws Exception {
-
-        String title = "테스트";
-        String content = "테스트1";
-
-        List<MultipartFile> mediaFiles = List.of(
-                new MockMultipartFile("mediaFiles", "image1.png", MediaType.IMAGE_PNG_VALUE, "dummy image content 1".getBytes())
+        member1 = Member.createLocalMember(
+                "test@gmail.com",
+                "test1224",
+                "Guest"
+        );
+        question = Question.of(
+                "테스트 제목",
+                "테스트 내용",
+                member
+        );
+        answer = Answer.of(
+                "테스트 답변 내용",
+                member,
+                question
+        );
+        comment = Comment.of(
+                "테스트 댓글 내용",
+                member,
+                answer
         );
 
-
-        List<String> techStackNames = List.of("techStack1", "techStack2");
-        List<String> categoryNames = List.of("category1", "category2");
-        List<TechStack> techStacks = techStackNames.stream()
-                .map(name -> TechStack.of(name, categoryNames.toString())) // 정적 팩토리 메서드가 없다면 new TechStack(name) 사용
-                .collect(Collectors.toList());
-        List<TechStack> savedTechStacks = techStackRepository.saveAll(techStacks);
-
-        QuestionCreateRequestDto questionCreateRequestDto = new QuestionCreateRequestDto(title, content, techStackNames, mediaFiles);
-
-        QuestionCreateResponseDto questionCreateResponseDto = questionService.createQuestion(questionCreateRequestDto, memberId);
-
-        assertThat(questionRepository.findById(questionCreateResponseDto.getQuestionId())).isPresent();
-        assertThat(questionRepository.findById(questionCreateResponseDto.getQuestionId()).get().getTitle()).isEqualTo(title);
+        //Mock 객체를 위해 ID값 주입
+        //Member1
+        ReflectionTestUtils.setField(member, "id", 1L);
+        ReflectionTestUtils.setField(member, "publicId", UUID.randomUUID());
+        //Member2
+        ReflectionTestUtils.setField(member1, "id", 2L);
+        ReflectionTestUtils.setField(member1, "publicId", UUID.randomUUID());
+        //Question
+        ReflectionTestUtils.setField(question, "id", 1L);
     }
 
     @Test
-    @DisplayName("질문 저장 및 조회 테스트")
-    void QuestionRepositoryTest ()throws Exception {
+    @DisplayName("질문 작성 성공")
+    public void createQuestionTest() {
 
-        //given
-        Question question = Question.of("테스트 제목", "테스트 내용", null);
+        MockMultipartFile mockImg = new MockMultipartFile(
+                "images",
+                "test.png",
+                "image/png",
+                "dummy".getBytes());
+        List<String> techStacks = List.of("Java");
 
-        //when
-        Question saved = questionRepository.save(question);
-        Question found = questionRepository.findById(saved.getId()).orElseThrow();
+        QuestionCreateRequestDto requestDto = new QuestionCreateRequestDto(question.getTitle(), question.getContent(),techStacks, List.of(mockImg));
 
-        //then
-        assertThat(found).isNotNull();
-        assertThat(found.getTitle()).isEqualTo("테스트 제목");
+        when(commonValidation.MemberValidation(member.getId())).thenReturn(member);
+        when(questionRepository.save(any(Question.class))).thenReturn(question);
+
+        QuestionCreateResponseDto responseDto = questionService.createQuestion(requestDto, member.getId());
+
+        assertThat(responseDto.getTitle()).isEqualTo(question.getTitle());
+        assertThat(responseDto.getContent()).isEqualTo(question.getContent());
+        assertThat(responseDto.getTechStacks()).isEqualTo(techStacks);
+        assertThat(responseDto.getPublicId()).isEqualTo(member.getPublicId());
+
+    }
+
+    @Test
+    @DisplayName("질문 작성 실페 : 제목 없음")
+    public void createQuestionFailedTest() {
+
+        String title = "";
+
+        MockMultipartFile mockImg = new MockMultipartFile(
+                "images",
+                "test.png",
+                "image/png",
+                "dummy".getBytes());
+        List<String> techStacks = List.of("Java");
+
+        QuestionCreateRequestDto requestDto = new QuestionCreateRequestDto(title, question.getContent() ,techStacks, List.of(mockImg));
+
+        assertThatThrownBy(() -> questionService.createQuestion(requestDto, member.getId()))
+                .isInstanceOf(QuestionException.class)
+                .hasMessageContaining("제목을 찾을 수 없습니다.");
+
+    }
+
+    @Test
+    @DisplayName("질문 작성 실페 : 내용 없음")
+    public void createQuestionFailedTest2() {
+
+        String content = "";
+
+        MockMultipartFile mockImg = new MockMultipartFile(
+                "images",
+                "test.png",
+                "image/png",
+                "dummy".getBytes());
+        List<String> techStacks = List.of("Java");
+
+        QuestionCreateRequestDto requestDto = new QuestionCreateRequestDto(question.getTitle(), content ,techStacks, List.of(mockImg));
+
+        assertThatThrownBy(() -> questionService.createQuestion(requestDto, member.getId()))
+                .isInstanceOf(QuestionException.class)
+                .hasMessageContaining("내용을 찾을 수 없습니다.");
+
+    }
+
+    @Test
+    @DisplayName("질문 수정 성공")
+    public void modifyQuestionTest() {
+
+        String title = "원래 제목";
+        String modifyTitle = "수정된 제목";
+
+        String content = "원래 내용";
+        String modifyContent = "수정된 내용";
+
+        MockMultipartFile mockImg = new MockMultipartFile(
+                "images",
+                "test.png",
+                "image/png",
+                "dummy".getBytes());
+        //Question 수정 시 들어가는 Java
+        List<String> techStacks = List.of("Java");
+        /**
+         * Question TechStackRepo에 존재하는지를 검증하기 위해 만들어놓은 techStack
+         * Mockito에서는 진짜 DB가 없기에 techStack을 선언한 후, findByName을 하면 이 객체를 반환해라라고 하지않으면
+         * null값으로 들어가게 된다.
+         */
+        TechStack techStack = TechStack.of("Java", "Backend");
+
+        QuestionUpdateRequestDto requestDto = new QuestionUpdateRequestDto(question.getId(),modifyTitle, modifyContent, techStacks, List.of(mockImg));
+
+        when(commonValidation.QuestionValidation(question.getId())).thenReturn(question);
+        when(techStackRepository.findByName("Java"))
+                .thenReturn(Optional.of(techStack));
+
+        QuestionUpdateResponseDto responseDto = questionService.updateQuestion(requestDto, member.getId());
+
+        assertThat(responseDto.getTitle()).isNotEqualTo(title);
+        assertThat(responseDto.getContent()).isNotEqualTo(content);
+        assertThat(responseDto.getTechStacks()).isEqualTo(techStacks);
+        assertThat(responseDto.getPublicId()).isEqualTo(member.getPublicId());
+    }
+
+    @Test
+    @DisplayName("질문 수정 실페 : 작성자가 아닌 경우")
+    public void modifyQuestionFailedTest() {
+
+        String modifyTitle = "수정된 제목";
+
+        String modifyContent = "수정된 내용";
+
+        MockMultipartFile mockImg = new MockMultipartFile(
+                "images",
+                "test.png",
+                "image/png",
+                "dummy".getBytes());
+        //Question 수정 시 들어가는 Java
+        List<String> techStacks = List.of("Java");
+
+        QuestionUpdateRequestDto requestDto = new QuestionUpdateRequestDto(question.getId(), modifyTitle, modifyContent, techStacks, List.of(mockImg));
+
+        when(commonValidation.QuestionValidation(question.getId())).thenReturn(question);
+
+        assertThatThrownBy(() -> questionService.updateQuestion(requestDto, member1.getId()))
+        .isInstanceOf(QuestionException.class)
+                .hasMessageContaining("질문을 작성한 사용자가 아닙니다.");
+
+
+    }
+
+    @Test
+    @DisplayName("질문 삭제 성공")
+    public void deleteQuestionTest() {
+
+        when(commonValidation.QuestionValidation(question.getId())).thenReturn(question);
+
+        questionService.deleteQuestion(question.getId(), member.getId());
+
+        assertThat(question.isDeleted()).isTrue();
+
+    }
+
+    @Test
+    @DisplayName("질문 삭제 실패 : 작성자가 아닌 경우")
+    public void deleteQuestionFailedTest() {
+
+        when(commonValidation.QuestionValidation(question.getId())).thenReturn(question);
+
+        assertThatThrownBy(() -> questionService.deleteQuestion(question.getId(), member1.getId()))
+                .isInstanceOf(QuestionException.class)
+                .hasMessageContaining("질문을 작성한 사용자가 아닙니다.");
+
+    }
+
+    @Test
+    @DisplayName("질문 상태 변경 성공")
+    public void questionStatusTest() {
+
+        when(commonValidation.QuestionValidation(question.getId())).thenReturn(question);
+        when(commonValidation.MemberValidation(member.getId())).thenReturn(member);
+
+        QuestionStatus status = QuestionStatus.RESOLVED;
+
+        QuestionUpdateStatusRequestDto requestDto = new QuestionUpdateStatusRequestDto(status);
+
+        QuestionUpdateStatusResponseDto responseDto = questionService.updateQuestionStatus(requestDto, member.getId(), question.getId());
+
+        assertThat(responseDto.getStatus()).isEqualTo(status);
+
+    }
+
+    @Test
+    @DisplayName("질문 상태 변경 실패 : 작성자가 아닌 경우")
+    public void questionStatusFailedTest() {
+
+        when(commonValidation.QuestionValidation(question.getId())).thenReturn(question);
+        when(commonValidation.MemberValidation(member1.getId())).thenReturn(member1);
+
+        QuestionStatus status = QuestionStatus.RESOLVED;
+
+        QuestionUpdateStatusRequestDto requestDto = new QuestionUpdateStatusRequestDto(status);
+
+        assertThatThrownBy(() -> questionService.updateQuestionStatus(requestDto, member1.getId(), question.getId()))
+                .isInstanceOf(QuestionException.class)
+                .hasMessageContaining("질문을 작성한 사용자가 아닙니다.");
     }
 
 
