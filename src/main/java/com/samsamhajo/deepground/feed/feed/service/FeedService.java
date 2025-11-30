@@ -6,7 +6,6 @@ import com.samsamhajo.deepground.feed.feed.exception.FeedException;
 import com.samsamhajo.deepground.feed.feed.model.*;
 import com.samsamhajo.deepground.feed.feed.repository.FeedRepository;
 import com.samsamhajo.deepground.feed.feedcomment.service.FeedCommentService;
-import com.samsamhajo.deepground.feed.feedshared.model.FetchSharedFeedResponse;
 import com.samsamhajo.deepground.feed.feedshared.service.SharedFeedService;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.entity.MemberProfile;
@@ -88,8 +87,8 @@ public class FeedService {
                 .memberName(feed.getMember().getNickname())
                 .mediaUrls(feedMediaService.findAllMediaUrlsByFeedId(feed.getId()))
                 .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId()))
-                .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))
-                .likeCount(feedLikeService.countFeedLikeByFeedId(feed.getId()))
+                .commentCount(feed.getCommentCount())
+                .likeCount(feed.getLikeCount())
                 .isLiked(isLikedByCurrentUser)
                 .profileImageUrl(member.getMemberProfile().getProfileImage())
                 .build();
@@ -126,7 +125,7 @@ public class FeedService {
                                             .mediaUrls(feedMediaService.findAllMediaUrlsByFeedId(feed.getId()))
                                             .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId()))
                                             .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))
-                                            .likeCount(feedLikeService.countFeedLikeByFeedId(feed.getId()))
+                                            .likeCount(feed.getLikeCount())
                                             .isLiked(isLikedByCurrentUser)
                                             .profileImageUrl(member.getMemberProfile().getProfileImage())
                                             .build();
@@ -176,4 +175,5 @@ public class FeedService {
         feedLikeService.deleteAllByFeedId(feedId);
         feedMediaService.deleteAllByFeedId(feedId);
     }
+
 }

@@ -124,4 +124,8 @@ public class FeedCommentService {
     private void saveFeedCommentMedia(FeedCommentCreateRequest request, FeedComment feedComment) {
         feedCommentMediaService.createFeedCommentMedia(feedComment, request.getImages());
     }
+
+    private void updateCountCommentById(Long feedId) {
+        feedRepository.updateCountFeedCommentByFeedId(feedId);
+    }
 } 

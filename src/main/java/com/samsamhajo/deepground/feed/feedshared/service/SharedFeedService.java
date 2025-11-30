@@ -60,4 +60,6 @@ public class SharedFeedService {
     public SharedFeed findOrNullByFeedId(Long feedId) {
         return sharedFeedRepository.getOrNullByFeedId(feedId);
     }
+
+    private void updateSharedCountByFeedId(Long feedId) {feedRepository.updateCountFeedSharedById();}
 } 

@@ -41,8 +41,12 @@ public class FeedLikeService {
         feedLikeRepository.delete(feedLike);
     }
 
-    public int countFeedLikeByFeedId(Long feedId) {
+    private int countFeedLikeByFeedId(Long feedId) {
         return feedLikeRepository.countByFeedId(feedId);
+    }
+
+    private void updateCountFeedLikeByFeedId(Long feedId) {
+        feedRepository.updateCountFeedLikeByFeedId(feedId);
     }
 
     public void deleteAllByFeedId(Long feedId) {

@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.feed.feedcomment.service;
 
 
+import com.samsamhajo.deepground.feed.feed.repository.FeedRepository;
 import com.samsamhajo.deepground.feed.feedcomment.entity.FeedComment;
 import com.samsamhajo.deepground.feed.feedcomment.entity.FeedCommentLike;
 import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentErrorCode;
@@ -21,6 +22,7 @@ public class FeedCommentLikeService {
 
     private final FeedCommentRepository feedCommentRepository;
     private final FeedCommentLikeRepository feedCommentLikeRepository;
+    private final FeedRepository feedRepository;
 
     @Transactional
     public void feedLikeIncrease(Long feedId, Member member) {
@@ -31,6 +33,8 @@ public class FeedCommentLikeService {
         FeedCommentLike feedCommentLike = FeedCommentLike.of(feedComment, member);
 
         feedCommentLikeRepository.save(feedCommentLike);
+
+        updateCountCommentLikeById(feedId);
     }
 
     @Transactional
@@ -39,6 +43,8 @@ public class FeedCommentLikeService {
         validateDecrease(feedId);
 
         FeedCommentLike feedCommentLike = feedCommentLikeRepository.getByFeedCommentIdAndMemberId(feedId, memberId);
+
+        updateCountCommentLikeById(feedId);
 
         feedCommentLikeRepository.delete(feedCommentLike);
     }
@@ -65,5 +71,9 @@ public class FeedCommentLikeService {
         if (feedCommentLikeRepository.existsByFeedCommentIdAndMemberId(feedCommentId, memberId)) {
             throw new FeedCommentException(FeedCommentErrorCode.FEED_COMMENT_LIKE_ALREADY_EXISTS);
         }
+    }
+
+    private void updateCountCommentLikeById (Long feedCommentId) {
+        feedCommentRepository.updateCountCommentLikeById(feedCommentId);
     }
 }
