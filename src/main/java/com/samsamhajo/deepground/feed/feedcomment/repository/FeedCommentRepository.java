@@ -4,6 +4,8 @@ import com.samsamhajo.deepground.feed.feedcomment.entity.FeedComment;
 import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentErrorCode;
 import com.samsamhajo.deepground.feed.feedcomment.exception.FeedCommentException;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,4 +18,13 @@ public interface FeedCommentRepository extends JpaRepository<FeedComment, Long> 
     List<FeedComment> findAllByFeedId(Long feedId);
 
     int countByFeedId(Long feedId);
-} 
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE FeedComment fc" +
+            "   SET fc.likeCount = (" +
+            "   SELECT COUNT(fc)" +
+            "   FROM FeedCommentLike fcl" +
+            "   WHERE fcl.feedComment = fc)" +
+            "   WHERE fc.id =: feedCommnetId")
+    void updateCountCommentLikeById(Long feedCommentId);
+}
