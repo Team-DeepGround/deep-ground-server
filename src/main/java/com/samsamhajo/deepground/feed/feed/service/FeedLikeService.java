@@ -29,6 +29,8 @@ public class FeedLikeService {
         FeedLike feedLike = FeedLike.of(feed, member);
 
         feedLikeRepository.save(feedLike);
+
+        updateCountFeedLikeByFeedId(feedId);
     }
 
     @Transactional
@@ -39,6 +41,8 @@ public class FeedLikeService {
         FeedLike feedLike = feedLikeRepository.getByFeedIdAndMemberId(feedId, memberId);
 
         feedLikeRepository.delete(feedLike);
+
+        updateCountFeedLikeByFeedId(feedId);
     }
 
     private int countFeedLikeByFeedId(Long feedId) {
