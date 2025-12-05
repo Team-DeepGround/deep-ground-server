@@ -23,7 +23,7 @@ public class FeedComment extends BaseEntity {
     @Column(length = 4096, nullable = false)
     private String content;
 
-    @Column(name = "feed_comment_like_count")
+    @Column(name = "feed_comment_like_count",columnDefinition = "0")
     private int likeCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
