@@ -4,6 +4,7 @@ import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.feed.feed.entity.Feed;
 import com.samsamhajo.deepground.feed.feed.exception.FeedSuccessCode;
 import com.samsamhajo.deepground.feed.feed.model.*;
+import com.samsamhajo.deepground.feed.feed.model.v2.FetchFeedsResponse;
 import com.samsamhajo.deepground.feed.feed.service.FeedService;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.global.utils.GlobalLogger;
@@ -34,16 +35,31 @@ public class FeedController {
                 .ok(SuccessResponse.of(FeedSuccessCode.FEED_CREATED));
     }
 
+//    @GetMapping("/list")
+//    public ResponseEntity<SuccessResponse<com.samsamhajo.deepground.feed.feed.model.FetchFeedsResponse>> getFeeds(
+//            @AuthenticationPrincipal CustomUserDetails userDetails,
+//            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+//
+//        Long memberId = null;
+//        if (userDetails != null) {
+//            memberId = userDetails.getMember().getId();
+//        }
+//        com.samsamhajo.deepground.feed.feed.model.FetchFeedsResponse response = feedService.getFeeds(pageable, memberId);
+//
+//        return ResponseEntity
+//                .ok(SuccessResponse.of(FeedSuccessCode.FEED_LIST_FETCHED, response));
+//    }
+
     @GetMapping("/list")
-    public ResponseEntity<SuccessResponse<FetchFeedsResponse>> getFeeds(
+    public ResponseEntity<SuccessResponse<FetchFeedsResponse>> getFeedsV2(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
 
         Long memberId = null;
         if (userDetails != null) {
             memberId = userDetails.getMember().getId();
         }
-        FetchFeedsResponse response = feedService.getFeeds(pageable, memberId);
+        FetchFeedsResponse response = feedService.getFeedsV2(pageable ,memberId);
 
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedSuccessCode.FEED_LIST_FETCHED, response));
