@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface FeedRepository extends JpaRepository<Feed, Long> {
+public interface FeedRepository extends JpaRepository<Feed, Long>, FeedRepositoryCustom {
 
     default Feed getById(Long id) {
         return findById(id).orElseThrow(() -> new FeedException(FeedErrorCode.FEED_NOT_FOUND));
@@ -49,13 +49,4 @@ public interface FeedRepository extends JpaRepository<Feed, Long> {
             "   WHERE sf.feed = f) " +
             "WHERE f.id= :feedId")
     void updateCountFeedSharedById(Long feedId);
-
-
-  @Query("SELECT new com.samsamhajo.deepground.feed.feed.model.v2.FetchFeedResponse(" +
-                "m.publicId, m.memberProfile.profilePublicId, f.id, m.nickname, f.content, " +
-                "f.likeCount, f.commentCount, f.sharedCount, m.memberProfile.profileImage, f.createdAt) " +
-                "FROM Feed f " +
-                "JOIN f.member m " +
-                "ORDER BY f.createdAt DESC")
-        Slice<FetchFeedResponse> findFeeds(Pageable pageable);
 }
