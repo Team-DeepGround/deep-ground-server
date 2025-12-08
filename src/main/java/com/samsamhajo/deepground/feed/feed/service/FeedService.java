@@ -102,7 +102,7 @@ public class FeedService {
 
     public FetchFeedsResponse getFeeds(Pageable pageable, Long memberId) {
 
-        Slice<FetchFeedResponse> feedSlice = feedRepository.findFeeds(pageable,memberId);
+        Slice<FetchFeedResponse> feedSlice = feedRepository.findFeeds(pageable);
         List<FetchFeedResponse> feeds = feedSlice.getContent();
 
         List<Long> feedIds = feeds.stream().map(FetchFeedResponse::getFeedId).toList();

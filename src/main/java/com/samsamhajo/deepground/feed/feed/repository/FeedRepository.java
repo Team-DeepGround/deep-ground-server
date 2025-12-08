@@ -3,9 +3,10 @@ package com.samsamhajo.deepground.feed.feed.repository;
 import com.samsamhajo.deepground.feed.feed.entity.Feed;
 import com.samsamhajo.deepground.feed.feed.exception.FeedErrorCode;
 import com.samsamhajo.deepground.feed.feed.exception.FeedException;
-import com.samsamhajo.deepground.feed.feed.model.FetchFeedResponse;
+import com.samsamhajo.deepground.feed.feed.model.v2.FetchFeedResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface FeedRepository extends JpaRepository<Feed, Long>,FeedRepositoryCustom {
+public interface FeedRepository extends JpaRepository<Feed, Long> {
 
     default Feed getById(Long id) {
         return findById(id).orElseThrow(() -> new FeedException(FeedErrorCode.FEED_NOT_FOUND));
@@ -49,4 +50,12 @@ public interface FeedRepository extends JpaRepository<Feed, Long>,FeedRepository
             "WHERE f.id= :feedId")
     void updateCountFeedSharedById(Long feedId);
 
+
+  @Query("SELECT new com.samsamhajo.deepground.feed.feed.model.v2.FetchFeedResponse(" +
+                "m.publicId, m.memberProfile.profilePublicId, f.id, m.nickname, f.content, " +
+                "f.likeCount, f.commentCount, f.sharedCount, m.memberProfile.profileImage, f.createdAt) " +
+                "FROM Feed f " +
+                "JOIN f.member m " +
+                "ORDER BY f.createdAt DESC")
+        Slice<FetchFeedResponse> findFeeds(Pageable pageable);
 }

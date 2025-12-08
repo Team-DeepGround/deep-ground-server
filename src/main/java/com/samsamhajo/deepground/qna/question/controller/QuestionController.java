@@ -1,8 +1,6 @@
 package com.samsamhajo.deepground.qna.question.controller;
 
 import com.samsamhajo.deepground.auth.security.CustomUserDetails;
-import com.samsamhajo.deepground.feed.feed.exception.FeedSuccessCode;
-import com.samsamhajo.deepground.feed.feed.model.FetchFeedsResponse;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.global.utils.GlobalLogger;
 import com.samsamhajo.deepground.qna.question.Dto.*;

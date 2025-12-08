@@ -157,7 +157,7 @@ class FeedServiceTest {
 
         Slice<FetchFeedResponse> feedSlice = new SliceImpl<>(List.of(dto2, dto1));
 
-        when(feedRepository.findFeeds(any(Pageable.class), any())).thenReturn(feedSlice);
+        when(feedRepository.findFeeds(any(Pageable.class))).thenReturn(feedSlice);
 
         // when
         FetchFeedsResponse result = feedService.getFeeds(PageRequest.of(0, 10), testMember.getId());
