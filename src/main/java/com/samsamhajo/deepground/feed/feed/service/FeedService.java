@@ -5,13 +5,12 @@ import com.samsamhajo.deepground.feed.feed.entity.FeedMedia;
 import com.samsamhajo.deepground.feed.feed.exception.FeedErrorCode;
 import com.samsamhajo.deepground.feed.feed.exception.FeedException;
 import com.samsamhajo.deepground.feed.feed.model.*;
-import com.samsamhajo.deepground.feed.feed.model.v2.FetchFeedResponseV2;
+import com.samsamhajo.deepground.feed.feed.model.v2.FetchFeedResponse;
 import com.samsamhajo.deepground.feed.feed.model.v2.FetchFeedsResponse;
 import com.samsamhajo.deepground.feed.feed.repository.FeedLikeRepository;
 import com.samsamhajo.deepground.feed.feed.repository.FeedMediaRepository;
 import com.samsamhajo.deepground.feed.feed.repository.FeedRepository;
 import com.samsamhajo.deepground.feed.feedcomment.service.FeedCommentService;
-import com.samsamhajo.deepground.feed.feedshared.service.SharedFeedService;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.entity.MemberProfile;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,6 @@ public class FeedService {
     private final FeedMediaService feedMediaService;
     private final FeedCommentService feedCommentService;
     private final FeedLikeService feedLikeService;
-    private final SharedFeedService sharedFeedService;
     private final FeedMediaRepository feedMediaRepository;
     private final FeedLikeRepository feedLikeRepository;
 
@@ -70,7 +68,7 @@ public class FeedService {
         return feed;
     }
 
-    public FetchFeedResponse getFeed(Long feedId, Long memberId) {
+    public com.samsamhajo.deepground.feed.feed.model.FetchFeedResponse getFeed(Long feedId, Long memberId) {
         Feed feed = feedRepository.getById(feedId);
 
         boolean isUserAuthenticated = (memberId != null);
@@ -86,7 +84,7 @@ public class FeedService {
             isLikedByCurrentUser = feedLikeService.isLiked(feed.getId(), memberId);
         }
 
-        return FetchFeedResponse.builder()
+        return com.samsamhajo.deepground.feed.feed.model.FetchFeedResponse.builder()
                 .feedId(feed.getId())
                 .content(feed.getContent())
                 .createdAt(feed.getCreatedAt().toLocalDate())
@@ -102,52 +100,12 @@ public class FeedService {
                 .build();
     }
 
-    public com.samsamhajo.deepground.feed.feed.model.FetchFeedsResponse getFeeds(Pageable pageable, Long memberId) {
+    public FetchFeedsResponse getFeeds(Pageable pageable, Long memberId) {
 
-        Page<Feed> feeds = feedRepository.findAll(pageable);
+        Slice<FetchFeedResponse> feedSlice = feedRepository.findFeeds(pageable,memberId);
+        List<FetchFeedResponse> feeds = feedSlice.getContent();
 
-        boolean isUserAuthenticated = (memberId != null);
-
-        return com.samsamhajo.deepground.feed.feed.model.FetchFeedsResponse.of(
-                feeds.getContent().stream()
-                        .map(feed -> {
-
-                                    Member member = feed.getMember();
-
-                                    boolean isLikedByCurrentUser = false;
-                                    if (isUserAuthenticated) {
-                                        isLikedByCurrentUser = feedLikeService.isLiked(feed.getId(), memberId);
-                                    }
-
-                                    return FetchFeedResponse.builder()
-                                            .feedId(feed.getId())
-                                            .content(feed.getContent())
-                                            .createdAt(feed.getCreatedAt().toLocalDate())
-                                            .publicId(feed.getMember().getPublicId())
-                                            .profilePublicId(feed.getMember().getMemberProfile().getProfilePublicId())
-                                            .memberName(feed.getMember().getNickname())
-                                            .mediaUrls(feedMediaService.findAllMediaUrlsByFeedId(feed.getId()))
-                                            .shareCount(feed.getCommentCount())
-                                            .commentCount(feed.getCommentCount())
-                                            .likeCount(feed.getLikeCount())
-                                            .isLiked(isLikedByCurrentUser)
-                                            .profileImageUrl(member.getMemberProfile().getProfileImage())
-                                            .build();
-                                }
-                        ).toList(),
-                feeds.getTotalElements(),
-                feeds.getNumber(),        // 현재 페이지 번호 (0부터 시작)
-                feeds.getSize(),          // 요청된 페이지 크기
-                feeds.getTotalPages()
-        );
-    }
-
-    public FetchFeedsResponse getFeedsV2(Pageable pageable, Long memberId) {
-
-        Slice<FetchFeedResponseV2> feedSlice = feedRepository.findFeeds(pageable,memberId);
-        List<FetchFeedResponseV2> feeds = feedSlice.getContent();
-
-        List<Long> feedIds = feeds.stream().map(FetchFeedResponseV2::getFeedId).toList();
+        List<Long> feedIds = feeds.stream().map(FetchFeedResponse::getFeedId).toList();
 
         Map<Long,List<String>> mediaMap = feedMediaRepository.findByFeedIdIn(feedIds)
                 .stream()

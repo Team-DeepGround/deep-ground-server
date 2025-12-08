@@ -1,6 +1,6 @@
 package com.samsamhajo.deepground.feed.feed.repository;
 
-import com.samsamhajo.deepground.feed.feed.model.v2.FetchFeedResponseV2;
+import com.samsamhajo.deepground.feed.feed.model.v2.FetchFeedResponse;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
@@ -18,13 +18,13 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
     private final EntityManager em;
 
     @Override
-    public Slice<FetchFeedResponseV2> findFeeds(Pageable pageable, Long memberId) {
+    public Slice<FetchFeedResponse> findFeeds(Pageable pageable, Long memberId) {
 
-        List<FetchFeedResponseV2> feeds = em.createQuery("select new com.samsamhajo.deepground.feed.feed.model.v2.FetchFeedResponseV2" +
+        List<FetchFeedResponse> feeds = em.createQuery("select new com.samsamhajo.deepground.feed.feed.model.v2.FetchFeedResponseV2" +
                         "(m.publicId , m.memberProfile.profilePublicId , f.id, m.nickname, f.content, f.likeCount, f.commentCount," +
                         "f.sharedCount, m.memberProfile.profileImage, f.createdAt)" +
                         "from Feed f " +
-                        "join f.member m", FetchFeedResponseV2.class)
+                        "join f.member m", FetchFeedResponse.class)
                 .setFirstResult((int) pageable.getOffset())
                 .setMaxResults(pageable.getPageSize()+1)
                 .getResultList();

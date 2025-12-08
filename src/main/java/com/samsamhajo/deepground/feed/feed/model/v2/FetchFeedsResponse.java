@@ -8,17 +8,17 @@ import java.util.List;
 @Getter
 public class FetchFeedsResponse {
 
-    private List<FetchFeedResponseV2> feeds;
+    private List<FetchFeedResponse> feeds;
     private int page;
     private boolean hasNext;
 
-    private FetchFeedsResponse(List<FetchFeedResponseV2> feeds, int page, boolean hasNext) {
+    private FetchFeedsResponse(List<FetchFeedResponse> feeds, int page, boolean hasNext) {
         this.feeds = feeds;
         this.page = page;
         this.hasNext = hasNext;
     }
 
-    public static FetchFeedsResponse of(Slice<FetchFeedResponseV2> slice) {
+    public static FetchFeedsResponse of(Slice<FetchFeedResponse> slice) {
         return new FetchFeedsResponse(
                 slice.getContent(),
                 slice.getNumber(),

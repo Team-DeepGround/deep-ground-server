@@ -45,7 +45,7 @@ public class FeedLikeService {
         updateCountFeedLikeByFeedId(feedId);
     }
 
-    private int countFeedLikeByFeedId(Long feedId) {
+    public int countFeedLikeByFeedId(Long feedId) {
         return feedLikeRepository.countByFeedId(feedId);
     }
 

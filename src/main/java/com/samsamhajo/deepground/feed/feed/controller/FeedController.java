@@ -35,23 +35,8 @@ public class FeedController {
                 .ok(SuccessResponse.of(FeedSuccessCode.FEED_CREATED));
     }
 
-//    @GetMapping("/list")
-//    public ResponseEntity<SuccessResponse<com.samsamhajo.deepground.feed.feed.model.FetchFeedsResponse>> getFeeds(
-//            @AuthenticationPrincipal CustomUserDetails userDetails,
-//            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-//
-//        Long memberId = null;
-//        if (userDetails != null) {
-//            memberId = userDetails.getMember().getId();
-//        }
-//        com.samsamhajo.deepground.feed.feed.model.FetchFeedsResponse response = feedService.getFeeds(pageable, memberId);
-//
-//        return ResponseEntity
-//                .ok(SuccessResponse.of(FeedSuccessCode.FEED_LIST_FETCHED, response));
-//    }
-
     @GetMapping("/list")
-    public ResponseEntity<SuccessResponse<FetchFeedsResponse>> getFeedsV2(
+    public ResponseEntity<SuccessResponse<FetchFeedsResponse>> getFeeds(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
 
@@ -59,7 +44,7 @@ public class FeedController {
         if (userDetails != null) {
             memberId = userDetails.getMember().getId();
         }
-        FetchFeedsResponse response = feedService.getFeedsV2(pageable ,memberId);
+        FetchFeedsResponse response = feedService.getFeeds(pageable ,memberId);
 
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedSuccessCode.FEED_LIST_FETCHED, response));
@@ -92,7 +77,6 @@ public class FeedController {
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedSuccessCode.FEED_FETCHED, response));
     }
-
 
     @PutMapping(value = "/{feedId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse<Feed>> updateFeed(

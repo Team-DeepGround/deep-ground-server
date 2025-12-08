@@ -1,6 +1,7 @@
 package com.samsamhajo.deepground.feed.feed.model.v2;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -9,7 +10,8 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class FetchFeedResponseV2 {
+@NoArgsConstructor
+public class FetchFeedResponse {
 
     private UUID publicId;
     private UUID profilePublicId;
@@ -26,9 +28,9 @@ public class FetchFeedResponseV2 {
     private LocalDateTime createdAt;
     private List<String> mediaUrls;
 
-    private FetchFeedResponseV2(UUID publicId, UUID profilePublicId, Long feedId, String memberName,
-                                String content, int likeCount, int commentCount, int shareCount,
-                                String profileImageUrl, LocalDateTime createdAt){
+    private FetchFeedResponse(UUID publicId, UUID profilePublicId, Long feedId, String memberName,
+                              String content, int likeCount, int commentCount, int shareCount,
+                              String profileImageUrl, LocalDateTime createdAt){
         this.publicId = publicId;
         this.profilePublicId = profilePublicId;
         this.feedId = feedId;
@@ -41,9 +43,9 @@ public class FetchFeedResponseV2 {
         this.createdAt = createdAt;
     }
 
-    private FetchFeedResponseV2(UUID publicId, UUID profilePublicId, Long feedId, String memberName,
-                                String content, int likeCount, int commentCount, int shareCount,
-                                String profileImageUrl, LocalDateTime createdAt, List<String> mediaUrls){
+    private FetchFeedResponse(UUID publicId, UUID profilePublicId, Long feedId, String memberName,
+                              String content, int likeCount, int commentCount, int shareCount,
+                              String profileImageUrl, LocalDateTime createdAt, List<String> mediaUrls){
         this.publicId = publicId;
         this.profilePublicId = profilePublicId;
         this.feedId = feedId;
