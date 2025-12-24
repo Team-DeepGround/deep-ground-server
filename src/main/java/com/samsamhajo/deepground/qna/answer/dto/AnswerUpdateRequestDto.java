@@ -20,7 +20,6 @@ public class AnswerUpdateRequestDto {
     @NotBlank(message = "댓글 내용은 비어 있을 수 없습니다.")
     @Size(min = 1, message = "2글자 이상은 입력하셔야합니다.")
     private String answerContent;
-    private List<MultipartFile> mediaFiles = new ArrayList<>();
     private Long questionId;
     private Long answerId;
     private List<MultipartFile> images = new ArrayList<>();

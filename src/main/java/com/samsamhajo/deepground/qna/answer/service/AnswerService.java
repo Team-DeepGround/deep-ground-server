@@ -42,6 +42,14 @@ public class AnswerService {
     @Transactional
     public AnswerCreateResponseDto createAnswer(AnswerCreateRequestDto answerCreateRequestDto, Long memberId) {
 
+        /**
+         * DTO에 존재하는 Valid는 Controller딴에서 검증이 들어가므로 Mock테스트에서는 예외처리를 테스트 할 수 없어, Service코드에
+         * if문 추가하여 예외 메세지 검증을 위해 추가
+         */
+        if (answerCreateRequestDto.getAnswerContent() == null || answerCreateRequestDto.getAnswerContent().isBlank()) {
+            throw new AnswerException(AnswerErrorCode.ANSWER_CONTENT_REQUIRED);
+        }
+
         Member member = memberRepository.getReferenceById(memberId);
         Question question = commonValidation.QuestionValidation(answerCreateRequestDto.getQuestionId());
 
@@ -62,7 +70,7 @@ public class AnswerService {
                 QNANotificationData.answer(answer)
         ));
 
-        return AnswerCreateResponseDto.of(answer, mediaUrl);
+        return AnswerCreateResponseDto.of(saved, mediaUrl);
     }
 
     @Transactional

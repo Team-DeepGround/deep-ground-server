@@ -5,6 +5,8 @@ import com.samsamhajo.deepground.member.repository.MemberRepository;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerCreateResponseDto;
 import com.samsamhajo.deepground.qna.answer.dto.AnswerDetailDto;
 import com.samsamhajo.deepground.qna.answer.entity.Answer;
+import com.samsamhajo.deepground.qna.answer.exception.AnswerErrorCode;
+import com.samsamhajo.deepground.qna.answer.exception.AnswerException;
 import com.samsamhajo.deepground.qna.answer.repository.AnswerRepository;
 import com.samsamhajo.deepground.qna.answer.service.AnswerService;
 import com.samsamhajo.deepground.qna.question.Dto.*;
@@ -49,6 +51,15 @@ public class QuestionService{
     //Question 생성 메서드
     @Transactional
     public QuestionCreateResponseDto createQuestion(QuestionCreateRequestDto questionCreateRequestDto, Long memberId) {
+
+        if (questionCreateRequestDto.getTitle() == null || questionCreateRequestDto.getTitle().isBlank()) {
+            throw new QuestionException(QuestionErrorCode.QUESTION_TITLE_REQUIRED);
+        }
+
+        if (questionCreateRequestDto.getContent() == null || questionCreateRequestDto.getContent().isBlank()) {
+            throw new QuestionException(QuestionErrorCode.QUESTION_CONTENT_REQUIRED);
+        }
+
        Member member = commonValidation.MemberValidation(memberId);
 
         Question question = Question.of(
@@ -62,7 +73,7 @@ public class QuestionService{
         questionTagService.createQuestionTag(question, questionCreateRequestDto.getTechStacks());
 
         return QuestionCreateResponseDto.of(
-                question,
+                saved,
                 questionCreateRequestDto.getTechStacks(),
                 mediaUrl
         );
@@ -140,7 +151,7 @@ public class QuestionService{
         Member member = commonValidation.MemberValidation(memberId);
         Question question = commonValidation.QuestionValidation(questionId);
 
-        if(!member.getId().equals(memberId)) {
+        if(!question.getMember().getId().equals(memberId)) {
             throw new QuestionException(QuestionErrorCode.QUESTION_MEMBER_MISMATCH);
         } else { question.updateStatus(questionUpdateStatusRequestDto.getStatus());}
 
