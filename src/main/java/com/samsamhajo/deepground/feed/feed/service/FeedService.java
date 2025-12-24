@@ -1,24 +1,28 @@
 package com.samsamhajo.deepground.feed.feed.service;
 
 import com.samsamhajo.deepground.feed.feed.entity.Feed;
+import com.samsamhajo.deepground.feed.feed.entity.FeedMedia;
 import com.samsamhajo.deepground.feed.feed.exception.FeedErrorCode;
 import com.samsamhajo.deepground.feed.feed.exception.FeedException;
 import com.samsamhajo.deepground.feed.feed.model.*;
+import com.samsamhajo.deepground.feed.feed.model.v2.FetchFeedResponse;
+import com.samsamhajo.deepground.feed.feed.model.v2.FetchFeedsResponse;
+import com.samsamhajo.deepground.feed.feed.repository.FeedLikeRepository;
+import com.samsamhajo.deepground.feed.feed.repository.FeedMediaRepository;
 import com.samsamhajo.deepground.feed.feed.repository.FeedRepository;
 import com.samsamhajo.deepground.feed.feedcomment.service.FeedCommentService;
-import com.samsamhajo.deepground.feed.feedshared.model.FetchSharedFeedResponse;
-import com.samsamhajo.deepground.feed.feedshared.service.SharedFeedService;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.entity.MemberProfile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +33,8 @@ public class FeedService {
     private final FeedMediaService feedMediaService;
     private final FeedCommentService feedCommentService;
     private final FeedLikeService feedLikeService;
-    private final SharedFeedService sharedFeedService;
+    private final FeedMediaRepository feedMediaRepository;
+    private final FeedLikeRepository feedLikeRepository;
 
     @Transactional
     public Feed createFeed(FeedCreateRequest request, Member member) {
@@ -63,7 +68,7 @@ public class FeedService {
         return feed;
     }
 
-    public FetchFeedResponse getFeed(Long feedId, Long memberId) {
+    public com.samsamhajo.deepground.feed.feed.model.FetchFeedResponse getFeed(Long feedId, Long memberId) {
         Feed feed = feedRepository.getById(feedId);
 
         boolean isUserAuthenticated = (memberId != null);
@@ -79,7 +84,7 @@ public class FeedService {
             isLikedByCurrentUser = feedLikeService.isLiked(feed.getId(), memberId);
         }
 
-        return FetchFeedResponse.builder()
+        return com.samsamhajo.deepground.feed.feed.model.FetchFeedResponse.builder()
                 .feedId(feed.getId())
                 .content(feed.getContent())
                 .createdAt(feed.getCreatedAt().toLocalDate())
@@ -87,9 +92,9 @@ public class FeedService {
                 .profilePublicId(publicProfileId)
                 .memberName(feed.getMember().getNickname())
                 .mediaUrls(feedMediaService.findAllMediaUrlsByFeedId(feed.getId()))
-                .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId()))
-                .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))
-                .likeCount(feedLikeService.countFeedLikeByFeedId(feed.getId()))
+                .shareCount(feed.getCommentCount())
+                .commentCount(feed.getCommentCount())
+                .likeCount(feed.getLikeCount())
                 .isLiked(isLikedByCurrentUser)
                 .profileImageUrl(member.getMemberProfile().getProfileImage())
                 .build();
@@ -97,46 +102,30 @@ public class FeedService {
 
     public FetchFeedsResponse getFeeds(Pageable pageable, Long memberId) {
 
-        Page<Feed> feeds = feedRepository.findAll(pageable);
+        Slice<FetchFeedResponse> feedSlice = feedRepository.findFeeds(pageable);
+        List<FetchFeedResponse> feeds = feedSlice.getContent();
 
-        boolean isUserAuthenticated = (memberId != null);
+        List<Long> feedIds = feeds.stream().map(FetchFeedResponse::getFeedId).toList();
 
-        return FetchFeedsResponse.of(
-                feeds.getContent().stream()
-                        .map(feed -> {
+        Map<Long,List<String>> mediaMap = feedMediaRepository.findByFeedIdIn(feedIds)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        fm -> fm.getFeed().getId(),
+                        Collectors.mapping(FeedMedia::getMediaUrl, Collectors.toList())
+                ));
 
-                                    Member member = feed.getMember();
+        Set<Long> likedFeedIdSet = new HashSet<>();
+        if (memberId != null) {
+            List<Long> likes = feedLikeRepository.findLikedFeedIds(memberId, feedIds);
+            likedFeedIdSet.addAll(likes);
+        }
 
-                                    UUID profilePublicId = Optional.ofNullable(member.getMemberProfile())
-                                            .map(MemberProfile::getProfilePublicId)
-                                            .orElse(null);
+        feeds.forEach(f -> {
+            f.setMediaUrls(mediaMap.getOrDefault(f.getFeedId(), List.of()));
+            f.setLiked(likedFeedIdSet.contains(f.getFeedId()));
+        });
 
-                                    boolean isLikedByCurrentUser = false;
-                                    if (isUserAuthenticated) {
-                                        isLikedByCurrentUser = feedLikeService.isLiked(feed.getId(), memberId);
-                                    }
-
-                                    return FetchFeedResponse.builder()
-                                            .feedId(feed.getId())
-                                            .content(feed.getContent())
-                                            .createdAt(feed.getCreatedAt().toLocalDate())
-                                            .publicId(feed.getMember().getPublicId())
-                                            .profilePublicId(profilePublicId)
-                                            .memberName(feed.getMember().getNickname())
-                                            .mediaUrls(feedMediaService.findAllMediaUrlsByFeedId(feed.getId()))
-                                            .shareCount(sharedFeedService.countSharedFeedByOriginFeedId(feed.getId()))
-                                            .commentCount(feedCommentService.countFeedCommentsByFeedId(feed.getId()))
-                                            .likeCount(feedLikeService.countFeedLikeByFeedId(feed.getId()))
-                                            .isLiked(isLikedByCurrentUser)
-                                            .profileImageUrl(member.getMemberProfile().getProfileImage())
-                                            .build();
-                                }
-                        ).toList(),
-                feeds.getTotalElements(),
-                feeds.getNumber(),        // 현재 페이지 번호 (0부터 시작)
-                feeds.getSize(),          // 요청된 페이지 크기
-                feeds.getTotalPages()
-        );
+        return FetchFeedsResponse.of(feedSlice);
     }
 
     public FetchFeedSummariesResponse getFeedSummariesByMemberId(Pageable pageable, Long memberId) {
@@ -176,4 +165,5 @@ public class FeedService {
         feedLikeService.deleteAllByFeedId(feedId);
         feedMediaService.deleteAllByFeedId(feedId);
     }
+
 }

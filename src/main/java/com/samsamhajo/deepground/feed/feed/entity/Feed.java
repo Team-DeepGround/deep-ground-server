@@ -24,6 +24,15 @@ public class Feed extends BaseEntity {
     @Column(length = 4096, nullable = false)
     private String content;
 
+    @Column(name = "feed_comment_count" ,columnDefinition = "0")
+    private int commentCount;
+
+    @Column(name = "feed_like_count",columnDefinition = "0")
+    private int likeCount;
+
+    @Column(name = "feed_shared_count",columnDefinition = "0")
+    private int sharedCount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;

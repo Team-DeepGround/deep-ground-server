@@ -4,6 +4,7 @@ import com.samsamhajo.deepground.auth.security.CustomUserDetails;
 import com.samsamhajo.deepground.feed.feed.entity.Feed;
 import com.samsamhajo.deepground.feed.feed.exception.FeedSuccessCode;
 import com.samsamhajo.deepground.feed.feed.model.*;
+import com.samsamhajo.deepground.feed.feed.model.v2.FetchFeedsResponse;
 import com.samsamhajo.deepground.feed.feed.service.FeedService;
 import com.samsamhajo.deepground.global.success.SuccessResponse;
 import com.samsamhajo.deepground.global.utils.GlobalLogger;
@@ -37,13 +38,13 @@ public class FeedController {
     @GetMapping("/list")
     public ResponseEntity<SuccessResponse<FetchFeedsResponse>> getFeeds(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
 
         Long memberId = null;
         if (userDetails != null) {
             memberId = userDetails.getMember().getId();
         }
-        FetchFeedsResponse response = feedService.getFeeds(pageable, memberId);
+        FetchFeedsResponse response = feedService.getFeeds(pageable ,memberId);
 
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedSuccessCode.FEED_LIST_FETCHED, response));
@@ -76,7 +77,6 @@ public class FeedController {
         return ResponseEntity
                 .ok(SuccessResponse.of(FeedSuccessCode.FEED_FETCHED, response));
     }
-
 
     @PutMapping(value = "/{feedId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse<Feed>> updateFeed(

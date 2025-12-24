@@ -5,20 +5,23 @@ import com.samsamhajo.deepground.feed.feed.exception.FeedErrorCode;
 import com.samsamhajo.deepground.feed.feed.exception.FeedException;
 import com.samsamhajo.deepground.feed.feed.model.FeedCreateRequest;
 import com.samsamhajo.deepground.feed.feed.model.FeedUpdateRequest;
-import com.samsamhajo.deepground.feed.feed.model.FetchFeedsResponse;
+import com.samsamhajo.deepground.feed.feed.model.v2.FetchFeedResponse;
+import com.samsamhajo.deepground.feed.feed.model.v2.FetchFeedsResponse;
+import com.samsamhajo.deepground.feed.feed.repository.FeedLikeRepository;
+import com.samsamhajo.deepground.feed.feed.repository.FeedMediaRepository;
 import com.samsamhajo.deepground.feed.feed.repository.FeedRepository;
 import com.samsamhajo.deepground.feed.feedcomment.service.FeedCommentService;
-import com.samsamhajo.deepground.feed.feedshared.model.FetchSharedFeedResponse;
 import com.samsamhajo.deepground.feed.feedshared.service.SharedFeedService;
 import com.samsamhajo.deepground.member.entity.Member;
 import com.samsamhajo.deepground.member.entity.MemberProfile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
@@ -30,34 +33,28 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class FeedServiceTest {
 
+    @Mock
     private FeedRepository feedRepository;
+    @Mock
     private FeedMediaService feedMediaService;
+    @Mock
+    private FeedMediaRepository feedMediaRepository;
+    @Mock
     private FeedCommentService feedCommentService;
+    @Mock
     private FeedLikeService feedLikeService;
-    private SharedFeedService sharedFeedService;
+
+    @InjectMocks
     private FeedService feedService;
+
 
     private static final String TEST_CONTENT = "테스트 피드 내용입니다.";
     private static final String TEST_EMAIL = "test@example.com";
     private static final String TEST_PASSWORD = "password123";
     private static final String TEST_NICKNAME = "테스트유저";
-
-    @BeforeEach
-    void setUp() {
-        feedRepository = mock(FeedRepository.class);
-        feedMediaService = mock(FeedMediaService.class);
-        feedCommentService = mock(FeedCommentService.class);
-        feedLikeService = mock(FeedLikeService.class);
-        sharedFeedService = mock(SharedFeedService.class);
-        feedService = new FeedService(
-                feedRepository,
-                feedMediaService,
-                feedCommentService,
-                feedLikeService, sharedFeedService
-        );
-    }
 
     @Test
     @DisplayName("피드 생성 성공")
@@ -119,8 +116,6 @@ class FeedServiceTest {
         Feed existingFeed = Feed.of(TEST_CONTENT, testMember);
         FeedUpdateRequest updateRequest = new FeedUpdateRequest("", List.of());
 
-        when(feedRepository.findById(existingFeed.getId())).thenReturn(Optional.of(existingFeed));
-
         // when & then
         assertThatThrownBy(() -> feedService.updateFeed(existingFeed.getId(), updateRequest, testMember.getId()))
                 .isInstanceOf(FeedException.class)
@@ -148,23 +143,21 @@ class FeedServiceTest {
         // 필요 시 profileId 세팅
         ReflectionTestUtils.setField(profile, "profileId", 10L);
 
-        Feed feed1 = Feed.of("피드1", testMember);
-        Feed feed2 = Feed.of("피드2", testMember);
+        FetchFeedResponse dto1 = new FetchFeedResponse();
+        dto1.setFeedId(100L);
+        dto1.setContent("피드1");
+        dto1.setMemberName(TEST_NICKNAME); // "테스트유저" 직접 주입!
+        dto1.setShareCount(0);
 
-        ReflectionTestUtils.setField(testMember, "id", 1L);
-        ReflectionTestUtils.setField(feed1, "id", 1L);
-        ReflectionTestUtils.setField(feed2, "id", 2L);
-        ReflectionTestUtils.setField(feed1, "createdAt", java.time.LocalDateTime.now());
-        ReflectionTestUtils.setField(feed2, "createdAt", java.time.LocalDateTime.now());
+        FetchFeedResponse dto2 = new FetchFeedResponse();
+        dto2.setFeedId(101L);
+        dto2.setContent("피드2");
+        dto2.setMemberName(TEST_NICKNAME); // "테스트유저" 직접 주입!
+        dto2.setShareCount(0);
 
-        Page<Feed> feedPage = new PageImpl<>(List.of(feed2, feed1));
+        Slice<FetchFeedResponse> feedSlice = new SliceImpl<>(List.of(dto2, dto1));
 
-        when(feedRepository.findAll(any(Pageable.class))).thenReturn(feedPage);
-        when(feedMediaService.findAllMediaUrlsByFeedId(anyLong())).thenReturn(List.of());
-        when(feedCommentService.countFeedCommentsByFeedId(anyLong())).thenReturn(0);
-        when(feedLikeService.countFeedLikeByFeedId(anyLong())).thenReturn(0);
-        when(feedLikeService.isLiked(anyLong(), anyLong())).thenReturn(false);
-        when(sharedFeedService.countSharedFeedByOriginFeedId(anyLong())).thenReturn(0);
+        when(feedRepository.findFeeds(any(Pageable.class))).thenReturn(feedSlice);
 
         // when
         FetchFeedsResponse result = feedService.getFeeds(PageRequest.of(0, 10), testMember.getId());
@@ -175,61 +168,7 @@ class FeedServiceTest {
         assertThat(result.getFeeds().get(1).getContent()).isEqualTo("피드1");
         assertThat(result.getFeeds().get(0).getMemberName()).isEqualTo(TEST_NICKNAME);
         assertThat(result.getFeeds().get(1).getMemberName()).isEqualTo(TEST_NICKNAME);
-
-        assertThat(result.getFeeds().get(0).getShareCount()).isEqualTo(0);
-        assertThat(result.getFeeds().get(1).getShareCount()).isEqualTo(0);
-        assertThat(result.getFeeds().get(0).isShared()).isFalse();
-        assertThat(result.getFeeds().get(1).isShared()).isFalse();
-        assertThat(result.getFeeds().get(0).getSharedFeed()).isNull();
-        assertThat(result.getFeeds().get(1).getSharedFeed()).isNull();
     }
-
-
-    @Test
-    @DisplayName("피드 목록 조회 성공")
-    void getFeedsSuccessWithSharedFeed() {
-        // given
-        Member testMember = Member.createLocalMember(TEST_EMAIL, TEST_PASSWORD, TEST_NICKNAME);
-
-        // 🔸 프로필 생성 & 멤버에 연결
-        MemberProfile profile = MemberProfile.create(
-                null, testMember, "소개", "직업", "회사", "서울", "학력",
-                new ArrayList<>(), null, null, null, null
-        );
-        ReflectionTestUtils.setField(profile, "profileId", 10L);
-
-        Feed feed1 = Feed.of("피드1", testMember);
-        Feed feed2 = Feed.of("피드2", testMember);
-
-        ReflectionTestUtils.setField(testMember, "id", 1L);
-        ReflectionTestUtils.setField(feed1, "id", 1L);
-        ReflectionTestUtils.setField(feed2, "id", 2L);
-        ReflectionTestUtils.setField(feed1, "createdAt", java.time.LocalDateTime.now());
-        ReflectionTestUtils.setField(feed2, "createdAt", java.time.LocalDateTime.now());
-
-        Page<Feed> feedPage = new PageImpl<>(List.of(feed2, feed1));
-
-        when(feedRepository.findAll(any(Pageable.class))).thenReturn(feedPage);
-        when(feedMediaService.findAllMediaUrlsByFeedId(anyLong())).thenReturn(List.of());
-        when(feedCommentService.countFeedCommentsByFeedId(anyLong())).thenReturn(0);
-        when(feedLikeService.countFeedLikeByFeedId(anyLong())).thenReturn(0);
-        when(feedLikeService.isLiked(anyLong(), anyLong())).thenReturn(false);
-        when(sharedFeedService.countSharedFeedByOriginFeedId(1L)).thenReturn(5);
-        when(sharedFeedService.countSharedFeedByOriginFeedId(2L)).thenReturn(0);
-
-        // when
-        FetchFeedsResponse result = feedService.getFeeds(PageRequest.of(0, 10), testMember.getId());
-
-        // then
-        assertThat(result.getFeeds()).hasSize(2);
-        assertThat(result.getFeeds().get(0).getContent()).isEqualTo("피드2");
-        assertThat(result.getFeeds().get(1).getContent()).isEqualTo("피드1");
-
-        assertThat(result.getFeeds().get(0).getShareCount()).isEqualTo(0);
-        assertThat(result.getFeeds().get(1).getShareCount()).isEqualTo(5);
-        assertThat(result.getFeeds().get(0).getSharedFeed()).isNull();
-    }
-
 
     @Test
     @DisplayName("피드 삭제 성공")
@@ -237,8 +176,6 @@ class FeedServiceTest {
         // given
         Member testMember = Member.createLocalMember(TEST_EMAIL, TEST_PASSWORD, TEST_NICKNAME);
         Feed existingFeed = Feed.of(TEST_CONTENT, testMember);
-
-        when(feedRepository.getById(existingFeed.getId())).thenReturn(existingFeed);
 
         // when
         feedService.deleteFeed(existingFeed.getId());
