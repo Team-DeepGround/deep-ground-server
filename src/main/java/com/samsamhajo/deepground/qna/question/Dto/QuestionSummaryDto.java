@@ -32,7 +32,7 @@ public class QuestionSummaryDto {
         return new QuestionSummaryDto(q.getId(), q.getTitle(), member, q.getQuestionStatus(), techStacks, answerCount, q.getCreatedAt().toLocalDate(), mediaUrl, imageUrl);
     }
 
-    public QuestionSummaryDto(Long questionId, String title, Member member , QuestionStatus questionStatus , List<String> techStacks, int answerCount, LocalDate createdAt, List<String> mediaUrl, String imageUrl) {
+    public QuestionSummaryDto(Long questionId, String title, Member member, QuestionStatus questionStatus, List<String> techStacks, int answerCount, LocalDate createdAt, List<String> mediaUrl, String imageUrl) {
         this.questionId = questionId;
         this.title = title;
         this.publicId = member.getPublicId();

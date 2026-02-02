@@ -14,7 +14,6 @@ import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class QuestionCreateRequestDto {
 

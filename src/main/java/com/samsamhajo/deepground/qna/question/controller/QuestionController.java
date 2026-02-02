@@ -39,11 +39,9 @@ public class QuestionController {
         QuestionCreateResponseDto questionCreateResponseDto = questionService.createQuestion(questionRequestDto, customUserDetails.getMember().getId());
         GlobalLogger.info("질문 생성 = {}",  questionCreateResponseDto.getQuestionId(), "멤버ID= {}", customUserDetails.getMember().getId());
 
-
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(SuccessResponse.of(QuestionSuccessCode.QUESTION_CREATED, questionCreateResponseDto));
-
     }
 
     @PutMapping(value = "/{questionId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
