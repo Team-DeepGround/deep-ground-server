@@ -48,27 +48,19 @@ public class QuestionService{
 
     //Question 생성 메서드
     @Transactional
-    /**
-     * public QuestionCreateResponseDTO createQuestion(QuestionCreateRequestDto questionCreateRequestDto, Long memberId) ->
-     * QuestionCreateRequestDto와 memberId를 받아서 QuestionCreateResponseDto로 반환해주는 createQuestion 즉 질문을 생성해주는 함수입니다. 라고 말하고 있는 것이다.
-     */
     public QuestionCreateResponseDto createQuestion(QuestionCreateRequestDto questionCreateRequestDto, Long memberId) {
-        // member 검증 로직
        Member member = commonValidation.MemberValidation(memberId);
 
-       // 질문이라는 객체를 만들건데 아까 우리가 받았던 questionCreateRequestDto에 담긴 제목과 내용, 작성자로 질문이라는 객체를 만들어주세요!
         Question question = Question.of(
                 questionCreateRequestDto.getTitle(),
                 questionCreateRequestDto.getContent(),
                 member
         );
 
-        // Question saved = Question이라는 객체를 saved라는 변수로 활용하기 위해서 questionRepository (즉 질문DB에 저장해주세요)
         Question saved = questionRepository.save(question);
         List<String> mediaUrl = createQuestionMedia(questionCreateRequestDto, question);
         questionTagService.createQuestionTag(question, questionCreateRequestDto.getTechStacks());
 
-        // QuestionCreateResponseDto을 saved(즉 우리가 저장한 Question(질문)으로 조립해서 반환해주세요!)
         return QuestionCreateResponseDto.of(
                 saved,
                 questionCreateRequestDto.getTechStacks(),

@@ -32,11 +32,6 @@ public class CommonValidation {
     private final AnswerLikeRepository answerLikeRepository;
 
     //Member 공통 Validation 코드
-
-    /**
-     * 즉 member라는 객체를 하나 만들건데 memberRepository.findById(우리가 controller에서 받았던 memberId로 DB에서 회원을 찾았을 때
-     * 없다면 ? MEMBER_NOT_FOUND라는 에러를 발생해주세요! 즉 회원가입이 된 회원인지 아닌지 검증을 하는 로직이다.
-     */
     public Member MemberValidation(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
