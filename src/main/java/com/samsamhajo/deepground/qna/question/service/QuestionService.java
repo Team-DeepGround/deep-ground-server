@@ -62,7 +62,7 @@ public class QuestionService{
         questionTagService.createQuestionTag(question, questionCreateRequestDto.getTechStacks());
 
         return QuestionCreateResponseDto.of(
-                question,
+                saved,
                 questionCreateRequestDto.getTechStacks(),
                 mediaUrl
         );
@@ -154,23 +154,16 @@ public class QuestionService{
     //Question 리스트 조회 메서드
     @Transactional(readOnly = true)
     public QuestionListResponseDto getQuestions(Pageable pageable) {
-        Page<Question> questionPage = questionRepository.findAllByDeletedFalse(pageable);
 
-        List<QuestionSummaryDto> summaries = questionPage.stream()
-                .map(question -> {
-                    Member member = commonValidation.MemberValidation(question.getMember().getId());
-                    List<String> teckStacks = tagService.getStackNamesByQuestionId(question.getId());
-                    int answerCount = answerService.countAnswersByQuestionId(question.getId());
+        Page<QuestionSummaryDto> page =
+                questionRepository.findQuestionSummaries(pageable);
 
-                    List<String> mediaUrl = questionMediaRepository.findAllByQuestionId(question.getId()).stream()
-                            .map(QuestionMedia::getMediaUrl)
-                            .toList();
-
-                    return QuestionSummaryDto.of(question, teckStacks, answerCount, mediaUrl, member);
-                }).toList();
-
-        return QuestionListResponseDto.of(summaries, questionPage.getTotalPages());
+        return QuestionListResponseDto.of(
+                page.getContent(),
+                page.getTotalPages()
+        );
     }
+
 
     //Question 상세 조회 메서드
     @Transactional(readOnly = true)
